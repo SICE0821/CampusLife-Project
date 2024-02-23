@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 const Register = () => {
   const navigation = useNavigation(); 
@@ -9,13 +10,11 @@ const Register = () => {
   const [userpass, setUserpass] = useState('');
   const [userconfirmpass, setUserconfirmpass] = useState('');
 
-  const SignSuccess = ({ navigation}: any) => {
-
+  const SignSuccess = () => {
     console.log("로그인 성공");
     navigation.navigate("로그인");
   }
   
-
   return (
     <View style={styles.container}>
       <Image style={styles.Img} source={require('./assets/logoImg.png')}/>
@@ -62,7 +61,9 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
+    padding : 30,
   },
+
   Img :{
     width : 80,
     height : 56,
@@ -70,6 +71,15 @@ const styles = StyleSheet.create({
     marginBottom : 30,
   },
 
+  ContainerBox:{
+    flexDirection: 'row',
+    width : 31,
+    paddingBottom : 20,
+  },    
+
+  Checkbox:{
+    paddingLeft : 25,
+  },
   input :{
     width : 300,
     height : 45,
@@ -88,9 +98,9 @@ const styles = StyleSheet.create({
     borderRadius:5,
     borderColor:'gray',
     alignItems : 'center',
-    paddingTop: 12,
+    paddingTop: 8,
     fontWeight : 'bold',
-    margin: 15, 
+    margin: 20, 
   }
 });
 

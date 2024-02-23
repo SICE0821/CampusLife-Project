@@ -11,7 +11,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Register from './Register.tsx'
 import 'react-native-gesture-handler';
-import CheckBox from 'react-native-check-box';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 const Stack = createStackNavigator();
 
@@ -69,13 +69,30 @@ function LoginScreen({ navigation}: any) {
         onChangeText={(text) => setPassword(text)}
       />
 
-    <CheckBox
-      isChecked={isChecked}
-      onClick={() => setIsChecked(!isChecked)}
-      rightText="아이디 저장"
-      rightTextStyle={{fontSize : 19, color : 'black' , fontWeight : 'bold'}}
-    />
+    <View style={styles.ContainerBox}>
+      <BouncyCheckbox
+        style={styles.Checkbox}
+        size={25}
+        fillColor="black"
+        unfillColor="#FFFFFF"
+        text="아이디 저장"
+        iconStyle={{ borderColor: "black" }}
+        textStyle={{ fontFamily: "JosefinSans-Regular", textDecorationLine: "none", }}
+        onPress={(isChecked: boolean) => {}}
+      />
 
+      <BouncyCheckbox
+        style={styles.Checkbox}
+        size={25}
+        fillColor="black"
+        unfillColor="#FFFFFF"
+        text="자동 로그인"
+        iconStyle={{ borderColor: "black" }}
+        textStyle={{ fontFamily: "JosefinSans-Regular", textDecorationLine: "none", }}
+        onPress={(isChecked: boolean) => {}}
+      />
+    </View>
+    
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
@@ -99,7 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFDECF',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'flex',
   },
 
   logo: {
@@ -127,11 +144,14 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 
-  checkboxesContainer: {
+  ContainerBox: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // 간격 조절을 위한 스타일
-    width: 300,
+    width : 317,
     marginTop: 15,
+  },
+
+  Checkbox:{
+    paddingLeft: 25, 
   },
 
   loginButton: {
