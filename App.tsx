@@ -27,6 +27,7 @@ import IconH from 'react-native-vector-icons/Foundation';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
+console.log(windowWidth);
 
 function App(): React.JSX.Element {
   return (
@@ -355,8 +356,10 @@ const styles = StyleSheet.create({
 
   
   noticecontainer : {
-    height : windowHeight -550,
-   //backgroundColor : 'green',
+    height : windowHeight -1000,
+    marginTop : -20,
+    marginBottom : 15,
+    //backgroundColor : 'green',
   },
 
   noticeheader : {
@@ -381,7 +384,7 @@ const styles = StyleSheet.create({
   },
 
   textborder : {
-    flex : 1,
+    flex : 0.5,
     marginTop : 1,
     marginBottom : 10,
     marginLeft : 10,
