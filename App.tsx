@@ -24,6 +24,8 @@ import IconE from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Fontisto';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
+import { NavigationContainer } from '@react-navigation/native';
+import Tabs from "./BottomTab";
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -266,6 +268,10 @@ function App(): React.JSX.Element {
         </View>    
 
       </ScrollView>
+
+      <NavigationContainer>
+          <Tabs />
+      </NavigationContainer>
     </View>
   );
 }
