@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const Search = () => {
+const Search = ({ navigation}: any) => {
   const [email, setEmail] = useState('');
   const [studentId, setStudentId] = useState('');
   const [id, setId] = useState('');
@@ -34,6 +34,10 @@ const Search = () => {
     setIsPassconfirmPressed(true);
     setIsIdconfirmPressed(false);
   };
+
+  const returnApp = () => {
+    navigation.navigate('로그인')
+  }
 
   return(
       <View style={styles.container}>
@@ -98,12 +102,23 @@ const Search = () => {
               </View>
           ) : null}
 
-          {isIdconfirmPressed && (
-              <Text style={styles.SearchText3}>아이디를 찾았습니다.</Text>
-          )}
+      {isIdconfirmPressed && (
+        <View>
+          <Text style={styles.SearchText3}>아이디를 찾았습니다.</Text>
+          <TouchableOpacity style={styles.confirmBtn} onPress={returnApp}>
+            <Text style={styles.SearchText3}>확인</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
 
           {isPassconfirmPressed && (
+            <View>
               <Text style={styles.SearchText3}>비밀번호를 찾았습니다.</Text>
+              <TouchableOpacity style={styles.confirmBtn} onPress={returnApp}>
+                <Text style={styles.SearchText3}>확인</Text>
+              </TouchableOpacity>
+            </View>
           )}
       </View>
   )
