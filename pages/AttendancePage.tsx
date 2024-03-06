@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, Button } from 'react-native';
 
-const TimetablePage = ({ navigation }) => {
+const AttendancePage : React.FC = () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>TimetablePage</Text>
+      <Text>AttendancePage</Text>
     </View>
   );
 };
 
-export default TimetablePage;
+export default AttendancePage;
