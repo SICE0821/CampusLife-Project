@@ -5,8 +5,10 @@ import {
   Text,
   View,
   Dimensions,
-  SafeAreaView,
+  Image,
 } from 'react-native';
+import Swiper from 'react-native-swiper';
+
 import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
@@ -15,10 +17,16 @@ import IconE from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Fontisto';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
+
+const attendancepng = require('../assets/attendanceevent.png');
+const friendsinvitepng = require('../assets/friendsinvite.png');
+const volunteerpng = require('../assets/volunteer.png');
+
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-const MainPage = ({ navigation }) => {
+const MainPage = () => {
   return (
     <View style = {styles.container}>
       <ScrollView>
@@ -67,12 +75,50 @@ const MainPage = ({ navigation }) => {
               </View>
             </View>
         </View>
+        <View style = {styles.eventcontainer}>
+          <View style = {styles.eventhearder}> 
+            <Text style = {styles.eventheadertext}>이벤트</Text>
+            <Text style = {{marginTop : 1, marginLeft : 5, color : "#FFC700"}}><IconF name = "ticket" size = {23}/></Text>
+          </View>
+          <Swiper loop = {true}>
+            <View style = {styles.eventbox}>
+              <View style = {styles.eventpicture}>
+                <Image style = {{width : 300, height : 250}}
+                        source = {attendancepng}/>
+                </View>
+              <View style = {styles.eventtext}>
+                <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>출석체크 이벤트!</Text>
+                <Text style = {{marginLeft : 10,}}>앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!</Text>
+              </View>
+            </View>
+            <View style = {styles.eventbox}>
+              <View style = {styles.eventpicture}>
+                <Image style = {{width : 270, height : 250}}
+                        source = {friendsinvitepng}/>
+                </View>
+              <View style = {styles.eventtext}>
+                <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>친구코드 이벤트!</Text>
+                <Text style = {{marginLeft : 10,}}>친구에게 나의 코드를 보낼시에 포인트를 제공해 드립니다!</Text>
+              </View>
+            </View>
+            <View style = {styles.eventbox}>
+              <View style = {styles.eventpicture}>
+                <Image style = {{width : 340, height : 250}}
+                        source = {volunteerpng}/>
+                </View>
+              <View style = {styles.eventtext}>
+                <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>봉사활동 이벤트!</Text>
+                <Text style = {{marginLeft : 10,}}>봉사활동을 하고 인증해주시면 포인트를 제공해 드립니다!</Text>
+              </View>
+            </View>
+          </Swiper>
+          </View>
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학교 공지사항</Text>
-            <Text style = {{marginTop : 10, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {23}/></Text>
-            <Text style = {{marginLeft : 180, marginTop : 17}}>더보기</Text>
-            <Text style = {{marginTop : 17}}><IconB name = {"caretright"}/></Text>
+            <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {23}/></Text>
+            <Text style = {{marginLeft : 160, marginTop : 25}}>더보기</Text>
+            <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
             <View style = {styles.textborder}>
@@ -82,7 +128,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -91,7 +137,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>학교 축제 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -100,7 +146,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>총학생회장 선거 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -109,7 +155,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>학교 식당 폐업 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -118,21 +164,19 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>졸업식 연기 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
-
-
             </View>
           </View>
         </View>
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학사 공지사항</Text>
-            <Text style = {{marginTop : 10, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {23}/></Text>
-            <Text style = {{marginLeft : 180, marginTop : 17}}>더보기</Text>
-            <Text style = {{marginTop : 17}}><IconB name = {"caretright"}/></Text>
+            <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {23}/></Text>
+            <Text style = {{marginLeft : 160, marginTop : 25}}>더보기</Text>
+            <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
             <View style = {styles.textborder}>
@@ -142,7 +186,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -151,7 +195,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>학교 축제 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -160,7 +204,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>총학생회장 선거 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -169,7 +213,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>학교 식당 폐업 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -178,7 +222,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>졸업식 연기 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
                 </View>
               </View>
@@ -188,9 +232,9 @@ const MainPage = ({ navigation }) => {
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>인기글</Text>
-            <Text style = {{marginTop : 10, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {23}/></Text>
-            <Text style = {{marginLeft : 240,marginTop : 17}}>더보기</Text>
-            <Text style = {{marginTop : 17}}><IconB name = {"caretright"}/></Text>
+            <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {23}/></Text>
+            <Text style = {{marginLeft : 220, marginTop : 25}}>더보기</Text>
+            <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
             <View style = {styles.textborder}>
@@ -200,7 +244,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
@@ -211,7 +255,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>학교 축제 안내</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
@@ -222,7 +266,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>총학생회장 선거 안내</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
@@ -233,7 +277,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>학교 식당 폐업 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
@@ -244,7 +288,7 @@ const MainPage = ({ navigation }) => {
                   <Text style = {styles.M}>졸업식 연기 안내</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
@@ -279,6 +323,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'black',
+    
   },
 
   cardtop : {
@@ -345,10 +390,12 @@ const styles = StyleSheet.create({
 
   
   noticecontainer : {
-    height : windowHeight -1000,
+    height : windowHeight -500,
     marginTop : -20,
     marginBottom : 15,
     //backgroundColor : 'green',
+    marginLeft : 15,
+    marginRight : 15,
   },
 
   noticeheader : {
@@ -359,7 +406,7 @@ const styles = StyleSheet.create({
   },
   noticeheadertext : {
     fontSize : 20,
-    marginTop : 10,
+    marginTop : 15,
     marginLeft : 15,
     color : 'black',
   },
@@ -368,12 +415,13 @@ const styles = StyleSheet.create({
     //justifyContent : 'center',
     //alignItems : 'center',
     flex : 0.85,
-    
     //backgroundColor : "blue"
+    elevation: 20,
+    
   },
 
   textborder : {
-    flex : 0.5,
+    flex : 1,
     marginTop : 1,
     marginBottom : 10,
     marginLeft : 10,
@@ -381,6 +429,8 @@ const styles = StyleSheet.create({
     //backgroundColor : 'green',
     borderRadius : 15,
     borderWidth : 2,
+
+    
   },
 
   onebox : {
@@ -420,11 +470,64 @@ const styles = StyleSheet.create({
   },
 
   M : {
-    marginLeft : 10,
+    marginLeft : 15,
     fontSize : 17,
     color : 'black',
   },
 
+  eventcontainer : {
+    height : windowHeight -400,
+    //backgroundColor : 'green',
+  
+  },
+
+  eventheadertext : {
+    fontSize : 20,
+    marginLeft : 20,
+    color : 'black',
+    backgroundColor : 'white',
+  },
+
+  eventbox : {
+    flex  : 1,
+    //backgroundColor : 'red',
+    margin : 20,
+    marginTop : 4,
+    borderRadius : 20,
+    borderWidth : 2,
+  },
+
+  eventpicture : {
+    flex : 0.75,
+    borderTopLeftRadius : 20,
+    borderTopRightRadius : 20,
+    borderBottomWidth : 2,
+    backgroundColor : 'white',
+    justifyContent : 'center',
+    alignItems : 'center',
+    shadowOffset: {
+      width: 0,
+      height: 2, // 그림자의 세로 방향 오프셋
+    },
+    shadowOpacity: 0.2, // 그림자의 투명도
+    shadowRadius: 4, // 그림자의 반경
+    elevation: 5, // 안드로이드에서 그림자를 사용할 때 필요한 속성
+  },
+
+  eventtext : {
+    //backgroundColor : 'green',
+    flex : 0.25,
+    borderBottomLeftRadius : 20,
+    borderBottomRightRadius : 20,
+  },
+
+  eventhearder : {
+    flex : 0.08,
+    //backgroundColor : 'red',
+    flexDirection : 'row',
+  }
+
 });
 
 export default MainPage;
+
