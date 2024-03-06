@@ -10,6 +10,7 @@ StatusBar,
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import Register from './Register.tsx'
+import Search from './Search.tsx'
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
@@ -18,10 +19,10 @@ const Stack = createStackNavigator();
 function App(): React.JSX.Element {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-          screenOptions={{headerShown: false,}}>
+      <Stack.Navigator screenOptions={{headerShown: false,}}>
         <Stack.Screen name="로그인" component={LoginScreen}/>
         <Stack.Screen name="회원가입" component={Register} />
+        <Stack.Screen name="찾기" component={Search} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -43,6 +44,10 @@ function LoginScreen({ navigation}: any) {
 
   const navigateToRegister = () => {
     navigation.navigate('회원가입');
+  };
+
+  const navigateToSearch = () => {
+    navigation.navigate('찾기')
   };
 
   return (
@@ -89,7 +94,7 @@ function LoginScreen({ navigation}: any) {
         text="자동 로그인"
         iconStyle={{ borderColor: "black" }}
         textStyle={{ fontFamily: "JosefinSans-Regular", textDecorationLine: "none", }}
-        onPress={(isChecked: boolean) => {}}
+        onPress={(isCheckedAutoLogin: boolean) => {}}
       />
     </View>
     
@@ -97,12 +102,12 @@ function LoginScreen({ navigation}: any) {
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={navigateToSearch}>
         <Text style={styles.loginlinkText}>아이디, 비밀번호 찾기</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={navigateToRegister}>
-        <Text style={styles.loginlinkText}>앱을 처음 이 용하시나요? 클릭하세요!</Text>
+        <Text style={styles.loginlinkText}>앱을 처음 이용하시나요? 클릭하세요!</Text>
       </TouchableOpacity>
 
       <StatusBar/>
@@ -116,7 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFDECF',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'flex',
+    justifyContent: 'flex-start',
   },
 
   logo: {

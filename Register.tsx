@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import firestore from '@react-native-firebase/firestore'
+import {signIn, signUp} from './lib/auth'
+import {createUser} from './lib/user'
 
 const Register = () => {
   const navigation = useNavigation(); 
@@ -10,10 +13,20 @@ const Register = () => {
   const [userpass, setUserpass] = useState('');
   const [userconfirmpass, setUserconfirmpass] = useState('');
 
-  const SignSuccess = () => {
-    console.log("로그인 성공");
-    navigation.navigate("로그인");
-  }
+  const SignSuccess = async () => {
+    try{
+      await createUser({
+        username,
+        userpass,
+        usernickname,
+      })
+      Alert.alert('회원가입 성공');
+      navigation.navigate('로그인');
+    }catch(error){
+      Alert.alert('회원가입 실패');
+    }
+}
+
   
   return (
     <View style={styles.container}>
