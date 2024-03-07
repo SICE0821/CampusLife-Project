@@ -4,15 +4,16 @@
  *
  * @format
  */
+import { NavigationContainer } from '@react-navigation/native';
 import BottomNavigation from './pages/BottomTabNavigation';
 import React from 'react';
 import { StyleSheet, View,} from 'react-native';
 
 function App(): React.JSX.Element {
   return (
-    <View style = {styles.container}>
+      <NavigationContainer>
         <BottomNavigation/>
-    </View>
+      </NavigationContainer>
   );
 }
 
