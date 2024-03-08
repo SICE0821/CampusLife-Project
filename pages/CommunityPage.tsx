@@ -1,31 +1,28 @@
 import React from 'react';
-import { View, Text, StyleSheet, } from 'react-native';
-import Swiper from 'react-native-swiper';
+import { View, StyleSheet, Button } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+
+export type RootStackParam = {
+  CoummunityPage : undefined;
+  CoummunityDetailPage : undefined;
+}
 
 const CommunityPage = () => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParam>>();
   return (
     <View style = {styles.container}>
-      <Swiper>
-        <View>
-          <Text>안녕하세요</Text>
-        </View>
-        <View>
-          <Text>반갑습니다.</Text>
-        </View>
-        <View>
-          <Text>반갑습니다.</Text>
-        </View>
-      </Swiper>
-    </View>
+      <Button title="클릭하세요" onPress={() => navigation.navigate('CoummunityDetailPage')} />
+    </View> 
   );
 };
 
 
 const styles = StyleSheet.create({
   container : {
-    flex : 0.5,
-    backgroundColor : 'red',
-    
+    flex : 1,
+    justifyContent : 'center',
+    alignItems : 'center',
   }
 })
 

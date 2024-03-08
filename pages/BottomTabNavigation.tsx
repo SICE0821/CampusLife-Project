@@ -5,11 +5,12 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import MainPage from './MainPage';
-import CoummunityPage from './CommunityPage';
-import EventPage from './EventPage';
-import AttendancePage from './AttendancePage';
-import TimetablePage from './TimetablePage';
+import {MainPageStackNavigator} from './StackNavigation';
+import {CoummunityStackNavigator} from './StackNavigation';
+import {EventStackNavigator} from './StackNavigation';
+import {AttendanceStackNavigator} from './StackNavigation';
+import {TimetableStackNavigator} from './StackNavigation';
+
 
 import IconA from 'react-native-vector-icons/Entypo';
 import IconB from 'react-native-vector-icons/Fontisto';
@@ -21,18 +22,22 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const BackButton = () => {
+<<<<<<< HEAD
   const navigation = useNavigation();
   return (
     <TouchableOpacity style={{ backgroundColor: 'blue' }} onPress={() => navigation.goBack}>
+=======
+  const navigation = useNavigation()
+  return (
+    <TouchableOpacity onPress={() => navigation.goBack()}>
+>>>>>>> dab0bd2b3f735bb6138ec8b48cab415005308566
         <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
     </TouchableOpacity>
   );
 }
 
   function BottomTabNavigationApp() {
-
     return (
-      <NavigationContainer>
         <Tab.Navigator
           screenOptions={{
             tabBarStyle: {
@@ -47,8 +52,13 @@ const BackButton = () => {
             tabBarActiveTintColor: 'black',
           }}>
           <Tab.Screen
+<<<<<<< HEAD
             name="MainPage"
             component={MainPage}
+=======
+            name="MainPageStackNavigator"
+            component={MainPageStackNavigator}
+>>>>>>> dab0bd2b3f735bb6138ec8b48cab415005308566
             options={{
               title: '홈',
               headerShown: false,
@@ -62,8 +72,13 @@ const BackButton = () => {
             }}
           />
           <Tab.Screen
+<<<<<<< HEAD
             name="CoummunityPage"
             component={CoummunityPage}
+=======
+            name="CoummunityStackNavigator"
+            component={CoummunityStackNavigator}
+>>>>>>> dab0bd2b3f735bb6138ec8b48cab415005308566
             options={{
               headerStyle: {
                 backgroundColor: '#F27405',
@@ -84,10 +99,16 @@ const BackButton = () => {
             }}
           />
           <Tab.Screen
-            name="EventPage"
-            component={EventPage}
+            name="EventStackNavigator"
+            component={EventStackNavigator}
             options={{
               title: '이벤트',
+              headerStyle: {
+                backgroundColor: '#F27405',
+              },
+              headerLeft: () => (
+                <BackButton/>
+              ),
               tabBarIcon: ({ color, size }) => (
                 <IconB name="ticket" size={30} color={color} /> // 홈 아이콘
               ),
@@ -97,8 +118,8 @@ const BackButton = () => {
             }}
           />
           <Tab.Screen
-            name="AttendancePage"
-            component={AttendancePage}
+            name="AttendanceStackNavigator"
+            component={AttendanceStackNavigator}
             options={{
               title: '출석',
               tabBarIcon: ({ color, size }) => (
@@ -111,8 +132,8 @@ const BackButton = () => {
           />
 
           <Tab.Screen
-            name="TimetablePage"
-            component={TimetablePage}
+            name="TimetableStackNavigator"
+            component={TimetableStackNavigator}
             options={{
               title: '시간표',
               tabBarIcon: ({ color, size }) => (
@@ -124,7 +145,6 @@ const BackButton = () => {
             }}
           />
         </Tab.Navigator>
-      </NavigationContainer>
     );
   };
 
