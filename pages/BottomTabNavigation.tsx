@@ -22,50 +22,12 @@ const Stack = createStackNavigator();
 
 const BackButton = () => {
   const navigation = useNavigation();
-
   return (
-    <TouchableOpacity style={{ backgroundColor: 'blue' }} onPress={() => navigation.goBack()}>
+    <TouchableOpacity style={{ backgroundColor: 'blue' }} onPress={() => navigation.goBack}>
         <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
     </TouchableOpacity>
   );
 }
-
-  function MainPageStack() {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="MainPagestack"
-          component={MainPage}
-          options={{
-            headerShown: false
-          }}
-        />
-      </Stack.Navigator>
-    );
-  }
-
-  function CommunityPageStack() {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen
-          name="CommunityPagestack"
-          component={CoummunityPage}
-          options={({ navigation }) => ({
-            headerStyle: {
-              backgroundColor: '#F27405',
-            },
-            headerLeft: () => (
-              <TouchableOpacity style={{ backgroundColor: 'blue' }} onPress={() => console.log("뒤로가기 버튼을 눌렀습니다!")}>
-                <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
-              </TouchableOpacity>
-            ),
-            headerTintColor: 'white',
-            headerTitleAlign: 'center',
-          })}
-        />
-      </Stack.Navigator>
-    );
-  }
 
   function BottomTabNavigationApp() {
 
@@ -86,7 +48,7 @@ const BackButton = () => {
           }}>
           <Tab.Screen
             name="MainPage"
-            component={MainPageStack}
+            component={MainPage}
             options={{
               title: '홈',
               headerShown: false,
@@ -101,7 +63,7 @@ const BackButton = () => {
           />
           <Tab.Screen
             name="CoummunityPage"
-            component={CommunityPageStack}
+            component={CoummunityPage}
             options={{
               headerStyle: {
                 backgroundColor: '#F27405',

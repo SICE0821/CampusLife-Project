@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconB from 'react-native-vector-icons/AntDesign';
@@ -416,8 +417,7 @@ const styles = StyleSheet.create({
     //alignItems : 'center',
     flex : 0.85,
     //backgroundColor : "blue"
-    elevation: 20,
-    
+
   },
 
   textborder : {
