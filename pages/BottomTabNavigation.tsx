@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import {MainPageStackNavigator} from './StackNavigation';
-import {CoummunityStackNavigator} from './StackNavigation';
+import {CommunityStackNavigator} from './StackNavigation';
 import {EventStackNavigator} from './StackNavigation';
 import {AttendanceStackNavigator} from './StackNavigation';
 import {TimetableStackNavigator} from './StackNavigation';
@@ -62,7 +62,7 @@ const BackButton = () => {
           />
           <Tab.Screen
             name="CoummunityStackNavigator"
-            component={CoummunityStackNavigator}
+            component={CommunityStackNavigator}
             options={{
               headerStyle: {
                 backgroundColor: '#F27405',

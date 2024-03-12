@@ -2,15 +2,15 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import MainPage from './MainPage';
-import CoummunityPage from './CommunityPage';
+import CommunityPage from './CommunityPage';
 import EventPage from './EventPage';
 import AttendancePage from './AttendancePage';
 import TimetablePage from './TimetablePage';
-import CoummunityDetailPage from './CommunityDetailPage';
+import CommunityDetailPage from './CommunityDetailPage';
 
 
 const MainPageStack = createStackNavigator();
-const CoummunityStack = createStackNavigator();
+const CommunityStack = createStackNavigator();
 const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
@@ -23,12 +23,12 @@ export const MainPageStackNavigator = () => {
     );
 };
 
-export const CoummunityStackNavigator = () => {
+export const CommunityStackNavigator = () => {
     return(
-        <CoummunityStack.Navigator>
-            <CoummunityStack.Screen name = "CoummunityPage" component = {CoummunityPage}/>
-            <CoummunityStack.Screen name = "CoummunityDetailPage" component = {CoummunityDetailPage}/>
-        </CoummunityStack.Navigator>
+        <CommunityStack.Navigator>
+            <CommunityStack.Screen name = "CommunityPage" component = {CommunityPage}/>
+            <CommunityStack.Screen name = "CommunityDetailPage" component = {CommunityDetailPage}/>
+        </CommunityStack.Navigator>
     );
 };
 
