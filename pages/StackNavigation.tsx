@@ -8,9 +8,11 @@ import AttendancePage from './AttendancePage';
 import TimetablePage from './TimetablePage';
 import CoummunityDetailPage from './CommunityDetailPage';
 
+import { RootStackParam } from './CommunityPage';
+
 
 const MainPageStack = createStackNavigator();
-const CoummunityStack = createStackNavigator();
+const CoummunityStack = createStackNavigator<RootStackParam>();
 const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();

@@ -22,15 +22,9 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const BackButton = () => {
-<<<<<<< HEAD
-  const navigation = useNavigation();
-  return (
-    <TouchableOpacity style={{ backgroundColor: 'blue' }} onPress={() => navigation.goBack}>
-=======
   const navigation = useNavigation()
   return (
     <TouchableOpacity onPress={() => navigation.goBack()}>
->>>>>>> dab0bd2b3f735bb6138ec8b48cab415005308566
         <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
     </TouchableOpacity>
   );
@@ -52,13 +46,8 @@ const BackButton = () => {
             tabBarActiveTintColor: 'black',
           }}>
           <Tab.Screen
-<<<<<<< HEAD
-            name="MainPage"
-            component={MainPage}
-=======
             name="MainPageStackNavigator"
             component={MainPageStackNavigator}
->>>>>>> dab0bd2b3f735bb6138ec8b48cab415005308566
             options={{
               title: '홈',
               headerShown: false,
@@ -72,13 +61,8 @@ const BackButton = () => {
             }}
           />
           <Tab.Screen
-<<<<<<< HEAD
-            name="CoummunityPage"
-            component={CoummunityPage}
-=======
             name="CoummunityStackNavigator"
             component={CoummunityStackNavigator}
->>>>>>> dab0bd2b3f735bb6138ec8b48cab415005308566
             options={{
               headerStyle: {
                 backgroundColor: '#F27405',

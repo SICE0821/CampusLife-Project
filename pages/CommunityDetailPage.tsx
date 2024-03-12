@@ -7,13 +7,22 @@ import {
   Dimensions,
   Image,
 } from 'react-native';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParam } from './CommunityPage'
 
-const CoummunityPage = () => {
+type CommunityDetailPageProps = {
+    route: RouteProp<RootStackParam, 'CoummunityDetailPage'>;
+  };
+  
+
+const CoummunityDetailPage : React.FC<CommunityDetailPageProps> = ({route}) => {
+    const { name, age } = route.params;
     return (
         <View>
-            <Text>안녕하세요</Text>
+            <Text>Name: {name}</Text>
+            <Text>Age: {age}</Text>
         </View>
     );
 };
 
-export default CoummunityPage;
+export default CoummunityDetailPage;
