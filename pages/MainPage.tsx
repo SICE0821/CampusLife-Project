@@ -416,8 +416,7 @@ const styles = StyleSheet.create({
     //alignItems : 'center',
     flex : 0.85,
     //backgroundColor : "blue"
-    elevation: 20,
-    
+
   },
 
   textborder : {

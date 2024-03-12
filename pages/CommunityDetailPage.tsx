@@ -13,16 +13,22 @@ import {
   Image,
   Button,
 } from 'react-native';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParam } from './CommunityPage'
 
-const CommunityDetailPage: React.FC = () => {
-    const navigation = useNavigation<StackNavigationProp<RootStackParam>>();
-    const route = useRoute<RootStackParam>();
+type CommunityDetailPageProps = {
+    route: RouteProp<RootStackParam, 'CoummunityDetailPage'>;
+  };
+  
+
+const CoummunityDetailPage : React.FC<CommunityDetailPageProps> = ({route}) => {
     const { name, age } = route.params;
     return (
         <View>
-            <Button title = "이동 가자" onPress = {() => navigation.navigate("CommunityPage")}/>
+            <Text>Name: {name}</Text>
+            <Text>Age: {age}</Text>
         </View>
     );
 };
 
-export default CommunityDetailPage;
+export default CoummunityDetailPage;
