@@ -61,8 +61,8 @@ const BackButton = () => {
             }}
           />
           <Tab.Screen
-            name="CoummunityStackNavigator"
-            component={CommunityStackNavigator}
+            name="CoummunityStackNavigator" //navigator가 참고할 수 있는 이름이야 이 이름을 보고 해당 페이지를 찾는다.
+            component={CommunityStackNavigator} //실제로 이 이름을 가진 screen이 무엇인지를 정의하고있는 부분이야.
             options={{
               headerStyle: {
                 backgroundColor: '#F27405',

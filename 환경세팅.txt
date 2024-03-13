@@ -17,3 +17,10 @@ pm install 하고 시작하면 됩니다.
 3. 재빌드
 
 4. https://oblador.github.io/react-native-vector-icons/ 여기서 아이콘 이름 서치 가능
+
+
+--------------------------------------------------
+하단 네비게이션 바 사용법
+npm install @react-navigation/bottom-tabs
+
+---------------------------------------------------

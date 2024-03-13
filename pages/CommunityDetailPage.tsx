@@ -1,32 +1,24 @@
 import React from 'react';
 import { useNavigation, RouteProp, useRoute  } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParam } from './CommunityPage';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParam} from '../types/type';
 
+import {Text, View, Button,} from 'react-native';
 
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  Image,
-  Button,
-} from 'react-native';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackParam } from './CommunityPage'
 
 type CommunityDetailPageProps = {
-    route: RouteProp<RootStackParam, 'CoummunityDetailPage'>;
+    navigation : StackNavigationProp<RootStackParam, 'CommunityDetailPage'>
+    route: RouteProp<RootStackParam, 'CommunityDetailPage'>;
   };
   
 
-const CoummunityDetailPage : React.FC<CommunityDetailPageProps> = ({route}) => {
+const CoummunityDetailPage : React.FC<CommunityDetailPageProps> = ({route, navigation}) => {
     const { name, age } = route.params;
     return (
         <View>
             <Text>Name: {name}</Text>
             <Text>Age: {age}</Text>
+            <Button title='이동 하자~' onPress={() => navigation.navigate("CommunityPage")}/>
         </View>
     );
 };

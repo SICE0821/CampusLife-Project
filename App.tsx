@@ -5,7 +5,7 @@
  * @format
  */
 import { NavigationContainer } from '@react-navigation/native';
-import BottomNavigation from './pages/BottomTabNavigation';
+import BottomNavigation from './Navigations/BottomTabNavigation';
 import React from 'react';
 import { StyleSheet, View,} from 'react-native';
 
