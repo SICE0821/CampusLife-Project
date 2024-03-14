@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import {MainPageStackNavigator} from './StackNavigation';
 import {CommunityStackNavigator} from './StackNavigation';
@@ -28,6 +28,22 @@ const BackButton = () => {
         <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
     </TouchableOpacity>
   );
+}
+
+const SearchButton = () => {
+  return (
+    <TouchableOpacity onPress={() => {console.log("찾기 버튼 누름")}}>
+        <IconD style = {{marginRight : 10}} name="search1" size = {30} color="white" />
+    </TouchableOpacity>
+  )
+}
+
+const WriteButton = () => {
+  return (
+    <TouchableOpacity onPress={() => {console.log("쓰기 버튼 누름")}}>
+        <IconD style = {{marginRight : 10}} name="form" size = {30} color="white" />
+    </TouchableOpacity>
+  )
 }
 
   function BottomTabNavigationApp() {
@@ -69,6 +85,12 @@ const BackButton = () => {
               },
               headerLeft: () => (
                 <BackButton/>
+              ),
+              headerRight: () => (
+                <View style = {{flexDirection : 'row'}}>
+                  <WriteButton/>
+                  <SearchButton/>
+                </View>
               ),
               headerTintColor: 'white',
               headerTitleAlign: 'center',

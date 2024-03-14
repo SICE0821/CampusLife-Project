@@ -6,6 +6,7 @@
  */
 import { NavigationContainer } from '@react-navigation/native';
 import BottomNavigation from './Navigations/BottomTabNavigation';
+import {CommunityTopNavigation} from './Navigations/TopNavigation'
 import React from 'react';
 import { StyleSheet, View,} from 'react-native';
 

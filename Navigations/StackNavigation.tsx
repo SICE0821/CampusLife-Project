@@ -1,13 +1,15 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import MainPage from '../pages/MainPage';
-import CommunityPage from '../pages/CommunityPage';
+import CommunityPage from '../pages/Community/CommunityPage'
+import {CommunityTopNavigation} from './TopNavigation'
 import EventPage from '../pages/EventPage';
 import AttendancePage from '../pages/AttendancePage';
 import TimetablePage from '../pages/TimetablePage';
-import CommunityDetailPage from '../pages/CommunityDetailPage';
+import CommunityDetailPage from '../pages/Community/CommunityDetailPage';
 import { RootStackParam } from '../types/type';
+
+
 
 
 const MainPageStack = createStackNavigator();
@@ -17,6 +19,7 @@ const CoummunityStack = createStackNavigator<RootStackParam>();
 const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
+
 
 export const MainPageStackNavigator = () => {
     return(
@@ -29,7 +32,10 @@ export const MainPageStackNavigator = () => {
 export const CommunityStackNavigator = () => {
     return(
         <CoummunityStack.Navigator>
-            <CoummunityStack.Screen name = "CommunityPage" component = {CommunityPage}/>
+            <CoummunityStack.Screen 
+                name = "CommunityPage" 
+                component = {CommunityTopNavigation}
+                options = {{headerShown : false}}/>
             <CoummunityStack.Screen name = "CommunityDetailPage" component = {CommunityDetailPage}/>
         </CoummunityStack.Navigator>
     );

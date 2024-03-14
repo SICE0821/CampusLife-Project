@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import {RootStackParam} from '../types/type';
+import {RootStackParam} from '../../types/type';
+import CommunityTopNavigation from '../../Navigations/MaterialNavigation'
+import { NavigationContainer } from '@react-navigation/native';
 
 
 //type을 하나 생성해준다.
