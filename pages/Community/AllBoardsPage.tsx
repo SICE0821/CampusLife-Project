@@ -1,81 +1,43 @@
-import React, { useState } from 'react';
-import {Text, View, Button, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, Button } from 'react-native';
 
-const AllBoardsPage : React.FC = () => {
+const server = () => {
+    fetch('http://192.168.0.12:3000')
+    .then((response: Response) => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.text();
+    })
+    .then((data: string) => {
+        console.log('Server response:', data);
+    })
+    .catch((error: Error) => {
+        console.error('Fetch error:', error);
+    });
+}
 
-    const [data, setData] = useState<Array<{ id: string; title: string }>>([
-        { id: '1', title: '아이템 1' },
-        { id: '2', title: '아이템 2' },
-        { id: '3', title: '아이템 3' },
-        { id: '4', title: '아이템 4' },
-        { id: '5', title: '아이템 5' },
-      ]);
-      const [loading, setLoading] = useState<boolean>(false);
-      const [page, setPage] = useState<number>(1);
-    
-      const fetchMoreData = () => {
-        // 이미 모든 데이터를 로드한 경우 더 이상 데이터를 불러오지 않음
-        if (loading || data.length >= 100) return;
-        setLoading(true);
-    
-        // 예제를 위해 1초 후에 데이터를 추가합니다.
-        setTimeout(() => {
-          const newData = Array.from({ length: 5 }, (_, index) => ({
-            id: String(data.length + index + 1),
-            title: `아이템 ${data.length + index + 1}`,
-          }));
-          setData([...data, ...newData]);
-          setLoading(false);
-        }, 1000);
-      };
-
-    const renderFooter = () => {
-        if (!loading) return null;
-    
-        return (
-          <View style={{ paddingVertical: 20 }}>
-            <ActivityIndicator size="large" color="#0000ff" />
-          </View>
-        );
-      };
-    
-    const renderItem = ({ item }: { item: { id: string; title: string } }) => (
-        <View style={{ padding: 20, borderBottomWidth: 1, borderBottomColor: '#ccc' }}>
-          <Text>{item.title}</Text>
-        </View>
-      );
-    
-
+const AllBoardsPage: React.FC = () => {
     return (
-        <View style = {styles.container}>
-            <View style = {styles.topnavigationspace}>
-            </View>
-            <FlatList
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                onEndReached={fetchMoreData}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={renderFooter}
-                style = {{flex :0.91,}}
-            />
+        <View style={styles.container}>
+            <View style={styles.topnavigationspace}></View>
+            <Button title = "서버에게 요청" onPress={() => server()}></Button>
         </View>
         
     );
 };
 
 const styles = StyleSheet.create({
-    container : {
-        flex : 1,
-        backgroundColor : 'white',
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
     },
-    topnavigationspace : {
-        flex : 0.09,
-        //backgroundColor : 'yellow',
+    topnavigationspace: {
+        flex: 0.09,
+        //backgroundColor: 'yellow',
     }
-
-    }
-)
+});
 
 export default AllBoardsPage;
+
 
