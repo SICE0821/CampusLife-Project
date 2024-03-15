@@ -10,7 +10,15 @@ type CommunityDetailPageProps = {
     navigation : StackNavigationProp<RootStackParam, 'CommunityDetailPage'>
     route: RouteProp<RootStackParam, 'CommunityDetailPage'>;
   };
-  
+
+
+const F1 = ({jungyouhwan} : any) => {
+    return (
+        <View>
+            <Text>{jungyouhwan}</Text>
+        </View>
+    )
+}
 
 const CoummunityDetailPage : React.FC<CommunityDetailPageProps> = ({route, navigation}) => {
     const { name, age } = route.params;
@@ -19,6 +27,7 @@ const CoummunityDetailPage : React.FC<CommunityDetailPageProps> = ({route, navig
             <Text>Name: {name}</Text>
             <Text>Age: {age}</Text>
             <Button title='이동 하자~' onPress={() => navigation.navigate("CommunityPage")}/>
+            <F1 jungyouhwan = "정유환"/>
         </View>
     );
 };
