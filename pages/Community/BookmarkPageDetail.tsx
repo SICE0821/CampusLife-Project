@@ -5,12 +5,11 @@ import {RootStackParam} from '../../types/type';
 
 import {Text, View, Button,StyleSheet} from 'react-native';
 
-const DepartmentBoardPage:React.FC = () => {
+const BookmarkPageDetail:React.FC = () => {
     return (
         <View style = {styles.container}>
             <View style = {styles.topnavigationspace}>
             </View>
-            <Text>전체 게시판입니다.</Text>
         </View>
     );
 };
@@ -22,10 +21,10 @@ const styles = StyleSheet.create({
     },
     topnavigationspace : {
         flex : 0.09,
-        backgroundColor : 'yellow',
+        //backgroundColor : 'yellow',
     }
 
     }
 )
 
-export default DepartmentBoardPage;
+export default BookmarkPageDetail;

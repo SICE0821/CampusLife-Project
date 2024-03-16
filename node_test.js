@@ -27,8 +27,8 @@ async function getDataFromTable() {
     let conn;
     try {
         conn = await pool.getConnection();
-        await conn.query('USE test');  //데이터 베이스 이름
-        const rows = await conn.query('SELECT * FROM test1'); //쿼리 
+        await conn.query('USE campus_life_ex');  //데이터 베이스 이름
+        const rows = await conn.query('SELECT * FROM community'); //쿼리 
         return rows;
     } catch (err) {
         throw err;
@@ -37,6 +37,7 @@ async function getDataFromTable() {
     }
 }
 
+checkConnection();
 getDataFromTable()
     .then(rows => {
         console.log('Data retrieved:', rows);
