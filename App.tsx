@@ -9,12 +9,13 @@ import BottomNavigation from './Navigations/BottomTabNavigation';
 import {CommunityTopNavigation} from './Navigations/TopNavigation'
 import React from 'react';
 import { StyleSheet, View,} from 'react-native';
+import {RootStackNavigator} from './Navigations/StackNavigation'
 
 function App(): React.JSX.Element {
   return (
       <NavigationContainer>
-        <BottomNavigation/>
-      </NavigationContainer>
+        <RootStackNavigator/>
+    </NavigationContainer>
   );
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import MainPage from '../pages/MainPage';
 import CommunityPage from '../pages/community/CommunityPage'
@@ -6,10 +6,16 @@ import {CommunityTopNavigation} from './TopNavigation'
 import EventPage from '../pages/EventPage';
 import AttendancePage from '../pages/AttendancePage';
 import TimetablePage from '../pages/TimetablePage';
-import CommunityDetailPage from '../pages/community/CommunityDetailPage';
+import WritePostPage from '../pages/Community/WritePostPage';
 import { RootStackParam } from '../types/type';
+import { BottomTabBar } from '@react-navigation/bottom-tabs';
+import { TabActions } from '@react-navigation/native';
+import BottomTabNavigator from './BottomTabNavigation'
+import { StyleSheet, Text, TouchableOpacity, View,Button } from 'react-native';
+import IconD from 'react-native-vector-icons/AntDesign';
+import { useNavigation } from '@react-navigation/native';
 
-
+const RootStack = createStackNavigator();
 
 
 const MainPageStack = createStackNavigator();
@@ -20,6 +26,43 @@ const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
 
+const BackButton = () => {
+    const navigation:any = useNavigation()
+    return (
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+          <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+      </TouchableOpacity>
+    );
+  }
+
+export const RootStackNavigator = () => {
+    return (
+        <RootStack.Navigator>
+            <RootStack.Screen name = "BottomTabNavigator" component = {BottomTabNavigator} options = {{headerShown : false}}/>
+            <RootStack.Screen name = "WritePostPage" 
+                              component = {WritePostPage} 
+                              options={{
+                                headerStyle: {
+                                  backgroundColor: '#F27405',
+                                },
+                                headerLeft: () => (
+                                  <BackButton/>
+                                ),
+                                headerRight: () => (
+                                    <TouchableOpacity onPress={() => console.log("완료버튼 누름")}>
+                                         <View style = {{flexDirection : 'row', backgroundColor : '#B20000', justifyContent : 'center',
+                                                 alignItems : 'center', width :65, height :35, borderRadius : 20, marginRight :10,}}>
+                                            <Text style = {{color : 'white', fontSize : 17, fontWeight : "bold"}}>완료</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                ),
+                                headerTintColor: 'white',
+                                headerTitleAlign: 'center',
+                                title: '커뮤니티',
+                              }}/>
+        </RootStack.Navigator>
+    )
+}
 
 export const MainPageStackNavigator = () => {
     return(
@@ -29,15 +72,25 @@ export const MainPageStackNavigator = () => {
     );
 };
 
-export const CommunityStackNavigator = () => {
+export const CommunityStackNavigator = ({navigation} : any) => {
+    //navigation.setOptions({ tabBarStyle: { display: 'none' } });
     return(
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen 
                 name = "CommunityPage" 
                 component = {CommunityTopNavigation}
                 options = {{headerShown : false}}/>
-            <CoummunityStack.Screen name = "CommunityDetailPage" component = {CommunityDetailPage}/>
+
+            <CoummunityStack.Screen 
+                name = "WritePostPage" 
+                component = {WritePostPage}
+                />
+            <CoummunityStack.Screen 
+                name = "TimetablePage" 
+                component = {TimetablePage}
+                />
         </CoummunityStack.Navigator>
+
     );
 };
 

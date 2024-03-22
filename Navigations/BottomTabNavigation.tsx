@@ -5,6 +5,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParam} from '../types/type';
+
+import MainPage from '../pages/MainPage'
 import {MainPageStackNavigator} from './StackNavigation';
 import {CommunityStackNavigator} from './StackNavigation';
 import {EventStackNavigator} from './StackNavigation';
@@ -21,8 +25,13 @@ import BabelConfig from '../babel.config';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+type CommunityNavigationProp = {
+  navigation: any;
+}
+
+
 const BackButton = () => {
-  const navigation = useNavigation()
+  const navigation:any = useNavigation()
   return (
     <TouchableOpacity onPress={() => navigation.goBack()}>
         <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
@@ -38,15 +47,8 @@ const SearchButton = () => {
   )
 }
 
-const WriteButton = () => {
-  return (
-    <TouchableOpacity onPress={() => {console.log("쓰기 버튼 누름")}}>
-        <IconD style = {{marginRight : 10}} name="form" size = {30} color="white" />
-    </TouchableOpacity>
-  )
-}
-
   function BottomTabNavigationApp() {
+    const navigation: any = useNavigation();
     return (
         <Tab.Navigator
           screenOptions={{
@@ -62,7 +64,7 @@ const WriteButton = () => {
             tabBarActiveTintColor: 'black',
           }}>
           <Tab.Screen
-            name="MainPageStackNavigator"
+            name="MainPage"
             component={MainPageStackNavigator}
             options={{
               title: '홈',
@@ -88,7 +90,9 @@ const WriteButton = () => {
               ),
               headerRight: () => (
                 <View style = {{flexDirection : 'row'}}>
-                  <WriteButton/>
+                   <TouchableOpacity onPress={() => navigation.navigate("WritePostPage")}>
+                      <IconD style = {{marginRight : 10}} name="form" size = {30} color="white" />
+                    </TouchableOpacity>
                   <SearchButton/>
                 </View>
               ),

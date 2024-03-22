@@ -4,5 +4,7 @@ export type RootStackParam = {
       name : string,
       age : number,
     };
+    WritePostPage : undefined;
+    TimetablePage : undefined;
   }
   

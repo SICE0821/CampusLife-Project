@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 
 const server = () => {
-  return fetch('http://172.30.1.72:3000')
+  return fetch('http:// 172.30.1.24:3000/AllCommunity')
     .then((response: Response) => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -25,6 +25,7 @@ const AllBoardsPage: React.FC = () => {
   const navigation = useNavigation();
   const [serverResponse, setServerResponse] = useState<string | null>(null);
 
+  
   useEffect(() => {
       const fetchData = async () => {
           try {
@@ -43,6 +44,7 @@ const AllBoardsPage: React.FC = () => {
       return unsubscribeFocus; // clean-up 함수 등록
 
   }, [navigation]);
+  
     return (
         <View style={styles.container}>
             <View style={styles.topnavigationspace}></View>

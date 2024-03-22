@@ -1,8 +1,8 @@
 import AllBoardsPage from '../pages/community/AllBoardsPage'
-import AllBoardersPageDetail from '../pages/community/AllBoardsPageDetail'
-import BookmarkPageDetail from '../pages/community/BookmarkPageDetail'
-import HotBoardsPage from '../pages/community/HotBoardsPage'
-import DepartmentBoardPage from '../pages/community/DepartmentBoardPage'
+import AllBoardersPageDetail from '../pages/Community/AllBoardsPageDetail'
+import BookmarkPageDetail from '../pages/Community/BookmarkPageDetail'
+import HotBoardsPage from '../pages/Community/HotBoardsPage'
+import DepartmentBoardPage from '../pages/Community/DepartmentBoardPage'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -10,24 +10,28 @@ const TopTab = createBottomTabNavigator();
 const BottomTab = createBottomTabNavigator();
 
 export const CommunityBottomNavigation = () => {
+    
     return (
         <BottomTab.Navigator
             screenOptions={{
                 tabBarStyle : {
-                    top : 60,
+                    top : 63,
                     position: 'absolute',
-                    height: 60,
-                    //marginLeft : 12,
-                    //marginRight : 150,
-                    borderWidth : 0,
+                    height: 40,
+                    left : -3,
+                    marginRight : 120,
+                    marginLeft : 10,               
                     elevation : 0,
-                    backgroundColor : 'blue',
+                    borderWidth : 0,
+                    borderTopWidth: 0, // 위쪽 경계선 제거
+                    //backgroundColor : 'blue',
                 
                 },
                 tabBarLabelStyle: { 
-                    fontSize : 10,
+                    fontSize : 20,
                     alignItems: 'center',
-                    marginBottom : 14,
+                    marginBottom : 10,
+                    marginTop : 5,
                     fontWeight: 'bold',
                     },
                 tabBarActiveTintColor : 'black'
@@ -61,14 +65,14 @@ export const CommunityTopNavigation = () => {
         <TopTab.Navigator
             screenOptions={{
                 tabBarStyle : {
-                    top : 0,
+                    top : 10,
                     position: 'absolute',
-                    height: 60,
+                    height: 40,
                     marginLeft : 12,
                     marginRight : 150,
-                    borderWidth : 0,
+                    //borderWidth : 2,
                     elevation : 0,
-                    backgroundColor : 'blue',
+                    //backgroundColor : 'blue',
                 
                 },
                 tabBarLabelStyle: { 

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useState} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   ScrollView,
   StyleSheet,
@@ -26,7 +27,75 @@ const volunteerpng = require('../assets/volunteer.png');
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
+type mainpagepostdata = {
+  post_id: number,
+  title: string,
+  view: number,
+}
+
+type mainpagehptdata = {
+  post_id: number,
+  title: string,
+  view: number,
+  like: number,
+}
+
 const MainPage = () => {
+  const [schoolpostdata, setschollpostdata] = useState<mainpagepostdata[]>([]);
+  const [departmentpostdata, setdepartmentpostdata] = useState<mainpagepostdata[]>([]);
+  const [hotpostdata, sethotpostdata] = useState<mainpagehptdata[]>([]);
+
+  const fetchschoolpostData = async () => {
+      try {
+        const response = await fetch('http://172.30.1.24:3000/MainPageSchoolPost');
+        if (!response.ok) {
+          throw new Error('서버 응답 실패');
+        }
+        const data = await response.json();
+        setschollpostdata(data);
+        console.log("데이터 받음:", data);
+      } catch (error) {
+        console.error('데이터를 가져오는 중 오류 발생:', error);
+      }
+    };
+
+    const fetchdepartmentpostData = async () => {
+      try {
+        const response = await fetch('http://172.30.1.24:3000/MainPagedepartmentPost');
+        if (!response.ok) {
+          throw new Error('서버 응답 실패');
+        }
+        const data = await response.json();
+        setdepartmentpostdata(data);
+        console.log("데이터 받음:", data);
+      } catch (error) {
+        console.error('데이터를 가져오는 중 오류 발생:', error);
+      }
+    };
+
+    const fetchhotpostData = async () => {
+      try {
+        const response = await fetch('http://172.30.1.24:3000/MainPagehotPost');
+        if (!response.ok) {
+          throw new Error('서버 응답 실패');
+        }
+        const data = await response.json();
+        sethotpostdata(data);
+        console.log("데이터 받음:", data);
+      } catch (error) {
+        console.error('데이터를 가져오는 중 오류 발생:', error);
+      }
+    };
+
+    
+
+    useFocusEffect(
+      React.useCallback(() => {
+        fetchschoolpostData();
+        fetchdepartmentpostData();
+        fetchhotpostData();
+      }, [])
+    );
   return (
     <View style = {styles.container}>
       <ScrollView>
@@ -124,48 +193,48 @@ const MainPage = () => {
             <View style = {styles.textborder}>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>예비군 훈련 안내</Text>
+                  <Text style = {styles.M}>{schoolpostdata[0]?.title}</Text>
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[0]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>학교 축제 안내</Text>
+                  <Text style = {styles.M}>{schoolpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[1]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>총학생회장 선거 안내</Text>
+                  <Text style = {styles.M}>{schoolpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[2]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>학교 식당 폐업 안내</Text>
+                  <Text style = {styles.M}>{schoolpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[3]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>졸업식 연기 안내</Text>
+                  <Text style = {styles.M}>{schoolpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[4]?.view}</Text>
                 </View>
               </View>
             </View>
@@ -182,48 +251,48 @@ const MainPage = () => {
             <View style = {styles.textborder}>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>예비군 훈련 안내</Text>
+                  <Text style = {styles.M}>{departmentpostdata[0]?.title}</Text>
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[0]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>학교 축제 안내</Text>
+                  <Text style = {styles.M}>{departmentpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[1]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>총학생회장 선거 안내</Text>
+                  <Text style = {styles.M}>{departmentpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[2]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>학교 식당 폐업 안내</Text>
+                  <Text style = {styles.M}>{departmentpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[3]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
-                  <Text style = {styles.M}>졸업식 연기 안내</Text>
+                  <Text style = {styles.M}>{departmentpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[4]?.view}</Text>
                 </View>
               </View>
             </View>
@@ -231,7 +300,7 @@ const MainPage = () => {
         </View>    
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
-            <Text style = {styles.noticeheadertext}>인기글</Text>
+            <Text style = {styles.noticeheadertext}>{hotpostdata[0]?.title}</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {23}/></Text>
             <Text style = {{marginLeft : 220, marginTop : 25}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>
@@ -240,58 +309,58 @@ const MainPage = () => {
             <View style = {styles.textborder}>
               <View style = {styles.onebox}>
                 <View style = {styles.fireoneboxtext}>  
-                  <Text style = {styles.M}>예비군 훈련 안내</Text>
+                  <Text style = {styles.M}>{hotpostdata[0]?.title}</Text>
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[0]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[0]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.fireoneboxtext}>  
-                  <Text style = {styles.M}>학교 축제 안내</Text>
+                  <Text style = {styles.M}>{hotpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[1]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[1]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.fireoneboxtext}>  
-                  <Text style = {styles.M}>총학생회장 선거 안내</Text>
+                  <Text style = {styles.M}>{hotpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[2]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[2]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.fireoneboxtext}>  
-                  <Text style = {styles.M}>학교 식당 폐업 안내</Text>
+                  <Text style = {styles.M}>{hotpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[3]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[3]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
                 <View style = {styles.fireoneboxtext}>  
-                  <Text style = {styles.M}>졸업식 연기 안내</Text>
+                  <Text style = {styles.M}>{hotpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
                   <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 /</Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[4]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>30 </Text>
+                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[4]?.like} </Text>
                 </View>
               </View>
             </View>
