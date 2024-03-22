@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const Search = ({ navigation}: any) => {
+const Search = ({navigation}: any) => {
   const [email, setEmail] = useState('');
   const [studentId, setStudentId] = useState('');
   const [id, setId] = useState('');
@@ -14,15 +14,15 @@ const Search = ({ navigation}: any) => {
   const handleIdButtonClick = () => {
       setIsIdButtonPressed(true);
       setIsPassButtonPressed(false);
-      setIsIdconfirmPressed(false); // 이 부분 추가
-      setIsPassconfirmPressed(false); // 이 부분 추가
+      setIsIdconfirmPressed(false);
+      setIsPassconfirmPressed(false);
   };
 
   const handlePasswordButtonClick = () => {
       setIsIdButtonPressed(false);
       setIsPassButtonPressed(true);
-      setIsIdconfirmPressed(false); // 이 부분 추가
-      setIsPassconfirmPressed(false); // 이 부분 추가
+      setIsIdconfirmPressed(false); 
+      setIsPassconfirmPressed(false);
   };
 
   const handleIdconfirmButtonClick = () => {
@@ -52,12 +52,6 @@ const Search = ({ navigation}: any) => {
 
           {isIdButtonPressed && !isIdconfirmPressed ? (
               <View>
-                  <TextInput
-                      style={styles.cssText}
-                      placeholder="이메일"
-                      value={email}
-                      onChangeText={(text) => setEmail(text)}
-                  />
                   <TextInput
                       style={styles.cssText}
                       placeholder="이름"
@@ -131,7 +125,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    
   },
 
   containerText:{

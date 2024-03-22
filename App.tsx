@@ -5,7 +5,8 @@ Text,
 View, 
 TextInput, 
 TouchableOpacity, 
-StatusBar, 
+StatusBar,
+Alert,
 } from 'react-native';
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -34,11 +35,29 @@ function LoginScreen({ navigation}: any) {
   const [isChecked, setIsChecked] = useState(false);
   const [isCheckedAutoLogin, setIsCheckedAutoLogin] = useState(false);
 
-  const handleLogin = () => {
-    // 여기에서 로그인 로직을 구현하거나 다른 작업을 수행합니다.
-    console.log('Username:', username);
-    console.log('Password:', password);
-    console.log('IsChecked:', isChecked);
+
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://192.168.35.240:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+      const data = await response.text();
+      if (data === 'success') {
+        Alert.alert('로그인 성공');
+      } else {
+        Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
+      }
+    } catch (error) {
+      console.error('로그인 오류:', error);
+      Alert.alert('로그인 오류');
+    }
   };
 
 

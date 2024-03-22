@@ -1,31 +1,41 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import BouncyCheckbox from "react-native-bouncy-checkbox";
-import firestore from '@react-native-firebase/firestore'
-import {signIn, signUp} from './lib/auth'
 import {createUser} from './lib/user'
 
-const Register = () => {
-  const navigation = useNavigation(); 
+const Register = ({navigation}: any) => {
   const [username, setUsername] = useState('');
-  const [usernickname, setUsernickname] = useState('');
   const [userpass, setUserpass] = useState('');
   const [userconfirmpass, setUserconfirmpass] = useState('');
+  const [studentId, setstudentId] = useState('');
+  const [friendCode, setfriendCode] = useState('');
+  
 
-  const SignSuccess = async () => {
-    try{
-      await createUser({
-        username,
-        userpass,
-        usernickname,
-      })
-      Alert.alert('회원가입 성공');
-      navigation.navigate('로그인');
-    }catch(error){
+  const handleRegister = async () => {
+    try {
+      const response = await fetch('http://192.168.35.240:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          userpass,
+          studentId,
+          friendCode,
+        }),
+      });
+
+      if (response.ok) {
+        Alert.alert('회원가입 성공');
+      } else {
+        Alert.alert('회원가입 실패');
+      }
+    } catch (error) {
+      console.error('Error registering user:', error);
       Alert.alert('회원가입 실패');
     }
-}
+  };
 
   
   return (
@@ -37,12 +47,6 @@ const Register = () => {
         placeholder="아이디"
         value={username}
         onChangeText={(text) => setUsername(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="닉네임"
-        value={usernickname}
-        onChangeText={(text) => setUsernickname(text)}
       />
       <TextInput
         style={styles.input}
@@ -58,8 +62,20 @@ const Register = () => {
         value={userconfirmpass}
         onChangeText={(text) => setUserconfirmpass(text)}
       />
+      <TextInput
+        style={styles.input}
+        placeholder="학번"
+        value={studentId}
+        onChangeText={(text) => setstudentId(text)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="친구 코드"
+        value={friendCode}
+        onChangeText={(text) => setfriendCode(text)}
+      />
 
-      <TouchableOpacity style={styles.signBtn} onPress={SignSuccess}>
+      <TouchableOpacity style={styles.signBtn} onPress={handleRegister}>
         <Text>회원가입</Text>
       </TouchableOpacity>
     
