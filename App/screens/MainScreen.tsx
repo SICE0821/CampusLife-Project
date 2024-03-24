@@ -47,7 +47,7 @@ const MainPage = () => {
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.30.1.24:3000/MainPageSchoolPost');
+        const response = await fetch('http://172.30.1.31:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -61,7 +61,7 @@ const MainPage = () => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.30.1.24:3000/MainPagedepartmentPost');
+        const response = await fetch('http://172.30.1.31:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -75,7 +75,7 @@ const MainPage = () => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.30.1.24:3000/MainPagehotPost');
+        const response = await fetch('http://172.30.1.31:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -300,7 +300,7 @@ const MainPage = () => {
         </View>    
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
-            <Text style = {styles.noticeheadertext}>{hotpostdata[0]?.title}</Text>
+            <Text style = {styles.noticeheadertext}>인기글</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {23}/></Text>
             <Text style = {{marginLeft : 220, marginTop : 25}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>

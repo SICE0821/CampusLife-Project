@@ -1,21 +1,20 @@
-import AllBoardsPage from '../pages/community/AllBoardsPage'
-import AllBoardersPageDetail from '../pages/Community/AllBoardsPageDetail'
-import BookmarkPageDetail from '../pages/Community/BookmarkPageDetail'
-import HotBoardsPage from '../pages/Community/HotBoardsPage'
-import DepartmentBoardPage from '../pages/Community/DepartmentBoardPage'
+import GeneralPostsScreen from '../screens/CommunityScreens/GeneralPostsScreen'
+import BookmarkScreen from '../screens/CommunityScreens/BookmarkScreen'
+import HotPostsScreen from '../screens/CommunityScreens/HotPostsScreen'
+import DepartmentPostsScreen from '../screens/CommunityScreens/DepartmentPostsScreen'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const TopTab = createBottomTabNavigator();
-const BottomTab = createBottomTabNavigator();
+const CommunityTopTab = createBottomTabNavigator();
+const CommunityTopBottomTab = createBottomTabNavigator();
 
-export const CommunityBottomNavigation = () => {
+export const TopBottomTabNavigator = () => {
     
+    //전체, HOT게시글, 책갈피 상단 탭 네비게이션
     return (
-        <BottomTab.Navigator
+        <CommunityTopBottomTab.Navigator
             screenOptions={{
                 tabBarStyle : {
-                    top : 63,
+                    top : 60,
                     position: 'absolute',
                     height: 40,
                     left : -3,
@@ -23,7 +22,7 @@ export const CommunityBottomNavigation = () => {
                     marginLeft : 10,               
                     elevation : 0,
                     borderWidth : 0,
-                    borderTopWidth: 0, // 위쪽 경계선 제거
+                    borderTopWidth: 0, 
                     //backgroundColor : 'blue',
                 
                 },
@@ -37,32 +36,33 @@ export const CommunityBottomNavigation = () => {
                 tabBarActiveTintColor : 'black'
             
         }}>
-            <BottomTab.Screen name = '전체' component={AllBoardersPageDetail} options = {{
+            <CommunityTopBottomTab.Screen name = '전체' component={GeneralPostsScreen} options = {{
                             headerShown : false,
                             tabBarIcon: () => null,
                             }}>
-            </BottomTab.Screen>
+            </CommunityTopBottomTab.Screen>
 
-            <BottomTab.Screen name = 'HOT게시글' component={BookmarkPageDetail} options = {{
+            <CommunityTopBottomTab.Screen name = 'HOT게시글' component={BookmarkScreen} options = {{
                             headerShown : false,
                             tabBarIcon: () => null,
 
                             }} >
-            </BottomTab.Screen>
+            </CommunityTopBottomTab.Screen>
 
-            <BottomTab.Screen name = '책갈피' component={HotBoardsPage} options = {{
+            <CommunityTopBottomTab.Screen name = '책갈피' component={HotPostsScreen} options = {{
                             headerShown : false,
                             tabBarIcon: () => null,
                             }} >
-            </BottomTab.Screen>
-        </BottomTab.Navigator>
+            </CommunityTopBottomTab.Screen>
+        </CommunityTopBottomTab.Navigator>
 
     )
 }
 
-export const CommunityTopNavigation = () => {
+//커뮤니티 전체, 학과 게시판 상단 탭 네비게이션
+export const TopbTabNavigator = () => {
     return (
-        <TopTab.Navigator
+        <CommunityTopTab.Navigator
             screenOptions={{
                 tabBarStyle : {
                     top : 10,
@@ -84,18 +84,18 @@ export const CommunityTopNavigation = () => {
                 tabBarActiveTintColor : 'black'
                 
             }}>
-            <TopTab.Screen name="전체 게시판"
-                        component={CommunityBottomNavigation}
+            <CommunityTopTab.Screen name="전체 게시판"
+                        component={TopBottomTabNavigator}
                         options = {{
                             headerShown : false,
                             tabBarIcon: () => null,
                             }}/>
-            <TopTab.Screen name="학과 게시판" 
-                        component={DepartmentBoardPage} 
+            <CommunityTopTab.Screen name="학과 게시판" 
+                        component={TopBottomTabNavigator} 
                         options = {{
                             headerShown : false,
                             tabBarIcon: () => null,
                             }}/>
-        </TopTab.Navigator>
+        </CommunityTopTab.Navigator>
     );
 }

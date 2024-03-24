@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import {createUser} from './lib/user'
-
 const Register = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [userpass, setUserpass] = useState('');
@@ -40,7 +38,7 @@ const Register = ({navigation}: any) => {
   
   return (
     <View style={styles.container}>
-      <Image style={styles.Img} source={require('./assets/logoImg.png')}/>
+      <Image style={styles.Img} source={require('../../assets/logoImg.png')}/>
 
       <TextInput
         style={styles.input}

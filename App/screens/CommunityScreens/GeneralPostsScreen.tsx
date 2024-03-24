@@ -19,12 +19,12 @@ const renderEmptyItem = () => {
     )
 }
 
-const AllBoardersPageDetail:React.FC = () => {
+const GeneralPostsScreen:React.FC = () => {
     const [communityData, setCommunityData] = useState<Data[]>([]);
 
     const fetchData = async () => {
         try {
-          const response = await fetch('http://172.30.1.24:3000/AllCommunity');
+          const response = await fetch('http://172.30.1.31:3000/AllCommunity');
           if (!response.ok) {
             throw new Error('서버 응답 실패');
           }
@@ -166,4 +166,4 @@ const styles = StyleSheet.create({
     }
 )
 
-export default AllBoardersPageDetail;
+export default GeneralPostsScreen;

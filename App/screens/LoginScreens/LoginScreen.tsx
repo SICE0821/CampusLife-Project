@@ -6,25 +6,19 @@ View,
 TextInput, 
 TouchableOpacity, 
 StatusBar,
-Alert,
 } from 'react-native';
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import Register from './Register.tsx'
-import Search from './Search.tsx'
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 function LoginScreen({ navigation}: any) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [isChecked, setIsChecked] = useState(false);
-    const [isCheckedAutoLogin, setIsCheckedAutoLogin] = useState(false);
-  
   
     const handleLogin = async () => {
+      navigation.navigate('MainTabNavigator');
+    /*
       try {
-        const response = await fetch('http://192.168.35.240:3000/login', {
+        const response = await fetch('http://172.16.117.26:3000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -44,20 +38,22 @@ function LoginScreen({ navigation}: any) {
         console.error('로그인 오류:', error);
         Alert.alert('로그인 오류');
       }
+    */
     };
+    
   
   
     const navigateToRegister = () => {
-      navigation.navigate('회원가입');
+      navigation.navigate('RegisterPage');
     };
   
     const navigateToSearch = () => {
-      navigation.navigate('찾기')
+      navigation.navigate('SearchPage')
     };
   
     return (
       <View style={styles.container}>
-        <Image style={styles.logo} source={require('./assets/logo.png')} />
+        <Image style={styles.logo} source={require('../../assets/logo.png')} />
   
         <Text style={styles.appintroduce}>
           학교를 더 즐겁게! {"\n"} 

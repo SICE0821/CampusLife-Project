@@ -13,7 +13,7 @@ const WritePostPage : React.FC = () => {
     const [postfontoption, setpostfontoption] = useState("게시판을 정해주세요");
     const [titletext, settitleText] = useState('');
     const [maintext, setmainText] = useState('');
-    const [post_id, setpost_id] = useState(14);
+    const [post_id, setpost_id] = useState(285);
 
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -40,7 +40,7 @@ const WritePostPage : React.FC = () => {
         };
       
         try {
-          const response = await fetch('http://172.30.1.24:3000/post', {
+          const response = await fetch('http://172.30.1.31:3000/post', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

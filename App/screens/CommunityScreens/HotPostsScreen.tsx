@@ -1,11 +1,7 @@
 import React from 'react';
-import { useNavigation, RouteProp, useRoute  } from '@react-navigation/native';
-import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParam} from '../../types/type';
+import {View, StyleSheet} from 'react-native';
 
-import {Text, View, Button,StyleSheet} from 'react-native';
-
-const HotBoardsPageDetail:React.FC = () => {
+const HotPostsScreen:React.FC = () => {
     return (
         <View style = {styles.container}>
             <View style = {styles.topnavigationspace}>
@@ -27,4 +23,4 @@ const styles = StyleSheet.create({
     }
 )
 
-export default HotBoardsPageDetail;
+export default HotPostsScreen;

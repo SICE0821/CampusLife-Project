@@ -6,5 +6,6 @@ export type RootStackParam = {
     };
     WritePostPage : undefined;
     TimetablePage : undefined;
+    CommunityTopNavigation : undefined;
   }
   

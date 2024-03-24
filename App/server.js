@@ -1,67 +1,15 @@
 const express = require("express");
 const app = express();
-const mariadb = require('mariadb');
 const PORT = 3000;
-
+const mariadb = require('mariadb');
+const { getDataFormTable,
+        gethotpostdata, 
+        getdeparmentpostdata, 
+        getschoolpostdata, 
+        insertDataIntoDB } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
-//데이터 베이스 정보.
-const pool = mariadb.createPool({
-    host: '14.6.152.64',
-    port: 3306,
-    user: 'yuhwan',
-    password: '0000',
-    connectionLimit: 5,
-    database: 'campuslife',
-});
-
-/*
-async function getDataFromTable() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        await conn.query('USE test');  //데이터 베이스 이름
-        const rows = await conn.query('SELECT * FROM test1 ORDER BY write_pk DESC'); //쿼리 
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.end();
-    }
-}
-*/
-
-async function getDataFormTable() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query('SELECT post_id, user_id, title, contents, date, view, `like` FROM post WHERE department_check = 0 AND inform_check = 0');
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.end();
-    }
-}
-async function gethotpostdata() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query(`
-            SELECT post_id, title, view, \`like\`
-            FROM post 
-            WHERE department_check = 0 AND inform_check = 0 
-            ORDER BY \`like\` DESC 
-            LIMIT 5
-        `);
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.end();
-    }
-}
-
+//메인페이지에 핫 게시글 데이터를 가져온다.
 app.get('/MainPagehotPost', async (req, res) => {
     try {
         console.log("인기 페이지로 http로 잘 전송됨")
@@ -80,25 +28,7 @@ app.get('/MainPagehotPost', async (req, res) => {
     }
 });
 
-async function getdeparmentpostdata() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query(`
-            SELECT post_id, title, view 
-            FROM post 
-            WHERE department_check = 1 AND inform_check = 1 
-            ORDER BY post_id DESC 
-            LIMIT 5
-        `);
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.end();
-    }
-}
-
+//메인페이지에 학과 게시글 데이터를 가져온다.
 app.get('/MainPagedepartmentPost', async (req, res) => {
     try {
         console.log("학과 페이지로 http로 잘 전송됨")
@@ -116,26 +46,7 @@ app.get('/MainPagedepartmentPost', async (req, res) => {
     }
 });
 
-
-async function getschoolpostdata() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query(`
-            SELECT post_id, title, view 
-            FROM post 
-            WHERE department_check = 0 AND inform_check = 1 
-            ORDER BY post_id DESC 
-            LIMIT 5
-        `);
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.end();
-    }
-}
-
+//메인페이지에 전체 게시글 데이터를 가져온다.
 app.get('/MainPageSchoolPost', async (req, res) => {
     try {
         console.log("스쿨페이지로 http로 잘 전송됨")
@@ -153,44 +64,15 @@ app.get('/MainPageSchoolPost', async (req, res) => {
     }
 });
 
-async function insertDataIntoDB(post_id, user_id, department_check, inform_check, title, contents, view, like) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        // 데이터 삽입 쿼리 작성
-        const query = `INSERT INTO post (post_id, user_id, department_check, inform_check, title, contents, date, view, \`like\`) 
-               VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?)`;
-        // 쿼리 실행
-        const result = await conn.query(query, [post_id, user_id, department_check, inform_check, title, contents, view, like]);
-        console.log('Data inserted successfully:', result);
-    } catch (err) {
-        console.error('Error inserting data:', err);
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
-
-async function checkConnection() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        console.log('Successfully connected to MariaDB');
-    } catch (err) {
-        console.error('Error connecting to MariaDB:', err);
-    } finally {
-        if (conn) conn.end();
-    }
-}
-
+//게시글을 작성하여 데이터베이스에 넣는다.
 app.post('/post', async (req, res) => {
-    // POST 요청의 본문에서 데이터 추출
     const { post_id, user_id, department_check, inform_check, title, contents, data, view, like } = req.body;
     insertDataIntoDB(post_id, user_id, department_check, inform_check, title, contents, view, like);
     res.json({ message: 'Data received successfully', receivedData: { post_id, user_id, department_check, inform_check, title, contents, data, view, like } });
   });
   
 
-//게시판 전체 글 가져오기.
+//게시글화면에서 전체 게시글을 가져온다.
 app.get('/AllCommunity', async (req, res) => {
     try {
         console.log("커뮤니티 http로 잘 전송됨")
@@ -211,6 +93,7 @@ app.get('/AllCommunity', async (req, res) => {
     }
 });
 
+//회원가입
 app.post('/register', async (req, res) => {
     const { studentId, username, userpass, friendCode } = req.body;
   
@@ -226,7 +109,8 @@ app.post('/register', async (req, res) => {
     }
   });
   
-  app.post('/login', async (req, res) => {
+//로그인
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
   
     const conn = await pool.getConnection();
@@ -245,9 +129,9 @@ app.post('/register', async (req, res) => {
     }
   });
 
-
+  
+//서버 시작
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}/`);
 });
 
-checkConnection();

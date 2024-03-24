@@ -6,11 +6,14 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import IconD from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
 import CommunityScreen from './CommunityScreen';
+import { useEffect } from 'react';
 
 const Tab = createBottomTabNavigator();
 
-export const BottomNavigation = () => {
-    const navigation : any = useNavigation();
+export const BottomNavigation = ({route} : any) => {
+  const navigation : any = useNavigation();
+  const { userpk } = route.params;
+  console.log(userpk);
     return(
         <Tab.Navigator>
             <Tab.Screen name = "HomeScreen" 
@@ -21,13 +24,16 @@ export const BottomNavigation = () => {
                             },
                             headerRight: () => (
                               <View style = {{flexDirection : 'row'}}>
-                                 <TouchableOpacity onPress={() => navigation.navigate("DetailScreen")}>
+                                 <TouchableOpacity onPress={() => navigation.navigate("DetailScreen", {userpk : userpk})}>
                                     <IconD style = {{marginRight : 10}} name="form" size = {30} color="white" />
                                   </TouchableOpacity>
                               </View>
                             ),        
-                          }}/>
-            <Tab.Screen name = "CommunityScreen" component = {CommunityScreen}/>
+                          }}
+                          initialParams={{ userpk: userpk }}/>
+            <Tab.Screen name = "CommunityScreen" 
+                        component = {CommunityScreen}
+                        initialParams={{ userpk: userpk }}/>
         </Tab.Navigator>
     );
 };
