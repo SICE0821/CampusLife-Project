@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const EventPage : React.FC = () => {
+const EventShopScreen : React.FC = () => {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>EventPage</Text>
+      <Text>EventShopScreen</Text>
     </View>
   );
 };
 
-export default EventPage;
+export default EventShopScreen;

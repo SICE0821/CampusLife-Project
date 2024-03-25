@@ -5,6 +5,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
 
 import {MainScreenStackNavigator} from './StackNavigator';
 import {CommunityScreenStackNavigator} from './StackNavigator';
+import {EventTopTabNavigator} from './TopTabNavigator'
 import {EventScreenStackNavigator} from './StackNavigator';
 import {AttendanceScreenStackNavigator} from './StackNavigator';
 import {TimetableScreenStackNavigator} from './StackNavigator';
@@ -71,12 +72,7 @@ export const MainTabNavigator = () => {
             headerStyle: {
               backgroundColor: '#F27405',
             },
-            headerLeft: () => (
-              <TouchableOpacity 
-                  onPress={() => navigation.goBack()}>
-                  <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
-                </TouchableOpacity>
-            ),
+            headerShown : false,
             tabBarIcon: ({ color, size }) => (
               <IconB name="ticket" size={30} color={color} />
             ),
