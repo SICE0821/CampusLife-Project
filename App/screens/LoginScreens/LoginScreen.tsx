@@ -6,6 +6,7 @@ View,
 TextInput, 
 TouchableOpacity, 
 StatusBar,
+Alert
 } from 'react-native';
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -13,12 +14,13 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 function LoginScreen({ navigation}: any) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-  
+
+    
     const handleLogin = async () => {
       navigation.navigate('MainTabNavigator');
-    /*
+      /*
       try {
-        const response = await fetch('http://172.16.117.26:3000/login', {
+        const response = await fetch('http://172.30.1.37:3000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -38,10 +40,9 @@ function LoginScreen({ navigation}: any) {
         console.error('로그인 오류:', error);
         Alert.alert('로그인 오류');
       }
-    */
+      */
     };
     
-  
   
     const navigateToRegister = () => {
       navigation.navigate('RegisterPage');

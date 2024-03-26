@@ -1,11 +1,16 @@
 import GeneralPostsScreen from '../screens/CommunityScreens/GeneralPostsScreen'
 import BookmarkScreen from '../screens/CommunityScreens/BookmarkScreen'
 import HotPostsScreen from '../screens/CommunityScreens/HotPostsScreen'
+import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
+import DeadlineEventScreen from '../screens/EventScreens/RegularEventScreen';
+import EventShopScreen from '../screens/EventScreens/RegularEventScreen';
 import DepartmentPostsScreen from '../screens/CommunityScreens/DepartmentPostsScreen'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 
 const CommunityTopTab = createBottomTabNavigator();
 const CommunityTopBottomTab = createBottomTabNavigator();
+const EventTopTab = createMaterialTopTabNavigator();
 
 export const TopBottomTabNavigator = () => {
     
@@ -97,5 +102,31 @@ export const TopbTabNavigator = () => {
                             tabBarIcon: () => null,
                             }}/>
         </CommunityTopTab.Navigator>
+    );
+}
+
+export const EventTopTabNavigator = () => {
+    return(
+        <EventTopTab.Navigator>
+            <EventTopTab.Screen name = "정기 이벤트" 
+                                component={ ReqularEventScreen }
+                                options = {{
+                                    //headerShown : false,
+                                    //tabBarIcon: () => null,
+                                    }}
+                                />
+            <EventTopTab.Screen name = "한정 이벤트" 
+                                component = {DeadlineEventScreen}
+                                options = {{
+                                    //headerShown : false,
+                                    //tabBarIcon: () => null,
+                                    }}/>
+            <EventTopTab.Screen name = "이벤트 상점" 
+                                component = {EventShopScreen}
+                                options = {{
+                                //headerShown : false,
+                                //tabBarIcon: () => null,
+                                }}/>
+        </EventTopTab.Navigator>
     );
 }

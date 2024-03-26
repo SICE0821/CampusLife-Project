@@ -2,7 +2,13 @@ import React from 'react';
 import {Text, View, Button,} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+type user = {
+    id : number,
+    name : string,
+}
+
 const DetailScreen : React.FC = ({route} : any) => {
+
     const { userpk } = route.params;
     const navigation: any = useNavigation();
     console.log(userpk);

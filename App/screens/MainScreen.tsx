@@ -47,7 +47,7 @@ const MainPage = () => {
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.30.1.31:3000/MainPageSchoolPost');
+        const response = await fetch('http://172.30.1.37:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -61,7 +61,7 @@ const MainPage = () => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.30.1.31:3000/MainPagedepartmentPost');
+        const response = await fetch('http://172.30.1.37:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -75,7 +75,7 @@ const MainPage = () => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.30.1.31:3000/MainPagehotPost');
+        const response = await fetch('http://172.30.1.37:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }

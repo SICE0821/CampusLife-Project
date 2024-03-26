@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
 import MainScreen from '../screens/MainScreen';
-import EventScreen from '../screens/EventScreen';
+import {EventTopTabNavigator} from './TopTabNavigator'
 import AttendanceScreen from '../screens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
 import WritePostScreen from '../screens/CommunityScreens/WritePostScreen';
@@ -120,9 +120,25 @@ export const CommunityScreenStackNavigator = () => {
 
 //이벤트 페이지 관련 스택 네비게이터
 export const EventScreenStackNavigator = () => {
+    const navigation :any = useNavigation();
     return(
         <EventStack.Navigator>
-            <EventStack.Screen name = "EventScreen" component = {EventScreen}/>
+            <EventStack.Screen name = "이벤트" 
+                               component = {EventTopTabNavigator}
+                               options={{
+                                headerStyle: {
+                                  backgroundColor: '#F27405',
+                                },
+                                headerLeft: () => (
+                                  <TouchableOpacity 
+                                      onPress={() => navigation.goBack()}>
+                                      <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                                    </TouchableOpacity>
+                                ),
+                                headerTintColor: 'white',
+                                headerTitleAlign: 'center',
+                                title: '이벤트',
+                              }}/>
         </EventStack.Navigator>
     );
 };
