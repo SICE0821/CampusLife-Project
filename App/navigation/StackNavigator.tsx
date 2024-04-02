@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, TouchableOpacity, View} from 'react-native';
+import React, {useLayoutEffect} from 'react';
+import { Text, Touchable, TouchableOpacity, View} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 
@@ -12,12 +12,16 @@ import LoginScreen from '../screens/LoginScreens/LoginScreen';
 import RegisterScreen from '../screens/LoginScreens/RegisterScreen';
 import SearchScreen from '../screens/LoginScreens/SearchScreen';
 import { RootStackParam } from '../types/type';
+import EventShopScreen from '../screens/EventScreens/EventShopScreen'
+import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+
 
 import {MainTabNavigator} from './BottomTabNavigator'
 import {TopbTabNavigator} from './TopTabNavigator'
 
 import IconD from 'react-native-vector-icons/AntDesign';
-import IconA from 'react-native-vector-icons/Entypo';
+import IconG from 'react-native-vector-icons/FontAwesome6';
 
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
@@ -26,6 +30,7 @@ const CoummunityStack = createStackNavigator<RootStackParam>();
 const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
+const EventShopStack = createStackNavigator();
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = () => {
@@ -119,11 +124,17 @@ export const CommunityScreenStackNavigator = () => {
 };
 
 //이벤트 페이지 관련 스택 네비게이터
-export const EventScreenStackNavigator = () => {
-    const navigation :any = useNavigation();
+export const EventScreenStackNavigator = ({navigation, route} : any) => {
+    React.useLayoutEffect(() => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+        if(routeName === "EventHaveCouponScreen") {
+            console.log(routeName);
+            //navigation.setOptions({tabBarStyle: {display: 'none'}});
+        }
+    }, [navigation, route])
     return(
         <EventStack.Navigator>
-            <EventStack.Screen name = "이벤트" 
+            <EventStack.Screen name = "EventTopTabNavigator" 
                                component = {EventTopTabNavigator}
                                options={{
                                 headerStyle: {
@@ -135,10 +146,32 @@ export const EventScreenStackNavigator = () => {
                                       <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                                     </TouchableOpacity>
                                 ),
+                                headerRight: () => (
+                                    <TouchableOpacity
+                                        onPress = {() => navigation.navigate("EventHaveCouponScreen")}>
+                                        <Text style = {{color : 'black', marginRight : 10,}}><IconG name = "ticket" size = {30}/></Text>
+                                    </TouchableOpacity>
+                                ),
                                 headerTintColor: 'white',
                                 headerTitleAlign: 'center',
                                 title: '이벤트',
                               }}/>
+            <EventShopStack.Screen name = "EventHaveCouponScreen" 
+                                   component = {EventHaveCouponScreen}
+                                   options={{
+                                    headerStyle: {
+                                      backgroundColor: '#F27405',
+                                    },
+                                    headerLeft: () => (
+                                      <TouchableOpacity 
+                                          onPress={() => navigation.navigate("EventTopTabNavigator")}>
+                                          <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                                        </TouchableOpacity>
+                                    ),
+                                    headerTintColor: 'white',
+                                    headerTitleAlign: 'center',
+                                    title: '이벤트',
+                                  }}/>
         </EventStack.Navigator>
     );
 };
@@ -152,7 +185,7 @@ export const AttendanceScreenStackNavigator = () => {
     );
 };
 
-//시간표 페이지 과녈ㄴ 스택 네비게이터
+//시간표 페이지 관련 스택 네비게이터
 export const TimetableScreenStackNavigator = () => {
     return(
         <TimetableStack.Navigator>
@@ -160,3 +193,12 @@ export const TimetableScreenStackNavigator = () => {
         </TimetableStack.Navigator>
     );
 };
+
+export const EventShopScreenStackNavigator = ({navigation, route} : any) => {
+    return(
+        <EventShopStack.Navigator>
+            <EventShopStack.Screen name = "EventShopScreen" component = {EventShopScreen} options = {{
+            headerShown : false}}/>
+        </EventShopStack.Navigator>
+    )
+}

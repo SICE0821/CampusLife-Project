@@ -3,11 +3,12 @@ import BookmarkScreen from '../screens/CommunityScreens/BookmarkScreen'
 import HotPostsScreen from '../screens/CommunityScreens/HotPostsScreen'
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
 import DeadlineEventScreen from '../screens/EventScreens/RegularEventScreen';
-import EventShopScreen from '../screens/EventScreens/RegularEventScreen';
 import DepartmentPostsScreen from '../screens/CommunityScreens/DepartmentPostsScreen'
+import {EventShopScreenStackNavigator} from '../navigation/StackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import React, { useState, useLayoutEffect } from 'react';
 const CommunityTopTab = createBottomTabNavigator();
 const CommunityTopBottomTab = createBottomTabNavigator();
 const EventTopTab = createMaterialTopTabNavigator();
@@ -105,7 +106,14 @@ export const TopbTabNavigator = () => {
     );
 }
 
-export const EventTopTabNavigator = () => {
+export const EventTopTabNavigator = ({navigation, route} : any) => {
+    React.useLayoutEffect(() => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+        if(routeName === "이벤트 상점") {
+            console.log(routeName);
+            navigation.setOptions({tabBarStyle: {display: 'none'}});
+        }
+    }, [navigation, route])
     return(
         <EventTopTab.Navigator>
             <EventTopTab.Screen name = "정기 이벤트" 
@@ -118,11 +126,10 @@ export const EventTopTabNavigator = () => {
             <EventTopTab.Screen name = "한정 이벤트" 
                                 component = {DeadlineEventScreen}
                                 options = {{
-                                    //headerShown : false,
-                                    //tabBarIcon: () => null,
+                                    
                                     }}/>
             <EventTopTab.Screen name = "이벤트 상점" 
-                                component = {EventShopScreen}
+                                component = {EventShopScreenStackNavigator}
                                 options = {{
                                 //headerShown : false,
                                 //tabBarIcon: () => null,

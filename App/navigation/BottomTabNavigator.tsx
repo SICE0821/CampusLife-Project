@@ -54,6 +54,7 @@ export const MainTabNavigator = () => {
           component={CommunityScreenStackNavigator}
           options={{
           headerShown : false,
+          //tabBarStyle : {display : 'none'},
           tabBarIcon: ({ color, size }) => (
               <IconA name="chat" size={30} color={color} />
           ),
@@ -72,6 +73,7 @@ export const MainTabNavigator = () => {
             headerStyle: {
               backgroundColor: '#F27405',
             },
+            tabBarStyle : {display : 'none'},
             headerShown : false,
             tabBarIcon: ({ color, size }) => (
               <IconB name="ticket" size={30} color={color} />

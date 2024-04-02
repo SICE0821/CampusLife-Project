@@ -44,7 +44,7 @@ const GeneralPostsScreen:React.FC = () => {
     
       const renderItem = ({ item }: { item: Data }) => (
         <TouchableWithoutFeedback onPress={() => console.log(item.id)}>
-            <View style = {styles.writeboxcontainer}>
+        <View style = {styles.writeboxcontainer}>
           <View style = {styles.writetitle}>
             <View style = {styles.titlebox}>
                 <Text style = {{fontSize : 20, margin : 5, marginLeft: 5, color : 'black'}}>{item.title}</Text>
@@ -94,22 +94,23 @@ const styles = StyleSheet.create({
     },
 
     topnavigationspace : {
-        flex : 0.07,
+        height : 0.07,
         //backgroundColor : 'yellow',
     },
 
     topnavigationborder : {
-        flex : 0.93,
+        flex : 1,
         //backgroundColor : "red",
         borderWidth : 2,
         borderTopLeftRadius : 10,
         borderTopRightRadius : 10,
+        marginTop : 50,
     },
 
     flatlisttopline : {
         //backgroundColor : 'red',
         //right : 118,
-        height : 49, 
+        height : 60, 
         borderBottomWidth :1,
         borderBottomColor: '#CCCCCC'
     },
