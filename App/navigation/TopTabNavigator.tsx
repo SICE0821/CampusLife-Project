@@ -2,8 +2,8 @@ import GeneralPostsScreen from '../screens/CommunityScreens/GeneralPostsScreen'
 import BookmarkScreen from '../screens/CommunityScreens/BookmarkScreen'
 import HotPostsScreen from '../screens/CommunityScreens/HotPostsScreen'
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
-import DeadlineEventScreen from '../screens/EventScreens/RegularEventScreen';
-import EventShopScreen from '../screens/EventScreens/RegularEventScreen';
+import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
+import EventShopScreen from '../screens/EventScreens/EventShopScreen';
 import DepartmentPostsScreen from '../screens/CommunityScreens/DepartmentPostsScreen'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';

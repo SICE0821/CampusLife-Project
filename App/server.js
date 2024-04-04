@@ -10,10 +10,10 @@ const { getDataFormTable,
 app.use(express.json());
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '127.0.0.1',
   port: 3306,
-  user: 'yuhwan',
-  password: '0000',
+  user: 'root',
+  password: '1214',
   connectionLimit: 5,
   database: 'campuslife',
 });

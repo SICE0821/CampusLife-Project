@@ -69,6 +69,7 @@ export const MainTabNavigator = () => {
           component={EventScreenStackNavigator}
           options={{
             title: '이벤트',
+            tabBarStyle : {display : 'none'},
             headerStyle: {
               backgroundColor: '#F27405',
             },
