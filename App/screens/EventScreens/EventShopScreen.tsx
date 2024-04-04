@@ -1,45 +1,37 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import ModalBox from 'react-native-modalbox';
 import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconD from 'react-native-vector-icons/FontAwesome6';
+const restaurantpng = require('../../assets/restaurant1.png');
+const penpng = require('../../assets/pen1.png');
+const coffeepng = require('../../assets/coffee1.png');
+
 const dataList: any[] = [
   {
-    firstitemname: "현금교환",
+    firstitemname: "식권",
     firstvalue: "2000p",
-    seconditemname: "식권",
+    seconditemname: "커피",
     secondvalue: "3000P"
   },
   {
-    firstitemname: "현금교환",
+    firstitemname: "식권",
     firstvalue: "2000p",
-    seconditemname: "식권",
+    seconditemname: "커피",
     secondvalue: "3000P"
   },
   {
-    firstitemname: "현금교환",
+    firstitemname: "식권",
     firstvalue: "2000p",
-    seconditemname: "식권",
+    seconditemname: "커피",
     secondvalue: "3000P"
   },
   {
-    firstitemname: "현금교환",
+    firstitemname: "식권",
     firstvalue: "2000p",
-    seconditemname: "식권",
-    secondvalue: "3000P"
-  },
-  {
-    firstitemname: "현금교환",
-    firstvalue: "2000p",
-    seconditemname: "식권",
-    secondvalue: "3000P"
-  },
-  {
-    firstitemname: "현금교환",
-    firstvalue: "2000p",
-    seconditemname: "식권",
+    seconditemname: "커피",
     secondvalue: "3000P"
   },
 ];
@@ -70,7 +62,7 @@ const EventShopScreen: React.FC = () => {
     <View style={styles.itemrowcontainer}>
       <TouchableOpacity style={styles.itemonebox} onPress={selectItem}>
         <View style={styles.square}>
-          <Text style={{ color: 'black' }}><IconG name="cash" size={160} /></Text>
+          <Image style = {{width : 130, height : 130}} source = {restaurantpng}/>
         </View>
         <View style={styles.fontbox}>
           <Text style={{ fontSize: 20, fontWeight: 'bold', color: "black", marginLeft: 10 }}>{item.firstitemname}</Text>
@@ -80,7 +72,7 @@ const EventShopScreen: React.FC = () => {
 
       <TouchableOpacity style={styles.itemonebox}>
         <View style={styles.square}>
-          <Text style={{ color: 'black' }}><IconD name="ticket" size={105} /></Text> 
+          <Image style = {{width : 130, height : 130}} source = {coffeepng}/>
         </View>
         <View style={styles.fontbox}>
           <Text style={{ fontSize: 20, fontWeight: 'bold', color: "black", marginLeft: 10 }}>{item.seconditemname}</Text>
@@ -109,50 +101,48 @@ const EventShopScreen: React.FC = () => {
         onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
       >
         <View style={styles.modalContent}>
-          <View style = {styles.modalHeader}>
-            <Text style = {styles.headertext}>구입상품 : </Text>
-            <Text style = {styles.headertext}>현금 교환</Text>
-            <View style = {styles.itembox2}>
+          <View style={styles.modalHeader}>
+            <Text style={styles.headertext}>구입상품 : </Text>
+            <Text style={styles.headertext}>현금 교환</Text>
+            <View style={styles.itembox2}>
               <Text style={{ color: 'black' }}><IconG name="cash" size={45} /></Text>
             </View>
           </View>
-          <View style = {styles.text2}>
-            <View style = {styles.icon1}>
-              <Text style = {{marginLeft : 2, color : '#9A9EFF'}}> <IconA name="payments" size ={33} /></Text>
+          <View style={styles.text2}>
+            <View style={styles.iconbox}>
+              <Text style={{ color: '#9A9EFF', marginTop: 5, marginLeft: 30, }}> <IconA name="payments" size={33} /></Text>
             </View>
-            <View style = {styles.text3}>
-              <Text style = {{fontSize : 18, color : 'black'}}>현재 잔액 :</Text>
-            </View>
-            <View style = {styles.money}>
-              <Text style = {{fontSize : 18, color : 'black'}}>10000P</Text>
+            <View style={styles.textbox}>
+              <Text style={{ fontSize: 18, color: 'black' }}>현재 잔액 :</Text>
+              <Text style={{ fontSize: 18, color: 'black' }}>10000P</Text>
             </View>
           </View>
-          <View style = {styles.text2}>
-            <View style = {styles.icon2}>
-              <Text style = {{ color : 'black', marginRight : 3,}}> <IconG name="cash" size ={35} /></Text>
-            </View>
-            <View style = {styles.text3}>
-              <Text style = {{fontSize : 18, color : 'black',}}>상품 금액 :</Text>
-            </View>
-            <View style = {styles.money}>
-              <Text style = {{fontSize : 18, color : 'black'}}>2000P</Text>
-            </View>
-          </View>
-          <View style = {styles.text2}>
-            <View style = {styles.icon1}>
-              <Text style = {{marginLeft : 2, color : 'red'}}> <IconA name="payments" size ={33} /></Text>
-            </View>
-            <View style = {styles.text3}>
-              <Text style = {{fontSize : 18, color : 'black'}}>현재 잔액 :</Text>
-            </View>
-            <View style = {styles.money}>
-              <Text style = {{fontSize : 18, color : 'black'}}>10000 - 2000 = 8000P</Text>
-            </View>
-          </View>
-          <View style = {styles.selectButton}>
-              <View style = {styles.ButtonBox}>
-                <Text style = {{color : 'black', fontWeight : 'bold', fontSize : 23, marginTop : 5}}>구입하기</Text>
+          <View style={styles.text2}>
+            <View style={styles.iconbox}>
+              <View style={styles.icon2}>
+                <Text style={{ color: 'black' }}><IconG name="cash" size={40} /></Text>
               </View>
+            </View>
+            <View style={styles.textbox}>
+              <Text style={{ fontSize: 18, color: 'black', }}>상품 금액 :</Text>
+              <Text style={{ fontSize: 18, color: 'black' }}>2000P</Text>
+            </View>
+          </View>
+          <View style={styles.text2}>
+            <View style={styles.iconbox}>
+              <Text style={{color: 'red',marginTop: 5, marginLeft: 30, }}> <IconA name="payments" size={33} /></Text>
+            </View>
+            <View style={styles.textbox}>
+              <Text style={{ fontSize: 18, color: 'black' }}>현재 잔액 :</Text>
+              <View style={styles.money}>
+                <Text style={{ fontSize: 18, color: 'black' }}>10000 - 2000 = 8000P</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.selectButton}>
+            <View style={styles.ButtonBox}>
+              <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 23, marginTop: 5 }}>구입하기</Text>
+            </View>
           </View>
         </View>
       </ModalBox>
@@ -200,87 +190,92 @@ const styles = StyleSheet.create({
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: 300,
+    height: 350,
   },
   modalContent: {
     flex: 1,
     //backgroundColor: 'red',
-    borderTopLeftRadius : 20,
-    borderTopRightRadius : 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
-  modalHeader : {
-    flex : 0.3,
-    //backgroundColor : 'blue',
-    borderTopLeftRadius : 20,
-    borderTopRightRadius : 20,
-    justifyContent : 'center',
-    alignItems : 'center',
-    flexDirection : 'row',
+  modalHeader: {
+    flex: 0.2,
+    //backgroundColor: 'blue',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
-  headertext : {
-    fontSize : 30,
-    fontWeight : 'bold',
-    color : 'black',
-    marginTop : 20,
-  },
-  itembox2 : {
-    flex : 0.33,
-    backgroundColor : '#FFDECF',
-    borderRadius : 5,
-    justifyContent : 'center',
-    alignItems : 'center',
-    marginLeft : 5,
+  headertext: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'black',
     marginTop : 15,
   },
-  text2 : {
-    flex : 0.15,
-    //backgroundColor : 'blue',
-    flexDirection : 'row'
+  itembox2: {
+    height: 45,
+    width: 45,
+    backgroundColor: '#FFDECF',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+    marginTop : 15,
   },
-  icon1: {
-    width : 50,
-    //flex : 0.3,
-    //backgroundColor : 'green',
-    marginLeft : 30,
-    justifyContent : 'center',
-    alignItems : 'center',
+  text2: {
+    flex: 0.15,
+    //backgroundColor: 'red',
+    flexDirection: 'row',
+    //marginBottom: 10,
   },
-  text3 : {
-    flex : 0.25,
+  text3: {
+    flex: 0.25,
     //backgroundColor : 'red',
-    justifyContent : 'center',
-    alignItems : 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  money : {
-    flex : 0.7,
+  money: {
+    flex: 0.7,
     //backgroundColor : 'yellow',
-    justifyContent : 'center',
+    justifyContent: 'center',
   },
   icon2: {
-    height : 43,
-    width : 43,
-    //flex : 0.3,
-    backgroundColor : '#FFDECF',
-    marginLeft : 34,
-    justifyContent : 'center',
-    alignItems : 'center',
-    borderRadius : 10,
+    height: 40,
+    width: 40,
+    backgroundColor: '#FFDECF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 5,
+    marginLeft: 30,
   },
-  selectButton : {
-    flex : 0.25,
+  selectButton: {
+    flex: 0.25,
     //backgroundColor : 'blue',
-    justifyContent : 'center',
-    alignItems : 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  ButtonBox : {
-    width : 270,
-    height : 45,
-    margin : 20,
-    borderRadius : 10,
-    backgroundColor : '#9A9EFF',
-    justifyContent : 'center',
+  ButtonBox: {
+    width: 270,
+    height: 45,
+    margin: 20,
+    borderRadius: 10,
+    backgroundColor: '#9A9EFF',
+    justifyContent: 'center',
     //alignContent : 'center',
-    flexDirection : 'row'
+    flexDirection: 'row'
+  },
+  iconbox: {
+    flex: 0.2,
+    //backgroundColor: 'yellow',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  textbox: {
+    flex: 0.8,
+    //backgroundColor: 'green',
+    alignItems: 'center',
+    flexDirection: 'row',
   }
 
 });

@@ -48,14 +48,14 @@ export const TopBottomTabNavigator = () => {
                             }}>
             </CommunityTopBottomTab.Screen>
 
-            <CommunityTopBottomTab.Screen name = 'HOT게시글' component={BookmarkScreen} options = {{
+            <CommunityTopBottomTab.Screen name = 'HOT게시글' component={HotPostsScreen} options = {{
                             headerShown : false,
                             tabBarIcon: () => null,
 
                             }} >
             </CommunityTopBottomTab.Screen>
 
-            <CommunityTopBottomTab.Screen name = '책갈피' component={HotPostsScreen} options = {{
+            <CommunityTopBottomTab.Screen name = '책갈피' component={BookmarkScreen} options = {{
                             headerShown : false,
                             tabBarIcon: () => null,
                             }} >

@@ -24,7 +24,7 @@ const GeneralPostsScreen:React.FC = () => {
 
     const fetchData = async () => {
         try {
-          const response = await fetch('http://172.30.1.31:3000/AllCommunity');
+          const response = await fetch('http://172.30.1.8:3000/AllCommunity');
           if (!response.ok) {
             throw new Error('서버 응답 실패');
           }
@@ -70,8 +70,6 @@ const GeneralPostsScreen:React.FC = () => {
 
     return (
         <View style = {styles.container}>
-            <View style = {styles.topnavigationspace}>
-            </View>
             <View style = {styles.topnavigationborder}>
                 <View style = {styles.flatlisttopline}>
                 </View>   
@@ -93,10 +91,6 @@ const styles = StyleSheet.create({
         backgroundColor : 'white',
     },
 
-    topnavigationspace : {
-        height : 0.07,
-        //backgroundColor : 'yellow',
-    },
 
     topnavigationborder : {
         flex : 1,
