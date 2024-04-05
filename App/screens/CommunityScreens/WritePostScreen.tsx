@@ -40,7 +40,7 @@ const WritePostPage : React.FC = () => {
         };
       
         try {
-          const response = await fetch('http:// 172.16.108.216:3000/post', {
+          const response = await fetch('http://172.16.117.109:3000/post', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
