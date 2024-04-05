@@ -88,8 +88,12 @@ export const MainTabNavigator = () => {
           component={AttendanceScreenStackNavigator}
           options={{
             title: '출석',
+            headerStyle: {
+              backgroundColor: '#F27405',
+            },
+            headerShown : false,
             tabBarIcon: ({ color, size }) => (
-              <IconA name="check" size={37} color={color} /> 
+              <IconB name="ticket" size={30} color={color} />
             ),
             tabBarLabel: () => (
               <Text style={{ fontSize: 13, marginBottom: 5 }}>출석</Text>

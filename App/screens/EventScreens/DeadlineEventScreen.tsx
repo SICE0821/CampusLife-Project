@@ -16,7 +16,7 @@ const DeadlineEventScreen : React.FC = () => {
   };
 
   return (
-      <View>
+      <View style = {{flex : 1, backgroundColor : 'white'}}>
         <View style={styles.eventBox1}>
           <Text style={styles.title}>대학 촬영 대회</Text>
           <Text style={styles.subtitle}>대학 경치를 촬영해 응모! 수상자는 포인트 지급!</Text>

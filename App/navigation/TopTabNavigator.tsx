@@ -116,7 +116,9 @@ export const EventTopTabNavigator = ({navigation, route} : any) => {
         }
     }, [navigation, route])
     return(
-        <EventTopTab.Navigator>
+        <EventTopTab.Navigator screenOptions={{
+            swipeEnabled : false
+        }}>
             <EventTopTab.Screen name = "정기 이벤트" 
                                 component={ ReqularEventScreen }
                                 options = {{

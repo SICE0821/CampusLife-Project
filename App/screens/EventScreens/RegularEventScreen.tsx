@@ -6,7 +6,7 @@ import Swiper from 'react-native-swiper';
 const calendarpng = require('../../assets/calendar.png');
 const friendcodepng = require('../../assets/friendcode.png');
 
-const RegularEventScreen : React.FC = () => {
+const RegularEventScreen: React.FC = () => {
 
   const navigation = useNavigation();
 
@@ -17,35 +17,40 @@ const RegularEventScreen : React.FC = () => {
   };
 
   return (
-    <View style={{height:600}}>
-    <Swiper
-    loop={false}
-    showsPagination={true} 
-    activeDotStyle={{ backgroundColor: 'blue', width: 10, height: 10 }}>
-      {/* 첫 번째 슬라이드 */}
-      <View>
-        <View style={styles.eventBox1}>
-          <Text style={styles.title}>출석체크</Text>
-          <Text style={styles.subtitle}>매일 출석 도장을 찍으면 100 point 지급!</Text>
-          <Image style={styles.imageStyle} source={calendarpng}/>
-        </View>
-        <TouchableOpacity style={styles.button1} onPress={handleButtonPress}>
-          <Text style={styles.buttonText}>출석체크 하러가기</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 0.87, backgroundColor: 'white' }}>
+        <Swiper
+          loop={false}
+          showsPagination={true}
+          activeDotStyle={{ backgroundColor: 'blue', width: 10, height: 10 }}>
+          {/* 첫 번째 슬라이드 */}
+          <View>
+            <View style={styles.eventBox1}>
+              <Text style={styles.title}>출석체크</Text>
+              <Text style={styles.subtitle}>매일 출석 도장을 찍으면 100 point 지급!</Text>
+              <Image style={styles.imageStyle} source={calendarpng} />
+            </View>
+            <TouchableOpacity style={styles.button1} onPress={handleButtonPress}>
+              <Text style={styles.buttonText}>출석체크 하러가기</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* 두 번째 슬라이드 */}
-      <View>
-        <View style={styles.eventBox2}>
-          <Text style={styles.title}>친구코드</Text>
-          <Text style={styles.subtitle}>친구에게 코드를 보내주면 10point 지급!</Text>
-          <Image style={styles.imageStyle} source={friendcodepng}/>
-        </View>
-        <TouchableOpacity style={styles.button2} onPress={handleButtonPress}>
-          <Text style={styles.buttonText}>자세히 보기</Text>
-        </TouchableOpacity>
+          {/* 두 번째 슬라이드 */}
+          <View>
+            <View style={styles.eventBox2}>
+              <Text style={styles.title}>친구코드</Text>
+              <Text style={styles.subtitle}>친구에게 코드를 보내주면 10point 지급!</Text>
+              <Image style={styles.imageStyle} source={friendcodepng} />
+            </View>
+            <TouchableOpacity style={styles.button2} onPress={handleButtonPress}>
+              <Text style={styles.buttonText}>자세히 보기</Text>
+            </TouchableOpacity>
+          </View>
+        </Swiper>
       </View>
-    </Swiper>
+      <View style={{ flex: 0.13, backgroundColor: 'white' }}>
+
+      </View>
     </View>
   );
 };

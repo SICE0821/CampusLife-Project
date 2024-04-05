@@ -177,10 +177,25 @@ export const EventScreenStackNavigator = ({navigation, route} : any) => {
 };
 
 //출석체크 페이지 관련 스택 네비게이터
-export const AttendanceScreenStackNavigator = () => {
+export const AttendanceScreenStackNavigator = ({navigation, route} : any) => {
     return(
         <AttendanceStack.Navigator>
-            <AttendanceStack.Screen name = "AttendanceScreen" component = {AttendanceScreen}/>
+            <AttendanceStack.Screen name = "AttendanceScreen" 
+                                    component = {AttendanceScreen}
+                                    options={{
+                                        headerStyle: {
+                                          backgroundColor: '#F27405',
+                                        },
+                                        headerLeft: () => (
+                                          <TouchableOpacity 
+                                              onPress={() => navigation.navigate("MainPage")}>
+                                              <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                                            </TouchableOpacity>
+                                        ),
+                                        headerTintColor: 'white',
+                                        headerTitleAlign: 'center',
+                                        title: '출석',
+                                      }}/>
         </AttendanceStack.Navigator>
     );
 };
