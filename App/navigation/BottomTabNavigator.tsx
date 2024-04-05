@@ -70,10 +70,10 @@ export const MainTabNavigator = () => {
           component={EventScreenStackNavigator}
           options={{
             title: '이벤트',
+            tabBarStyle : {display : 'none'},
             headerStyle: {
               backgroundColor: '#F27405',
             },
-            tabBarStyle : {display : 'none'},
             headerShown : false,
             tabBarIcon: ({ color, size }) => (
               <IconB name="ticket" size={30} color={color} />
