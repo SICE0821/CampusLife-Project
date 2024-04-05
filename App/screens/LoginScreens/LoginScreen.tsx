@@ -6,6 +6,7 @@ View,
 TextInput, 
 TouchableOpacity, 
 StatusBar,
+Alert,
 } from 'react-native';
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
@@ -16,9 +17,8 @@ function LoginScreen({ navigation}: any) {
   
     const handleLogin = async () => {
       navigation.navigate('MainTabNavigator');
-    /*
-      try {
-        const response = await fetch('http://172.16.117.26:3000/login', {
+      /*try {
+        const response = await fetch('http://172.16.108.216:3000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ function LoginScreen({ navigation}: any) {
         });
         const data = await response.text();
         if (data === 'success') {
-          Alert.alert('로그인 성공');
+          navigation.navigate('MainTabNavigator');
         } else {
           Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
         }
@@ -38,11 +38,9 @@ function LoginScreen({ navigation}: any) {
         console.error('로그인 오류:', error);
         Alert.alert('로그인 오류');
       }
-    */
-    };
+      */
     
-  
-  
+    };
     const navigateToRegister = () => {
       navigation.navigate('RegisterPage');
     };

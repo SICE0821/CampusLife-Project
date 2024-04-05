@@ -89,6 +89,7 @@ export const MainTabNavigator = () => {
           name="AttendanceStackNavigator"
           component={AttendanceScreenStackNavigator}
           options={{
+            headerShown : false,
             title: '출석',
             tabBarIcon: ({ color, size }) => (
               <IconA name="check" size={37} color={color} /> 

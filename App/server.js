@@ -9,6 +9,15 @@ const { getDataFormTable,
         insertDataIntoDB } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
+const pool = mariadb.createPool({
+  host: '14.6.152.64',
+  port: 3306,
+  user: 'dohyun',
+  password: '0000',
+  connectionLimit: 5,
+  database: 'campuslife',
+});
+
 //메인페이지에 핫 게시글 데이터를 가져온다.
 app.get('/MainPagehotPost', async (req, res) => {
     try {
@@ -112,7 +121,6 @@ app.post('/register', async (req, res) => {
 //로그인
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-  
     const conn = await pool.getConnection();
     try {
       const result = await conn.query('SELECT * FROM user WHERE id = ? AND passwd = ?', [username, password]);
