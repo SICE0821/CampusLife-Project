@@ -122,7 +122,6 @@ app.post('/register', async (req, res) => {
 //로그인
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-  
     const conn = await pool.getConnection();
     try {
       const result = await conn.query('SELECT * FROM user WHERE id = ? AND passwd = ?', [username, password]);

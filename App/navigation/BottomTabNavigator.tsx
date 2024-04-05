@@ -87,6 +87,7 @@ export const MainTabNavigator = () => {
           name="AttendanceStackNavigator"
           component={AttendanceScreenStackNavigator}
           options={{
+            headerShown : false,
             title: '출석',
             headerStyle: {
               backgroundColor: '#F27405',

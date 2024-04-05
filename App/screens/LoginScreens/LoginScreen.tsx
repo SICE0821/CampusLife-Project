@@ -32,7 +32,7 @@ function LoginScreen({ navigation}: any) {
         });
         const data = await response.text();
         if (data === 'success') {
-          Alert.alert('로그인 성공');
+          navigation.navigate('MainTabNavigator');
         } else {
           Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
         }
