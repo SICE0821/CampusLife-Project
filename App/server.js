@@ -2,15 +2,17 @@ const express = require("express");
 const app = express();
 const PORT = 3000;
 const mariadb = require('mariadb');
-const { getDataFormTable,
+const { getGeneralPosts,
+        getDepartmentPosts,
         gethotpostdata, 
         getdeparmentpostdata, 
         getschoolpostdata, 
         insertDataIntoDB } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
+
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -83,10 +85,9 @@ app.post('/post', async (req, res) => {
   
 
 //게시글화면에서 전체 게시글을 가져온다.
-app.get('/AllCommunity', async (req, res) => {
+app.get('/generalpost', async (req, res) => {
     try {
-        console.log("커뮤니티 http로 잘 전송됨")
-        const rows = await getDataFormTable();
+        const rows = await getGeneralPosts();
         const processedData = rows.map(item => ({
             id: item.post_id,
             title: item.title,
@@ -101,6 +102,25 @@ app.get('/AllCommunity', async (req, res) => {
         console.error(error); 
         res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+app.get('/departmentpost', async (req, res) => {
+  try {
+      const rows = await getDepartmentPosts();
+      const processedData = rows.map(item => ({
+          id: item.post_id,
+          title: item.title,
+          writer: item.user_id,
+          time: item.date,
+          watch: item.view,
+          like: item.like
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 //회원가입

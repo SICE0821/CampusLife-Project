@@ -92,9 +92,8 @@ export const MainTabNavigator = () => {
             headerStyle: {
               backgroundColor: '#F27405',
             },
-            headerShown : false,
             tabBarIcon: ({ color, size }) => (
-              <IconB name="ticket" size={30} color={color} />
+              <IconA name="check" size={37} color={color} />
             ),
             tabBarLabel: () => (
               <Text style={{ fontSize: 13, marginBottom: 5 }}>출석</Text>
