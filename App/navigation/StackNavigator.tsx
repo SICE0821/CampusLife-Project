@@ -15,6 +15,7 @@ import { RootStackParam } from '../types/type';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen'
 import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 
 
 import { MainTabNavigator } from './BottomTabNavigator'
@@ -58,6 +59,10 @@ export const RootStackNavigator = () => {
                     title: '커뮤니티',
                 })}
             />
+            <RootStack.Screen name="SearchPostScreen"
+                component={SearchPostScreen}
+                options={{ headerShown: false }}>
+            </RootStack.Screen>
         </RootStack.Navigator>
     )
 }
@@ -105,7 +110,7 @@ export const CommunityScreenStackNavigator = () => {
                             <TouchableOpacity onPress={() => navigation.navigate("WritePostScreen")}>
                                 <IconD style={{ marginRight: 10 }} name="form" size={30} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { console.log("찾기 버튼 누름") }}>
+                            <TouchableOpacity onPress={() => navigation.navigate("SearchPostScreen")}>
                                 <IconD style={{ marginRight: 10 }} name="search1" size={30} color="white" />
                             </TouchableOpacity>
                         </View>

@@ -57,7 +57,7 @@ const WritePostPage: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://172.16.117.89:3000/post', {
+      const response = await fetch('http://172.30.1.72:3000/post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ const WritePostPage: React.FC = () => {
         </View>
         <View style={styles.writespace}>
           <TextInput
-            style={{ fontSize: 20 }}
+            style={{ fontSize: 20, }}
             onChangeText={handlemainTextChange}
             value={maintext}
             multiline={true}
@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
     //marginTop : 10,
     fontSize: 20,
     color: 'black',
+    //backgroundColor : 'yellow'
   },
   writespace: {
     margin: 15,
