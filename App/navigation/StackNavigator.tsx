@@ -15,6 +15,7 @@ import { RootStackParam } from '../types/type';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen'
 import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
 
 
 import { MainTabNavigator } from './BottomTabNavigator'
@@ -44,6 +45,23 @@ export const RootStackNavigator = () => {
             <RootStack.Screen
                 name="WritePostScreen"
                 component={WritePostScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("CommunityScreenStackNavigator")}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '커뮤니티',
+                })}
+            />
+            <RootStack.Screen
+                name = "PostDetailScreen"
+                component={PostDetailScreen}
                 options={({ navigation }: any) => ({
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -105,7 +123,7 @@ export const CommunityScreenStackNavigator = () => {
                             <TouchableOpacity onPress={() => navigation.navigate("WritePostScreen")}>
                                 <IconD style={{ marginRight: 10 }} name="form" size={30} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => { console.log("찾기 버튼 누름") }}>
+                            <TouchableOpacity onPress={() => {navigation.navigate("PostDetailScreen")}}>
                                 <IconD style={{ marginRight: 10 }} name="search1" size={30} color="white" />
                             </TouchableOpacity>
                         </View>

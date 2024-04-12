@@ -1,16 +1,37 @@
-import React from 'react';
-import {Text, View, Button,} from 'react-native';
+import React, { useState } from 'react';
+import { Text, View, Button, StyleSheet, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const LoginScreen : React.FC = ({navigation} : any, {route} : any) => {
-    const pk : number = 1;
-    const name : string = "유환";
+const LoginScreen: React.FC = ({ navigation }: any, { route }: any) => {
+    const [Text, setText] = useState('');
+    const handleInputChange = (inputText: string) => {
+        setText(inputText);
+    };
+
     return (
-        <View style = {{justifyContent :'center', alignItems : 'center', flex : 1}}>
-            <Text style = {{fontSize : 50, fontWeight :'bold'}}> 로그인 스크린 </Text>
-            <Button title = "바텀 네비게이션으로 이동" onPress={ () => navigation.navigate("BottomNavigation", { userpk : pk})}/>
+        <View style={styles.container}>
+            <View style={styles.inputTextcontainer}>
+                <TextInput
+                    style={{ height: 60, borderColor: 'gray', borderWidth: 1, marginBottom: 20, paddingHorizontal: 10 }}
+                    onChangeText={handleInputChange}
+                    value={Text}
+                    placeholder="텍스트를 입력하세요"
+                />
+            </View>
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'red',
+    },
+    inputTextcontainer: {
+        height : 60,
+        backgroundColor: 'green',
+    }
+}
+)
 
 export default LoginScreen;
