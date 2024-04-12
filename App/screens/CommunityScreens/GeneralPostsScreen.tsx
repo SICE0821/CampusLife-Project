@@ -19,7 +19,7 @@ const renderEmptyItem = () => {
     )
 }
 
-const GeneralPostsScreen: React.FC = ({ natvigation, route }: any) => {
+const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
     const [communityData, setCommunityData] = useState<Data[]>([]);
     const { department_check } = route.params;
 
@@ -59,7 +59,7 @@ const GeneralPostsScreen: React.FC = ({ natvigation, route }: any) => {
     );
 
     const renderItem = ({ item }: { item: Data }) => (
-        <TouchableWithoutFeedback onPress={() => console.log(item.id)}>
+        <TouchableWithoutFeedback onPress={() => navigation.navigate("PostDetailScreen")}>
             <View style={styles.writeboxcontainer}>
                 <View style={styles.writetitle}>
                     <View style={styles.titlebox}>

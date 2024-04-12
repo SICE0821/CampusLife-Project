@@ -15,6 +15,7 @@ import { RootStackParam } from '../types/type';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen'
 import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 
 
@@ -45,6 +46,23 @@ export const RootStackNavigator = () => {
             <RootStack.Screen
                 name="WritePostScreen"
                 component={WritePostScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("CommunityScreenStackNavigator")}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '커뮤니티',
+                })}
+            />
+            <RootStack.Screen
+                name = "PostDetailScreen"
+                component={PostDetailScreen}
                 options={({ navigation }: any) => ({
                     headerStyle: {
                         backgroundColor: '#F27405',
