@@ -10,30 +10,27 @@ const SearchPostScreen: React.FC = ({ navigation }: any) => {
     }
     return (
         <View style={styles.container}>
-            <View style={styles.headerbox}>
-                <View style={styles.searchbox}>
-                    <View style={styles.searchtextbox}>
-                        <View style={styles.picturebox1}>
-                            <IconD name="search1" size={30} color="#979797" />
-                        </View>
-                        <View style={styles.searchtextinputbox}>
-                            <View style = {{flex : 1}}>
-                                <TextInput
-                                    style={{ fontSize: 16 }}
-                                    onChangeText={handlesearchTextChange}
-                                    value={searchtext}
-                                />
-                            </View>
-                        </View>
-
+            <View style={styles.emptyspace1}></View>
+            <View style={styles.headercontainer}>
+                <View style={styles.searchcontainer}>
+                    <View style={styles.picturebox}>
+                        <IconD name="search1" size={30} color="#979797" />
+                    </View>
+                    <View style={styles.textinputbox}>
+                        <TextInput
+                            style={{ flex: 1, fontSize : 16}}
+                            onChangeText={handlesearchTextChange}
+                            value={searchtext}
+                            multiline={true}
+                            placeholder="글 제목, 내용"
+                        />
                     </View>
                 </View>
-                <View style={styles.cancelbox}>
-                    <TouchableOpacity
-                        style={styles.cancelbutton}
-                        onPress={() => navigation.navigate("CommunityScreenStackNavigator")}
-                    >
-                        <Text style={{ fontSize: 20, color: 'black' }}>취소</Text>
+                <View style={styles.cancelcontainer}>
+                    <TouchableOpacity style = {styles.cancelbox} onPress={() => navigation.navigate("CommunityScreenStackNavigator")}>
+                        <Text style = {{fontSize : 20, color : 'black'}}>
+                            취소
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -46,47 +43,51 @@ const styles = StyleSheet.create({
         flex: 1,
         //backgroundColor : 'red',
     },
-    headerbox: {
-        height: 55,
-        backgroundColor: 'blue',
+    emptyspace1: {
+        height: 30,
+        //dbackgroundColor: 'blue',
+    },
+    headercontainer: {
+        height: 45,
+        //backgroundColor: 'red',
         flexDirection: 'row',
-        marginTop: 10,
-
     },
-    searchbox: {
-        flex: 0.80,
-        //backgroundColor: 'green',
-    },
-    cancelbox: {
-        flex: 0.20,
-        //backgroundColor: 'yellow',
-    },
-    cancelbutton: {
-        flex: 1,
-        backgroundColor: '#9A9EFF',
-        margin: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 12,
-    },
-    searchtextbox: {
-        flex: 1,
+    searchcontainer: {
+        flex: 0.83,
         backgroundColor: '#FFDECF',
-        margin: 8,
-        borderRadius: 12,
         flexDirection: 'row',
+        marginLeft :8,
+        borderRadius: 8,
+        borderWidth: 1,
     },
-    picturebox1: {
-        flex: 0.13,
-        //backgroundColor : 'yellow',
-        borderRadius: 12,
+    cancelcontainer: {
+        flex: 0.17,
+        //backgroundColor : 'green'
+    },
+    picturebox: {
+        flex: 0.12,
+        //backgroundColor : 'green',
+        borderTopLeftRadius: 8,
+        borderBottomLeftRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    searchtextinputbox: {
-        flex: 0.87,
-        justifyContent: 'center',
+    textinputbox: {
+        flex: 0.88,
+        //backgroundColor : "black",
+        borderTopRightRadius: 8,
+        borderBottomRightRadius: 8,
+    },
+    cancelbox : {
+        flex : 1,
+        backgroundColor : '#9A9EFF',
+        borderRadius : 8,
+        marginLeft : 8,
+        marginRight : 8,
+        justifyContent : 'center',
+        alignItems : 'center',
     }
-})
+}
+)
 
 export default SearchPostScreen;
