@@ -14,13 +14,22 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 function LoginScreen({ navigation}: any) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [StudentPK, setStudentPK] = useState(null);
 
-    
-    const handleLogin = async () => {
-      navigation.navigate('MainTabNavigator');
-      /*
+    const SendStudentPK = async () => {
       try {
-        const response = await fetch('http://172.30.1.37:3000/login', {
+          const response = await fetch('http://172.29.8.84:3000/generalpost');
+          const StudentPK = await response.json();
+          console.log(StudentPK);
+          setCommunityData(postsdata);
+      } catch (error) {
+          console.error(error)
+      }
+  }
+
+    const handleLogin = async () => {
+      try {
+        const response = await fetch('http://172.29.8.84:3000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -40,9 +49,8 @@ function LoginScreen({ navigation}: any) {
         console.error('로그인 오류:', error);
         Alert.alert('로그인 오류');
       }
-      */
+      
     };
-    
   
     const navigateToRegister = () => {
       navigation.navigate('RegisterPage');
@@ -104,11 +112,11 @@ function LoginScreen({ navigation}: any) {
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
   
-        <TouchableOpacity onPress={navigateToSearch}>
+        <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
           <Text style={styles.loginlinkText}>아이디, 비밀번호 찾기</Text>
         </TouchableOpacity>
   
-        <TouchableOpacity onPress={navigateToRegister}>
+        <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
           <Text style={styles.loginlinkText}>앱을 처음 이용하시나요? 클릭하세요!</Text>
         </TouchableOpacity>
   

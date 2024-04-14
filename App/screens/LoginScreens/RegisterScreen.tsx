@@ -9,9 +9,9 @@ const Register = ({navigation}: any) => {
   const [friendCode, setfriendCode] = useState('');
   
 
-  const handleRegister = async () => {
+  const handleRegister = async ({navigation} :any) => {
     try {
-      const response = await fetch('http:// 172.16.108.216:3000/register', {
+      const response = await fetch('http://172.29.8.84:3000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -26,6 +26,7 @@ const Register = ({navigation}: any) => {
 
       if (response.ok) {
         Alert.alert('회원가입 성공');
+        navigation.navigate("LoginScreenStackNavigator");
       } else {
         Alert.alert('회원가입 실패');
       }

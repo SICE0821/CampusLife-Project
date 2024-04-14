@@ -25,7 +25,7 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
 
     const getGeneralposts = async () => {
         try {
-            const response = await fetch('http://14.35.13.183:3000/generalpost');
+            const response = await fetch('http://172.29.8.84:3000/generalpost');
             const postsdata = await response.json();
             console.log(postsdata);
             setCommunityData(postsdata);
@@ -36,7 +36,7 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
 
     const getDepartmentposts = async () => {
         try {
-            const response = await fetch('http://14.35.13.183:3000/departmentpost');
+            const response = await fetch('http://172.29.8.84:3000/departmentpost');
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {
