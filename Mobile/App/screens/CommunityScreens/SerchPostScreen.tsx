@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         marginLeft :8,
         borderRadius: 8,
-        borderWidth: 1,
+        //borderWidth: 1,
     },
     cancelcontainer: {
         flex: 0.17,

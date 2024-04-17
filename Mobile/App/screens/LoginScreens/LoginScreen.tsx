@@ -16,6 +16,17 @@ function LoginScreen({ navigation}: any) {
     const [password, setPassword] = useState('');
     const [StudentPK, setStudentPK] = useState(null);
 
+    const GetStudentPK = async () => {
+      try {
+          const response = await fetch('http://172.29.8.84:3000/generalpost');
+          const StudentPK = await response.json();
+          console.log(StudentPK);
+          setStudentPK(StudentPK);
+      } catch (error) {
+          console.error(error)
+      }
+  }
+
     const handleLogin = async () => {
       navigation.navigate('MainTabNavigator');
       /*
@@ -33,6 +44,7 @@ function LoginScreen({ navigation}: any) {
         const data = await response.text();
         if (data === 'success') {
           navigation.navigate('MainTabNavigator');
+          
         } else {
           Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
         }
