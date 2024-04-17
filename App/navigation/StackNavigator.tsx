@@ -5,12 +5,13 @@ import { useNavigation } from '@react-navigation/native';
 
 import MainScreen from '../screens/MainScreen';
 import EventScreen from '../screens/EventScreen';
-import AttendanceScreen from '../screens/AttendanceScreen';
+import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
 import WritePostScreen from '../screens/CommunityScreens/WritePostScreen';
 import LoginScreen from '../screens/LoginScreens/LoginScreen';
 import RegisterScreen from '../screens/LoginScreens/RegisterScreen';
 import SearchScreen from '../screens/LoginScreens/SearchScreen';
+import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import { RootStackParam } from '../types/type';
 
 import {MainTabNavigator} from './BottomTabNavigator'
@@ -57,6 +58,7 @@ export const RootStackNavigator = () => {
                                 headerTitleAlign: 'center',
                                 title: '커뮤니티',
                               }}/>
+                <AttendanceStack.Screen name = "FullScreenCamera" component = {FullScreenCamera} options = {{headerShown : false}}/>
         </RootStack.Navigator>
     )
 }

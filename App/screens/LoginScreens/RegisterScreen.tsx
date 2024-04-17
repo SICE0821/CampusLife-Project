@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
 const Register = ({navigation}: any) => {
   const [username, setUsername] = useState('');
   const [userpass, setUserpass] = useState('');
@@ -11,7 +12,7 @@ const Register = ({navigation}: any) => {
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http:// 172.16.108.216:3000/register', {
+      const response = await fetch('http://172.16.108.84:3000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

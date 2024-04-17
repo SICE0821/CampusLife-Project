@@ -1,17 +1,21 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
+import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView, Dimensions} from 'react-native';
 import ModalBox from 'react-native-modalbox';
 import Modal from 'react-native-modal';
 import IconA from 'react-native-vector-icons/FontAwesome5';
+import { createStackNavigator } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
 import { Camera,
   useCameraDevice, 
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
 
-const AttendancePage : React.FC = () => {
+const AttendanceScreen = ({navigation, route}: any) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { hasPermission, requestPermission } = useCameraPermission()
+  const [isCameraButton, setIsCameraButton] = useState(false);
+  const [scannedCode, setScannedCode] = useState(null);
   const device = useCameraDevice('back')
 
   const getCurrentDate = () => {
@@ -24,50 +28,44 @@ const AttendancePage : React.FC = () => {
 
     return `${year}년 ${month}월 ${date}일 ${day}요일`;
   };
-  const checkopenModal = () => {
-    setIsModalVisible(true); // 모달 열기
-  };
 
   const openModal = () => {
     setIsModalOpen(true); // 모달을 열기 위해 상태를 true로 설정
   };
 
   const closeModal = () => {
-    setIsModalOpen(false); // 모달을 닫기 위해 상태를 false로 설정
+    setIsModalOpen(false);
+    setIsCameraButton(false); // 모달을 닫을 때 카메라 버튼 상태도 false로 변경합니다.
   };
 
-  const codeScanner = useCodeScanner({
-    codeTypes: ['qr', 'ean-13'],
-    onCodeScanned: (codes) => {
-      console.log(`Scanned ${codes.length} codes!`)
+  const openCamera = () => {
+    setIsCameraButton(true);
+  };
+
+  const getRealBoxColor = () => {
+    if (scannedCode === 'YOUR_QR_CODE_VALUE') { // 스캔된 QR 코드 값에 따라 변경
+      return 'green'; // 초록색
+    } else {
+      return 'gray'; // 기본 색상
     }
-  })
+  };
 
   React.useEffect(() =>{
     requestPermission();
   }, [])
+  
+  React.useEffect(() => {
+    if (isCameraButton) {
+      navigation.navigate('FullScreenCamera');
+      closeModal();
+    }
+  }, [isCameraButton]);
 
-   const openCamera = async () => {
-        try {
-            if (device == null) return
-              <View>
-                  <Text>Device not found.</Text>
-              </View>
-            return (
-                <Camera
-                    style={StyleSheet.absoluteFill}
-                    device={device}
-                    photo={true}
-                    video={false}
-                    audio={false} // 선택사항
-                    isActive={true}
-                    codeScanner={codeScanner}
-                />
-            );
-        } catch (error) {
-            console.error('Failed to open camera: ', error);
-        }
-    };
+  useEffect(() => {
+    if (route.params && route.params.scannedCode) {
+      setScannedCode(route.params.scannedCode);
+    }
+  }, [route.params.scannedCode]);
 
   return (
     <View style={styles.container}>
@@ -114,24 +112,24 @@ const AttendancePage : React.FC = () => {
           swipeToClose={false}
           onClosed={closeModal}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.header}>
-              <View style={{flexDirection : 'row'}}>
-                <View style={{}}>
-                  <Text style={styles.ListText2}>DB 설계 및 관리</Text>
-                </View>
-                <View style ={{marginLeft : 175}}>
-                  <TouchableOpacity onPress = {openCamera}>
-                    <IconA name="camera" size={32} color="black" />
-                  </TouchableOpacity>
-                </View>
+        <View style={styles.modalContainer}>
+          <View style={styles.header}>
+            <View style={{ flexDirection: 'row' }}>
+              <View>
+                <Text style={styles.ListText2}>DB 설계 및 관리</Text>
               </View>
-              <View style={{}}>
-                <View style={{}}>
-                  <Text style={styles.ListInfo2}>미출결 : 45    출결 : 0    지각 : 0    결석 : 0</Text>
-                </View>
+              <View style={{ marginLeft: 175 }}>
+                <TouchableOpacity onPress={openCamera}>
+                  <IconA name="camera" size={32} color="black" />
+                </TouchableOpacity>
               </View>
             </View>
+            <View>
+              <View>
+                <Text style={styles.ListInfo2}>미출결 : 45 출결 : 0 지각 : 0 결석 : 0</Text>
+              </View>
+            </View>
+          </View>
               <View style={styles.WeekContainer}>
                   <View style={styles.Week}>
                     <Text style={{fontSize:20 , fontWeight : 'bold', color : 'black'}}>1주차</Text>
@@ -141,9 +139,17 @@ const AttendancePage : React.FC = () => {
                       <View style={styles.Attendance}>
                           <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'black', marginLeft : 25 }}>1차시         09 : 10 ~ 10 : 00</Text>
                       </View>
-                      
                       <View style={styles.Box}>  
-                        <View style={styles.realBox}>
+                        <View style={[styles.realBox, { backgroundColor: getRealBoxColor() }]}>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.Include}>
+                      <View style={styles.Attendance}>
+                        <Text style = {{fontSize:17 , fontWeight : 'bold', color : 'black', marginLeft : 25}}>1차시         09 : 10 ~ 10 : 00</Text>
+                      </View>
+                      <View style={styles.Box}>  
+                        <View style={[styles.realBox, { backgroundColor: getRealBoxColor() }]}>
 
                         </View>
                       </View>
@@ -153,17 +159,7 @@ const AttendancePage : React.FC = () => {
                         <Text style = {{fontSize:17 , fontWeight : 'bold', color : 'black', marginLeft : 25}}>1차시         09 : 10 ~ 10 : 00</Text>
                       </View>
                       <View style={styles.Box}>  
-                        <View style={styles.realBox}>
-
-                        </View>
-                      </View>
-                    </View>
-                    <View style={styles.Include}>
-                      <View style={styles.Attendance}>
-                        <Text style = {{fontSize:17 , fontWeight : 'bold', color : 'black', marginLeft : 25}}>1차시         09 : 10 ~ 10 : 00</Text>
-                      </View>
-                      <View style={styles.Box}>  
-                        <View style={styles.realBox}>
+                        <View style={[styles.realBox, { backgroundColor: getRealBoxColor() }]}>
 
                         </View>
                       </View>
@@ -171,7 +167,7 @@ const AttendancePage : React.FC = () => {
                   </View>
               </View>
           </View>
-        </ModalBox> 
+        </ModalBox>
       </View>
   );
 };
@@ -181,6 +177,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
+  },
+  phonecontainer:{
+    flex: 1,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+  scanner:{
+    flex : 1,
   },
   textContainer: { // 오늘의 출석, 날짜 텍스트 컨테이너
     alignItems: 'center',
@@ -211,6 +215,7 @@ const styles = StyleSheet.create({
   date: { // 날짜 텍스트 css
     fontWeight: 'bold',
     fontSize: 15,
+    marginLeft : 6,
   },
   buttonContainer: { // 오늘의 출석 버튼 컨테이너
     marginBottom : 20,
@@ -319,4 +324,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AttendancePage;
+export default AttendanceScreen;

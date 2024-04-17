@@ -17,8 +17,8 @@ function LoginScreen({ navigation}: any) {
   
     const handleLogin = async () => {
       navigation.navigate('MainTabNavigator');
-      /*try {
-        const response = await fetch('http://172.16.108.216:3000/login', {
+      try {
+        const response = await fetch('http://172.16.108.84:3000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -38,8 +38,8 @@ function LoginScreen({ navigation}: any) {
         console.error('로그인 오류:', error);
         Alert.alert('로그인 오류');
       }
-      */
-    
+      
+      navigation.navigate('MainTabNavigator');
     };
     const navigateToRegister = () => {
       navigation.navigate('RegisterPage');

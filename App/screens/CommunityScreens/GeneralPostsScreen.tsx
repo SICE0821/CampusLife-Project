@@ -24,7 +24,7 @@ const GeneralPostsScreen:React.FC = () => {
 
     const fetchData = async () => {
         try {
-          const response = await fetch('http:// 172.16.108.216:3000/AllCommunity');
+          const response = await fetch('http://172.16.108.84:3000/AllCommunity');
           if (!response.ok) {
             throw new Error('서버 응답 실패');
           }
