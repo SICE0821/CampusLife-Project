@@ -16,18 +16,9 @@ function LoginScreen({ navigation}: any) {
     const [password, setPassword] = useState('');
     const [StudentPK, setStudentPK] = useState(null);
 
-    const SendStudentPK = async () => {
-      try {
-          const response = await fetch('http://172.29.8.84:3000/generalpost');
-          const StudentPK = await response.json();
-          console.log(StudentPK);
-          setCommunityData(postsdata);
-      } catch (error) {
-          console.error(error)
-      }
-  }
-
     const handleLogin = async () => {
+      navigation.navigate('MainTabNavigator');
+      /*
       try {
         const response = await fetch('http://172.29.8.84:3000/login', {
           method: 'POST',
@@ -49,6 +40,7 @@ function LoginScreen({ navigation}: any) {
         console.error('로그인 오류:', error);
         Alert.alert('로그인 오류');
       }
+      */
       
     };
   
