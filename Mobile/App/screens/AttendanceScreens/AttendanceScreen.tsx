@@ -65,7 +65,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
     if (route.params && route.params.scannedCode) {
       setScannedCode(route.params.scannedCode);
     }
-  }, []);
+  }, [route.params]);
 
 
   return (

@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import MainScreen from '../screens/MainScreen';
 import { EventTopTabNavigator } from './TopTabNavigator'
-import AttendanceScreen from '../screens/AttendanceScreen';
+import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
 import WritePostScreen from '../screens/CommunityScreens/WritePostScreen';
 import LoginScreen from '../screens/LoginScreens/LoginScreen';
@@ -17,6 +17,7 @@ import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
+import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 
 
 import { MainTabNavigator } from './BottomTabNavigator'
@@ -81,6 +82,7 @@ export const RootStackNavigator = () => {
                 component={SearchPostScreen}
                 options={{ headerShown: false }}>
             </RootStack.Screen>
+            <AttendanceStack.Screen name = "FullScreenCamera" component = {FullScreenCamera} options = {{headerShown : false}}/>
         </RootStack.Navigator>
     )
 }
