@@ -18,7 +18,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
-
+import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 
 import { MainTabNavigator } from './BottomTabNavigator'
 import { TopbTabNavigator } from './TopTabNavigator'
@@ -179,6 +179,23 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
                 }} />
             <EventShopStack.Screen name="EventHaveCouponScreen"
                 component={EventHaveCouponScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("EventTopTabNavigator")}>
+                            <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이벤트',
+                }} />
+                <EventShopStack.Screen 
+                name="DailyEventScreen"
+                component={DailyEventScreen}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
