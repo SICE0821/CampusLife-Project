@@ -21,7 +21,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
         <CommunityTopBottomTab.Navigator
             screenOptions={{
                 tabBarStyle: {
-                    top: 60,
+                    top: 68,
                     position: 'absolute',
                     height: 40,
                     left: -3,
@@ -34,7 +34,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
                 },
                 tabBarLabelStyle: {
-                    fontSize: 20,
+                    fontSize: 23,
                     alignItems: 'center',
                     marginBottom: 10,
                     marginTop: 5,
@@ -82,7 +82,7 @@ export const TopbTabNavigator = () => {
                 tabBarStyle: {
                     top: 10,
                     position: 'absolute',
-                    height: 40,
+                    height: 45,
                     marginLeft: 12,
                     marginRight: 150,
                     //borderWidth : 2,
@@ -91,7 +91,7 @@ export const TopbTabNavigator = () => {
 
                 },
                 tabBarLabelStyle: {
-                    fontSize: 23,
+                    fontSize: 28,
                     alignItems: 'center',
                     marginBottom: 14,
                     fontWeight: 'bold',
@@ -127,7 +127,13 @@ export const EventTopTabNavigator = ({ navigation, route }: any) => {
     }, [navigation, route])
     return (
         <EventTopTab.Navigator screenOptions={{
-            swipeEnabled: false
+            swipeEnabled: false,
+
+            tabBarLabelStyle: {
+                fontSize: 20,
+                fontWeight: 'bold',
+            },
+            
         }}>
             <EventTopTab.Screen name="정기 이벤트"
                 component={ReqularEventScreen}
