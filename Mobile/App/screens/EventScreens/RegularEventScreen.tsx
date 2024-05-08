@@ -6,15 +6,7 @@ import Swiper from 'react-native-swiper';
 const calendarpng = require('../../assets/calendar.png');
 const friendcodepng = require('../../assets/friendcode.png');
 
-const RegularEventScreen: React.FC = () => {
-
-  const navigation = useNavigation();
-
-  const handleButtonPress = () => {
-    // 버튼이 눌렸을 때 실행할 동작을 정의합니다.
-    // 예를 들어 다른 화면으로 이동하거나, 특정 함수를 호출하는 등의 동작을 수행할 수 있습니다.
-    // navigation.navigate('TargetScreen'); // 다른 화면으로 이동하는 예시
-  };
+const RegularEventScreen: React.FC = ({navigation} : any) => {
 
   return (
     <View style={{ flex: 1 }}>
@@ -30,7 +22,7 @@ const RegularEventScreen: React.FC = () => {
               <Text style={styles.subtitle}>매일 출석 도장을 찍으면 100 point 지급!</Text>
               <Image style={styles.imageStyle} source={calendarpng} />
             </View>
-            <TouchableOpacity style={styles.button1} onPress={handleButtonPress}>
+            <TouchableOpacity style={styles.button1} onPress={() => navigation.navigate("DailyEventScreen")}>
               <Text style={styles.buttonText}>출석체크 하러가기</Text>
             </TouchableOpacity>
           </View>
@@ -42,7 +34,7 @@ const RegularEventScreen: React.FC = () => {
               <Text style={styles.subtitle}>친구에게 코드를 보내주면 10point 지급!</Text>
               <Image style={styles.imageStyle} source={friendcodepng} />
             </View>
-            <TouchableOpacity style={styles.button2} onPress={handleButtonPress}>
+            <TouchableOpacity style={styles.button2} onPress={() => console.log("친구코드 디테일페이지")}>
               <Text style={styles.buttonText}>자세히 보기</Text>
             </TouchableOpacity>
           </View>

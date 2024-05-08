@@ -17,6 +17,8 @@ import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
+import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
+import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 
 
 import { MainTabNavigator } from './BottomTabNavigator'
@@ -33,6 +35,7 @@ const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
 const EventShopStack = createStackNavigator();
+const ReqularEventScreenStack = createStackNavigator();
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = () => {
@@ -61,7 +64,7 @@ export const RootStackNavigator = () => {
                 })}
             />
             <RootStack.Screen
-                name = "PostDetailScreen"
+                name="PostDetailScreen"
                 component={PostDetailScreen}
                 options={({ navigation }: any) => ({
                     headerStyle: {
@@ -192,6 +195,31 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
                     title: '이벤트',
                 }} />
         </EventStack.Navigator>
+    );
+};
+
+export const ReqularEventScreenNavigator = ({ navigation, route }: any) => {
+    return (
+        <ReqularEventScreenStack.Navigator>
+            <ReqularEventScreenStack.Screen
+                name="ReqularEventScreen"
+                component={ReqularEventScreen}
+                options={{
+                    //headerShown : false,
+                    //tabBarIcon: () => null,
+                }}>
+            </ReqularEventScreenStack.Screen>
+
+            <ReqularEventScreenStack.Screen
+                name="DailyEventScreen"
+                component={DailyEventScreen}
+                options={{
+                    headerShown : false,
+                    //tabBarIcon: () => null,
+                }}>
+            </ReqularEventScreenStack.Screen>
+
+        </ReqularEventScreenStack.Navigator>
     );
 };
 
