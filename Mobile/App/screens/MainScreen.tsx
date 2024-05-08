@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
   },
 
   eventcontainer : {
-    height : windowHeight -550,
+    height : 480,
     //backgroundColor : 'green',
     marginBottom : 35,
   
