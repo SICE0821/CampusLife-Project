@@ -34,7 +34,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
                 },
                 tabBarLabelStyle: {
-                    fontSize: 23,
+                    fontSize: 21,
                     alignItems: 'center',
                     marginBottom: 10,
                     marginTop: 5,
@@ -91,7 +91,7 @@ export const TopbTabNavigator = () => {
 
                 },
                 tabBarLabelStyle: {
-                    fontSize: 28,
+                    fontSize: 26,
                     alignItems: 'center',
                     marginBottom: 14,
                     fontWeight: 'bold',

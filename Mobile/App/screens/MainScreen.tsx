@@ -186,7 +186,7 @@ const MainPage = () => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학교 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 190, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26,}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -244,7 +244,7 @@ const MainPage = () => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학사 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 190, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -302,7 +302,7 @@ const MainPage = () => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>인기글</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {27}/></Text>
-            <Text style = {{marginLeft : 265, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 255, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
