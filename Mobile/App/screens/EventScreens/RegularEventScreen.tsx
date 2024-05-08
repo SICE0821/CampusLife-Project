@@ -8,6 +8,12 @@ const friendcodepng = require('../../assets/friendcode.png');
 
 const RegularEventScreen: React.FC = ({navigation} : any) => {
 
+  const handleButtonPress = () => {
+    // 버튼이 눌렸을 때 실행할 동작을 정의합니다.
+    // 예를 들어 다른 화면으로 이동하거나, 특정 함수를 호출하는 등의 동작을 수행할 수 있습니다.
+    // navigation.navigate('TargetScreen'); // 다른 화면으로 이동하는 예시
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 0.87, backgroundColor: 'white' }}>
