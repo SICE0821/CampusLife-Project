@@ -47,13 +47,13 @@ const MainPage = () => {
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.111:3000/MainPageSchoolPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         setschollpostdata(data);
-        console.log("데이터 받음:", data);
+       //console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -61,13 +61,13 @@ const MainPage = () => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.111:3000/MainPagedepartmentPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         setdepartmentpostdata(data);
-        console.log("데이터 받음:", data);
+       //console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -75,13 +75,13 @@ const MainPage = () => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.111:3000/MainPagehotPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         sethotpostdata(data);
-        console.log("데이터 받음:", data);
+       // console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }

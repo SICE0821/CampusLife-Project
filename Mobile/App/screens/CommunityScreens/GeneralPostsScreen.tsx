@@ -25,9 +25,9 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
 
     const getGeneralposts = async () => {
         try {
-            const response = await fetch('http://172.16.117.111:3000/generalpost');
+            const response = await fetch('http://175.212.187.92:3000/generalpost');
             const postsdata = await response.json();
-            console.log(postsdata);
+            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error)
@@ -47,13 +47,13 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
     useFocusEffect(
         React.useCallback(() => {
             if (department_check == 0) {
-                console.log("전체 게시판!");
+                //console.log("전체 게시판!");
                 getGeneralposts();
             } else if (department_check == 1) {
-                console.log("학과 게시판");
+                //console.log("학과 게시판");
                 getDepartmentposts();
             } else {
-                console.log("이도 저도 아닌데?");
+               // console.log("이도 저도 아닌데?");
             }
         }, [])
     );

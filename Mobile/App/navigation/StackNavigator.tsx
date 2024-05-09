@@ -48,8 +48,8 @@ export const RootStackNavigator = () => {
     return (
         <RootStack.Navigator initialRouteName="LoginScreenStackNavigator">
             <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator}  />
-            <RootStack.Screen name = "AdminTabNavigator" component = {AdminTabNavigator} options={{ headerShown: false }} />
-            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator}  options={{ headerShown: false }}/>
+            <RootStack.Screen name = "AdminTabNavigator" component = {AdminTabNavigator}  />
+            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator}  />
             <RootStack.Screen
                 name="WritePostScreen"
                 component={WritePostScreen}
