@@ -47,13 +47,13 @@ const MainPage = () => {
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.91:3000/MainPageSchoolPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         setschollpostdata(data);
-        console.log("데이터 받음:", data);
+       //console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -61,13 +61,13 @@ const MainPage = () => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.91:3000/MainPagedepartmentPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         setdepartmentpostdata(data);
-        console.log("데이터 받음:", data);
+       //console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -75,13 +75,13 @@ const MainPage = () => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.91:3000/MainPagehotPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         sethotpostdata(data);
-        console.log("데이터 받음:", data);
+       // console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -108,38 +108,38 @@ const MainPage = () => {
                 </View>
                 <View style = {styles.info}>
                   <View style ={styles.name}>
-                    <Text style = {{fontSize : 22, marginTop : 17, fontWeight : 'bold', color : 'black'}}> 정유환 </Text>
+                    <Text style = {{fontSize : 25, marginTop : 17, fontWeight : 'bold', color : 'black'}}> 정유환 </Text>
                   </View>
                   <View style = {styles.department}>
-                    <Text style = {{fontSize : 13, marginLeft : 4, marginTop : 3, color : 'black'}}> 컴퓨터소프트웨어과/2학년</Text>
+                    <Text style = {{fontSize : 15, marginLeft : 4, marginTop : 3, color : 'black'}}> 컴퓨터소프트웨어과/2학년</Text>
                   </View>
                   <View style = {styles.point}>
-                    <Text style = {{marginLeft : 2,marginBottom : 6, color : 'black'}}> <IconA name="payments" size ={33} /></Text>
-                    <Text style = {{fontSize : 21, marginLeft : 5, marginBottom : 11, color : 'black'}}>500P</Text>
+                    <Text style = {{marginLeft : 2,marginBottom : 6, color : 'black'}}> <IconA name="payments" size ={36} /></Text>
+                    <Text style = {{fontSize : 24, marginLeft : 5, marginBottom : 11, color : 'black'}}>500P</Text>
                   </View>
                 </View>
 
               </View>
               <View style = {styles.cardbottom}>
                 <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconB name = "idcard" size = {30}/></Text>
-                  <Text style = {{fontSize : 11, color : 'black'}}>정보변경</Text>
+                  <Text style = {{color : 'black'}}><IconB name = "idcard" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>정보변경</Text>
                 </View>
                 <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconC name = "calendar-check-o" size = {30}/></Text>
-                  <Text style = {{fontSize : 11, color : 'black'}}>학적확인</Text>
+                  <Text style = {{color : 'black'}}><IconC name = "calendar-check-o" size = {35}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>학적확인</Text>
                 </View>
                 <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconD name = "bell" size = {30}/></Text>
-                  <Text style = {{fontSize : 11, color : 'black'}}>알림</Text>
+                  <Text style = {{color : 'black'}}><IconD name = "bell" size = {35}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>알림</Text>
                 </View>
                 <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconE name = "information-circle-outline" size = {30}/></Text>
-                  <Text style = {{fontSize : 11, color : 'black'}}>학교정보</Text>
+                  <Text style = {{color : 'black'}}><IconE name = "information-circle-outline" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>학교정보</Text>
                 </View>
                 <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconF name = "prescription" size = {30}/></Text>
-                  <Text style = {{fontSize : 11, color : 'black'}}>스터디룸</Text>
+                  <Text style = {{color : 'black'}}><IconF name = "prescription" size = {35}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>스터디룸</Text>
                 </View>
               </View>
             </View>
@@ -147,7 +147,7 @@ const MainPage = () => {
         <View style = {styles.eventcontainer}>
           <View style = {styles.eventhearder}> 
             <Text style = {styles.eventheadertext}>이벤트</Text>
-            <Text style = {{marginTop : 1, marginLeft : 5, color : "#FFC700"}}><IconF name = "ticket" size = {23}/></Text>
+            <Text style = {{marginTop : 1, marginLeft : 5, color : "#FFC700"}}><IconF name = "ticket" size = {27}/></Text>
           </View>
           <Swiper loop = {true}>
             <View style = {styles.eventbox}>
@@ -185,20 +185,20 @@ const MainPage = () => {
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학교 공지사항</Text>
-            <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {23}/></Text>
-            <Text style = {{marginLeft : 160, marginTop : 25}}>더보기</Text>
-            <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>
+            <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
+            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginTop : 26,}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
             <View style = {styles.textborder}>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
                   <Text style = {styles.M}>{schoolpostdata[0]?.title}</Text>
-                  <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
+                  <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {40}/></Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[0]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{schoolpostdata[0]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -206,8 +206,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{schoolpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[1]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{schoolpostdata[1]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -215,8 +215,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{schoolpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[2]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{schoolpostdata[2]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -224,8 +224,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{schoolpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[3]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{schoolpostdata[3]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -233,8 +233,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{schoolpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{schoolpostdata[4]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{schoolpostdata[4]?.view}</Text>
                 </View>
               </View>
             </View>
@@ -243,20 +243,20 @@ const MainPage = () => {
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학사 공지사항</Text>
-            <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {23}/></Text>
-            <Text style = {{marginLeft : 160, marginTop : 25}}>더보기</Text>
-            <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>
+            <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
+            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
             <View style = {styles.textborder}>
               <View style = {styles.onebox}>
                 <View style = {styles.oneboxtext}>  
                   <Text style = {styles.M}>{departmentpostdata[0]?.title}</Text>
-                  <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
+                  <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {40}/></Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[0]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{departmentpostdata[0]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -264,8 +264,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{departmentpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[1]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{departmentpostdata[1]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -273,8 +273,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{departmentpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[2]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{departmentpostdata[2]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -282,8 +282,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{departmentpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[3]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{departmentpostdata[3]?.view}</Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -291,8 +291,8 @@ const MainPage = () => {
                   <Text style = {styles.M}>{departmentpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{departmentpostdata[4]?.view}</Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{departmentpostdata[4]?.view}</Text>
                 </View>
               </View>
             </View>
@@ -301,22 +301,22 @@ const MainPage = () => {
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>인기글</Text>
-            <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {23}/></Text>
-            <Text style = {{marginLeft : 220, marginTop : 25}}>더보기</Text>
-            <Text style = {{marginTop : 26}}><IconB name = {"caretright"}/></Text>
+            <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {27}/></Text>
+            <Text style = {{marginLeft : 255, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
             <View style = {styles.textborder}>
               <View style = {styles.onebox}>
                 <View style = {styles.fireoneboxtext}>  
                   <Text style = {styles.M}>{hotpostdata[0]?.title}</Text>
-                  <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {30}/></Text>
+                  <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {40}/></Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[0]?.view} /</Text>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[0]?.like} </Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[0]?.view} /</Text>
+                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[0]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -324,10 +324,10 @@ const MainPage = () => {
                   <Text style = {styles.M}>{hotpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[1]?.view} /</Text>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[1]?.like} </Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[1]?.view} /</Text>
+                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[1]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -335,10 +335,10 @@ const MainPage = () => {
                   <Text style = {styles.M}>{hotpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[2]?.view} /</Text>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[2]?.like} </Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[2]?.view} /</Text>
+                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[2]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -346,10 +346,10 @@ const MainPage = () => {
                   <Text style = {styles.M}>{hotpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[3]?.view} /</Text>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[3]?.like} </Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[3]?.view} /</Text>
+                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[3]?.like} </Text>
                 </View>
               </View>
               <View style = {styles.onebox}>
@@ -357,16 +357,16 @@ const MainPage = () => {
                   <Text style = {styles.M}>{hotpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -12}}> <IconB name = "eyeo" size = {26}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[4]?.view} /</Text>
-                  <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {20}/></Text>
-                  <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[4]?.like} </Text>
+                  <Text style = {{color : '#F29F05', fontSize : 17}}> <IconB name = "like1" size = {25}/></Text>
+                  <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[4]?.like} </Text>
                 </View>
               </View>
             </View>
           </View>
         </View>
-        <View style = {{height : windowHeight - 735, backgroundColor : 'white'}}></View>
+        <View style = {{height : 50, backgroundColor : 'white', }}></View>
       </ScrollView>
     </View>
   );
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
   },
 
   cardView : {
-   flex : 0.27, 
+   height : 250, 
    //backgroundColor : '#EDA332',
   },
 
@@ -392,7 +392,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'black',
-    
+    //backgroundColor : 'blue',
+
   },
 
   cardtop : {
@@ -423,10 +424,10 @@ const styles = StyleSheet.create({
   },
 
   profilePicture : {
-    width : 80,
-    height : 80,
+    width : 95,
+    height : 95,
     backgroundColor :'white',
-    borderRadius : 45,
+    borderRadius : 50,
   },
 
   info : {
@@ -460,8 +461,8 @@ const styles = StyleSheet.create({
   
   noticecontainer : {
     height : windowHeight -500,
-    marginTop : -20,
-    marginBottom : 15,
+    marginTop : -50,
+    //marginBottom : 15,
     //backgroundColor : 'green',
     marginLeft : 15,
     marginRight : 15,
@@ -474,7 +475,7 @@ const styles = StyleSheet.create({
     alignItems : 'center',
   },
   noticeheadertext : {
-    fontSize : 20,
+    fontSize : 23,
     marginTop : 15,
     marginLeft : 15,
     color : 'black',
@@ -483,9 +484,8 @@ const styles = StyleSheet.create({
   noticetextcontainer : {
     //justifyContent : 'center',
     //alignItems : 'center',
-    flex : 0.85,
+    flex : 0.75,
     //backgroundColor : "blue"
-
   },
 
   textborder : {
@@ -539,18 +539,19 @@ const styles = StyleSheet.create({
 
   M : {
     marginLeft : 15,
-    fontSize : 17,
+    fontSize : 20,
     color : 'black',
   },
 
   eventcontainer : {
-    height : windowHeight -400,
+    height : 480,
     //backgroundColor : 'green',
+    marginBottom : 35,
   
   },
 
   eventheadertext : {
-    fontSize : 20,
+    fontSize : 23,
     marginLeft : 20,
     color : 'black',
     backgroundColor : 'white',

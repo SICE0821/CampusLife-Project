@@ -7,7 +7,8 @@ const { getGeneralPosts,
         gethotpostdata, 
         getdeparmentpostdata, 
         getschoolpostdata, 
-        insertDataIntoDB } = require('./db.js'); // db 파일에서 함수 가져오기
+        insertDataIntoDB,
+        getuserpk } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 
@@ -24,7 +25,7 @@ const pool = mariadb.createPool({
 //메인페이지에 핫 게시글 데이터를 가져온다.
 app.get('/MainPagehotPost', async (req, res) => {
     try {
-        console.log("인기 페이지로 http로 잘 전송됨")
+       // console.log("인기 페이지로 http로 잘 전송됨")
         const rows = await gethotpostdata();
         const processedData = rows.map(item => ({
             post_id: item.post_id,
@@ -33,7 +34,7 @@ app.get('/MainPagehotPost', async (req, res) => {
             like : item.like,
         }));
         res.json(processedData);
-        console.log("성공적으로 데이터 보냄");
+      //  console.log("성공적으로 데이터 보냄");
     } catch (error) {
         console.error(error); 
         res.status(500).json({ error: 'Internal Server Error' });
@@ -43,7 +44,7 @@ app.get('/MainPagehotPost', async (req, res) => {
 //메인페이지에 학과 게시글 데이터를 가져온다.
 app.get('/MainPagedepartmentPost', async (req, res) => {
     try {
-        console.log("학과 페이지로 http로 잘 전송됨")
+       // console.log("학과 페이지로 http로 잘 전송됨")
         const rows = await getdeparmentpostdata();
         const processedData = rows.map(item => ({
             post_id: item.post_id,
@@ -53,7 +54,7 @@ app.get('/MainPagedepartmentPost', async (req, res) => {
         res.json(processedData);
         console.log("성공적으로 데이터 보냄");
     } catch (error) {
-        console.error(error); 
+       // console.error(error); 
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
@@ -61,7 +62,7 @@ app.get('/MainPagedepartmentPost', async (req, res) => {
 //메인페이지에 전체 게시글 데이터를 가져온다.
 app.get('/MainPageSchoolPost', async (req, res) => {
     try {
-        console.log("스쿨페이지로 http로 잘 전송됨")
+        //console.log("스쿨페이지로 http로 잘 전송됨")
         const rows = await getschoolpostdata();
         const processedData = rows.map(item => ({
             post_id: item.post_id,
@@ -69,7 +70,7 @@ app.get('/MainPageSchoolPost', async (req, res) => {
             view: item.view,
         }));
         res.json(processedData);
-        console.log("성공적으로 데이터 보냄");
+       // console.log("성공적으로 데이터 보냄");
     } catch (error) {
         console.error(error); 
         res.status(500).json({ error: 'Internal Server Error' });
@@ -82,7 +83,27 @@ app.post('/post', async (req, res) => {
     insertDataIntoDB(post_id, user_id, department_check, inform_check, title, contents, view, like);
     res.json({ message: 'Data received successfully', receivedData: { post_id, user_id, department_check, inform_check, title, contents, data, view, like } });
   });
+
+//아이디와 비밀번호를 받고 유저 pk값을 가져온다.
+app.post('/get_user_data', async(req, res) => {
+  const {user_id, user_pass} = req.body;
+  const rows = await getuserpk(user_id, user_pass);
   
+  const userData = {
+    user_pk: rows[0].user_id,
+    student_pk: rows[0].student_id,
+    friend_code: rows[0].friend_code,
+    admin_check: rows[0].admin_check,
+    name: rows[0].name,
+    campus_pk: rows[0].campus_id,
+    department_pk: rows[0].department_id,
+    email: rows[0].email,
+    grade: rows[0].grade,
+  };
+  
+  res.json(userData);
+})
+
 
 //게시글화면에서 전체 게시글을 가져온다.
 app.get('/generalpost', async (req, res) => {

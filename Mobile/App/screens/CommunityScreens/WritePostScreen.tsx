@@ -57,7 +57,7 @@ const WritePostPage: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://172.29.8.84:3000/post', {
+      const response = await fetch('http://192.168.35.243:3000/post', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ const WritePostPage: React.FC = () => {
         body: JSON.stringify(post),
       });
       const responseData = await response.json();
-      console.log(responseData);
+      //console.log(responseData);
       checkopenModal();
     } catch (error) {
       console.error('Error:'); // error.message를 사용하여 오류 메시지를 출력합니다.

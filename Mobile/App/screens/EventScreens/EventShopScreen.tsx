@@ -176,12 +176,13 @@ const styles = StyleSheet.create({
     marginTop: -5,
   },
   square: {
-    flex: 0.75,
+    flex: 1,
     borderRadius: 20,
     margin: 10,
     backgroundColor: '#FFDECF',
     justifyContent: 'center',
     alignItems: 'center',
+
   },
   fontbox: {
     flex: 0.25,

@@ -113,13 +113,13 @@ const styles = StyleSheet.create( {
     backgroundColor : 'white',
   },
   toptitlebox : {
-    flex : 0.07,
+    flex : 0.06,
     //backgroundColor : "red",
     justifyContent : 'center',
     alignItems : 'center',
   },
   toptitletext : {
-    fontSize : 20,
+    fontSize : 24,
     color : 'black',
   },
   dividingline : {
@@ -140,10 +140,12 @@ const styles = StyleSheet.create( {
     //backgroundColor : 'blue'
   },
   itempicture : {
-    flex : 1,
+    width : 100,
+    height : 100,
     backgroundColor : '#FFDECF',
     borderRadius : 8,
     margin : 6,
+    marginLeft : 10,
     justifyContent : 'center',
     alignItems : 'center',
   },
@@ -169,21 +171,22 @@ const styles = StyleSheet.create( {
   itemisusedbox : {
     flex : 0.32,
     //backgroundColor : 'red',
-    justifyContent :'center'
+    justifyContent :'center',
+    alignItems : 'center'
   },
   itemnamefont : {
-    fontSize : 16,
+    fontSize : 18,
     color : 'black',
     marginLeft : 10,
     marginTop : 7,
   },
   itemisusedfont : {
-    fontSize : 16,
+    fontSize : 18,
     color : 'black',
     marginTop : 7,
   },
   ticketusagedatefont : {
-    fontSize : 16,
+    fontSize : 18,
     color : 'black',
     marginLeft : 10,
     marginBottom : 7,

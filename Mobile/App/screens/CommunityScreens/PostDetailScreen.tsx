@@ -75,10 +75,10 @@ const PostDetailScreen: React.FC = () => {
                         </View>
                         <View style={styles.profileinfocontainer}>
                             <View style={{ flex: 0.6, justifyContent: 'center', }}>
-                                <Text style={{ fontSize: 16, color: 'black', fontWeight: 'bold', marginTop: 13, }}>정유환(컴퓨터소프트웨어과)</Text>
+                                <Text style={{ fontSize: 20, color: 'black', fontWeight: 'bold', marginTop: 13, }}>정유환(컴퓨터소프트웨어과)</Text>
                             </View>
                             <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 10, }}>
-                                <Text style={{ fontSize: 13, }}>01/26 25:00</Text>
+                                <Text style={{ fontSize: 17, }}>01/26 25:00</Text>
                             </View>
                         </View>
                         <View style={styles.listcontainer}>
@@ -88,11 +88,11 @@ const PostDetailScreen: React.FC = () => {
                 </View>
                 <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
                 <View style={styles.titlecontainer}>
-                    <Text style={{ fontSize: 25, marginLeft: 20, color: 'black' }}>
+                    <Text style={{ fontSize: 29, marginLeft: 20, color: 'black' }}>
                         집가고싶어요
                     </Text>
                 </View>
-                <Text style={{ fontSize: 16, color: 'black', marginLeft: 20, marginRight: 20, }}>
+                <Text style={{ fontSize: 20, color: 'black', marginLeft: 20, marginRight: 20, }}>
                     에브리바디 해체! 추억에 지우개를?! 어랏 텐션이 올라? 폐가 돼? 네, 라고는 말할 수 없어!
                     잘 보이는 세상 과자는 사라져버려?! 어쩌지 "어떻게?!"도 "이렇게 해!"도 너답지 않네? 그런 시대라도 좋아
                     우린 아직 원더를 믿고 있는,걸 노 No? know! 어른들의 예리한 눈금 너무 시달려버려서 눈이 한쪽으로 치우쳐질 것 같아!
@@ -101,10 +101,10 @@ const PostDetailScreen: React.FC = () => {
                     잠깐으론 구겨지지 않는 미소 어때! 100번 실패해도 신비함은 흐트러지지 않아 원원에 둘이 통해 쓰리 포 에브리바디 쇼타임!
                 </Text>
                 <View style={styles.postslikeandlook}>
-                    <Text style={{ color: 'black', marginLeft: 16, marginTop: 6 }}> <IconB name="like1" size={20} /></Text>
-                    <Text style={{ color: 'black', fontSize: 16, marginTop: 7, }}> 15 </Text>
-                    <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}> <IconB name="eyeo" size={20} /></Text>
-                    <Text style={{ color: 'black', fontSize: 16, marginLeft: 3, marginTop: 7, }}>60</Text>
+                    <Text style={{ color: 'black', marginLeft: 16, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
+                    <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> 15 </Text>
+                    <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}> <IconB name="eyeo" size={24} /></Text>
+                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}>60</Text>
                 </View>
                 {data.map(item => (
                     <View key={item.id} style={styles.comentcontainer}>
@@ -115,34 +115,34 @@ const PostDetailScreen: React.FC = () => {
                                     </View>
                                 </View>
                                 <View style={styles.infotextbox}>
-                                    <Text style={{ fontSize: 20, color: 'black' }}>엄준식</Text>
-                                    <Text style={{ fontSize: 13, color: 'black' }}>컴퓨터소프트웨어과</Text>
+                                    <Text style={{ fontSize: 24, color: 'black' }}>엄준식</Text>
+                                    <Text style={{ fontSize: 17, color: 'black' }}>컴퓨터소프트웨어과</Text>
                                 </View>
                             </View>
                             <View style={styles.listbox}>
                                 <View style={styles.ComentLikeListBox}>
                                     <View style={styles.comentbox}>
-                                        <Text><IconD size={23} color="black" name={"comment"} /></Text>
+                                        <Text><IconD size={27} color="black" name={"comment"} /></Text>
                                     </View>
                                     <View style={styles.likebox}>
-                                        <Text><IconD size={25} color="black" name={"like"} /></Text>
+                                        <Text><IconD size={29} color="black" name={"like"} /></Text>
                                     </View>
                                     <View style={styles.reallistbox}>
-                                        <Text><IconA size={15} color="black" name={"dots-three-vertical"} /></Text>
+                                        <Text><IconA size={19} color="black" name={"dots-three-vertical"} /></Text>
                                     </View>
                                 </View>
                             </View>
                         </View>
-                        <Text style={{ fontSize: 16, color: 'black', marginLeft: 20, marginRight: 20, }}>
+                        <Text style={{ fontSize: 20, color: 'black', marginLeft: 20, marginRight: 20, }}>
                             에브리바디 해체! 추억에 지우개를?! 어랏 텐션이 올라? 폐가 돼? 네, 라고는 말할 수 없어!
                             원래 늘어나야되거든?
                         </Text>
                         <View style={styles.dataandlike}>
-                            <Text style={{ marginTop: 3, marginLeft: 20, }}>
+                            <Text style={{ marginTop: 3, marginLeft: 20, fontSize : 18}}>
                                 01/26 25:00
                             </Text>
-                            <Text><IconD size={30} color="black" name={"like"} /></Text>
-                            <Text style={{ fontSize: 16, marginTop: 1, }}>
+                            <Text style = {{marginTop : 2}}><IconD size={34} color="black" name={"like"} /></Text>
+                            <Text style={{ fontSize: 19, marginTop: 2, }}>
                                 30
                             </Text>
                         </View>
@@ -166,23 +166,23 @@ const PostDetailScreen: React.FC = () => {
                                         <View style={styles.listbox2}>
                                             <View style={styles.LikeListBox2}>
                                                 <View style={styles.likebox2}>
-                                                    <Text><IconD size={25} color="black" name={"like"} /></Text>
+                                                    <Text><IconD size={29} color="black" name={"like"} /></Text>
                                                 </View>
                                                 <View style={styles.reallistbox2}>
-                                                    <Text><IconA size={15} color="black" name={"dots-three-vertical"} /></Text>
+                                                    <Text><IconA size={19} color="black" name={"dots-three-vertical"} /></Text>
                                                 </View>
                                             </View>
                                         </View>
                                     </View>
-                                    <Text style={{ fontSize: 16, color: 'black', marginLeft: 20, marginRight: 20, }}>
+                                    <Text style={{ fontSize: 20, color: 'black', marginLeft: 20, marginRight: 20, }}>
                                         에브리바디 해체!
                                     </Text>
                                     <View style={styles.dataandlike}>
-                                        <Text style={{ marginTop: 3, marginLeft: 20, }}>
+                                        <Text style={{ marginTop: 3, marginLeft: 20, fontSize : 18}}>
                                             01/26 25:00
                                         </Text>
-                                        <Text><IconD size={30} color="black" name={"like"} /></Text>
-                                        <Text style={{ fontSize: 16, marginTop: 1, }}>
+                                        <Text style = {{marginTop : 2}}><IconD size={30} color="black" name={"like"} /></Text>
+                                        <Text style={{ fontSize: 19, marginTop: 2, }}>
                                             30
                                         </Text>
                                     </View>
@@ -196,7 +196,7 @@ const PostDetailScreen: React.FC = () => {
             <View style={styles.commentbox}>
                 <View style={[styles.inputtext, { height: inputheight }]}>
                     <TextInput
-                        style={{ paddingLeft: 20, fontSize: 16, }}
+                        style={{ paddingLeft: 20, fontSize: 20, }}
                         onChangeText={handleInputChange}
                         onContentSizeChange={handleContentSizeChange}
                         value={commenttext}
@@ -205,7 +205,7 @@ const PostDetailScreen: React.FC = () => {
                     />
                 </View>
                 <View style={styles.sendbutton}>
-                    <Text style={{ color: '#F29F05' }}> <IconC name="send" size={30} /></Text>
+                    <Text style={{ color: '#F29F05' }}> <IconC name="send" size={34} /></Text>
                 </View>
             </View>
         </View>
@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     profilepicturebox: {
-        width: 55,
-        height: 55,
+        width: 60,
+        height: 60,
         backgroundColor: '#CED4DA',
         borderRadius: 12,
     },
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'blue',
     },
     titlecontainer: {
-        height: 45,
+        height: 50,
         //backgroundColor : 'red',
         justifyContent: 'center',
     },
@@ -325,8 +325,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     picture: {
-        width: 50,
-        height: 50,
+        width: 54,
+        height: 54,
         backgroundColor: '#CED4DA',
         borderRadius: 8,
         marginLeft: 10,
@@ -336,8 +336,8 @@ const styles = StyleSheet.create({
         //backgroundColor: 'blue'
     },
     ComentLikeListBox: {
-        width: 105,
-        height: 25,
+        width: 109,
+        height: 29,
         borderRadius: 8,
         backgroundColor: '#CED4DA',
         marginTop: 7,
@@ -386,8 +386,8 @@ const styles = StyleSheet.create({
         //backgroundColor: 'red'
     },
     LikeListBox2: {
-        width: 70,
-        height: 25,
+        width: 74,
+        height: 29,
         borderRadius: 8,
         marginTop: 7,
         flexDirection: 'row',

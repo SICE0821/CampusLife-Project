@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import MainScreen from '../screens/MainScreen';
 import { EventTopTabNavigator } from './TopTabNavigator'
-import AttendanceScreen from '../screens/AttendanceScreen';
+import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
 import WritePostScreen from '../screens/CommunityScreens/WritePostScreen';
 import LoginScreen from '../screens/LoginScreens/LoginScreen';
@@ -17,9 +17,14 @@ import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
+import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
+import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
+import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
+
 
 
 import { MainTabNavigator } from './BottomTabNavigator'
+import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator } from './TopTabNavigator'
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -33,6 +38,7 @@ const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
 const EventShopStack = createStackNavigator();
+const ReqularEventScreenStack = createStackNavigator();
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = () => {
@@ -41,8 +47,9 @@ export const RootStackNavigator = () => {
 
     return (
         <RootStack.Navigator initialRouteName="LoginScreenStackNavigator">
-            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator} />
-            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator} options={{ headerShown: false }} />
+            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator}  />
+            <RootStack.Screen name = "AdminTabNavigator" component = {AdminTabNavigator}  />
+            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator}  />
             <RootStack.Screen
                 name="WritePostScreen"
                 component={WritePostScreen}
@@ -61,7 +68,7 @@ export const RootStackNavigator = () => {
                 })}
             />
             <RootStack.Screen
-                name = "PostDetailScreen"
+                name="PostDetailScreen"
                 component={PostDetailScreen}
                 options={({ navigation }: any) => ({
                     headerStyle: {
@@ -81,6 +88,7 @@ export const RootStackNavigator = () => {
                 component={SearchPostScreen}
                 options={{ headerShown: false }}>
             </RootStack.Screen>
+            <AttendanceStack.Screen name = "FullScreenCamera" component = {FullScreenCamera} options = {{headerShown : false}}/>
         </RootStack.Navigator>
     )
 }
@@ -191,7 +199,49 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
                     headerTitleAlign: 'center',
                     title: '이벤트',
                 }} />
+                <EventShopStack.Screen 
+                name="DailyEventScreen"
+                component={DailyEventScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("EventTopTabNavigator")}>
+                            <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이벤트',
+                }} />
         </EventStack.Navigator>
+    );
+};
+
+export const ReqularEventScreenNavigator = ({ navigation, route }: any) => {
+    return (
+        <ReqularEventScreenStack.Navigator>
+            <ReqularEventScreenStack.Screen
+                name="ReqularEventScreen"
+                component={ReqularEventScreen}
+                options={{
+                    //headerShown : false,
+                    //tabBarIcon: () => null,
+                }}>
+            </ReqularEventScreenStack.Screen>
+
+            <ReqularEventScreenStack.Screen
+                name="DailyEventScreen"
+                component={DailyEventScreen}
+                options={{
+                    headerShown : false,
+                    //tabBarIcon: () => null,
+                }}>
+            </ReqularEventScreenStack.Screen>
+
+        </ReqularEventScreenStack.Navigator>
     );
 };
 
