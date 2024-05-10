@@ -20,7 +20,7 @@ import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
-
+import AdminMainScreen from '../admin_screen/AdminMainScreen';
 
 
 import { MainTabNavigator } from './BottomTabNavigator'
@@ -39,6 +39,7 @@ const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
 const EventShopStack = createStackNavigator();
 const ReqularEventScreenStack = createStackNavigator();
+const AdminStack = createStackNavigator();
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = () => {
@@ -105,11 +106,21 @@ export const LoginScreenStackNavigator = () => {
 }
 
 //메인 페이지 관련 스택 네비게이터
-export const MainScreenStackNavigator = () => {
+export const MainScreenStackNavigator = ({route} : any) => {
+    const { userdata } = route.params;
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="MainScreen" component={MainScreen} />
+            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }}/>
         </MainStack.Navigator>
+    );
+};
+
+export const AdminMainScreenStackNavigator = ({route} : any) => {
+    const { userdata } = route.params;
+    return (
+        <AdminStack.Navigator>
+            <AdminStack.Screen name="AdminScreen" component={AdminMainScreen} initialParams={{ userdata }}/>
+        </AdminStack.Navigator>
     );
 };
 

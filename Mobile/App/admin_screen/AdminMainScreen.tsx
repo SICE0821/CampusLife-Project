@@ -41,12 +41,13 @@ type mainpagehptdata = {
   like: number,
 }
 
-const MainPage = ({route} : any) => {
+const AdminMainScreen = ({route} : any) => {
   const { userdata } = route.params;
+  const [userData, setUserData] = useState<UserData>(userdata);
   const [schoolpostdata, setschollpostdata] = useState<mainpagepostdata[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<mainpagepostdata[]>([]);
   const [hotpostdata, sethotpostdata] = useState<mainpagehptdata[]>([]);
-  const [userData, setUserData] = useState<UserData>(userdata);
+
   const fetchschoolpostData = async () => {
       try {
         const response = await fetch('http://175.212.187.92:3000/MainPageSchoolPost');
@@ -88,11 +89,10 @@ const MainPage = ({route} : any) => {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
     };
+
     const settingUserData = () => {
       setUserData(userdata);
     }
-
-    
 
     useFocusEffect(
       React.useCallback(() => {
@@ -604,5 +604,5 @@ const styles = StyleSheet.create({
 
 });
 
-export default MainPage;
+export default AdminMainScreen;
 

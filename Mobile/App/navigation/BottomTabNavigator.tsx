@@ -9,6 +9,7 @@ import {EventTopTabNavigator} from './TopTabNavigator'
 import {EventScreenStackNavigator} from './StackNavigator';
 import {AttendanceScreenStackNavigator} from './StackNavigator';
 import {TimetableScreenStackNavigator} from './StackNavigator';
+import { AdminMainScreenStackNavigator } from './StackNavigator';
 
 import IconA from 'react-native-vector-icons/Entypo';
 import IconB from 'react-native-vector-icons/Fontisto';
@@ -18,8 +19,9 @@ import IconD from 'react-native-vector-icons/AntDesign';
 const Tab = createBottomTabNavigator();
 
 //메인 바텀 탭 네비게이션
-export const MainTabNavigator = () => {
+export const MainTabNavigator = ({route} : any) => {
   const navigation: any = useNavigation();
+  const { userdata } = route.params;
   return (
       <Tab.Navigator
         screenOptions={{
@@ -48,6 +50,7 @@ export const MainTabNavigator = () => {
               <Text style={{ fontSize: 13, marginBottom: 5 }}>홈</Text>
             )
           }}
+          initialParams={{ userdata }}
         />
         <Tab.Screen
           name="CommunityScreenStackNavigator" 
@@ -119,8 +122,9 @@ export const MainTabNavigator = () => {
 }
 
 
-export const AdminTabNavigator = () => {
+export const AdminTabNavigator = ({route} : any) => {
   const navigation: any = useNavigation();
+  const { userdata } = route.params;
   return (
       <Tab.Navigator
         screenOptions={{
@@ -137,7 +141,7 @@ export const AdminTabNavigator = () => {
         }}>
         <Tab.Screen
           name="MainPage"
-          component={MainScreenStackNavigator}
+          component={AdminMainScreenStackNavigator}
           options={{
             title: '홈',
             headerShown: false,
@@ -149,6 +153,7 @@ export const AdminTabNavigator = () => {
               <Text style={{ fontSize: 13, marginBottom: 5 }}>홈</Text>
             )
           }}
+          initialParams={{ userdata }}
         />
         <Tab.Screen
           name="CommunityScreenStackNavigator" 

@@ -99,6 +99,7 @@ app.post('/get_user_data', async(req, res) => {
     department_pk: rows[0].department_id,
     email: rows[0].email,
     grade: rows[0].grade,
+    point: rows[0].point,
   };
   
   res.json(userData);
