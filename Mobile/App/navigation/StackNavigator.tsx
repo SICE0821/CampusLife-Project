@@ -21,6 +21,7 @@ import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 
 import { MainTabNavigator } from './BottomTabNavigator'
+import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator } from './TopTabNavigator'
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -42,8 +43,9 @@ export const RootStackNavigator = () => {
 
     return (
         <RootStack.Navigator initialRouteName="LoginScreenStackNavigator">
-            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator} />
-            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator} options={{ headerShown: false }} />
+            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator}  />
+            <RootStack.Screen name = "AdminTabNavigator" component = {AdminTabNavigator} options={{ headerShown: false }} />
+            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator}  options={{ headerShown: false }}/>
             <RootStack.Screen
                 name="WritePostScreen"
                 component={WritePostScreen}

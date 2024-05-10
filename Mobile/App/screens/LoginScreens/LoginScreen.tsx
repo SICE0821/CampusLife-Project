@@ -28,7 +28,8 @@ function LoginScreen({ navigation}: any) {
   }
 
     const handleLogin = async () => {
-      navigation.navigate('MainTabNavigator');
+      //navigation.navigate('MainTabNavigator');
+      navigation.navigate('AdminTabNavigator');
       
       try {
         const response = await fetch('http://172.16.108.66:3000/login', {

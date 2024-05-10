@@ -63,7 +63,7 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
             <View style={styles.writeboxcontainer}>
                 <View style={styles.writetitle}>
                     <View style={styles.titlebox}>
-                        <Text style={{ fontSize: 20, margin: 5, marginLeft: 5, color: 'black' }}>{item.title}</Text>
+                        <Text style={{ fontSize: 22, margin: 5, marginLeft: 5, color: 'black' }}>{item.title}</Text>
                     </View>
                     <View style={styles.eyesnum}>
                         <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
@@ -110,11 +110,11 @@ const styles = StyleSheet.create({
 
     topnavigationborder: {
         flex: 1,
-        //backgroundColor : "red",
+        //backgroundColor : "blue",
         borderWidth: 2,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
-        marginTop: 50,
+        marginTop: 57,
     },
 
     flatlisttopline: {
@@ -134,18 +134,19 @@ const styles = StyleSheet.create({
         //padding: 50, 
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
-        backgroundColor: 'white'
+        //backgroundColor: 'red',
+        height : 80,
     },
 
     writetitle: {
-        flex: 0.5,
+        flex: 0.6,
         flexDirection: 'row',
         marginTop: 5,
         //backgroundColor : 'yellow'
     },
 
     wirterandtime: {
-        flex: 0.5,
+        flex: 0.4,
         flexDirection: 'row'
         //backgroundColor : 'yellow'
     },
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     writerbox: {
         flex: 0.85,
         flexDirection: 'row',
-        // backgroundColor : 'yellow',
+        //backgroundColor : 'yellow',
     },
     likenum: {
         flex: 0.15,
