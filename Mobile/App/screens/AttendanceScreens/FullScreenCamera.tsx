@@ -9,8 +9,8 @@ const FullScreenCamera = ({navigation}: any) => {
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes) => {
-      navigation.navigate('AttendanceScreen', { scannedCode: codes[0] });
-      
+      console.log("QR 인식 됨");
+      navigation.navigate('AttendanceScreen', { scannedCode: codes });
     }
   })
   return (
@@ -35,6 +35,7 @@ const FullScreenCamera = ({navigation}: any) => {
         onPress={() => {
           setIsCameraActive(false);
           navigation.navigate('AttendanceScreen');
+          console.log("안녕");
         }}
       >
         <Text style={{ color: 'white', fontSize: 18 }}>Close</Text>

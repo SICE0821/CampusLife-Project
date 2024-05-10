@@ -41,7 +41,7 @@ const DailyEventScreen: React.FC = () => {
 }
 
   return (
-    <View>
+    <View style={styles.screenView}>
       <Modal animationType='fade' transparent={true} visible={isModalVisible}>
           <View style={styles.modalBackground}>
             <View style={styles.modalView}>
@@ -84,6 +84,10 @@ const DailyEventScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  screenView: {
+    width: '100%',
+    height: '90%'
+  },
   modalBackground: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.3)",
@@ -92,24 +96,25 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: 'white',
-    width: 300,
-    height: 150,
+    width: '70%',
+    height: '15%',
     borderRadius: 10,
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
   },
   modalFont: {
     marginTop: 15,
     fontSize: 30,
     color: 'black',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   modalclose: {
-    fontSize: 20,
-    fontWeight: 'bold'
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
   },
   topView: {
-    height: 150,
+    height: '20%',
     alignItems: 'center',
   },
   title: {
@@ -126,7 +131,7 @@ const styles = StyleSheet.create({
   calendar: {
     //height: 300,
     alignSelf: 'center',
-    width: 420,
+    width: '95%',
     borderWidth: 5,
     borderColor: '#E9E9E9',
     borderRadius: 20,
@@ -143,6 +148,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 28,
     fontWeight: 'bold',
+    
   },
 });
 

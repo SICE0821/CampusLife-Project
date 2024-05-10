@@ -15,18 +15,20 @@ const RegularEventScreen: React.FC = ({navigation} : any) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <View style={{ flex: 0.87, backgroundColor: 'white' }}>
+    <View style={{ height: '100%' }}>
+      <View style={{ height: '100%', backgroundColor: 'white' }}>
         <Swiper
           loop={false}
           showsPagination={true}
           activeDotStyle={{ backgroundColor: 'blue', width: 10, height: 10 }}>
           {/* 첫 번째 슬라이드 */}
-          <View>
+          <View style={{ flex: 1 }}>
             <View style={styles.eventBox1}>
               <Text style={styles.title}>출석체크</Text>
               <Text style={styles.subtitle}>매일 출석 도장을 찍으면 100 point 지급!</Text>
-              <Image style={styles.imageStyle} source={calendarpng} />
+              <View style={styles.imageView}>
+                <Image style={styles.imageStyle} source={calendarpng} />
+              </View>
             </View>
             <TouchableOpacity style={styles.button1} onPress={() => navigation.navigate("DailyEventScreen")}>
               <Text style={styles.buttonText}>출석체크 하러가기</Text>
@@ -34,11 +36,13 @@ const RegularEventScreen: React.FC = ({navigation} : any) => {
           </View>
 
           {/* 두 번째 슬라이드 */}
-          <View>
+          <View style={{ flex: 1 }}>
             <View style={styles.eventBox2}>
               <Text style={styles.title}>친구코드</Text>
               <Text style={styles.subtitle}>친구에게 코드를 보내주면 10point 지급!</Text>
-              <Image style={styles.imageStyle} source={friendcodepng} />
+              <View style={styles.imageView}>
+                <Image style={styles.imageStyle} source={friendcodepng} />
+              </View>
             </View>
             <TouchableOpacity style={styles.button2} onPress={() => console.log("친구코드 디테일페이지")}>
               <Text style={styles.buttonText}>자세히 보기</Text>
@@ -55,42 +59,43 @@ const RegularEventScreen: React.FC = ({navigation} : any) => {
 
 const styles = StyleSheet.create({
   eventBox1: {
-    width: 350,
-    height: 450,
+    width: '85%',
+    height: '70%',
     marginTop: 30,
     backgroundColor: '#FFDECF',
     borderRadius: 40,
     alignSelf: 'center'
   },
   eventBox2: {
-    width: 350,
-    height: 450,
+    width: '85%',
+    height: '70%',
     marginTop: 30,
     backgroundColor: '#C1FFBF',
     borderRadius: 40,
     alignSelf: 'center'
   },
   title: {
-    marginTop: 50,
-    marginBottom: 20,
-    fontSize: 45,
-    //fontWeight: 'bold',
+    marginTop: 30,
+    fontSize: 50,
     color: 'black',
     alignSelf: 'center',
-    //backgroundColor: 'yellow'
   },
   subtitle: {
-    marginBottom: 20,
+    marginTop: 10,
     fontSize: 15,
     color: 'black',
     alignSelf: 'center',
-    //backgroundColor: 'yellow'
+  },
+  imageView: {
+    marginTop: 30,
+    height: '60%',
+    alignSelf: 'center',
+    //backgroundColor: 'red'
   },
   imageStyle: {
-    width: 250,
-    height: 250,
-    //backgroundColor: 'red',
-    alignSelf: 'center'
+    flex: 1,
+    resizeMode: 'contain',
+    alignSelf: 'center',
   },
   button1: {
     backgroundColor: '#FFDECF',
@@ -101,7 +106,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   button2: {
-    backgroundColor: '#87C686',
+    backgroundColor: '#C1FFBF',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,

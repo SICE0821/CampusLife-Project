@@ -8,12 +8,13 @@ const { getGeneralPosts,
         getdeparmentpostdata, 
         getschoolpostdata, 
         insertDataIntoDB,
-        getuserpk } = require('./db.js'); // db 파일에서 함수 가져오기
+        getuserpk,
+        getlecturelist } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '172.16.106.43',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -179,6 +180,27 @@ app.post('/login', async (req, res) => {
       if (conn) conn.release();
     }
   });
+
+// 과목 가져오기
+app.get('/getlecture', async (req, res) => {
+  try {
+      const rows = await getlecturelist();
+      const processedData = rows.map(item => ({
+          lecture_id: item.lecture_id,
+          professor_name : item.professor_name,
+          credit: item.credit,
+          lecture_name : item.lecture_name,
+          lecture_room : item.lecture_room,
+          lecture_time : item.lecture_time,
+          week: item.week
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
   
 //서버 시작

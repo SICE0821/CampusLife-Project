@@ -95,6 +95,8 @@ export const MainTabNavigator = ({route} : any) => {
             headerStyle: {
               backgroundColor: '#F27405',
             },
+            
+            
             tabBarIcon: ({ color, size }) => (
               <IconA name="check" size={37} color={color} />
             ),

@@ -25,7 +25,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
                     position: 'absolute',
                     height: 40,
                     left: -3,
-                    marginRight: 120,
+                    marginRight: 80,
                     marginLeft: 10,
                     elevation: 0,
                     borderWidth: 0,
@@ -34,7 +34,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
                 },
                 tabBarLabelStyle: {
-                    fontSize: 21,
+                    fontSize: 20,
                     alignItems: 'center',
                     marginBottom: 10,
                     marginTop: 5,
@@ -84,14 +84,14 @@ export const TopbTabNavigator = () => {
                     position: 'absolute',
                     height: 45,
                     marginLeft: 12,
-                    marginRight: 150,
+                    marginRight: 100,
                     //borderWidth : 2,
                     elevation: 0,
                     //backgroundColor : 'blue',
 
                 },
                 tabBarLabelStyle: {
-                    fontSize: 26,
+                    fontSize: 25,
                     alignItems: 'center',
                     marginBottom: 14,
                     fontWeight: 'bold',

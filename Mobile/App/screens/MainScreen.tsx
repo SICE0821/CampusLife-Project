@@ -49,13 +49,13 @@ const MainPage = ({route} : any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://175.212.187.92:3000/MainPageSchoolPost');
+        const response = await fetch('http://172.16.108.66:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         setschollpostdata(data);
-       //console.log("데이터 받음:", data);
+       console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -63,13 +63,13 @@ const MainPage = ({route} : any) => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://175.212.187.92:3000/MainPagedepartmentPost');
+        const response = await fetch('http://172.16.108.66:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         setdepartmentpostdata(data);
-       //console.log("데이터 받음:", data);
+        console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -77,13 +77,13 @@ const MainPage = ({route} : any) => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://175.212.187.92:3000/MainPagehotPost');
+        const response = await fetch('http://172.16.108.66:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
         const data = await response.json();
         sethotpostdata(data);
-       // console.log("데이터 받음:", data);
+        console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -192,7 +192,7 @@ const MainPage = ({route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학교 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26,}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -250,7 +250,7 @@ const MainPage = ({route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학사 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -308,7 +308,7 @@ const MainPage = ({route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>인기글</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {27}/></Text>
-            <Text style = {{marginLeft : 255, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 205, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -319,7 +319,7 @@ const MainPage = ({route} : any) => {
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {40}/></Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[0]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[0]?.like} </Text>
@@ -330,7 +330,7 @@ const MainPage = ({route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[1]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[1]?.like} </Text>
@@ -341,7 +341,7 @@ const MainPage = ({route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[2]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[2]?.like} </Text>
@@ -352,7 +352,7 @@ const MainPage = ({route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[3]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[3]?.like} </Text>
@@ -363,7 +363,7 @@ const MainPage = ({route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[4]?.view} /</Text>
                   <Text style = {{color : '#F29F05', fontSize : 17}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[4]?.like} </Text>

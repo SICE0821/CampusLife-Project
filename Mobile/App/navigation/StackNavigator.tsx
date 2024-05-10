@@ -50,7 +50,7 @@ export const RootStackNavigator = () => {
         <RootStack.Navigator initialRouteName="LoginScreenStackNavigator">
             <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator}  />
             <RootStack.Screen name = "AdminTabNavigator" component = {AdminTabNavigator}  />
-            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator}  />
+            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator} options = {{headerShown : false}} />
             <RootStack.Screen
                 name="WritePostScreen"
                 component={WritePostScreen}
@@ -266,11 +266,13 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
+                    
+                    
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate("MainPage")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
-                        </TouchableOpacity>
+                        </TouchableOpacity> 
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
