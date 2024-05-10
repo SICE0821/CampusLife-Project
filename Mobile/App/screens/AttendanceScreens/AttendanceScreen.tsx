@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity, ScrollView, Dimensions} from 'react-native';
+import { Alert, SafeAreaView, View, Text, Button, StyleSheet, TouchableOpacity, ScrollView, Dimensions} from 'react-native';
 import ModalBox from 'react-native-modalbox';
 import Modal from 'react-native-modal';
 import IconA from 'react-native-vector-icons/FontAwesome5';
@@ -24,7 +24,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { hasPermission, requestPermission } = useCameraPermission()
   const [isCameraButton, setIsCameraButton] = useState(false);
-  const [scannedCode, setScannedCode] = useState(null);
+  const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [lectureList, setLectureList] = useState<Lecture[]>([]);
   const [modalLectureName, setModalLectureName] = useState<string>('');
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
@@ -143,13 +143,30 @@ const AttendanceScreen = ({navigation, route}: any) => {
   }, [isCameraButton]);
 
   useEffect(() => {
+    setScannedCode(route.params?.scannedCode);
+  }, [route.params?.scannedCode]);
+
+  /*useEffect(() => {
+    if (scannedCode) {
+      Alert.alert(
+        'QR 코드 스캔됨',
+        `스캔된 코드: ${scannedCode}`,
+        [
+          { text: '확인', onPress: () => console.log('확인 버튼 눌림') }
+        ],
+        { cancelable: false }
+      );
+    }
+  }, [scannedCode]);*/
+
+  useEffect(() => {
     fetchLectureData(); // 페이지가 로드될 때 강의 목록을 가져옴
   }, []);
 
   const nowday = getCurrentDay();
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.textContainer}>
         <Text style={styles.title}>오늘의 출석</Text>
         <Text style={styles.date}>{getCurrentDate()}</Text>
@@ -235,7 +252,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           </View>
         )}
         </ModalBox>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -362,7 +379,6 @@ const styles = StyleSheet.create({
     flex : 0.1,
     justifyContent : "center",
     alignItems : "center",
-    backgroundColor : 'red',
   },
   Include:{
     flexDirection : 'row',
