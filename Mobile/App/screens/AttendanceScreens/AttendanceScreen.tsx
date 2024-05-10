@@ -10,27 +10,116 @@ import { Camera,
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
 
+type Lecture = {
+    credit : number;
+    professor_name : string;
+    lecture_name : string;
+    lecture_room : string;
+    lecture_time : string;
+    week : string;
+}
+
 const AttendanceScreen = ({navigation, route}: any) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { hasPermission, requestPermission } = useCameraPermission()
   const [isCameraButton, setIsCameraButton] = useState(false);
   const [scannedCode, setScannedCode] = useState(null);
-  const device = useCameraDevice('back')
+  const [lectureList, setLectureList] = useState<Lecture[]>([]);
+  const [modalLectureName, setModalLectureName] = useState<string>('');
+  const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
+  
 
   const getCurrentDate = () => {
     const days = ['일', '월', '화', '수', '목', '금', '토'];
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
-    const date = now.getDate();
-    const day = days[now.getDay()];
+    const date = now.getDate() ;
+    const day = days[now.getDay() ];
 
     return `${year}년 ${month}월 ${date}일 ${day}요일`;
   };
 
-  const openModal = () => {
-    setIsModalOpen(true); // 모달을 열기 위해 상태를 true로 설정
+  const getCurrentDay = () => {
+    const days = ['월요일', '화요일', '수요일', '목요일', '금요일'];
+    const now = new Date();
+    return days[now.getDay() - 1]; // 현재 요일 반환
+  };
+
+  const formatTimeRange = (lectureTime: string) => {
+    return lectureTime.split(' ~ ');
+  };
+
+  const generateTimeRanges = (lectureTime: string) => {
+    const [start, end] = formatTimeRange(lectureTime);
+    const timeRanges = [];
+    
+    let [currentHour, currentMinute] = start.split(':').map(Number);
+    const [endHour, endMinute] = end.split(':').map(Number);
+  
+    while (!(currentHour === endHour && currentMinute === endMinute)) {
+      // 시작 시간을 10분 단위로 반올림
+      if (currentMinute % 10 !== 0) {
+        currentMinute = Math.ceil(currentMinute / 10) * 10;
+      }
+  
+      // 시간 형식 맞추기
+      const startHourStr = currentHour < 10 ? `0${currentHour}` : `${currentHour}`;
+      const startMinuteStr = currentMinute < 10 ? `0${currentMinute}` : `${currentMinute}`;
+  
+      let nextHour = currentHour;
+      let nextMinute = currentMinute + 50; // 50분 간격
+  
+      // 시간을 60분 단위로 조정
+      if (nextMinute >= 60) {
+        nextHour++;
+        nextMinute -= 60;
+      }
+  
+      // 종료 시간에 도달하면 반복 종료
+      if (nextHour > endHour || (nextHour === endHour && nextMinute > endMinute)) {
+        break;
+      }
+  
+      const nextHourStr = nextHour < 10 ? `0${nextHour}` : `${nextHour}`;
+      const nextMinuteStr = nextMinute < 10 ? `0${nextMinute}` : `${nextMinute}`;
+  
+      const nextTime = `${startHourStr}:${startMinuteStr} ~ ${nextHourStr}:${nextMinuteStr}`;
+      timeRanges.push(nextTime);
+  
+      // 다음 시간대의 시작 시간 설정
+      currentHour = nextHour;
+      currentMinute = nextMinute;
+  
+      // 이전 시간대의 종료 시간에 10분을 추가하여 다음 시간대의 시작 시간 설정
+      currentMinute += 10;
+      if (currentMinute >= 60) {
+        currentHour++;
+        currentMinute -= 60;
+      }
+    }
+  
+    return timeRanges;
+  };
+
+
+  const fetchLectureData = async () => {
+    try {
+      const response = await fetch('http://172.16.108.66:3000/getlecture');
+      if (!response.ok) {
+        throw new Error('서버 응답 실패');
+      }
+      const data = await response.json();
+      setLectureList(data); // 서버로부터 받은 강의 목록을 상태에 저장
+    } catch (error) {
+      console.error('데이터를 가져오는 중 오류 발생:', error);
+    }
+  };
+
+  const openModal = (lecture: Lecture) => {
+    setSelectedLecture(lecture);
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
@@ -40,14 +129,6 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   const openCamera = () => {
     setIsCameraButton(true);
-  };
-
-  const getRealBoxColor = () => {
-    if (scannedCode === 'YOUR_QR_CODE_VALUE') { // 스캔된 QR 코드 값에 따라 변경
-      return 'green'; // 초록색
-    } else {
-      return 'gray'; // 기본 색상
-    }
   };
 
   React.useEffect(() =>{
@@ -62,11 +143,10 @@ const AttendanceScreen = ({navigation, route}: any) => {
   }, [isCameraButton]);
 
   useEffect(() => {
-    if (route.params && route.params.scannedCode) {
-      setScannedCode(route.params.scannedCode);
-    }
-  }, [route.params]);
+    fetchLectureData(); // 페이지가 로드될 때 강의 목록을 가져옴
+  }, []);
 
+  const nowday = getCurrentDay();
 
   return (
     <View style={styles.container}>
@@ -75,101 +155,87 @@ const AttendanceScreen = ({navigation, route}: any) => {
         <Text style={styles.date}>{getCurrentDate()}</Text>
       </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.AttendanceList} onPress={openModal}>
-          <Text style={styles.ListText}>DB 설계 및 관리</Text>
-          <Text style={styles.ListInfo}>홍성욱 교수 | B0604                       미출결 : 45 출결 : 0 지각 : 0 결석 : 0</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.AttendanceList} >
-          <Text style={styles.ListText}>DB 설계 및 관리</Text>
-          <Text style={styles.ListInfo}>홍성욱 교수 | B0604                       미출결 : 45 출결 : 0 지각 : 0 결석 : 0</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.AttendanceList} >
-          <Text style={styles.ListText}>DB 설계 및 관리</Text>
-          <Text style={styles.ListInfo}>홍성욱 교수 | B0604                       미출결 : 45 출결 : 0 지각 : 0 결석 : 0</Text>
-        </TouchableOpacity>
-        
-        
-      </View>
+      {lectureList.map((lecture, index) => (
+        lecture.week === nowday && (
+          <View key={index} style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
+              <Text style={styles.ListText}>{lecture.lecture_name}</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                    미출결: 45 출결: 0 지각: 0 결석: 0</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      ))}
 
       <View style={styles.textContainer2}>
         <Text style={styles.title2}>출석 현황</Text>
       </View>
-      <View style={styles.buttonContainer2}>
-        <TouchableOpacity style={styles.AttendanceList} >
-          <Text style={styles.ListText}>DB 설계 및 관리</Text>
-          <Text style={styles.ListInfo}>홍성욱 교수 | B0604                       미출결 : 45 출결 : 0 지각 : 0 결석 : 0</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.AttendanceList} >
-          <Text style={styles.ListText}>DB 설계 및 관리</Text>
-          <Text style={styles.ListInfo}>홍성욱 교수 | B0604                       미출결 : 45 출결 : 0 지각 : 0 결석 : 0</Text>
-        </TouchableOpacity>
-        </View>
-    
+      {lectureList.map((lecture, index) => (
+        lecture.week !== nowday && (
+          <View key={index} style={styles.buttonContainer2}>
+            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
+              <Text style={styles.ListText}>{lecture.lecture_name}</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                   미출결: 45 출결: 0 지각: 0 결석: 0</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      ))}
         <ModalBox
-          isOpen={isModalOpen}
+          isOpen={isModalOpen && selectedLecture !== null}
           style={styles.modal}
           position="bottom"
           swipeToClose={false}
           onClosed={closeModal}
         >
-        <View style={styles.modalContainer}>
-          <View style={styles.header}>
-            <View style={{ flexDirection: 'row' }}>
-              <View>
-                <Text style={styles.ListText2}>DB 설계 및 관리</Text>
+        {selectedLecture && (
+          <View style={styles.modalContainer}>
+            <View style={styles.header}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', flex: 0.5 }}>
+                <View>
+                <Text style={styles.ListText2}>{selectedLecture?.lecture_name}</Text>
+                </View>
+                <View style={styles.Icon}>
+                  <TouchableOpacity onPress={openCamera}>
+                    <IconA name="camera" size={32} color="black" />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={{ marginLeft: 175 }}>
-                <TouchableOpacity onPress={openCamera}>
-                  <IconA name="camera" size={32} color="black" />
-                </TouchableOpacity>
+              <View>
+                <View>
+                  <Text style={styles.ListInfo2}>미출결 : 45  출결 : 0  지각 : 0  결석 : 0</Text>
+                </View>
               </View>
             </View>
-            <View>
-              <View>
-                <Text style={styles.ListInfo2}>미출결 : 45 출결 : 0 지각 : 0 결석 : 0</Text>
-              </View>
+            <View style={styles.WeekContainer}>
+              <ScrollView>
+                {[...Array(15)].map((_, weekIndex) => (
+                  <View key={weekIndex}>
+                    <View style={styles.Week}>
+                      <Text style={{ fontSize: 20, marginTop : 5,fontWeight: 'bold', color: 'black' }}>{weekIndex + 1}주차</Text>
+                    </View>
+                    <View style={styles.View}>
+                      {generateTimeRanges(selectedLecture.lecture_time).map((timeRange, index) => (
+                        <View key={index} style={styles.Include}>
+                          <View style={styles.Attendance}>
+                            <Text style={styles.timeText}>{index + 1}차시            {timeRange}</Text>
+                          </View>
+                          <View style={styles.Box}>
+                            <View style={[styles.realBox, { backgroundColor: "#909090" }]}>
+                            </View>
+                          </View>
+                        </View>
+                        
+                      ))}
+                    </View>
+                  </View>
+                  
+                ))}
+              </ScrollView>
             </View>
+            <View style = {{backgroundColor:"white" , height : 100, }}></View>
           </View>
-              <View style={styles.WeekContainer}>
-                  <View style={styles.Week}>
-                    <Text style={{fontSize:20 , fontWeight : 'bold', color : 'black'}}>1주차</Text>
-                  </View>
-                  <View style={styles.View}>
-                    <View style={styles.Include}>
-                      <View style={styles.Attendance}>
-                          <Text style={{ fontSize: 17, fontWeight: 'bold', color: 'black', marginLeft : 25 }}>1차시         09 : 10 ~ 10 : 00</Text>
-                      </View>
-                      <View style={styles.Box}>  
-                        <View style={[styles.realBox, { backgroundColor: getRealBoxColor() }]}>
-                        </View>
-                      </View>
-                    </View>
-                    <View style={styles.Include}>
-                      <View style={styles.Attendance}>
-                        <Text style = {{fontSize:17 , fontWeight : 'bold', color : 'black', marginLeft : 25}}>1차시         09 : 10 ~ 10 : 00</Text>
-                      </View>
-                      <View style={styles.Box}>  
-                        <View style={[styles.realBox, { backgroundColor: getRealBoxColor() }]}>
-
-                        </View>
-                      </View>
-                    </View>
-                    <View style={styles.Include}>
-                      <View style={styles.Attendance}>
-                        <Text style = {{fontSize:17 , fontWeight : 'bold', color : 'black', marginLeft : 25}}>1차시         09 : 10 ~ 10 : 00</Text>
-                      </View>
-                      <View style={styles.Box}>  
-                        <View style={[styles.realBox, { backgroundColor: getRealBoxColor() }]}>
-
-                        </View>
-                      </View>
-                    </View>
-                  </View>
-              </View>
-          </View>
+        )}
         </ModalBox>
-      </View>
+    </View>
   );
 };
 
@@ -179,51 +245,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  phonecontainer:{
-    flex: 1,
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
-  scanner:{
-    flex : 1,
-  },
   textContainer: { // 오늘의 출석, 날짜 텍스트 컨테이너
-    alignItems: 'center',
     justifyContent: 'center',
     top: 40,
-    marginRight : 205,
+    marginRight : 200,
     marginBottom : 60,
   },
   textContainer2:{ // 출석 현황 텍스트 컨테이너
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight : 205,
-    marginBottom : 20,
+    marginRight : 250,
+    marginTop : 10,
+    marginBottom : 15,
   },
   title: { // 오늘의 출석 텍스트 css
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 10,
-    marginRight : 52,
+    marginLeft : 5,
     color : 'black',
   },
   title2: { // 출석 현황 텍스트 css
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
-    marginRight : 70,
+    marginRight : 40,
     color : 'black',
   },
   date: { // 날짜 텍스트 css
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 20,
     marginLeft : 6,
   },
   buttonContainer: { // 오늘의 출석 버튼 컨테이너
-    marginBottom : 20,
     justifyContent: 'flex-start',
   },
   buttonContainer2: { // 출석 현황 버튼 컨테이너
-    marginBottom : 20,
+    marginTop : 5,
     justifyContent: 'flex-start',
     
   },
@@ -231,10 +288,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     marginBottom : 8,
     borderColor: 'black',
-    width: 360,
+    width: 395,
   },
   ListText: { // 과목명 텍스트
-    fontSize: 15,
+    fontSize: 20,
     color: 'black',
     marginBottom: 3,
     fontWeight: 'bold',
@@ -243,13 +300,13 @@ const styles = StyleSheet.create({
   },
   ListText2: { // 버튼 누른 후 과목명 텍스트
     fontSize: 25,
-    color:'black',
     marginLeft : 25,
+    color:'black',
     fontWeight: 'bold',
     
   },
   ListInfo: { // 과목마다의 출석 텍스트
-    fontSize: 12,
+    fontSize: 15,
     marginLeft: 5,
     marginBottom: 5,
     
@@ -262,7 +319,7 @@ const styles = StyleSheet.create({
   modal: { // 모달 창 css
     borderTopLeftRadius : 20,
     borderTopRightRadius : 20,
-    height: 550,
+    height: 600,
   },
   modalContainer:{
     flex : 1,
@@ -274,6 +331,7 @@ const styles = StyleSheet.create({
     flex : 0.2,
     borderTopLeftRadius : 20,
     borderTopRightRadius : 20,
+    borderBottomWidth: 2  ,
     justifyContent : "center",
     alignContent : "center",
   },
@@ -283,9 +341,8 @@ const styles = StyleSheet.create({
     fontWeight : 'bold',
     color: 'black', 
     backgroundColor : '#AFEEEE',
-    borderTopWidth : 2,
-    borderBottomWidth: 2,
-    paddingTop : 10,
+    borderBottomWidth: 2  ,
+    height : 45,
     paddingLeft : 25,
   },
   WeekContainer:{
@@ -323,6 +380,16 @@ const styles = StyleSheet.create({
     borderColor : 'black',
     borderWidth : 1,
   },
+  timeText:{
+    fontSize: 17, 
+    fontWeight: 'bold', 
+    color: 'black', 
+    marginLeft: 28,
+    marginBottom : 5,
+  },
+  Icon:{
+    marginRight : 20,
+  }
 });
 
 export default AttendanceScreen;

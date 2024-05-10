@@ -9,8 +9,8 @@ const FullScreenCamera = ({navigation}: any) => {
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes) => {
+      console.log("QR 인식!");
       navigation.navigate('AttendanceScreen', { scannedCode: codes[0] });
-      
     }
   })
   return (

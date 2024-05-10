@@ -224,11 +224,13 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
+                    
+                    
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate("MainPage")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
-                        </TouchableOpacity>
+                        </TouchableOpacity> 
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',

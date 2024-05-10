@@ -117,6 +117,25 @@ async function getDepartmentPosts() {
     }
 }
 
+// 과목의 정보를 가져오는 쿼리
+async function getlecturelist() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(`
+            SELECT lecture_id, professor.name AS professor_name, credit, lecture_name, lecture_room, lecture_time, week 
+            FROM lecture
+            JOIN professor ON lecture.professor_id = professor.professor_id
+            LIMIT 5;
+        `);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -124,5 +143,6 @@ module.exports = {
     gethotpostdata,
     getdeparmentpostdata,
     getschoolpostdata,
-    insertDataIntoDB
+    insertDataIntoDB,
+    getlecturelist
   };

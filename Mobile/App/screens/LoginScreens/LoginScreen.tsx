@@ -18,7 +18,7 @@ function LoginScreen({ navigation}: any) {
 
     const GetStudentPK = async () => {
       try {
-          const response = await fetch('http://192.168.35.243:3000/generalpost');
+          const response = await fetch('http://172.16.108.66:3000/generalpost');
           const StudentPK = await response.json();
           console.log(StudentPK);
           setStudentPK(StudentPK);
@@ -31,7 +31,7 @@ function LoginScreen({ navigation}: any) {
       navigation.navigate('MainTabNavigator');
       
       try {
-        const response = await fetch('http://192.168.35.243:3000/login', {
+        const response = await fetch('http://172.16.108.66:3000/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
