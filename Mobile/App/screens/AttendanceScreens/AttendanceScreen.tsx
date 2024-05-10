@@ -362,6 +362,7 @@ const styles = StyleSheet.create({
     flex : 0.1,
     justifyContent : "center",
     alignItems : "center",
+    backgroundColor : 'red',
   },
   Include:{
     flexDirection : 'row',

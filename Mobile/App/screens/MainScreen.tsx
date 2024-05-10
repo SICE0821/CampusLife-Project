@@ -53,7 +53,7 @@ const MainPage = () => {
         }
         const data = await response.json();
         setschollpostdata(data);
-        console.log("데이터 받음:", data);
+       //console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -67,7 +67,7 @@ const MainPage = () => {
         }
         const data = await response.json();
         setdepartmentpostdata(data);
-        console.log("데이터 받음:", data);
+       //console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -81,7 +81,7 @@ const MainPage = () => {
         }
         const data = await response.json();
         sethotpostdata(data);
-        console.log("데이터 받음:", data);
+       // console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }

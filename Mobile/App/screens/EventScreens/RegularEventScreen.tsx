@@ -44,7 +44,7 @@ const RegularEventScreen: React.FC = ({navigation} : any) => {
                 <Image style={styles.imageStyle} source={friendcodepng} />
               </View>
             </View>
-            <TouchableOpacity style={styles.button2} onPress={handleButtonPress}>
+            <TouchableOpacity style={styles.button2} onPress={() => console.log("친구코드 디테일페이지")}>
               <Text style={styles.buttonText}>자세히 보기</Text>
             </TouchableOpacity>
           </View>

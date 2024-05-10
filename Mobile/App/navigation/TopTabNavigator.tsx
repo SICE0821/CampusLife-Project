@@ -5,7 +5,7 @@ import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen';
 import DepartmentPostsScreen from '../screens/CommunityScreens/DepartmentPostsScreen'
-import { EventShopScreenStackNavigator } from '../navigation/StackNavigator'
+import { EventShopScreenStackNavigator, ReqularEventScreenNavigator } from '../navigation/StackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
@@ -136,7 +136,7 @@ export const EventTopTabNavigator = ({ navigation, route }: any) => {
             
         }}>
             <EventTopTab.Screen name="정기 이벤트"
-                component={ReqularEventScreen}
+                component={ReqularEventScreenNavigator}
                 options={{
                     //headerShown : false,
                     //tabBarIcon: () => null,
