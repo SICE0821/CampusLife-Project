@@ -142,7 +142,7 @@ export const AdminTabNavigator = ({route} : any) => {
           tabBarActiveTintColor: 'black',
         }}>
         <Tab.Screen
-          name="MainPage"
+          name="AdminMainPage"
           component={AdminMainScreenStackNavigator}
           options={{
             title: '홈',

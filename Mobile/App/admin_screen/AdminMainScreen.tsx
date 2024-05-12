@@ -7,13 +7,14 @@ import {
   View,
   Dimensions,
   Image,
+  TouchableOpacity
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import {UserData} from '../types/type'
 
 import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconB from 'react-native-vector-icons/AntDesign';
-import IconC from 'react-native-vector-icons/FontAwesome';
+import IconC from 'react-native-vector-icons/Entypo';
 import IconD from 'react-native-vector-icons/Feather';
 import IconE from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Fontisto';
@@ -23,8 +24,6 @@ import IconH from 'react-native-vector-icons/Foundation';
 const attendancepng = require('../assets/attendanceevent.png');
 const friendsinvitepng = require('../assets/friendsinvite.png');
 const volunteerpng = require('../assets/volunteer.png');
-
-
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -41,7 +40,7 @@ type mainpagehptdata = {
   like: number,
 }
 
-const AdminMainScreen = ({route} : any) => {
+const AdminMainScreen = ({route, navigation} : any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
   const [schoolpostdata, setschollpostdata] = useState<mainpagepostdata[]>([]);
@@ -120,33 +119,35 @@ const AdminMainScreen = ({route} : any) => {
                     <Text style = {{fontSize : 15, marginLeft : 4, marginTop : 3, color : 'black'}}> 컴퓨터소프트웨어과/2학년</Text>
                   </View>
                   <View style = {styles.point}>
-                    <Text style = {{marginLeft : 2,marginBottom : 6, color : 'black'}}> <IconA name="payments" size ={36} /></Text>
-                    <Text style = {{fontSize : 24, marginLeft : 5, marginBottom : 11, color : 'black'}}>{userData.point}</Text>
+                    <View style = {{flex : 0.4, flexDirection : 'row', alignItems : 'center'}}>
+                      <Text style = {{fontSize : 20, color : 'black'}}>신고관리</Text>
+                      <Text style = {{color : 'black'}}><IconB name = "caretright" size = {20}/></Text>
+                    </View>
+                    <View style = {{flex : 0.6, flexDirection : 'row', alignItems : 'center'}}>
+                    <Text style = {{fontSize : 20, color : 'black'}}>포인트관리</Text>
+                      <Text style = {{color : 'black'}}><IconB name = "caretright" size = {20}/></Text>
+                    </View>
                   </View>
                 </View>
 
               </View>
               <View style = {styles.cardbottom}>
-                <View style = {styles.cardchoice}>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => console.log("정보변경 터치")}>
                   <Text style = {{color : 'black'}}><IconB name = "idcard" size = {40}/></Text>
                   <Text style = {{fontSize : 15, color : 'black'}}>정보변경</Text>
-                </View>
-                <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconC name = "calendar-check-o" size = {35}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>학적확인</Text>
-                </View>
-                <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconD name = "bell" size = {35}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>알림</Text>
-                </View>
-                <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconE name = "information-circle-outline" size = {40}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black'}}>학교정보</Text>
-                </View>
-                <View style = {styles.cardchoice}>
-                  <Text style = {{color : 'black'}}><IconF name = "prescription" size = {35}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>스터디룸</Text>
-                </View>
+                </TouchableOpacity>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => console.log("신고관리 터치")}>
+                  <Text style = {{color : 'black'}}><IconA name = "report" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>신고관리</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => console.log("포인트관리 터치")}>
+                  <Text style = {{color : 'black'}}><IconA name = "payments" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>포인트관리</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => navigation.navigate("ItemRegistration")}>
+                  <Text style = {{color : 'black'}}><IconC name = "box" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>물품등록</Text>
+                </TouchableOpacity>
               </View>
             </View>
         </View>
@@ -418,7 +419,7 @@ const styles = StyleSheet.create({
     backgroundColor : '#FFDECF',
     borderBottomLeftRadius : 20,
     borderBottomRightRadius : 20,
-    
+    //backgroundColor : 'blue'
   },
   profile : {
     flex : 0.35,
@@ -454,14 +455,18 @@ const styles = StyleSheet.create({
   point : {
     flexDirection : 'row',
     flex : 0.4,
-    alignItems: 'center'
+    alignItems: 'center',
+    //backgroundColor : 'red'
+    
   },
   
   cardchoice : {
     margin : 5, 
-    flex : 0.2, borderBottomLeftRadius : 10, 
+    flex : 0.25, 
+    borderBottomLeftRadius : 10, 
     justifyContent : 'center', 
-    alignItems : 'center'
+    alignItems : 'center',
+    //backgroundColor : 'red'
   },
 
   

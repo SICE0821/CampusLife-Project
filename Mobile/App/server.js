@@ -9,12 +9,16 @@ const { getGeneralPosts,
         getschoolpostdata, 
         insertDataIntoDB,
         getuserpk,
-        getlecturelist } = require('./db.js'); // db 파일에서 함수 가져오기
+        getlecturelist,
+        get_event_objcet,
+        getBarcordMaxNum,
+        PostItem,
+        UpdateItem,
+        DeleteItem } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
-
 const pool = mariadb.createPool({
-  host: '172.16.106.43',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -78,6 +82,20 @@ app.get('/MainPageSchoolPost', async (req, res) => {
     }
 });
 
+//바코드 최댓값 가져오기
+app.get('/getMaxBarcordNum', async (req, res) => {
+  try {
+    const rows = await getBarcordMaxNum();
+    const BarcordMaxNum = {
+      barcordMaxNum : rows[0].max_code_num
+    }
+
+    res.json(BarcordMaxNum);
+  }catch (error) {
+    console.error("바코드 맥스넘 잘 못가져옴")
+  }
+})
+
 //게시글을 작성하여 데이터베이스에 넣는다.
 app.post('/post', async (req, res) => {
     const { post_id, user_id, department_check, inform_check, title, contents, data, view, like } = req.body;
@@ -105,6 +123,44 @@ app.post('/get_user_data', async(req, res) => {
   
   res.json(userData);
 })
+
+
+
+//해당 학교의 이벤트 상품 싹 가져오기
+app.post('/get_event_obj', async(req, res) => {
+  const {campus_id} = req.body;
+  const rows = await get_event_objcet(campus_id);
+  console.log("서버 응답 잘 받음");
+  
+  const event_object_datas = rows.reduce((accumulator, item) => {
+    const itemName = item.name;
+
+    // 이미 해당 아이템의 인덱스를 찾은 경우
+    const existingItemIndex = accumulator.findIndex(obj => obj.name === itemName);
+
+    if (existingItemIndex !== -1) {
+        // 이미 해당 아이템이 존재하는 경우 카운트 증가
+        accumulator[existingItemIndex].count++;
+    } else {
+        // 해당 아이템이 처음 발견된 경우 새로운 객체로 추가
+        accumulator.push({
+            objec_id: item.object_id,
+            name: itemName,
+            price: item.price,
+            code_num: item.code_num,
+            using_time: item.using_time,
+            image_num: item.image_num,
+            sell_check: item.sell_check,
+            explain: item.explain,
+            count: 1 // 초기 카운트는 1로 설정
+        });
+    }
+
+    return accumulator;
+}, []);
+
+res.json(event_object_datas);
+});
 
 
 //게시글화면에서 전체 게시글을 가져온다.
@@ -201,6 +257,27 @@ app.get('/getlecture', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//상품 등록하기
+app.post('/postItem', async (req, res) => {
+  const { campus_id, name, price, code_num, using_time, image_num, sell_check, explain} = req.body;
+  PostItem(campus_id, name, price, code_num, using_time, image_num, sell_check, explain);
+  console.log("성공적으로 값 넣음");
+});
+
+//상품 편집하기
+app.post('/updateItem', async (req, res) => {
+  const { name, newname, price, using_time, image_num, sell_check, explain} = req.body;
+  UpdateItem(name, newname, price, using_time, image_num, sell_check, explain);
+  console.log("성공적으로 값 넣음");
+});
+
+app.post('/deleteItem', async (req, res) => {
+  const { name, deletenum} = req.body;
+  DeleteItem(name, deletenum);
+  console.log("성공적으로 값 넣음");
+});
+
 
   
 //서버 시작
