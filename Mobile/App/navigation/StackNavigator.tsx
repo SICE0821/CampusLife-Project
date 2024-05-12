@@ -20,8 +20,8 @@ import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
-
-
+import StudentInfoScreen from '../screens/StudentInfoScreen';
+import AcademicInfoScreen from '../screens/AcademicInfoScreen';
 
 import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
@@ -29,6 +29,7 @@ import { TopbTabNavigator } from './TopTabNavigator'
 
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
+import IconF from 'react-native-vector-icons/FontAwesome';
 
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
@@ -106,9 +107,44 @@ export const LoginScreenStackNavigator = () => {
 
 //메인 페이지 관련 스택 네비게이터
 export const MainScreenStackNavigator = () => {
+    const navigation: any = useNavigation();
     return (
         <MainStack.Navigator>
             <MainStack.Screen name="MainScreen" component={MainScreen} />
+            <MainStack.Screen 
+                name="StudentInfoNavigator" 
+                component={StudentInfoScreen} 
+                options = {{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '정보변경',
+                }} 
+                />
+                <MainStack.Screen 
+                name="AcademicInfoNavigator"
+                component={AcademicInfoScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학적확인',
+                }}
+            />
         </MainStack.Navigator>
     );
 };

@@ -33,9 +33,8 @@ const FullScreenCamera = ({navigation}: any) => {
       <TouchableOpacity
         style={{ position: 'absolute', top: 20, right: 20 }}
         onPress={() => {
-          setIsCameraActive(false);
           navigation.navigate('AttendanceScreen');
-          console.log("안녕");
+          setIsCameraActive(false);
         }}
       >
         <Text style={{ color: 'white', fontSize: 18 }}>Close</Text>

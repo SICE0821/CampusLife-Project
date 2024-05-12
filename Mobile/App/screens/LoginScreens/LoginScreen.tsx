@@ -14,14 +14,14 @@ import BouncyCheckbox from "react-native-bouncy-checkbox";
 
 type UserData = {
   user_pk: number,
-  student_pk: number,
-  freind_code: string,
-  admin_check: number,
+  user_id: string,
+  point: number,
   name: string,
-  campus_pk: number,
-  department_pk: number,
+  birth: Date,
   email: string,
   grade: number,
+  campus_name : string,
+  department_name : string,
 }
 
 function LoginScreen({ navigation }: any) {
@@ -31,7 +31,7 @@ function LoginScreen({ navigation }: any) {
 
   const get_user_data = async () => {
     try {
-      const response = await fetch('http://172.16.108.66:3000/get_user_data', {
+      const response = await fetch('http://192.168.35.41:3000/get_user_data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,8 +42,7 @@ function LoginScreen({ navigation }: any) {
         })
       })
       const userdata = await response.json();
-      console.log(userdata);
-      console.log(userdata.admin_check);
+      setUserData(userdata);
     } catch (error) {
       console.error('유저 정보 가져오기 실패:', error);
     }
@@ -52,7 +51,7 @@ function LoginScreen({ navigation }: any) {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://172.16.108.66:3000/login', {
+      const response = await fetch('http://192.168.35.41:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,6 +64,7 @@ function LoginScreen({ navigation }: any) {
       const data = await response.text();
       if (data === 'success') {
         get_user_data();
+        console.log(UserData);
         navigation.navigate('MainTabNavigator');
       } else {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');

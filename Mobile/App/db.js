@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '172.16.106.43',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -123,15 +123,22 @@ async function getuserpk(user_id, user_passwd) {
         conn = await pool.getConnection();
         // 데이터 삽입 쿼리 작성
         const rows = await conn.query(`SELECT user.user_id, 
-        user.student_id, user.friend_code, 
-        user.point, user.admin_check, 
-        student.name, student.campus_id, 
-        student.department_id, student.email, 
-        student.grade 
+        user.id,  
+        user.point, 
+        student.name AS student_name, 
+        student.birth, 
+        student.email, 
+        student.grade,
+        campus.name AS campus_name,
+        department.name AS department_name 
         FROM 
         user 
         LEFT JOIN 
-        student ON user.student_id = student.student_id
+            student ON user.student_id = student.student_id
+        LEFT JOIN 
+            campus ON student.campus_id = campus.campus_id
+        LEFT JOIN 
+            department ON student.department_id = department.department_id
         WHERE
         user.id = ? AND user.passwd = ?`, [user_id, user_passwd]);
         return rows;

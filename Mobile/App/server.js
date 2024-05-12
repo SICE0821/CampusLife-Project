@@ -14,7 +14,7 @@ app.use(express.json());
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.43',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -92,14 +92,14 @@ app.post('/get_user_data', async(req, res) => {
   
   const userData = {
     user_pk: rows[0].user_id,
-    student_pk: rows[0].student_id,
-    friend_code: rows[0].friend_code,
-    admin_check: rows[0].admin_check,
+    user_id: rows[0].id,
+    point: rows[0].point,
     name: rows[0].name,
-    campus_pk: rows[0].campus_id,
-    department_pk: rows[0].department_id,
+    birth: rows[0].birth,
     email: rows[0].email,
     grade: rows[0].grade,
+    campus_name : rows[0].campus_name,
+    department_name : rows[0].department_name
   };
   
   res.json(userData);
