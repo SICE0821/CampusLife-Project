@@ -3,13 +3,27 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '172.16.106.43',
+    host: '127.0.0.1',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
     connectionLimit: 5,
     database: 'campuslife',
 });
+
+//앱 출첵 가져오기
+async function getDailyCheck() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query('SELECT user_id, date FROM app_attendance');
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
 
 //전체 게시판에서 전체 게시글을 가져오는 쿼리
 async function getGeneralPosts() {
@@ -163,6 +177,7 @@ async function getlecturelist() {
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
+    getDailyCheck,
     getGeneralPosts,
     getDepartmentPosts,
     gethotpostdata,

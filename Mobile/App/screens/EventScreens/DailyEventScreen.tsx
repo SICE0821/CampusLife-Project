@@ -1,8 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { Calendar } from 'react-native-calendars';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+
+type dailyCheckData = {
+    user_id: number,
+    date: string
+  }
 
 const DailyEventScreen: React.FC = () => {
+  const [DailyCheckData, setDailyCheckData] = useState<dailyCheckData[]>([]);
+
+  const fetchDailyCheckData = async () => {
+    try {
+      const response = await fetch('http://192.168.219.106:3000/DailyEventPageData');
+      if(!response.ok) {
+        throw new Error('출첵이 안불러와졌습니다....');
+      }
+      const data = await response.json();
+      setDailyCheckData(data);
+      console.log("데이터 받음:", data);
+      console.log("데이터 받음:", DailyCheckData[0].date);
+      
+    } catch (error) {
+      console.error('데이터를 가져오는 중 오류 발생:', error);
+    }
+  };
+
+  var dataday = DailyCheckData[0];
+
   const today = new Date();
   const year = today.getFullYear().toString();
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
@@ -17,8 +43,9 @@ const DailyEventScreen: React.FC = () => {
 
   const [markedDates, setMarkedDates] = useState({
     [todayString]: { marked: true },
-    '2024-04-08': { selected: true, selectedColor: "orange" },
-    '2024-04-15': { selected: true, selectedColor: "orange" } 
+    '2024-05-08': { selected: true, selectedColor: "orange" },
+    '2024-05-15': { selected: true, selectedColor: "orange" }, 
+    dataday : { selected: true, selectedColor: "orange" },
   });
 
   const [checkToday, setCheckToday] = useState(true);
@@ -39,6 +66,12 @@ const DailyEventScreen: React.FC = () => {
   const onPressModalClose = () => {
     setIsModalVisible(false);
 }
+
+useFocusEffect(
+  React.useCallback(() => {
+    fetchDailyCheckData();
+  }, [])
+);
 
   return (
     <View style={styles.screenView}>
@@ -141,14 +174,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
-    marginTop: 100,
+    marginTop: 20,
     alignSelf: 'center',
   },
   buttonText: {
     color: 'black',
     fontSize: 28,
     fontWeight: 'bold',
-    
   },
 });
 

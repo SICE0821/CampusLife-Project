@@ -9,12 +9,13 @@ const { getGeneralPosts,
         getschoolpostdata, 
         insertDataIntoDB,
         getuserpk,
-        getlecturelist } = require('./db.js'); // db 파일에서 함수 가져오기
+        getlecturelist,
+        getDailyCheck } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.43',
+  host: '127.0.0.1',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -22,6 +23,22 @@ const pool = mariadb.createPool({
   database: 'campuslife',
 });
 
+//앱 출첵용 데이터를 가져온다.
+app.get('/DailyEventPageData', async (req, res) => {
+  try {
+     console.log("잘 됨")
+      const rows = await getDailyCheck();
+      const processedData = rows.map(item => ({
+          user_id: item.user_id,
+          date: item.date
+      }));
+      res.json(processedData);
+    //  console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //메인페이지에 핫 게시글 데이터를 가져온다.
 app.get('/MainPagehotPost', async (req, res) => {
