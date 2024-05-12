@@ -3,6 +3,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import {
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   Text,
   View,
   Dimensions,
@@ -41,15 +42,17 @@ type mainpagehptdata = {
   like: number,
 }
 
-const MainPage = ({route} : any) => {
+const MainPage = ({navigation ,route} : any) => {
   const { userdata } = route.params;
   const [schoolpostdata, setschollpostdata] = useState<mainpagepostdata[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<mainpagepostdata[]>([]);
   const [hotpostdata, sethotpostdata] = useState<mainpagehptdata[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
+  
+
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.16.108.66:3000/MainPageSchoolPost');
+        const response = await fetch('http://192.168.35.41:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -63,7 +66,7 @@ const MainPage = ({route} : any) => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.16.108.66:3000/MainPagedepartmentPost');
+        const response = await fetch('http://192.168.35.41:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -77,7 +80,7 @@ const MainPage = ({route} : any) => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.16.108.66:3000/MainPagehotPost');
+        const response = await fetch('http://192.168.35.41:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -92,6 +95,13 @@ const MainPage = ({route} : any) => {
       setUserData(userdata);
     }
 
+    const StudentInfo = async () => {
+      navigation.navigate('StudentInfoNavigator');
+    }
+
+    const AcademicInfo = async () =>{
+      navigation.navigate('AcademicInfoNavigator');
+    }
     
 
     useFocusEffect(
@@ -127,26 +137,26 @@ const MainPage = ({route} : any) => {
 
               </View>
               <View style = {styles.cardbottom}>
-                <View style = {styles.cardchoice}>
+                <TouchableOpacity style = {styles.cardchoice} onPress = {StudentInfo}>
                   <Text style = {{color : 'black'}}><IconB name = "idcard" size = {40}/></Text>
                   <Text style = {{fontSize : 15, color : 'black'}}>정보변경</Text>
-                </View>
-                <View style = {styles.cardchoice}>
+                </TouchableOpacity>
+                <TouchableOpacity style = {styles.cardchoice} onPress = {AcademicInfo}>
                   <Text style = {{color : 'black'}}><IconC name = "calendar-check-o" size = {35}/></Text>
                   <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>학적확인</Text>
-                </View>
-                <View style = {styles.cardchoice}>
+                </TouchableOpacity>
+                <TouchableOpacity style = {styles.cardchoice} onPress = {() => navigation.navigate("AlarmDialogScreen")}>
                   <Text style = {{color : 'black'}}><IconD name = "bell" size = {35}/></Text>
                   <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>알림</Text>
-                </View>
-                <View style = {styles.cardchoice}>
+                </TouchableOpacity>
+                <TouchableOpacity style = {styles.cardchoice} onPress = {() => navigation.navigate("SchoolInfoScreen")}>
                   <Text style = {{color : 'black'}}><IconE name = "information-circle-outline" size = {40}/></Text>
                   <Text style = {{fontSize : 15, color : 'black'}}>학교정보</Text>
-                </View>
-                <View style = {styles.cardchoice}>
+                </TouchableOpacity>
+                <TouchableOpacity style = {styles.cardchoice} onPress = {() => navigation.navigate("StudyRoomScreen")}>
                   <Text style = {{color : 'black'}}><IconF name = "prescription" size = {35}/></Text>
                   <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>스터디룸</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
         </View>

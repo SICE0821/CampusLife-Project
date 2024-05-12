@@ -20,6 +20,11 @@ import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
+import StudentInfoScreen from '../screens/CardScreens/StudentInfoScreen';
+import AcademicInfoScreen from '../screens/CardScreens/AcademicInfoScreen';
+import SchoolInfoScreen from '../screens/CardScreens/SchoolInfoScreen';
+import StudyRoomScreen from '../screens/CardScreens/StudyRoomScreen'
+import AlarmDialogScreen from '../screens/CardScreens/AlarmDialogScreen';
 import AdminMainScreen from '../admin_screen/AdminMainScreen';
 
 
@@ -30,6 +35,7 @@ import ItemRegistration from '../admin_screen/ItemRegistration.tsx/ItemRegistrat
 
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
+import IconF from 'react-native-vector-icons/FontAwesome';
 
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
@@ -108,10 +114,96 @@ export const LoginScreenStackNavigator = () => {
 
 //메인 페이지 관련 스택 네비게이터
 export const MainScreenStackNavigator = ({ route }: any) => {
+    const navigation: any = useNavigation();
     const { userdata } = route.params;
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }} />
+            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }}/>
+            <MainStack.Screen 
+                name="StudentInfoNavigator" 
+                component={StudentInfoScreen} 
+                options = {{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '정보변경',
+                }} 
+                />
+                <MainStack.Screen 
+                name="AcademicInfoNavigator"
+                component={AcademicInfoScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학적확인',
+                }}
+            />
+            <MainStack.Screen 
+                name="AlarmDialogScreen"
+                component={AlarmDialogScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '알람 확인',
+                }}
+            />
+            <MainStack.Screen 
+                name="SchoolInfoScreen"
+                component={SchoolInfoScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학교 정보',
+                }}
+            />
+            <MainStack.Screen 
+                name="StudyRoomScreen"
+                component={StudyRoomScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '스터디룸',
+                }}
+            />
         </MainStack.Navigator>
     );
 };

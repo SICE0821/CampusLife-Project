@@ -17,6 +17,8 @@ const { getGeneralPosts,
         DeleteItem } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
+
+
 const pool = mariadb.createPool({
   host: '14.6.152.64',
   port: 3306,
@@ -118,9 +120,10 @@ app.post('/get_user_data', async(req, res) => {
     department_pk: rows[0].department_id,
     email: rows[0].email,
     grade: rows[0].grade,
+    birth: rows[0].birth,
     point: rows[0].point,
+    currentstatus: rows[0].currentstatus,
   };
-  
   res.json(userData);
 })
 

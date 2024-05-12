@@ -106,7 +106,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   const fetchLectureData = async () => {
     try {
-      const response = await fetch('http://172.16.108.66:3000/getlecture');
+      const response = await fetch('http://192.168.35.41:3000/getlecture');
       if (!response.ok) {
         throw new Error('서버 응답 실패');
       }
@@ -146,7 +146,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
     setScannedCode(route.params?.scannedCode);
   }, [route.params?.scannedCode]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     if (scannedCode) {
       Alert.alert(
         'QR 코드 스캔됨',
@@ -157,7 +157,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
         { cancelable: false }
       );
     }
-  }, [scannedCode]);*/
+  }, [scannedCode]);
 
   useEffect(() => {
     fetchLectureData(); // 페이지가 로드될 때 강의 목록을 가져옴
@@ -210,7 +210,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
                 <View>
                 <Text style={styles.ListText2}>{selectedLecture?.lecture_name}</Text>
                 </View>
-                <View style={styles.Icon}>
+                  <View style={styles.Icon}>
                   <TouchableOpacity onPress={openCamera}>
                     <IconA name="camera" size={32} color="black" />
                   </TouchableOpacity>

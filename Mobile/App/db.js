@@ -127,7 +127,9 @@ async function getuserpk(user_id, user_passwd) {
         user.point, user.admin_check, 
         student.name, student.campus_id, 
         student.department_id, student.email, 
-        student.grade 
+        student.grade,
+        student.birth,
+        student.currentstatus
         FROM 
         user 
         LEFT JOIN 
