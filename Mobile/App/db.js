@@ -125,6 +125,7 @@ async function getuserpk(user_id, user_passwd) {
         const rows = await conn.query(`SELECT user.user_id, 
         user.student_id, user.friend_code, 
         user.point, user.admin_check, 
+        user.profilePhoto,
         student.name, student.campus_id, 
         student.department_id, student.email, 
         student.grade,
@@ -136,6 +137,7 @@ async function getuserpk(user_id, user_passwd) {
         student ON user.student_id = student.student_id
         WHERE
         user.id = ? AND user.passwd = ?`, [user_id, user_passwd]);
+        
         return rows;
     } catch (err) {
         console.error('Error inserting data:', err);
@@ -249,6 +251,21 @@ async function DeleteItem(name, deltenum) {
     }
 }
 
+async function get_department_name(department_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "SELECT department.name FROM department WHERE department_id = ?"
+        const result = await conn.query(query, [department_name]);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
 
 
 
@@ -267,5 +284,6 @@ module.exports = {
     getBarcordMaxNum,
     PostItem,
     UpdateItem,
-    DeleteItem
+    DeleteItem,
+    get_department_name
 };

@@ -133,7 +133,6 @@ export const EventTopTabNavigator = ({ navigation, route }: any) => {
                 fontSize: 20,
                 fontWeight: 'bold',
             },
-            
         }}>
             <EventTopTab.Screen name="정기 이벤트"
                 component={ReqularEventScreenNavigator}

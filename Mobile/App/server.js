@@ -14,7 +14,8 @@ const { getGeneralPosts,
         getBarcordMaxNum,
         PostItem,
         UpdateItem,
-        DeleteItem } = require('./db.js'); // db 파일에서 함수 가져오기
+        DeleteItem,
+        get_department_name } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 
@@ -115,6 +116,7 @@ app.post('/get_user_data', async(req, res) => {
     student_pk: rows[0].student_id,
     friend_code: rows[0].friend_code,
     admin_check: rows[0].admin_check,
+    profile_photo : rows[0].profilePhoto,
     name: rows[0].name,
     campus_pk: rows[0].campus_id,
     department_pk: rows[0].department_id,
@@ -275,13 +277,24 @@ app.post('/updateItem', async (req, res) => {
   console.log("성공적으로 값 넣음");
 });
 
+//상품 삭제하기
 app.post('/deleteItem', async (req, res) => {
   const { name, deletenum} = req.body;
   DeleteItem(name, deletenum);
   console.log("성공적으로 값 넣음");
 });
 
-
+//학과 이름 가져오기
+app.post('/get_department_name', async (req, res) => {
+  const {department_name} = req.body; //데이터 가져올때 무조건 awit
+  const rows = await get_department_name(department_name);
+  const Department = {
+    userdepartment: rows[0].name
+  };
+  res.json(Department);
+  
+  console.log("학과 PK성공적으로 넣음");
+});
   
 //서버 시작
 app.listen(PORT, () => {

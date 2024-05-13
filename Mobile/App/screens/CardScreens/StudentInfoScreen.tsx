@@ -6,8 +6,7 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 
-const StudentInfoScreen = () => {
-    const navigation = useNavigation();
+const StudentInfoScreen = ({navigation} : any) => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -27,6 +26,17 @@ const StudentInfoScreen = () => {
         setIsModalOpen(false); // 모달을 닫기 위해 상태를 false로 설정
     };
     
+    useFocusEffect(
+        React.useCallback(() => {
+          changeHeaderRightContent();
+        }, [])
+      );
+
+      const changeHeaderRightContent = () => {
+        navigation.setOptions({
+            tabBarVisible: {display: 'none'}
+        });
+      };
     return (
         <View style={styles.container}>
             <View style={styles.profilePicture}>

@@ -122,19 +122,19 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen 
                 name="StudentInfoNavigator" 
                 component={StudentInfoScreen} 
-                options = {{
+                options={({ navigation }) => ({
                     headerStyle: {
-                        backgroundColor: '#F27405',
+                      backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
+                      <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                      </TouchableOpacity>
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '정보변경',
-                }} 
+                  })}
                 />
                 <MainStack.Screen 
                 name="AcademicInfoNavigator"
