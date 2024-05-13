@@ -115,6 +115,7 @@ app.post('/get_user_data', async(req, res) => {
     student_pk: rows[0].student_id,
     friend_code: rows[0].friend_code,
     admin_check: rows[0].admin_check,
+    id : rows[0].id,
     name: rows[0].name,
     campus_pk: rows[0].campus_id,
     department_pk: rows[0].department_id,

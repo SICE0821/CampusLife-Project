@@ -96,11 +96,11 @@ const MainPage = ({navigation ,route} : any) => {
     }
 
     const StudentInfo = async () => {
-      navigation.navigate('StudentInfoNavigator');
+      navigation.navigate('StudentInfoNavigator', {userdata});
     }
 
     const AcademicInfo = async () =>{
-      navigation.navigate('AcademicInfoNavigator');
+      navigation.navigate('AcademicInfoNavigator', {userdata});
     }
     
 

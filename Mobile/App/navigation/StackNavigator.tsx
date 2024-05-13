@@ -123,6 +123,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                 name="StudentInfoNavigator" 
                 component={StudentInfoScreen} 
                 options = {{
+
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
@@ -131,6 +132,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
+                    
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '정보변경',
@@ -366,7 +368,7 @@ export const ReqularEventScreenNavigator = ({ navigation, route }: any) => {
 //출석체크 페이지 관련 스택 네비게이터
 export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
     return (
-        <AttendanceStack.Navigator>
+        <AttendanceStack.Navigator> 
             <AttendanceStack.Screen name="AttendanceScreen"
                 component={AttendanceScreen}
                 options={{
@@ -374,7 +376,7 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
                         backgroundColor: '#F27405',
                     },
 
-
+                    
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate("MainPage")}>

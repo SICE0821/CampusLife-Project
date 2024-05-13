@@ -124,7 +124,8 @@ async function getuserpk(user_id, user_passwd) {
         // 데이터 삽입 쿼리 작성
         const rows = await conn.query(`SELECT user.user_id, 
         user.student_id, user.friend_code, 
-        user.point, user.admin_check, 
+        user.point, user.admin_check,
+        user.id,
         student.name, student.campus_id, 
         student.department_id, student.email, 
         student.grade,

@@ -21,4 +21,7 @@ export type UserData = {
     student_pk: number,
     user_pk: number,
     point : number,
+    birth : string,
+    currentstatus : string,
+    id : string,
   }
