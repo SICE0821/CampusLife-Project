@@ -13,10 +13,10 @@ import {
 } from "react-native-chart-kit";
 
 { // 학점 정보 데이터 요기
-    var circle1_data = 3.8; // 전체 평점 데이터
+    var circle1_data = 4.0; // 전체 평점 데이터
     var circle1_percent = (circle1_data / 4.5) * 100; // 전체 평점 퍼센트
 
-    var circle2_data = 4.2; // 전공 평점 데이터
+    var circle2_data = 3.2; // 전공 평점 데이터
     var circle2_percent = (circle2_data / 4.5) * 100; // 전공 평점 퍼센트
 
     var circle3_data = 3.25; // 교양 평점 데이터
@@ -44,6 +44,7 @@ import {
 
 // 학점 등급별 갯수 데이터 요기
 var datas = [1, 2, 3, 4, 5, 5, 3, 2, 1, 0,];
+//           A+ A  A- B+ B  B- C+ C  C- F
 
 
 { // 테이블 관련 설정
