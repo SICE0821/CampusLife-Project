@@ -143,7 +143,6 @@ const MainPage = ({navigation ,route} : any) => {
         fetchhotpostData();
         settingUserData();
         get_user_department();
-        getPhotos();
       }, [])
     );
   return (
@@ -154,7 +153,7 @@ const MainPage = ({navigation ,route} : any) => {
               <View style = {styles.cardtop}>
                 <View style = {styles.profile}>
                   <View style = {styles.profilePicture}>
-                    <Image source={{ uri: imagepath }} style={{width : 85, height : 85, borderRadius : 50,}} resizeMode="contain"/>
+                    <Image source={{ uri: userData.profile_photo }} style={{width : 85, height : 85, borderRadius : 50,}} resizeMode="contain"/>
                   </View>
                 </View>
                 <View style = {styles.info}>
@@ -454,8 +453,8 @@ const styles = StyleSheet.create({
   cardtop : {
     flex : 0.6,
     flexDirection : "row",
-    backgroundColor : '#FF9C63',
-    //backgroundColor : 'White',
+    //backgroundColor : '#FF9C63',
+    backgroundColor : '#FFFADD',
     borderTopLeftRadius : 20,
     borderTopRightRadius : 20,
     borderBottomWidth: 0.5,
@@ -465,16 +464,16 @@ const styles = StyleSheet.create({
   cardbottom : {
     flex : 0.4,
     flexDirection : 'row',
-    backgroundColor : '#FFDECF',
-    //backgroundColor : 'white',
+    //backgroundColor : '#FFDECF',
+    backgroundColor : 'white',
     borderBottomLeftRadius : 20,
     borderBottomRightRadius : 20,
     
   },
   profile : {
     flex : 0.35,
-    backgroundColor : '#FF9C63',
-    //backgroundColor : 'white',
+    //backgroundColor : '#FF9C63',
+    backgroundColor : '#FFFADD',
     borderTopLeftRadius : 20,
     justifyContent : 'center',
     alignItems : 'center',

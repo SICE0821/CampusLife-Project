@@ -13,9 +13,11 @@ import React, { useState, useLayoutEffect } from 'react';
 const CommunityTopTab = createBottomTabNavigator();
 const CommunityTopBottomTab = createBottomTabNavigator();
 const EventTopTab = createMaterialTopTabNavigator();
+import { UserData } from '../types/type';
 
 export const TopBottomTabNavigator = ({ navigation, route }: any) => {
-    const { department_check } = route.params
+    const { department_check, userdata } = route.params
+    console.log(userdata);
     //전체, HOT게시글, 책갈피 상단 탭 네비게이션
     return (
         <CommunityTopBottomTab.Navigator
@@ -45,7 +47,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
             }}>
             <CommunityTopBottomTab.Screen name='전체'
                                           component={GeneralPostsScreen}
-                                          initialParams={{ department_check: department_check }}
+                                          initialParams={{ department_check: department_check, userdata : userdata }}
                                           options={{
                                             headerShown: false,
                                             tabBarIcon: () => null,
@@ -75,7 +77,9 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 }
 
 //커뮤니티 전체, 학과 게시판 상단 탭 네비게이션
-export const TopbTabNavigator = () => {
+export const TopbTabNavigator = ({route, navigation} : any) => {
+    const { userdata } = route.params;
+    const [userData, setUserData] = useState<UserData>(userdata);
     return (
         <CommunityTopTab.Navigator
             screenOptions={{
@@ -100,14 +104,16 @@ export const TopbTabNavigator = () => {
 
             }}>
             <CommunityTopTab.Screen name="전체 게시판"
-                initialParams={{ department_check: 0 }}
+                initialParams={{ department_check: 0, userData} }
                 component={TopBottomTabNavigator}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
-                }} />
+                }}
+                 />
+                
             <CommunityTopTab.Screen name="학과 게시판"
-                initialParams={{ department_check: 1 }}
+                initialParams={{ department_check: 1, userData}}
                 component={TopBottomTabNavigator}
                 options={{
                     headerShown: false,

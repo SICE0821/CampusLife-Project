@@ -21,11 +21,12 @@ const renderEmptyItem = () => {
 
 const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
     const [communityData, setCommunityData] = useState<Data[]>([]);
-    const { department_check } = route.params;
-
+    const { department_check, userdata } = route.params;
+    console.log(userdata);
+    console.log(department_check);
     const getGeneralposts = async () => {
         try {
-            const response = await fetch('http://192.168.35.41:3000/generalpost');
+            const response = await fetch('http://175.212.187.92:3000/generalpost');
             const postsdata = await response.json();
             //console.log(postsdata);
             setCommunityData(postsdata);
@@ -36,7 +37,7 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
 
     const getDepartmentposts = async () => {
         try {
-            const response = await fetch('http://192.168.35.41:3000/departmentpost');
+            const response = await fetch('http://175.212.187.92:3000/departmentpost');
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {

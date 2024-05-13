@@ -1,8 +1,8 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Text, Touchable, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-
+import { useFocusEffect } from '@react-navigation/native';
 import MainScreen from '../screens/MainScreen';
 import { EventTopTabNavigator } from './TopTabNavigator'
 import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
@@ -26,7 +26,7 @@ import SchoolInfoScreen from '../screens/CardScreens/SchoolInfoScreen';
 import StudyRoomScreen from '../screens/CardScreens/StudyRoomScreen'
 import AlarmDialogScreen from '../screens/CardScreens/AlarmDialogScreen';
 import AdminMainScreen from '../admin_screen/AdminMainScreen';
-
+import { UserData } from "../types/type";
 
 import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
@@ -232,13 +232,26 @@ export const AdminMainScreenStackNavigator = ({ route, navigation }: any) => {
 };
 
 //커뮤니티 페이지 관련 스택 네비게이터
-export const CommunityScreenStackNavigator = () => {
-    const navigation: any = useNavigation();
+export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
+    const { userdata } = route.params;
+    const [userData, setUserData] = useState<UserData>(userdata);
+
+    const settingUserData = () => {
+        setUserData(userdata);
+    }
+    useFocusEffect(
+        React.useCallback(() => {
+            settingUserData();
+        }, [])
+    );
+    console.log("-----")
+    console.log(userdata);
     return (
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
                 name="CommunityTopNavigation"
                 component={TopbTabNavigator}
+                initialParams={userdata}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -262,7 +275,8 @@ export const CommunityScreenStackNavigator = () => {
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '커뮤니티',
-                }} />
+                }}
+            />
         </CoummunityStack.Navigator>
 
     );
