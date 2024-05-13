@@ -118,12 +118,11 @@ export const MainScreenStackNavigator = ({ route }: any) => {
     const { userdata } = route.params;
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }}/>
-            <MainStack.Screen 
-                name="StudentInfoNavigator" 
-                component={StudentInfoScreen} 
-                options = {{
-
+            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }} />
+            <MainStack.Screen
+                name="StudentInfoNavigator"
+                component={StudentInfoScreen}
+                options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
@@ -132,13 +131,12 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
-                    
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '정보변경',
-                }} 
-                />
-                <MainStack.Screen 
+                }}
+            />
+            <MainStack.Screen
                 name="AcademicInfoNavigator"
                 component={AcademicInfoScreen}
                 options={{
@@ -155,7 +153,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     title: '학적확인',
                 }}
             />
-            <MainStack.Screen 
+            <MainStack.Screen
                 name="AlarmDialogScreen"
                 component={AlarmDialogScreen}
                 options={{
@@ -172,7 +170,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     title: '알람 확인',
                 }}
             />
-            <MainStack.Screen 
+            <MainStack.Screen
                 name="SchoolInfoScreen"
                 component={SchoolInfoScreen}
                 options={{
@@ -189,7 +187,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     title: '학교 정보',
                 }}
             />
-            <MainStack.Screen 
+            <MainStack.Screen
                 name="StudyRoomScreen"
                 component={StudyRoomScreen}
                 options={{
@@ -368,7 +366,7 @@ export const ReqularEventScreenNavigator = ({ navigation, route }: any) => {
 //출석체크 페이지 관련 스택 네비게이터
 export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
     return (
-        <AttendanceStack.Navigator> 
+        <AttendanceStack.Navigator>
             <AttendanceStack.Screen name="AttendanceScreen"
                 component={AttendanceScreen}
                 options={{
@@ -376,7 +374,7 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
                         backgroundColor: '#F27405',
                     },
 
-                    
+
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate("MainPage")}>
