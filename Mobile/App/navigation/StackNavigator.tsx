@@ -11,7 +11,7 @@ import WritePostScreen from '../screens/CommunityScreens/WritePostScreen';
 import LoginScreen from '../screens/LoginScreens/LoginScreen';
 import RegisterScreen from '../screens/LoginScreens/RegisterScreen';
 import SearchScreen from '../screens/LoginScreens/SearchScreen';
-import { RootStackParam } from '../types/type';
+import {AcademicTopTabNavigator} from '../navigation/TopTabNavigator';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen'
 import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
@@ -21,13 +21,13 @@ import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
 import StudentInfoScreen from '../screens/CardScreens/StudentInfoScreen';
-import AcademicInfoScreen from '../screens/CardScreens/AcademicInfoScreen';
+import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
 import SchoolInfoScreen from '../screens/CardScreens/SchoolInfoScreen';
 import StudyRoomScreen from '../screens/CardScreens/StudyRoomScreen'
 import AlarmDialogScreen from '../screens/CardScreens/AlarmDialogScreen';
 import AdminMainScreen from '../admin_screen/AdminMainScreen';
 import { UserData } from "../types/type";
-
+import { PostTopTabNavigator } from './TopTabNavigator';
 import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator } from './TopTabNavigator'
@@ -40,7 +40,7 @@ import IconF from 'react-native-vector-icons/FontAwesome';
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
 const MainStack = createStackNavigator();
-const CoummunityStack = createStackNavigator<RootStackParam>();
+const CoummunityStack = createStackNavigator();
 const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
@@ -138,7 +138,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             />
             <MainStack.Screen
                 name="AcademicInfoNavigator"
-                component={AcademicInfoScreen}
+                component={AcademicTopTabNavigator}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -234,24 +234,12 @@ export const AdminMainScreenStackNavigator = ({ route, navigation }: any) => {
 //커뮤니티 페이지 관련 스택 네비게이터
 export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
     const { userdata } = route.params;
-    const [userData, setUserData] = useState<UserData>(userdata);
-
-    const settingUserData = () => {
-        setUserData(userdata);
-    }
-    useFocusEffect(
-        React.useCallback(() => {
-            settingUserData();
-        }, [])
-    );
-    console.log("-----")
-    console.log(userdata);
     return (
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
-                name="CommunityTopNavigation"
-                component={TopbTabNavigator}
-                initialParams={userdata}
+                name="PostTopTabNavigator"
+                component={PostTopTabNavigator}
+                initialParams = {{userdata}}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

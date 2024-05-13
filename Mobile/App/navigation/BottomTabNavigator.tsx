@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { Text, TouchableOpacity, View } from 'react-native';
 
+import {PostTopTabNavigator} from "../navigation/TopTabNavigator"
 import { MainScreenStackNavigator } from './StackNavigator';
 import { CommunityScreenStackNavigator } from './StackNavigator';
 import { EventTopTabNavigator } from './TopTabNavigator'

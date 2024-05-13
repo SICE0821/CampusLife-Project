@@ -19,11 +19,9 @@ const renderEmptyItem = () => {
     )
 }
 
-const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
+const GeneralPostsScreen = ({ navigation, route }: any) => {
     const [communityData, setCommunityData] = useState<Data[]>([]);
-    const { department_check, userdata } = route.params;
-    console.log(userdata);
-    console.log(department_check);
+
     const getGeneralposts = async () => {
         try {
             const response = await fetch('http://175.212.187.92:3000/generalpost');
@@ -47,15 +45,7 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            if (department_check == 0) {
-                //console.log("전체 게시판!");
-                getGeneralposts();
-            } else if (department_check == 1) {
-                //console.log("학과 게시판");
-                getDepartmentposts();
-            } else {
-               // console.log("이도 저도 아닌데?");
-            }
+
         }, [])
     );
 
@@ -87,9 +77,6 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.topnavigationborder}>
-                <View style={styles.flatlisttopline}>
-                </View>
                 <FlatList
                     style={styles.flatliststyle}
                     data={communityData}
@@ -97,7 +84,6 @@ const GeneralPostsScreen: React.FC = ({ navigation, route }: any) => {
                     ListFooterComponent={renderEmptyItem}
                 //keyExtractor={(item) => item.id}
                 />
-            </View>
         </View>
     );
 };

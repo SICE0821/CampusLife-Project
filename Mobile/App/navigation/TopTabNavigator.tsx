@@ -5,6 +5,9 @@ import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen';
 import DepartmentPostsScreen from '../screens/CommunityScreens/DepartmentPostsScreen'
+import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
+import AcademicRecord from '../screens/CardScreens/AcademicScreens/AcademicRecordScreen';
 import { EventShopScreenStackNavigator, ReqularEventScreenNavigator } from '../navigation/StackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -13,7 +16,148 @@ import React, { useState, useLayoutEffect } from 'react';
 const CommunityTopTab = createBottomTabNavigator();
 const CommunityTopBottomTab = createBottomTabNavigator();
 const EventTopTab = createMaterialTopTabNavigator();
+const PostTopTab = createMaterialTopTabNavigator();
+const PostDetailTopTab = createMaterialTopTabNavigator();
+const AcademicTopTab = createMaterialTopTabNavigator();
+
 import { UserData } from '../types/type';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+
+export const AcademicTopTabNavigator = () => {
+    return (
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <AcademicTopTab.Navigator
+                screenOptions={({ }) => ({
+                    tabBarStyle: {
+                        shadowOffset: {
+                            width: 0,
+                            height: 0, // for iOS
+                        },
+                        elevation: 0,
+                        backgroundColor: 'white',
+                        height: 55,
+                        width: 300,
+                        //borderBottomWidth : 1,
+                        zIndex: 0,
+
+                    },
+                    tabBarIndicatorStyle: {
+                        backgroundColor: '#9A9EFF',
+                        //orderWidth : 5,
+                        //width: 70,
+                        //left: 43,
+                    },
+                    tabBarLabelStyle: {
+                        //width : 70,
+                        //backgroundColor : 'red',
+                        fontSize: 20,
+                        fontWeight: 'bold'
+                    },
+                    gestureEnabled: false,
+                    swipeEnabled: false,
+                    animationEnabled: false,
+                })}>
+                <AcademicTopTab.Screen
+                    name="학적"
+                    component={AcademicInfoScreen} />
+                <AcademicTopTab.Screen
+                    name="수강신청이력"
+                    component={AcademicRecord} />
+            </AcademicTopTab.Navigator>
+        </View>
+    )
+}
+
+
+export const PostTopTabNavigator = () => {
+    return (
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
+            <PostTopTab.Navigator
+                screenOptions={({ }) => ({
+                    tabBarStyle: {
+                        shadowOffset: {
+                            width: 0,
+                            height: 0, // for iOS
+                        },
+                        elevation: 0,
+                        backgroundColor: 'white',
+                        height: 55,
+                        //width: 300,
+                        //borderBottomWidth : 1,
+                        zIndex: 0,
+
+                    },
+                    tabBarIndicatorStyle: {
+                        backgroundColor: '#9A9EFF',
+                        //orderWidth : 5,
+                        //width: 70,
+                        //left: 43,
+                    },
+                    tabBarLabelStyle: {
+                        //width : 70,
+                        //backgroundColor : 'red',
+                        fontSize: 20,
+                        fontWeight: 'bold'
+                    },
+                    gestureEnabled: false,
+                    swipeEnabled: false,
+                    animationEnabled: false,
+                })}>
+                <PostTopTab.Screen
+                    name="전체 게시판"
+                    component={PostDetailTopTabNavigator} />
+                <PostTopTab.Screen
+                    name="학과 게시판"
+                    component={PostDetailTopTabNavigator} />
+            </PostTopTab.Navigator>
+        </View>
+    )
+}
+
+export const PostDetailTopTabNavigator = () => {
+    return (
+        <View style = {{flex : 1, backgroundColor : 'white'}}>
+            <PostDetailTopTab.Navigator
+                screenOptions={({ }) => ({
+                    tabBarStyle: {
+                        shadowOffset: {
+                            width: 0,
+                            height: 0, // for iOS
+                        },
+                        elevation: 0,
+                        zIndex: 0,
+                        //borderWidth: 1,
+                        borderTopRightRadius: 20,
+                        borderTopLeftRadius: 20,
+                        backgroundColor: 'white',
+                        //width : 400
+        
+                    },
+                    tabBarIndicatorStyle: {
+                        backgroundColor: '#9A9EFF'
+                    },
+                    tabBarLabelStyle: {
+                        fontSize: 18,
+                        fontWeight: 'bold'
+                    },
+                    gestureEnabled: false,
+                    swipeEnabled: false,
+                    animationEnabled: false
+                })}>
+                <PostDetailTopTab.Screen
+                    name="전체"
+                    component={GeneralPostsScreen} />
+                <PostDetailTopTab.Screen
+                    name="HOT게시글"
+                    component={HotPostsScreen} />
+                <PostDetailTopTab.Screen
+                    name="책갈피"
+                    component={BookmarkScreen} />
+            </PostDetailTopTab.Navigator>
+        </View>
+
+    )
+}
 
 export const TopBottomTabNavigator = ({ navigation, route }: any) => {
     const { department_check, userdata } = route.params
@@ -46,30 +190,30 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
             }}>
             <CommunityTopBottomTab.Screen name='전체'
-                                          component={GeneralPostsScreen}
-                                          initialParams={{ department_check: department_check, userdata : userdata }}
-                                          options={{
-                                            headerShown: false,
-                                            tabBarIcon: () => null,
-                                          }}>
+                component={GeneralPostsScreen}
+                initialParams={{ department_check: department_check, userdata: userdata }}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }}>
             </CommunityTopBottomTab.Screen>
 
-            <CommunityTopBottomTab.Screen name='HOT게시글' 
-                                          component={HotPostsScreen}
-                                          initialParams={{ department_check: department_check }} 
-                                          options={{
-                                            headerShown: false,
-                                            tabBarIcon: () => null,
-                                          }} >
+            <CommunityTopBottomTab.Screen name='HOT게시글'
+                component={HotPostsScreen}
+                initialParams={{ department_check: department_check }}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }} >
             </CommunityTopBottomTab.Screen>
 
-            <CommunityTopBottomTab.Screen name='책갈피' 
-                                          component={BookmarkScreen}
-                                          initialParams={{ department_check: department_check }} 
-                                          options={{
-                                            headerShown: false,
-                                            tabBarIcon: () => null,
-                                          }} >
+            <CommunityTopBottomTab.Screen name='책갈피'
+                component={BookmarkScreen}
+                initialParams={{ department_check: department_check }}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }} >
             </CommunityTopBottomTab.Screen>
         </CommunityTopBottomTab.Navigator>
 
@@ -77,7 +221,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 }
 
 //커뮤니티 전체, 학과 게시판 상단 탭 네비게이션
-export const TopbTabNavigator = ({route, navigation} : any) => {
+export const TopbTabNavigator = ({ route, navigation }: any) => {
     const { userdata } = route.params;
     const [userData, setUserData] = useState<UserData>(userdata);
     return (
@@ -104,16 +248,16 @@ export const TopbTabNavigator = ({route, navigation} : any) => {
 
             }}>
             <CommunityTopTab.Screen name="전체 게시판"
-                initialParams={{ department_check: 0, userData} }
+                initialParams={{ department_check: 0, userData }}
                 component={TopBottomTabNavigator}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
                 }}
-                 />
-                
+            />
+
             <CommunityTopTab.Screen name="학과 게시판"
-                initialParams={{ department_check: 1, userData}}
+                initialParams={{ department_check: 1, userData }}
                 component={TopBottomTabNavigator}
                 options={{
                     headerShown: false,
