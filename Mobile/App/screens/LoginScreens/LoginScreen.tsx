@@ -11,23 +11,12 @@ import {
 } from 'react-native';
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-
-type UserData = {
-  user_pk: number,
-  student_pk: number,
-  freind_code: string,
-  admin_check: number,
-  name: string,
-  campus_pk: number,
-  department_pk: number,
-  email: string,
-  grade: number,
-}
+import { UserData } from "../../types/type"
 
 function LoginScreen({ navigation }: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [UserData, setUserData] = useState<any>();
+ 
 
   const get_user_data = async () => {
     try {
@@ -37,15 +26,17 @@ function LoginScreen({ navigation }: any) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id : username,
-          user_pass : password,
+          user_id: username,
+          user_pass: password,
         })
       })
       const userdata = await response.json();
       console.log(userdata);
-      console.log(userdata.admin_check);
-      setUserData(userdata);
-      console.log(UserData?.admin_check);
+      if (userdata.admin_check == true) {
+        navigation.navigate('AdminTabNavigator', {userdata});
+      } else {
+        navigation.navigate('MainTabNavigator', {userdata});
+      }
     } catch (error) {
       console.error('유저 정보 가져오기 실패:', error);
     }
@@ -66,12 +57,7 @@ function LoginScreen({ navigation }: any) {
       });
       const data = await response.text();
       if (data === 'success') {
-        get_user_data()
-        if(UserData.admin_check == true) {
-          navigation.navigate("AdminTabNavigator");
-        }else if(UserData.admin_check == false) {
-          navigation.navigate('MainTabNavigator');
-        }
+        await get_user_data();
       } else {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
       }

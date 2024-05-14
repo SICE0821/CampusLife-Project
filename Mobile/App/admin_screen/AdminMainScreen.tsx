@@ -3,30 +3,27 @@ import { useFocusEffect } from '@react-navigation/native';
 import {
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   Text,
   View,
   Dimensions,
   Image,
+  TouchableOpacity
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import {UserData} from '../types/type'
-import ImageCropPicker from 'react-native-image-crop-picker';
 
 import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconB from 'react-native-vector-icons/AntDesign';
-import IconC from 'react-native-vector-icons/FontAwesome';
+import IconC from 'react-native-vector-icons/Entypo';
 import IconD from 'react-native-vector-icons/Feather';
 import IconE from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Fontisto';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
 
-const attendancepng = require('../assets/handup.jpg');
-const friendsinvitepng = require('../assets/friend3.jpg');
-const volunteerpng = require('../assets/animation.gif');
-
-
+const attendancepng = require('../assets/attendanceevent.png');
+const friendsinvitepng = require('../assets/friendsinvite.png');
+const volunteerpng = require('../assets/volunteer.png');
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -43,46 +40,12 @@ type mainpagehptdata = {
   like: number,
 }
 
-const MainPage = ({navigation ,route} : any) => {
+const AdminMainScreen = ({route, navigation} : any) => {
   const { userdata } = route.params;
+  const [userData, setUserData] = useState<UserData>(userdata);
   const [schoolpostdata, setschollpostdata] = useState<mainpagepostdata[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<mainpagepostdata[]>([]);
   const [hotpostdata, sethotpostdata] = useState<mainpagehptdata[]>([]);
-  const [userData, setUserData] = useState<UserData>(userdata);
-  const [Userdepartment, setUserDepartment] = useState();
-  const [imagepath, setimagepath] = useState<string>();
-  
-  const getPhotos = async () => {
-    ImageCropPicker.openPicker({
-      multiple: true,
-      mediaType: 'photo',
-      includeBase64: true,
-      includeExif: true,
-      }).then(res => {
-        const imagePaths = res.map(image => image.path);
-        console.log(imagePaths);
-        setimagepath(imagePaths[0]);
-    });
-  };
-  
-  const get_user_department = async () => {
-    try {
-      const response = await fetch('http://175.212.187.92:3000/get_department_name', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          department_name: userData.department_pk,
-        })
-      })
-      const userdepartment = await response.json();
-      const userDepartment = userdepartment.userdepartment; //키값을 치면 값을 json에서 추출할 수 있다.
-      setUserDepartment(userDepartment);
-    } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
-    }
-  }
 
   const fetchschoolpostData = async () => {
       try {
@@ -106,7 +69,7 @@ const MainPage = ({navigation ,route} : any) => {
         }
         const data = await response.json();
         setdepartmentpostdata(data);
-        //console.log("데이터 받음:", data);
+       //console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
@@ -120,29 +83,22 @@ const MainPage = ({navigation ,route} : any) => {
         }
         const data = await response.json();
         sethotpostdata(data);
-        //console.log("데이터 받음:", data);
+       // console.log("데이터 받음:", data);
       } catch (error) {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
     };
+
     const settingUserData = () => {
       setUserData(userdata);
     }
 
-    const StudentInfo = async () => {
-      navigation.navigate('StudentInfoNavigator', {userdata});
-    }
-
-    const AcademicInfo = async () =>{
-      navigation.navigate('AcademicInfoNavigator', {userdata});
-    }
     useFocusEffect(
       React.useCallback(() => {
         fetchschoolpostData();
         fetchdepartmentpostData();
         fetchhotpostData();
         settingUserData();
-        get_user_department();
       }, [])
     );
   return (
@@ -153,7 +109,6 @@ const MainPage = ({navigation ,route} : any) => {
               <View style = {styles.cardtop}>
                 <View style = {styles.profile}>
                   <View style = {styles.profilePicture}>
-                    <Image source={{ uri: userData.profile_photo }} style={{width : 85, height : 85, borderRadius : 50,}} resizeMode="contain"/>
                   </View>
                 </View>
                 <View style = {styles.info}>
@@ -161,35 +116,37 @@ const MainPage = ({navigation ,route} : any) => {
                     <Text style = {{fontSize : 25, marginTop : 17, fontWeight : 'bold', color : 'black'}}> {userData.name} </Text>
                   </View>
                   <View style = {styles.department}>
-                    <Text style = {{fontSize : 15, marginLeft : 4, marginTop : 3, color : 'black'}}> {Userdepartment}/{userData.grade}학년</Text>
+                    <Text style = {{fontSize : 15, marginLeft : 4, marginTop : 3, color : 'black'}}> 컴퓨터소프트웨어과/2학년</Text>
                   </View>
                   <View style = {styles.point}>
-                    <Text style = {{marginLeft : 2,marginBottom : 6, color : 'black'}}> <IconA name="payments" size ={36} /></Text>
-                    <Text style = {{fontSize : 24, marginLeft : 5, marginBottom : 11, color : 'black'}}>{userData.point}</Text>
+                    <View style = {{flex : 0.4, flexDirection : 'row', alignItems : 'center'}}>
+                      <Text style = {{fontSize : 20, color : 'black'}}>신고관리</Text>
+                      <Text style = {{color : 'black'}}><IconB name = "caretright" size = {20}/></Text>
+                    </View>
+                    <View style = {{flex : 0.6, flexDirection : 'row', alignItems : 'center'}}>
+                    <Text style = {{fontSize : 20, color : 'black'}}>포인트관리</Text>
+                      <Text style = {{color : 'black'}}><IconB name = "caretright" size = {20}/></Text>
+                    </View>
                   </View>
                 </View>
 
               </View>
               <View style = {styles.cardbottom}>
-                <TouchableOpacity style = {styles.cardchoice} onPress = {StudentInfo}>
-                  <Text style = {{color : 'black'}}><IconB name = "idcard" size = {30}/></Text>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => console.log("정보변경 터치")}>
+                  <Text style = {{color : 'black'}}><IconB name = "idcard" size = {40}/></Text>
                   <Text style = {{fontSize : 15, color : 'black'}}>정보변경</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style = {styles.cardchoice} onPress = {AcademicInfo}>
-                  <Text style = {{color : 'black'}}><IconC name = "calendar-check-o" size = {30}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>학적확인</Text>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => console.log("신고관리 터치")}>
+                  <Text style = {{color : 'black'}}><IconA name = "report" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>신고관리</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style = {styles.cardchoice} onPress = {() => navigation.navigate("AlarmDialogScreen")}>
-                  <Text style = {{color : 'black'}}><IconD name = "bell" size = {30}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>알림</Text>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => console.log("포인트관리 터치")}>
+                  <Text style = {{color : 'black'}}><IconA name = "payments" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>포인트관리</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style = {styles.cardchoice} onPress = {() => navigation.navigate("SchoolInfoScreen")}>
-                  <Text style = {{color : 'black'}}><IconE name = "information-circle-outline" size = {30}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black'}}>학교정보</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style = {styles.cardchoice} onPress = {() => navigation.navigate("StudyRoomScreen")}>
-                  <Text style = {{color : 'black'}}><IconF name = "prescription" size = {30}/></Text>
-                  <Text style = {{fontSize : 15, color : 'black', marginTop : 5}}>스터디룸</Text>
+                <TouchableOpacity style = {styles.cardchoice} onPress={() => navigation.navigate("ItemRegistration")}>
+                  <Text style = {{color : 'black'}}><IconC name = "box" size = {40}/></Text>
+                  <Text style = {{fontSize : 15, color : 'black'}}>물품등록</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -202,9 +159,8 @@ const MainPage = ({navigation ,route} : any) => {
           <Swiper loop = {true}>
             <View style = {styles.eventbox}>
               <View style = {styles.eventpicture}>
-                <Image style = {{width : 430, height : 260, backgroundColor : 'red'}}
-                        source={attendancepng}
-                        />
+                <Image style = {{width : 300, height : 250}}
+                        source = {attendancepng}/>
                 </View>
               <View style = {styles.eventtext}>
                 <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>출석체크 이벤트!</Text>
@@ -213,9 +169,8 @@ const MainPage = ({navigation ,route} : any) => {
             </View>
             <View style = {styles.eventbox}>
               <View style = {styles.eventpicture}>
-                <Image style = {{width : 430, height : 260}}
-                        source = {friendsinvitepng}
-                        />
+                <Image style = {{width : 270, height : 250}}
+                        source = {friendsinvitepng}/>
                 </View>
               <View style = {styles.eventtext}>
                 <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>친구코드 이벤트!</Text>
@@ -224,9 +179,8 @@ const MainPage = ({navigation ,route} : any) => {
             </View>
             <View style = {styles.eventbox}>
               <View style = {styles.eventpicture}>
-                <Image style = {{width : 430, height : 250}}
-                        source = {volunteerpng}
-                        resizeMode="contain"/>
+                <Image style = {{width : 340, height : 250}}
+                        source = {volunteerpng}/>
                 </View>
               <View style = {styles.eventtext}>
                 <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>봉사활동 이벤트!</Text>
@@ -239,7 +193,7 @@ const MainPage = ({navigation ,route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학교 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26,}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -297,7 +251,7 @@ const MainPage = ({navigation ,route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학사 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 180, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -355,7 +309,7 @@ const MainPage = ({navigation ,route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>인기글</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "red"}}><IconF name = "fire" size = {27}/></Text>
-            <Text style = {{marginLeft : 205, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <Text style = {{marginLeft : 255, marginTop : 25, fontSize : 17,}}>더보기</Text>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -366,7 +320,7 @@ const MainPage = ({navigation ,route} : any) => {
                   <Text style = {{marginLeft : 8, color : 'red'}}><IconH name = "burst-new" size = {40}/></Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[0]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[0]?.like} </Text>
@@ -377,7 +331,7 @@ const MainPage = ({navigation ,route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[1]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[1]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[1]?.like} </Text>
@@ -388,7 +342,7 @@ const MainPage = ({navigation ,route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[2]?.title}</Text>
                 </View>
                 <View style = {styles.fireoneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[2]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[2]?.like} </Text>
@@ -399,7 +353,7 @@ const MainPage = ({navigation ,route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[3]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[3]?.view} /</Text>
                   <Text style = {{color : '#F29F05'}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[3]?.like} </Text>
@@ -410,7 +364,7 @@ const MainPage = ({navigation ,route} : any) => {
                   <Text style = {styles.M}>{hotpostdata[4]?.title}</Text>
                 </View>
                 <View style = {styles.oneboxeye}>
-                  <Text style = {{color : '#F29F05', marginLeft : -13}}> <IconB name = "eyeo" size = {30}/></Text>
+                  <Text style = {{color : '#F29F05', marginLeft : -6}}> <IconB name = "eyeo" size = {30}/></Text>
                   <Text style = {{marginLeft :2, color : 'black'}}>{hotpostdata[4]?.view} /</Text>
                   <Text style = {{color : '#F29F05', fontSize : 17}}> <IconB name = "like1" size = {25}/></Text>
                   <Text style = {{marginLeft :2, color : 'black', fontSize : 17}}>{hotpostdata[4]?.like} </Text>
@@ -428,11 +382,11 @@ const MainPage = ({navigation ,route} : any) => {
 const styles = StyleSheet.create({
   container: {
     flex : 1,
-    backgroundColor : '#F9F9F9',
+    backgroundColor : 'white',
   },
 
   cardView : {
-   height : 230, 
+   height : 250, 
    //backgroundColor : '#EDA332',
   },
 
@@ -443,37 +397,33 @@ const styles = StyleSheet.create({
     marginLeft : 30,
     marginRight : 30,
     borderRadius: 20,
-    //borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'black',
     //backgroundColor : 'blue',
-    elevation: 5,
 
   },
 
   cardtop : {
     flex : 0.6,
     flexDirection : "row",
-    //backgroundColor : '#FF9C63',
-    backgroundColor : '#FFFADD',
+    backgroundColor : '#FF9C63',
     borderTopLeftRadius : 20,
     borderTopRightRadius : 20,
-    borderBottomWidth: 0.5,
-    borderColor : 'F0EEEE',
+    borderBottomWidth: 1,
+    borderColor : 'black',
   },
 
   cardbottom : {
     flex : 0.4,
     flexDirection : 'row',
-    //backgroundColor : '#FFDECF',
-    backgroundColor : 'white',
+    backgroundColor : '#FFDECF',
     borderBottomLeftRadius : 20,
     borderBottomRightRadius : 20,
-    
+    //backgroundColor : 'blue'
   },
   profile : {
     flex : 0.35,
-    //backgroundColor : '#FF9C63',
-    backgroundColor : '#FFFADD',
+    backgroundColor : '#FF9C63',
     borderTopLeftRadius : 20,
     justifyContent : 'center',
     alignItems : 'center',
@@ -481,14 +431,10 @@ const styles = StyleSheet.create({
   },
 
   profilePicture : {
-    width : 85,
-    height : 85,
+    width : 95,
+    height : 95,
     backgroundColor :'white',
     borderRadius : 50,
-    justifyContent : 'center',
-    alignItems : 'center',
-    borderWidth : 1,
-    borderColor: 'lightgray'
   },
 
   info : {
@@ -509,14 +455,18 @@ const styles = StyleSheet.create({
   point : {
     flexDirection : 'row',
     flex : 0.4,
-    alignItems: 'center'
+    alignItems: 'center',
+    //backgroundColor : 'red'
+    
   },
   
   cardchoice : {
     margin : 5, 
-    flex : 0.2, borderBottomLeftRadius : 10, 
+    flex : 0.25, 
+    borderBottomLeftRadius : 10, 
     justifyContent : 'center', 
-    alignItems : 'center'
+    alignItems : 'center',
+    //backgroundColor : 'red'
   },
 
   
@@ -536,11 +486,10 @@ const styles = StyleSheet.create({
     alignItems : 'center',
   },
   noticeheadertext : {
-    fontSize : 20,
+    fontSize : 23,
     marginTop : 15,
     marginLeft : 15,
     color : 'black',
-    fontWeight : 'bold'
   },
 
   noticetextcontainer : {
@@ -556,10 +505,9 @@ const styles = StyleSheet.create({
     marginBottom : 10,
     marginLeft : 10,
     marginRight : 10,
-    backgroundColor : 'white',
+    //backgroundColor : 'green',
     borderRadius : 15,
-    elevation: 5,
-    //borderWidth : 2,
+    borderWidth : 2,
 
     
   },
@@ -602,22 +550,22 @@ const styles = StyleSheet.create({
 
   M : {
     marginLeft : 15,
-    fontSize : 19,
+    fontSize : 20,
     color : 'black',
   },
 
   eventcontainer : {
-    height : 420,
+    height : 480,
     //backgroundColor : 'green',
     marginBottom : 35,
   
   },
 
   eventheadertext : {
-    fontSize : 20,
-    marginLeft : 23,
+    fontSize : 23,
+    marginLeft : 20,
     color : 'black',
-    fontWeight : 'bold'
+    backgroundColor : 'white',
   },
 
   eventbox : {
@@ -626,27 +574,31 @@ const styles = StyleSheet.create({
     margin : 20,
     marginTop : 4,
     borderRadius : 20,
-    //borderWidth : 2,
-    elevation : 5,
+    borderWidth : 2,
   },
 
   eventpicture : {
     flex : 0.75,
     borderTopLeftRadius : 20,
     borderTopRightRadius : 20,
-    //borderBottomWidth : 2,
+    borderBottomWidth : 2,
     backgroundColor : 'white',
     justifyContent : 'center',
     alignItems : 'center',
-    //elevation: 5, 
+    shadowOffset: {
+      width: 0,
+      height: 2, // 그림자의 세로 방향 오프셋
+    },
+    shadowOpacity: 0.2, // 그림자의 투명도
+    shadowRadius: 4, // 그림자의 반경
+    elevation: 5, // 안드로이드에서 그림자를 사용할 때 필요한 속성
   },
 
   eventtext : {
-    backgroundColor : 'white',
+    //backgroundColor : 'green',
     flex : 0.25,
     borderBottomLeftRadius : 20,
     borderBottomRightRadius : 20,
-    
   },
 
   eventhearder : {
@@ -657,5 +609,5 @@ const styles = StyleSheet.create({
 
 });
 
-export default MainPage;
+export default AdminMainScreen;
 

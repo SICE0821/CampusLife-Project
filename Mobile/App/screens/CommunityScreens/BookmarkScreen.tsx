@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 
-const BookmarkScreen:React.FC = () => {
+const BookmarkScreen = () => {
     return (
         <View style = {styles.container}>
         <View style = {styles.topnavigationborder}>

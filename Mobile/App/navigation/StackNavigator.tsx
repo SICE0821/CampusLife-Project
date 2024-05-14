@@ -1,8 +1,8 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { Text, Touchable, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-
+import { useFocusEffect } from '@react-navigation/native';
 import MainScreen from '../screens/MainScreen';
 import { EventTopTabNavigator } from './TopTabNavigator'
 import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
@@ -11,7 +11,7 @@ import WritePostScreen from '../screens/CommunityScreens/WritePostScreen';
 import LoginScreen from '../screens/LoginScreens/LoginScreen';
 import RegisterScreen from '../screens/LoginScreens/RegisterScreen';
 import SearchScreen from '../screens/LoginScreens/SearchScreen';
-import { RootStackParam } from '../types/type';
+import {AcademicTopTabNavigator} from '../navigation/TopTabNavigator';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen'
 import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
@@ -20,25 +20,33 @@ import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
-
-
-
+import StudentInfoScreen from '../screens/CardScreens/StudentInfoScreen';
+import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
+import SchoolInfoScreen from '../screens/CardScreens/SchoolInfoScreen';
+import StudyRoomScreen from '../screens/CardScreens/StudyRoomScreen'
+import AlarmDialogScreen from '../screens/CardScreens/AlarmDialogScreen';
+import AdminMainScreen from '../admin_screen/AdminMainScreen';
+import { UserData } from "../types/type";
+import { PostTopTabNavigator } from './TopTabNavigator';
 import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator } from './TopTabNavigator'
+import ItemRegistration from '../admin_screen/ItemRegistration.tsx/ItemRegistration'
 
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
+import IconF from 'react-native-vector-icons/FontAwesome';
 
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
 const MainStack = createStackNavigator();
-const CoummunityStack = createStackNavigator<RootStackParam>();
+const CoummunityStack = createStackNavigator();
 const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
 const EventShopStack = createStackNavigator();
 const ReqularEventScreenStack = createStackNavigator();
+const AdminStack = createStackNavigator();
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = () => {
@@ -47,9 +55,9 @@ export const RootStackNavigator = () => {
 
     return (
         <RootStack.Navigator initialRouteName="LoginScreenStackNavigator">
-            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator}  />
-            <RootStack.Screen name = "AdminTabNavigator" component = {AdminTabNavigator}  />
-            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator}  />
+            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator} />
+            <RootStack.Screen name="AdminTabNavigator" component={AdminTabNavigator} options={{ headerShown: false }} />
+            <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator} options={{ headerShown: false }} />
             <RootStack.Screen
                 name="WritePostScreen"
                 component={WritePostScreen}
@@ -88,7 +96,7 @@ export const RootStackNavigator = () => {
                 component={SearchPostScreen}
                 options={{ headerShown: false }}>
             </RootStack.Screen>
-            <AttendanceStack.Screen name = "FullScreenCamera" component = {FullScreenCamera} options = {{headerShown : false}}/>
+            <AttendanceStack.Screen name="FullScreenCamera" component={FullScreenCamera} options={{ headerShown: false }} />
         </RootStack.Navigator>
     )
 }
@@ -105,22 +113,133 @@ export const LoginScreenStackNavigator = () => {
 }
 
 //메인 페이지 관련 스택 네비게이터
-export const MainScreenStackNavigator = () => {
+export const MainScreenStackNavigator = ({ route }: any) => {
+    const navigation: any = useNavigation();
+    const { userdata } = route.params;
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="MainScreen" component={MainScreen} />
+            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }} />
+            <MainStack.Screen
+                name="StudentInfoNavigator"
+                component={StudentInfoScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '정보변경',
+                }}
+            />
+            <MainStack.Screen
+                name="AcademicInfoNavigator"
+                component={AcademicTopTabNavigator}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학적확인',
+                }}
+            />
+            <MainStack.Screen
+                name="AlarmDialogScreen"
+                component={AlarmDialogScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '알람 확인',
+                }}
+            />
+            <MainStack.Screen
+                name="SchoolInfoScreen"
+                component={SchoolInfoScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학교 정보',
+                }}
+            />
+            <MainStack.Screen
+                name="StudyRoomScreen"
+                component={StudyRoomScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '스터디룸',
+                }}
+            />
         </MainStack.Navigator>
     );
 };
 
+export const AdminMainScreenStackNavigator = ({ route, navigation }: any) => {
+    const { userdata } = route.params;
+    return (
+        <AdminStack.Navigator>
+            <AdminStack.Screen name="AdminScreen" component={AdminMainScreen} initialParams={{ userdata }} />
+            <AdminStack.Screen name="ItemRegistration" component={ItemRegistration} initialParams={{ userdata }} options={{
+                headerStyle: {
+                    backgroundColor: '#F27405',
+                },
+                headerLeft: () => (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate("AdminScreen")}>
+                        <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                    </TouchableOpacity>
+                ),
+                headerTintColor: 'white',
+                headerTitleAlign: 'center',
+                title: '물품 등록 현황',
+            }} />
+        </AdminStack.Navigator>
+    );
+};
+
 //커뮤니티 페이지 관련 스택 네비게이터
-export const CommunityScreenStackNavigator = () => {
-    const navigation: any = useNavigation();
+export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
+    const { userdata } = route.params;
     return (
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
-                name="CommunityTopNavigation"
-                component={TopbTabNavigator}
+                name="PostTopTabNavigator"
+                component={PostTopTabNavigator}
+                initialParams = {{userdata}}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -144,7 +263,8 @@ export const CommunityScreenStackNavigator = () => {
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '커뮤니티',
-                }} />
+                }}
+            />
         </CoummunityStack.Navigator>
 
     );
@@ -199,7 +319,7 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
                     headerTitleAlign: 'center',
                     title: '이벤트',
                 }} />
-                <EventShopStack.Screen 
+            <EventShopStack.Screen
                 name="DailyEventScreen"
                 component={DailyEventScreen}
                 options={{
@@ -236,7 +356,7 @@ export const ReqularEventScreenNavigator = ({ navigation, route }: any) => {
                 name="DailyEventScreen"
                 component={DailyEventScreen}
                 options={{
-                    headerShown : false,
+                    headerShown: false,
                     //tabBarIcon: () => null,
                 }}>
             </ReqularEventScreenStack.Screen>
@@ -255,6 +375,8 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
+
+
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate("MainPage")}>
