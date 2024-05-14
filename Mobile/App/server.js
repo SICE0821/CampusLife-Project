@@ -15,9 +15,17 @@ const { getGeneralPosts,
         PostItem,
         UpdateItem,
         DeleteItem,
-        get_department_name } = require('./db.js'); // db 파일에서 함수 가져오기
+        get_department_name,
+        DeleteUser } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 
 const pool = mariadb.createPool({
@@ -174,12 +182,14 @@ app.get('/generalpost', async (req, res) => {
     try {
         const rows = await getGeneralPosts();
         const processedData = rows.map(item => ({
-            id: item.post_id,
+            post_id: item.post_id,
             title: item.title,
-            writer: item.user_id,
-            time: item.date,
-            watch: item.view,
-            like: item.like
+            contents: item.contents,
+            date: formatDate(item.date),
+            view: item.view,
+            like: item.like,
+            name: item.name,
+            admin_check: item.admin_check,
         }));
         res.json(processedData);
         console.log("성공적으로 데이터 보냄");
@@ -193,12 +203,14 @@ app.get('/departmentpost', async (req, res) => {
   try {
       const rows = await getDepartmentPosts();
       const processedData = rows.map(item => ({
-          id: item.post_id,
-          title: item.title,
-          writer: item.user_id,
-          time: item.date,
-          watch: item.view,
-          like: item.like
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
       }));
       res.json(processedData);
       console.log("성공적으로 데이터 보냄");
@@ -282,6 +294,13 @@ app.post('/updateItem', async (req, res) => {
 app.post('/deleteItem', async (req, res) => {
   const { name, deletenum} = req.body;
   DeleteItem(name, deletenum);
+  console.log("성공적으로 값 넣음");
+});
+
+//유저 삭제하기
+app.post('/delete_user', async (req, res) => {
+  const { user_pk } = req.body;
+  DeleteUser(user_pk);
   console.log("성공적으로 값 넣음");
 });
 

@@ -1,32 +1,46 @@
 import React, { useState, } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback,TouchableOpacity } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback,TouchableOpacity, Pressable, Animated } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
+import {Swipeable, GestureHandlerRootView} from 'react-native-gesture-handler';
 
-type Data = {
-    id: number,
-    like: number,
-    time: string,
+type PostData = {
+    post_id: number,
     title: string,
-    watch: number,
-    writer: string,
+    contents: string,
+    date: string,
+    view: number,
+    like: number,
+    name: string,
+    admin_check: boolean
 }
 
+    const renderLeftActions = () => (
+        // 왼쪽으로 스와이프할 때 나타날 컴포넌트
+        <View style={{ backgroundColor: 'green', justifyContent: 'center', alignItems: 'center', width: 100 }}>
+            <Text>Delete</Text>
+        </View>
+    );
+
+
+
 const renderEmptyItem = () => {
+    
     return (
         <View style={{ height: 85 }}>
         </View>
     )
 }
 
-const GeneralPostsScreen = ({ navigation, route }: any) => {
-    const [communityData, setCommunityData] = useState<Data[]>([]);
-
+const GeneralPostsScreen = ({ route, navigation }: any) => {
+    const { department_check, userdata } = route.params;
+    const [communityData, setCommunityData] = useState<PostData[]>([]);
+    const [scrollPosition, setScrollPosition] = useState(0);
     const getGeneralposts = async () => {
         try {
             const response = await fetch('http://175.212.187.92:3000/generalpost');
             const postsdata = await response.json();
-            //console.log(postsdata);
+            console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error)
@@ -45,26 +59,31 @@ const GeneralPostsScreen = ({ navigation, route }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-
+            if(department_check == 0) {
+                getGeneralposts();
+            }else if(department_check == 1) {
+                getDepartmentposts();
+            }
         }, [])
     );
 
-    const renderItem = ({ item }: { item: Data }) => (
+    const renderItem = ({ item }: { item: PostData }) => (
+        
         <TouchableWithoutFeedback onPress={() => navigation.navigate("PostDetailScreen")}>
             <View style={styles.writeboxcontainer}>
                 <View style={styles.writetitle}>
                     <View style={styles.titlebox}>
-                        <Text style={{ fontSize: 22, margin: 5, marginLeft: 5, color: 'black' }}>{item.title}</Text>
+                        <Text style={{ fontSize: 22, margin: 5, marginLeft: 10, color: 'black' }}>{item.title}</Text>
                     </View>
                     <View style={styles.eyesnum}>
                         <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
-                        <Text style={{ color: 'black', marginLeft: 3 }}>{item.watch}</Text>
+                        <Text style={{ color: 'black', marginLeft: 3 }}>{item.view}</Text>
                     </View>
                 </View>
                 <View style={styles.wirterandtime}>
                     <View style={styles.writerbox}>
-                        <Text style={{ fontSize: 13, marginLeft: 5, color: 'black' }}>{item.writer}</Text>
-                        <Text> | {item.time}</Text>
+                        <Text style={{ fontSize: 13, marginLeft: 10, color: item.admin_check === true ? 'red' : 'black' }}>{item.name}</Text>
+                        <Text> | {item.date}</Text>
                     </View>
                     <View style={styles.likenum}>
                         <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
@@ -160,6 +179,11 @@ const styles = StyleSheet.create({
         //backgroundColor : 'red',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    delete : {
+        width : 20,
+        height : 20,
+        backgroundColor : 'red',
     }
 
 }
