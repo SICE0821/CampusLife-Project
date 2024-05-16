@@ -17,8 +17,8 @@ type Item = {
     subItems: SubItem[];
 }
 
-const PostDetailScreen: React.FC = ({route} : any) => {
-    const {item, userData} = route.params; //유저 정보와, 커뮤니티정보
+const PostDetailScreen: React.FC = ({ route }: any) => {
+    const { item, userData } = route.params; //유저 정보와, 커뮤니티정보
     const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
     const [inputheight, setinputheight] = useState(40);
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>();
@@ -42,7 +42,7 @@ const PostDetailScreen: React.FC = ({route} : any) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    post_id : item.post_id
+                    post_id: item.post_id
                 })
             })
             const get_post_detail = await response.json();
@@ -52,24 +52,43 @@ const PostDetailScreen: React.FC = ({route} : any) => {
         }
     }
 
-        //댓글 리스트 가져오기
-        const CommentList = async () => {
-            try {
-                const response = await fetch('http://175.212.187.92:3000/get_comment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        post_ida : item.post_id
-                    })
+    //댓글 리스트 가져오기
+    const CommentList = async () => {
+        try {
+            const response = await fetch('http://175.212.187.92:3000/get_comment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_ida: item.post_id
                 })
-                const get_comment = await response.json();
-                setCommentData(get_comment);
-            } catch (error) {
-                console.error('유저 학과 이름 가져오기 실패:', error);
-            }
+            })
+            const get_comment = await response.json();
+            setCommentData(get_comment);
+        } catch (error) {
+            console.error('유저 학과 이름 가져오기 실패:', error);
         }
+    }
+
+    //댓글 리스트 가져오기
+    const reCommentList = async () => {
+        try {
+            const response = await fetch('http://175.212.187.92:3000/get_recomment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_ida: item.post_id
+                })
+            })
+            const get_recomment = await response.json();
+            setCommentData(get_recomment);
+        } catch (error) {
+            console.error('유저 학과 이름 가져오기 실패:', error);
+        }
+    }
 
     const handleContentSizeChange = (e: any) => {
         const maxlineHeight = 112;
@@ -109,7 +128,7 @@ const PostDetailScreen: React.FC = ({route} : any) => {
                 </View>
                 <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
                 <View style={styles.titlecontainer}>
-                    <Text style={{ fontSize: 25, marginLeft: 16, color: 'black', fontWeight : 'bold' }}>
+                    <Text style={{ fontSize: 25, marginLeft: 16, color: 'black', fontWeight: 'bold' }}>
                         {postDetailInfo?.title}
                     </Text>
                 </View>
@@ -122,7 +141,9 @@ const PostDetailScreen: React.FC = ({route} : any) => {
                     <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}><IconB name="eyeo" size={24} /></Text>
                     <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}> {postDetailInfo?.like} </Text>
                 </View>
-                {commentData.map(item => (
+                {
+                
+                commentData.map(item => (
                     <View key={item.comment_id} style={styles.comentcontainer}>
                         <View style={styles.comentTopsection}>
                             <View style={styles.infobox}>
@@ -153,10 +174,10 @@ const PostDetailScreen: React.FC = ({route} : any) => {
                             {item.content}
                         </Text>
                         <View style={styles.dataandlike}>
-                            <Text style={{ marginTop: 3, marginLeft: 20, fontSize : 18}}>
+                            <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 18 }}>
                                 {item.date}
                             </Text>
-                            <Text style = {{marginTop : 2}}><IconD size={34} color="black" name={"like"} /></Text>
+                            <Text style={{ marginTop: 2 }}><IconD size={34} color="black" name={"like"} /></Text>
                             <Text style={{ fontSize: 19, marginTop: 2, }}>
                                 {item.like}
                             </Text>
@@ -193,10 +214,10 @@ const PostDetailScreen: React.FC = ({route} : any) => {
                                         에브리바디 해체!
                                     </Text>
                                     <View style={styles.dataandlike}>
-                                        <Text style={{ marginTop: 3, marginLeft: 20, fontSize : 18}}>
+                                        <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 18 }}>
                                             01/26 25:00
                                         </Text>
-                                        <Text style = {{marginTop : 2}}><IconD size={30} color="black" name={"like"} /></Text>
+                                        <Text style={{ marginTop: 2 }}><IconD size={30} color="black" name={"like"} /></Text>
                                         <Text style={{ fontSize: 19, marginTop: 2, }}>
                                             30
                                         </Text>
@@ -243,32 +264,32 @@ const styles = StyleSheet.create({
 
     },
     profilepicturecontainer: {
-        height : 75,
-        width : 100,
+        height: 75,
+        width: 100,
         //backgroundColor : 'yellow',
         justifyContent: 'center',
         alignItems: 'center',
 
     },
     profileinfocontainer: {
-        height : 75,
+        height: 75,
         //backgroundColor : 'red',
-        width : 330,
-        
+        width: 330,
+
     },
     listcontainer: {
-        height : 75,
+        height: 75,
         //backgroundColor : 'blue',
         justifyContent: 'center',
         alignItems: 'center',
-        
+
     },
     profilepicturebox: {
         width: 60,
         height: 60,
         backgroundColor: '#CED4DA',
         borderRadius: 12,
-        
+
     },
     maintextcontainer: {
         flex: 0.45,
@@ -399,7 +420,7 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         //backgroundColor: 'blue',
         marginTop: 10,
-        marginLeft : 10,
+        marginLeft: 10,
     },
     maincontent: {
         flex: 0.9,
