@@ -4,6 +4,8 @@ import IconA from 'react-native-vector-icons/Entypo';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconD from 'react-native-vector-icons/EvilIcons';
 import IconC from 'react-native-vector-icons/Feather';
+import { useFocusEffect } from '@react-navigation/native';
+import { PostDeatilData, PostCommentData } from "../../types/type"
 
 type SubItem = {
     id: number;
@@ -15,41 +17,60 @@ type Item = {
     subItems: SubItem[];
 }
 
-const PostDetailScreen: React.FC = () => {
+const PostDetailScreen: React.FC = ({route} : any) => {
+    const {item, userData} = route.params; //유저 정보와, 커뮤니티정보
     const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
     const [inputheight, setinputheight] = useState(40);
+    const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>();
+    const [commentData, setCommentData] = useState<PostCommentData[]>([]);
     const [data, setData] = useState<Item[]>([]);
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // 데이터를 가져오는 비동기 작업을 수행합니다.
-                // 여기서는 임시로 가짜 데이터를 사용합니다.
-                const fakeData: Item[] = [
-                    {
-                        id: 1,
-                        subItems: [
-                            { id: 11, text: '첫 번째 하위 항목' },
-                            { id: 12, text: '두 번째 하위 항목' },
-                        ]
-                    },
-                    {
-                        id: 2,
-                        subItems: [
-                            { id: 21, text: '세 번째 하위 항목' },
-                            { id: 22, text: '네 번째 하위 항목' },
-                        ]
-                    }
-                ];
-                // 가져온 데이터를 상태에 업데이트합니다.
-                setData(fakeData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
 
-        // 컴포넌트가 마운트될 때 데이터를 가져오도록 합니다.
-        fetchData();
-    }, []);
+    useFocusEffect(
+        React.useCallback(() => {
+            //console.log(item.post_id);
+            DeatilPost();
+            CommentList();
+        }, [])
+    );
+
+    //포스터에 대한 정보
+    const DeatilPost = async () => {
+        try {
+            const response = await fetch('http://175.212.187.92:3000/get_post_detail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id : item.post_id
+                })
+            })
+            const get_post_detail = await response.json();
+            setPostDetailInfo(get_post_detail);
+        } catch (error) {
+            console.error('유저 학과 이름 가져오기 실패:', error);
+        }
+    }
+
+        //댓글 리스트 가져오기
+        const CommentList = async () => {
+            try {
+                const response = await fetch('http://175.212.187.92:3000/get_comment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        post_ida : item.post_id
+                    })
+                })
+                const get_comment = await response.json();
+                setCommentData(get_comment);
+            } catch (error) {
+                console.error('유저 학과 이름 가져오기 실패:', error);
+            }
+        }
+
     const handleContentSizeChange = (e: any) => {
         const maxlineHeight = 112;
         const currentlineHeight = e.nativeEvent.contentSize.height;
@@ -57,7 +78,7 @@ const PostDetailScreen: React.FC = () => {
         if (currentlineHeight <= maxlineHeight) {
             setinputheight(e.nativeEvent.contentSize.height);
         }
-        console.log(e.nativeEvent.contentSize.height);
+        //console.log(e.nativeEvent.contentSize.height);
     }
     const handleInputChange = (inputText: string) => {
         setcommenttext(inputText);
@@ -75,10 +96,10 @@ const PostDetailScreen: React.FC = () => {
                         </View>
                         <View style={styles.profileinfocontainer}>
                             <View style={{ flex: 0.6, justifyContent: 'center', }}>
-                                <Text style={{ fontSize: 20, color: 'black', fontWeight: 'bold', marginTop: 13, }}>정유환(컴퓨터소프트웨어과)</Text>
+                                <Text style={{ fontSize: 20, color: 'black', fontWeight: 'bold', marginTop: 13, }}>{postDetailInfo?.post_writer}({postDetailInfo?.writer_department})</Text>
                             </View>
-                            <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 10, }}>
-                                <Text style={{ fontSize: 17, }}>01/26 25:00</Text>
+                            <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 9, }}>
+                                <Text style={{ fontSize: 17, }}>{postDetailInfo?.write_date}</Text>
                             </View>
                         </View>
                         <View style={styles.listcontainer}>
@@ -88,26 +109,21 @@ const PostDetailScreen: React.FC = () => {
                 </View>
                 <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
                 <View style={styles.titlecontainer}>
-                    <Text style={{ fontSize: 29, marginLeft: 20, color: 'black' }}>
-                        집가고싶어요
+                    <Text style={{ fontSize: 25, marginLeft: 16, color: 'black', fontWeight : 'bold' }}>
+                        {postDetailInfo?.title}
                     </Text>
                 </View>
-                <Text style={{ fontSize: 20, color: 'black', marginLeft: 20, marginRight: 20, }}>
-                    에브리바디 해체! 추억에 지우개를?! 어랏 텐션이 올라? 폐가 돼? 네, 라고는 말할 수 없어!
-                    잘 보이는 세상 과자는 사라져버려?! 어쩌지 "어떻게?!"도 "이렇게 해!"도 너답지 않네? 그런 시대라도 좋아
-                    우린 아직 원더를 믿고 있는,걸 노 No? know! 어른들의 예리한 눈금 너무 시달려버려서 눈이 한쪽으로 치우쳐질 것 같아!
-                    "어떻게?!" "이렇게 해!"도 전부 정말 좋아!가 좋잖아!! 모두 모두가 웃어버릴 만한 속셈으로 숙적, 역경, 몬스터 불러도
-                    되잖아?! 엉뚱하고도 최강인 세상을 아무리 해도 구할 수 없는 곤란함도 좋잖아! 모두 모두 구해버리자! 라는 포즈로 조금이나
-                    잠깐으론 구겨지지 않는 미소 어때! 100번 실패해도 신비함은 흐트러지지 않아 원원에 둘이 통해 쓰리 포 에브리바디 쇼타임!
+                <Text style={{ fontSize: 20, color: 'black', marginLeft: 16, marginRight: 20, }}>
+                    {postDetailInfo?.contents}
                 </Text>
                 <View style={styles.postslikeandlook}>
-                    <Text style={{ color: 'black', marginLeft: 16, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
-                    <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> 15 </Text>
-                    <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}> <IconB name="eyeo" size={24} /></Text>
-                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}>60</Text>
+                    <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
+                    <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> {postDetailInfo?.view}</Text>
+                    <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}><IconB name="eyeo" size={24} /></Text>
+                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}> {postDetailInfo?.like} </Text>
                 </View>
-                {data.map(item => (
-                    <View key={item.id} style={styles.comentcontainer}>
+                {commentData.map(item => (
+                    <View key={item.comment_id} style={styles.comentcontainer}>
                         <View style={styles.comentTopsection}>
                             <View style={styles.infobox}>
                                 <View style={styles.picturebox}>
@@ -115,8 +131,8 @@ const PostDetailScreen: React.FC = () => {
                                     </View>
                                 </View>
                                 <View style={styles.infotextbox}>
-                                    <Text style={{ fontSize: 24, color: 'black' }}>엄준식</Text>
-                                    <Text style={{ fontSize: 17, color: 'black' }}>컴퓨터소프트웨어과</Text>
+                                    <Text style={{ fontSize: 24, color: 'black' }}>{item.student_name}</Text>
+                                    <Text style={{ fontSize: 17, color: 'black' }}>{item.department_name}</Text>
                                 </View>
                             </View>
                             <View style={styles.listbox}>
@@ -134,20 +150,19 @@ const PostDetailScreen: React.FC = () => {
                             </View>
                         </View>
                         <Text style={{ fontSize: 20, color: 'black', marginLeft: 20, marginRight: 20, }}>
-                            에브리바디 해체! 추억에 지우개를?! 어랏 텐션이 올라? 폐가 돼? 네, 라고는 말할 수 없어!
-                            원래 늘어나야되거든?
+                            {item.content}
                         </Text>
                         <View style={styles.dataandlike}>
                             <Text style={{ marginTop: 3, marginLeft: 20, fontSize : 18}}>
-                                01/26 25:00
+                                {item.date}
                             </Text>
                             <Text style = {{marginTop : 2}}><IconD size={34} color="black" name={"like"} /></Text>
                             <Text style={{ fontSize: 19, marginTop: 2, }}>
-                                30
+                                {item.like}
                             </Text>
                         </View>
-                        {item.subItems.map(subItem => (
-                            <View key={subItem.id} style={styles.subcommentbox}>
+                        {commentData.map(subItem => (
+                            <View key={subItem.comment_id} style={styles.subcommentbox}>
                                 <View style={styles.enterspace}>
                                     <Text style={{ color: 'black' }}> <IconC name="corner-down-right" size={30} /></Text>
                                 </View>
@@ -228,27 +243,32 @@ const styles = StyleSheet.create({
 
     },
     profilepicturecontainer: {
-        flex: 0.25,
+        height : 75,
+        width : 100,
         //backgroundColor : 'yellow',
         justifyContent: 'center',
         alignItems: 'center',
 
     },
     profileinfocontainer: {
-        flex: 0.55,
-        //backgroundColor : 'red'
+        height : 75,
+        //backgroundColor : 'red',
+        width : 330,
+        
     },
     listcontainer: {
-        flex: 0.2,
+        height : 75,
         //backgroundColor : 'blue',
         justifyContent: 'center',
         alignItems: 'center',
+        
     },
     profilepicturebox: {
         width: 60,
         height: 60,
         backgroundColor: '#CED4DA',
         borderRadius: 12,
+        
     },
     maintextcontainer: {
         flex: 0.45,
@@ -260,7 +280,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     postslikeandlook: {
-        height: 30,
+        height: 40,
         //backgroundColor: 'yellow',
         flexDirection: 'row',
         alignItems: 'center',

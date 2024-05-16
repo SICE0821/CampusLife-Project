@@ -238,7 +238,7 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
                 name="PostTopTabNavigator"
-                component={PostTopTabNavigator}
+                component={TopbTabNavigator}
                 initialParams = {{userdata}}
                 options={{
                     headerStyle: {
@@ -275,7 +275,7 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
     React.useLayoutEffect(() => {
         const routeName = getFocusedRouteNameFromRoute(route);
         if (routeName === "EventHaveCouponScreen") {
-            console.log(routeName);
+            //console.log(routeName);
             //navigation.setOptions({tabBarStyle: {display: 'none'}});
         }
     }, [navigation, route])
