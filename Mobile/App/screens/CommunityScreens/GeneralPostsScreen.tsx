@@ -88,7 +88,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         try {
             const response = await fetch('http://175.212.187.92:3000/generalpost');
             const postsdata = await response.json();
-            //console.log(postsdata);
+            console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error)
