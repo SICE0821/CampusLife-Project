@@ -5,6 +5,7 @@ import { Table, Row, Rows } from "react-native-table-component";
 
 {
     var boxColor = '#999999'
+    
 }
 
 { // 테이블 관련 설정
