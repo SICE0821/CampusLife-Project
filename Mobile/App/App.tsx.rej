@@ -1,0 +1,16 @@
+diff a/Mobile/App/App.tsx b/Mobile/App/App.tsx	(rejected hunks)
+@@ -3,12 +3,11 @@
+ import { NavigationContainer } from '@react-navigation/native';
+ import {RootStackNavigator} from './navigation/StackNavigator.tsx';
+ import {HomeScreenStack} from '../MyTest/StackNavigation.tsx'
++import SwipeableItem from '../MyTest/SwipeableItem.tsx'
+ 
+ function App(): React.JSX.Element {
+   return (
+-      <NavigationContainer>
+-        <RootStackNavigator/>
+-    </NavigationContainer>
++        <SwipeableItem/>
+   );
+ }
+ 
