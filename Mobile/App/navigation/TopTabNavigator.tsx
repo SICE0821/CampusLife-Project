@@ -69,7 +69,8 @@ export const AcademicTopTabNavigator = () => {
 }
 
 
-export const PostTopTabNavigator = () => {
+export const PostTopTabNavigator = ({route} : any) => {
+    const { userdata } = route.params;
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             <PostTopTab.Navigator
@@ -79,25 +80,35 @@ export const PostTopTabNavigator = () => {
                             width: 0,
                             height: 0, // for iOS
                         },
-                        elevation: 0,
+                        elevation: 5,
                         backgroundColor: 'white',
-                        height: 55,
-                        //width: 300,
+                        height: 50,
+                        width: 260,
                         //borderBottomWidth : 1,
                         zIndex: 0,
+                        borderWidth : 1,
+                        marginLeft : 10,
+                        marginTop : 10,
+                        borderRadius : 5,
+                        
+        
 
                     },
                     tabBarIndicatorStyle: {
-                        backgroundColor: '#9A9EFF',
+                        backgroundColor: 'transparent',
                         //orderWidth : 5,
                         //width: 70,
                         //left: 43,
+                        borderTopColor: '#9A9EFF', // 인디케이터의 색상 설정
+                        borderTopWidth: 5, // 인디케이터의 두께 설정
+                        width : 60,
+                        marginLeft : 33
                     },
-                    tabBarLabelStyle: {
-                        //width : 70,
-                        //backgroundColor : 'red',
+                    tabBarLabelStyle: {           
                         fontSize: 20,
-                        fontWeight: 'bold'
+                        fontWeight: 'bold',
+                        borderRadius : 16,
+                        //elevation : 5,
                     },
                     gestureEnabled: false,
                     swipeEnabled: false,
@@ -105,16 +116,19 @@ export const PostTopTabNavigator = () => {
                 })}>
                 <PostTopTab.Screen
                     name="전체 게시판"
-                    component={PostDetailTopTabNavigator} />
+                    component={PostDetailTopTabNavigator}
+                    initialParams = {{department_check: 0, userdata}} />
                 <PostTopTab.Screen
                     name="학과 게시판"
-                    component={PostDetailTopTabNavigator} />
+                    component={PostDetailTopTabNavigator}
+                    initialParams = {{department_check: 1, userdata}} />
             </PostTopTab.Navigator>
         </View>
     )
 }
 
-export const PostDetailTopTabNavigator = () => {
+export const PostDetailTopTabNavigator = ({route} : any) => {
+    const { department_check, userdata } = route.params;
     return (
         <View style = {{flex : 1, backgroundColor : 'white'}}>
             <PostDetailTopTab.Navigator
@@ -130,15 +144,27 @@ export const PostDetailTopTabNavigator = () => {
                         borderTopRightRadius: 20,
                         borderTopLeftRadius: 20,
                         backgroundColor: 'white',
-                        //width : 400
+                        width : 240,
+                        height : 45,
+                        
         
                     },
                     tabBarIndicatorStyle: {
-                        backgroundColor: '#9A9EFF'
+                        //borderWidth : 2,
+                        backgroundColor: 'transparent',
+                        width : 20,
+                        marginLeft : 31,
+                        borderTopColor: '#9A9EFF', // 인디케이터의 색상 설정
+                        borderTopWidth: 5, // 인디케이터의 두께 설정
                     },
                     tabBarLabelStyle: {
-                        fontSize: 18,
-                        fontWeight: 'bold'
+                        //backgroundColor : '#9A9EFF',
+                        fontSize: 17,
+                        fontWeight: 'bold',
+                        //paddingVertical: 8, // 위아래 여백 추가
+                        //paddingHorizontal: 16, // 좌우 여백 추가
+                        borderRadius : 16,
+                        //elevation : 5,
                     },
                     gestureEnabled: false,
                     swipeEnabled: false,
@@ -146,13 +172,16 @@ export const PostDetailTopTabNavigator = () => {
                 })}>
                 <PostDetailTopTab.Screen
                     name="전체"
-                    component={GeneralPostsScreen} />
+                    component={GeneralPostsScreen}
+                    initialParams = {{department_check, userdata}} />
                 <PostDetailTopTab.Screen
-                    name="HOT게시글"
-                    component={HotPostsScreen} />
+                    name="HOT"
+                    component={HotPostsScreen}
+                    initialParams = {{department_check, userdata}} />
                 <PostDetailTopTab.Screen
                     name="책갈피"
-                    component={BookmarkScreen} />
+                    component={BookmarkScreen}
+                    initialParams = {{department_check, userdata}} />
             </PostDetailTopTab.Navigator>
         </View>
 

@@ -3,12 +3,11 @@ import { StyleSheet} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import {RootStackNavigator} from './navigation/StackNavigator.tsx';
 import {HomeScreenStack} from '../MyTest/StackNavigation.tsx'
+import SwipeableItem from '../MyTest/SwipeableItem.tsx'
 
 function App(): React.JSX.Element {
   return (
-      <NavigationContainer>
-        <RootStackNavigator/>
-    </NavigationContainer>
+        <SwipeableItem/>
   );
 }
 
