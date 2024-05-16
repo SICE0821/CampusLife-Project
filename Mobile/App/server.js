@@ -21,7 +21,7 @@ app.use(express.json());
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '127.0.0.1',
   port: 3306,
   user: 'root',
   password: '1214',
