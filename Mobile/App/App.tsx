@@ -7,7 +7,10 @@ import SwipeableItem from '../MyTest/SwipeableItem.tsx'
 
 function App(): React.JSX.Element {
   return (
-        <SwipeableItem/>
+        <NavigationContainer>
+          <RootStackNavigator>
+          </RootStackNavigator>
+        </NavigationContainer>
   );
 }
 
