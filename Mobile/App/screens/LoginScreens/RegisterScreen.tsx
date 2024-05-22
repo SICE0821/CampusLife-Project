@@ -12,7 +12,7 @@ const Register = ({navigation}: any) => {
 
   const handleRegister = async ({navigation} :any) => {
     try {
-      const response = await fetch('http://192.168.35.41:3000/register', {
+      const response = await fetch('http://172.16.108.18:3000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
