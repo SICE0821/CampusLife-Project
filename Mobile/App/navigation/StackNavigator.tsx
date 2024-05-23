@@ -49,7 +49,7 @@ const ReqularEventScreenStack = createStackNavigator();
 const AdminStack = createStackNavigator();
 
 //모든 네비게이터 객체의 최상위 네비게이터
-export const RootStackNavigator = () => {
+export const RootStackNavigator = (route : any) => {
     const navigation: any = useNavigation();
     const [dataFromScreen1, setDataFromScreen1] = useState<any>();
 
@@ -112,31 +112,46 @@ export const LoginScreenStackNavigator = () => {
     )
 }
 
+
+
 //메인 페이지 관련 스택 네비게이터
 export const MainScreenStackNavigator = ({ route }: any) => {
     const navigation: any = useNavigation();
     const { userdata } = route.params;
+
+    React.useLayoutEffect(() => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+        if (routeName === "MainScreen" ||  routeName === undefined) {
+            navigation.setOptions({ tabBarStyle : {height: 65,
+                position: 'absolute',
+                bottom: 16,
+                right: 10,
+                left: 10,
+                borderRadius: 20,
+                backgroundColor: 'white',}});
+            } else {
+                navigation.setOptions({ tabBarStyle : {display: 'none' }});
+            }
+    }, [navigation, route])
+    
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }} />
-            <MainStack.Screen
-                name="StudentInfoNavigator"
-                component={StudentInfoScreen}
-                options={{
+            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }}/>
+            <MainStack.Screen 
+                name="StudentInfoNavigator" 
+                component={StudentInfoScreen} 
+                options = {{
+                    
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
+                    
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '정보변경',
-                }}
-            />
-            <MainStack.Screen
+                }} 
+                />
+                <MainStack.Screen 
                 name="AcademicInfoNavigator"
                 component={AcademicTopTabNavigator}
                 options={{
@@ -153,7 +168,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     title: '학적확인',
                 }}
             />
-            <MainStack.Screen
+            <MainStack.Screen 
                 name="AlarmDialogScreen"
                 component={AlarmDialogScreen}
                 options={{
@@ -170,7 +185,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     title: '알람 확인',
                 }}
             />
-            <MainStack.Screen
+            <MainStack.Screen 
                 name="SchoolInfoScreen"
                 component={SchoolInfoScreen}
                 options={{
@@ -187,7 +202,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     title: '학교 정보',
                 }}
             />
-            <MainStack.Screen
+            <MainStack.Screen 
                 name="StudyRoomScreen"
                 component={StudyRoomScreen}
                 options={{
@@ -368,7 +383,7 @@ export const ReqularEventScreenNavigator = ({ navigation, route }: any) => {
 //출석체크 페이지 관련 스택 네비게이터
 export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
     return (
-        <AttendanceStack.Navigator>
+        <AttendanceStack.Navigator> 
             <AttendanceStack.Screen name="AttendanceScreen"
                 component={AttendanceScreen}
                 options={{
@@ -376,7 +391,7 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
                         backgroundColor: '#F27405',
                     },
 
-
+                    
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate("MainPage")}>
