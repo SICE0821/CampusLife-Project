@@ -18,11 +18,12 @@ const { getGeneralPosts,
         Updateaccount,
         UpdateItem,
         DeleteItem,
+        UpdateImg,
         get_user_have_posts,
         add_book_mark,
         delete_book_mark,
         get_post_detail,
-        get_department_name } = require('./db.js'); // db 파일에서 함수 가져오기
+        get_department_name, } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -390,19 +391,6 @@ app.post('/updateImg', async (req, res) => {
   } catch (error) {
     console.error("계정 업데이트 실패", error);
     res.status(500).send({ message: "이미지 업데이트 실패" }); // 클라이언트에 응답 전송
-  }
-});
-
-//이미지 삭제
-app.post('/delete_img', async (req, res) => {
-  const { profilePhoto } = req.body;
-  try {
-      await DeleteImg(profilePhoto);
-      console.log("이미지 삭제 완료");
-      res.status(200).send({ message: "이미지 삭제가 완료되었습니다." }); // 클라이언트에 응답 전송
-  } catch (error) {
-      console.error("이미지 삭제 실패:", error);
-      res.status(500).send({ message: "이미지 삭제 실패" }); // 클라이언트에 응답 전송
   }
 });
 

@@ -20,7 +20,7 @@
 
         const get_user_university = async () => {
             try {
-            const response = await fetch('http://172.16.108.18:3000/get_university_name', {
+            const response = await fetch('http://192.168.35.207:3000/get_university_name', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
@@ -40,7 +40,7 @@
 
         const DeleteUser = async () => {
             try {
-                const response = await fetch('http://172.16.108.18:3000/delete_user', {
+                const response = await fetch('http://192.168.35.207:3000/delete_user', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -68,7 +68,7 @@
 
         const UpdateAccount = async () => {
             try {
-            const response = await fetch('http://172.16.108.18:3000/updateAccount', {
+            const response = await fetch('http://192.168.35.207:3000/updateAccount', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
@@ -104,7 +104,7 @@
 
     const UpdateImg = async() => {
         try {
-            const response = await fetch('http://172.16.108.18:3000/updateImg', {
+            const response = await fetch('http://192.168.35.207:3000/updateImg', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

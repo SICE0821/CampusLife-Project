@@ -26,8 +26,10 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const [isCameraButton, setIsCameraButton] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [lectureList, setLectureList] = useState<Lecture[]>([]);
-  const [modalLectureName, setModalLectureName] = useState<string>('');
+  const [currentWeek, setCurrentWeek] = useState(0);
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
+  const [lastScannedTime, setLastScannedTime] = useState<null | Date>(null);
+  const [isScanned, setIsScanned] = useState(false); // QR 코드가 스캔되었는지 추적
   
 
   const getCurrentDate = () => {
@@ -106,7 +108,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   const fetchLectureData = async () => {
     try {
-      const response = await fetch('http://172.16.108.18:3000/getlecture');
+      const response = await fetch('http://192.168.35.207:3000/getlecture');
       if (!response.ok) {
         throw new Error('서버 응답 실패');
       }
@@ -128,7 +130,18 @@ const AttendanceScreen = ({navigation, route}: any) => {
   };
 
   const openCamera = () => {
-    setIsCameraButton(true);
+    const currentTime = new Date().getTime();
+    if (isScanned && lastScannedTime && (currentTime - new Date(lastScannedTime).getTime()) < 10000) {
+      Alert.alert(
+        '출석 처리됨',
+        '이미 출석 처리가 완료되었습니다. 하루에 한 번만 출석할 수 있습니다.',
+        [{ text: '확인' }],
+        { cancelable: false }
+      );
+    } else {
+      setIsScanned(false);
+      setIsCameraButton(true);
+    }
   };
 
   React.useEffect(() =>{
@@ -148,12 +161,13 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   useEffect(() => {
     if (scannedCode) {
+      setCurrentWeek((prevWeek) => prevWeek + 1);
+      setLastScannedTime(new Date());
+      setIsScanned(true);
       Alert.alert(
         'QR 코드 스캔됨',
         `스캔된 코드: ${scannedCode}`,
-        [
-          { text: '확인', onPress: () => console.log('확인 버튼 눌림') }
-        ],
+        [{ text: '확인', onPress: () => console.log('확인 버튼 눌림') }],
         { cancelable: false }
       );
     }
@@ -236,7 +250,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
                             <Text style={styles.timeText}>{index + 1}차시            {timeRange}</Text>
                           </View>
                           <View style={styles.Box}>
-                            <View style={[styles.realBox, { backgroundColor: "#909090" }]}>
+                            <View style={[styles.realBox, { backgroundColor: weekIndex < currentWeek ? "#00FF00" : "#909090" }]}>
                             </View>
                           </View>
                         </View>
