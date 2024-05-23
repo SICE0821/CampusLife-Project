@@ -13,16 +13,37 @@ const { getGeneralPosts,
         get_event_objcet,
         getBarcordMaxNum,
         PostItem,
-        UpdateItem,
-        DeleteItem,
         get_department_name,
         get_university_name,
         DeleteUser,
         Updateaccount,
+        UpdateItem,
+        DeleteItem,
         UpdateImg,
-                     } = require('./db.js'); // db 파일에서 함수 가져오기
+        get_user_have_posts,
+        add_book_mark,
+        delete_book_mark,
+        get_post_detail,
+        get_department_name, } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function formatDate2(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day}-${hours}-${minutes}`;
+}
 
 
 const pool = mariadb.createPool({
@@ -187,12 +208,14 @@ app.get('/generalpost', async (req, res) => {
     try {
         const rows = await getGeneralPosts();
         const processedData = rows.map(item => ({
-            id: item.post_id,
+            post_id: item.post_id,
             title: item.title,
-            writer: item.user_id,
-            time: item.date,
-            watch: item.view,
-            like: item.like
+            contents: item.contents,
+            date: formatDate(item.date),
+            view: item.view,
+            like: item.like,
+            name: item.name,
+            admin_check: item.admin_check,
         }));
         res.json(processedData);
         console.log("성공적으로 데이터 보냄");
@@ -206,12 +229,14 @@ app.get('/departmentpost', async (req, res) => {
   try {
       const rows = await getDepartmentPosts();
       const processedData = rows.map(item => ({
-          id: item.post_id,
-          title: item.title,
-          writer: item.user_id,
-          time: item.date,
-          watch: item.view,
-          like: item.like
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
       }));
       res.json(processedData);
       console.log("성공적으로 데이터 보냄");
@@ -298,6 +323,13 @@ app.post('/deleteItem', async (req, res) => {
   console.log("성공적으로 값 넣음");
 });
 
+//유저 삭제하기
+app.post('/delete_user', async (req, res) => {
+  const { user_pk } = req.body;
+  DeleteUser(user_pk);
+  console.log("성공적으로 값 넣음");
+});
+
 //학과 이름 가져오기
 app.post('/get_department_name', async (req, res) => {
   const {department_name} = req.body; //데이터 가져올때 무조건 awit
@@ -362,9 +394,73 @@ app.post('/updateImg', async (req, res) => {
     res.status(500).send({ message: "이미지 업데이트 실패" }); // 클라이언트에 응답 전송
   }
 });
+
+//사용자의 현제 책갈피 정보를 가져옴
+app.post('/get_user_have_post', async (req, res) => {
+  const {user_id} = req.body; //데이터 가져올때 무조건 awit
+  //console.log(user_id);
+  const rows = await get_user_have_posts(user_id);
+  const user_have_posts = rows.map(item => ({
+    user_id : item.user_id,
+    post_id : item.post_id
+  }));
+  //console.log(user_have_posts);
+  res.json(user_have_posts);
+  console.log("책갈피 정보를 가져옴");
+});
+
+//책갈피 추가 및 삭제
+app.post('/add_book_mark', async (req, res) => {
+  const {user_id, post_id} = req.body; //데이터 가져올때 무조건 awit
+
+  const result = await add_book_mark(user_id, post_id);
+  if(result == true) {
+    console.log("추가완료");
+  }else if(result == false) {
+    const result = await delete_book_mark(user_id, post_id);;
+    console.log("삭제됨");
+  }
+});
+
+//포스트 디테일 페이지 정보 불러오기
+app.post('/get_post_detail', async (req, res) => {
+  const {post_id} = req.body; //데이터 가져올때 무조건 awit
+  const row = await get_post_detail(post_id);
+
+  const userData = {
+    post_writer: row[0].student_name,
+    writer_department: row[0].department_name,
+    write_date: formatDate2(row[0].date),
+    title: row[0].title,
+    contents : row[0].contents,
+    like : row[0].like,
+    view: row[0].view,
+    writer_propile: row[0].profilePhoto,
+  };
+  res.json(userData);
+
+});
+
+//포스트 댓글 리스트 불러오기
+app.post('/get_comment', async (req, res) => {
+  const {post_ida} = req.body; //데이터 가져올때 무조건 awit
+  const rows = await getComment(post_ida);
+      const commentdata = rows.map(item => ({
+          comment_id : item.comment_id,
+          content : item.contents,
+          date : item.date,
+          like : item.like,
+          student_name : item.student_name,
+          department_name : item.department_name,
+          user_id : item.user_id,
+          post_id : item.post_id
+      }));
+      res.json(commentdata);
+      console.log("성공적으로 댓글 데이터 보냄");
+});
+
   
 //서버 시작
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}/`);
 });
-

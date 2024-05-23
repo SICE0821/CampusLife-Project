@@ -135,17 +135,6 @@ const AcademicInfoScreen = () => {
 
     return (
         <View style={styles.container}>
-            <View style = {styles.textView}>
-                <TouchableOpacity>
-                    <Text style = {{fontSize: 25, fontWeight: "bold", marginLeft: 30,}}>학점</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Text style = {{fontSize: 25, fontWeight: "bold", marginLeft: 20,}}>수강신청이력</Text>
-                </TouchableOpacity>
-                <TouchableOpacity>
-                    <Icon style = {{marginLeft: 190}} name="calculator" size={32} color="black"></Icon>
-                </TouchableOpacity>
-            </View>
             <View style={{borderBottomWidth: 2, marginTop: 5, borderColor: "black"}}></View>
             <ScrollView>
                 {/* 학점 Circle 데이터 영역 */}
@@ -307,7 +296,7 @@ const AcademicInfoScreen = () => {
                 {!detailCreditAreaVisible11 && (
                     <View style={styles.detail_credit_area}>
                         <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: "tableBorderColor" }}>
+                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
                                 <Row
                                     data={tableHead}
                                     style={{ height: 30, backgroundColor: "#dddddd" }}
@@ -336,7 +325,7 @@ const AcademicInfoScreen = () => {
                 {!detailCreditAreaVisible12 && (
                     <View style={styles.detail_credit_area}>
                         <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: "tableBorderColor" }}>
+                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
                                 <Row
                                     data={tableHead}
                                     style={{ height: 30, backgroundColor: "#dddddd" }}
@@ -365,7 +354,7 @@ const AcademicInfoScreen = () => {
                 {!detailCreditAreaVisible21 && (
                     <View style={styles.detail_credit_area}>
                         <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: "tableBorderColor" }}>
+                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
                                 <Row
                                     data={tableHead}
                                     style={{ height: 30, backgroundColor: "#dddddd" }}
@@ -394,7 +383,7 @@ const AcademicInfoScreen = () => {
                 {!detailCreditAreaVisible22 && (
                     <View style={styles.detail_credit_area}>
                         <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: "tableBorderColor" }}>
+                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
                                 <Row
                                     data={tableHead}
                                     style={{ height: 30, backgroundColor: "#dddddd" }}
@@ -423,7 +412,7 @@ const AcademicInfoScreen = () => {
                 {!detailCreditAreaVisible31 && (
                     <View style={styles.detail_credit_area}>
                         <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: "tableBorderColor" }}>
+                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
                                 <Row
                                     data={tableHead}
                                     style={{ height: 30, backgroundColor: "#dddddd" }}
@@ -452,7 +441,7 @@ const AcademicInfoScreen = () => {
                 {!detailCreditAreaVisible32 && (
                     <View style={styles.detail_credit_area}>
                         <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: "tableBorderColor" }}>
+                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
                                 <Row
                                     data={tableHead}
                                     style={{ height: 30, backgroundColor: "#dddddd" }}
@@ -483,12 +472,6 @@ const styles = StyleSheet.create({
     container: { // 전체 뷰
         flex: 1,
         backgroundColor: 'white',
-    },
-    textView: { // 전체 뷰
-        flexDirection: "row",
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        marginTop: 20
     },
     circleArea: { // 학점 정보 circle 영역
         marginTop: 10,

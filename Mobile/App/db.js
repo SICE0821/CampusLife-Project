@@ -16,7 +16,20 @@ async function getGeneralPosts() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query('SELECT post_id, user_id, title, contents, date, view, `like` FROM post WHERE department_check = 0 AND inform_check = 0');
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " 
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 0 AND post.inform_check =0 "
+            + "ORDER BY post.date DESC"
+        );
         return rows;
     } catch (err) {
         throw err;
@@ -30,7 +43,20 @@ async function getDepartmentPosts() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query('SELECT post_id, user_id, title, contents, date, view, `like` FROM post WHERE department_check = 1 AND inform_check = 0');
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " 
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 1 AND post.inform_check =0 "
+            + "ORDER BY post.date DESC"
+        );
         return rows;
     } catch (err) {
         throw err;
@@ -252,6 +278,24 @@ async function DeleteItem(name, deltenum) {
     }
 }
 
+//유저삭제
+async function DeleteUser(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "DELETE FROM user "
+                     + "WHERE user_id = ?"
+        const result = await conn.query(query, [user_pk]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+//학과 이름가져오기
 async function get_department_name(department_name) {
     let conn;
     try {
