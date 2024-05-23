@@ -13,7 +13,6 @@ const { getGeneralPosts,
         get_event_objcet,
         getBarcordMaxNum,
         PostItem,
-        get_department_name,
         get_university_name,
         DeleteUser,
         Updateaccount,
@@ -46,7 +45,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.75',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',

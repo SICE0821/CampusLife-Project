@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '172.16.106.75',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -295,6 +295,7 @@ async function DeleteUser(user_pk) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
 //학과 이름가져오기
 async function get_department_name(department_name) {
     let conn;
@@ -314,6 +315,7 @@ async function get_department_name(department_name) {
 
 async function get_university_name(university_name) {
     let conn;
+
     try {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
