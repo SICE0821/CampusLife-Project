@@ -20,14 +20,13 @@ const { getGeneralPosts,
         DeleteUser,
         Updateaccount,
         UpdateImg,
-        DeleteImg,
                      } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.75',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -361,19 +360,6 @@ app.post('/updateImg', async (req, res) => {
   } catch (error) {
     console.error("계정 업데이트 실패", error);
     res.status(500).send({ message: "이미지 업데이트 실패" }); // 클라이언트에 응답 전송
-  }
-});
-
-//이미지 삭제
-app.post('/delete_img', async (req, res) => {
-  const { profilePhoto } = req.body;
-  try {
-      await DeleteImg(profilePhoto);
-      console.log("이미지 삭제 완료");
-      res.status(200).send({ message: "이미지 삭제가 완료되었습니다." }); // 클라이언트에 응답 전송
-  } catch (error) {
-      console.error("이미지 삭제 실패:", error);
-      res.status(500).send({ message: "이미지 삭제 실패" }); // 클라이언트에 응답 전송
   }
 });
   

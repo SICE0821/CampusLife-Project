@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '172.16.106.75',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -338,24 +338,6 @@ async function UpdateImg(profilePhoto, user_id) {
     }
 }
 
-//이미지 경로 삭제
-async function DeleteImg(profilePhoto) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        // 데이터 업데이트 쿼리 작성
-        const query = "DELETE FROM user "
-                     + "WHERE profilePhoto = ? "
-        const result = await conn.query(query, [profilePhoto]);
-        // 쿼리 실행
-        console.log('Data updated successfully:', result);
-    } catch (err) {
-        console.error('Error updating data:', err);
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
-
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -377,6 +359,4 @@ module.exports = {
     DeleteUser,
     Updateaccount,
     UpdateImg,
-    DeleteImg,
-    //getstudentInfo
 };
