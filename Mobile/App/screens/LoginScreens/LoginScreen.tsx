@@ -44,6 +44,7 @@ function LoginScreen({ navigation }: any) {
 
 
   const handleLogin = async () => {
+
     try {
       const response = await fetch('http://172.16.108.18:3000/login', {
         method: 'POST',

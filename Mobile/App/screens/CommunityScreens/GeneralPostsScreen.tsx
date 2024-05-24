@@ -37,7 +37,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     const swipeableRef = useRef<Swipeable>(null);
     const [swipeableRefs, setSwipeableRefs] = useState<Array<Swipeable>>([]);
     const [refreshing, setRefreshing] = useState(false);
-    
+
     const onRefresh = async () => {
         setRefreshing(true);
         await AreYouHavePost();
@@ -47,7 +47,9 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     
     const Addbookmark = async (user_pk : any, post_pk : any) => {
         try {
-            const response = await fetch('http://172.16.108.18:3000/add_book_mark', {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const response = await fetch('http://172.16.117.211:3000/add_book_mark', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,8 +57,15 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                 body: JSON.stringify({
                     user_id: user_pk,
                     post_id: post_pk,
-                })
+                }),
+                signal: controller.signal
             })
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const result= await response.json();
         } catch (error) {
             console.error('유저 학과 이름 가져오기 실패:', error);
@@ -69,7 +78,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         <TouchableOpacity
             onPress={() => {
                 Addbookmark(userData.user_pk, item.post_id);
-                onRefresh();
+                //onRefresh();
                }}
             style={{
                 backgroundColor: '#FFDFC1',
@@ -107,19 +116,35 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
 
     const AreYouHavePost = async () => {
         try {
-            const response = await fetch('http://172.16.108.18:3000/get_user_have_post', {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const response = await fetch('http://172.16.117.211:3000/get_user_have_post', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     user_id: userData.user_pk
-                })
+                }),
+                signal: controller.signal
             })
             const user_have_posts = await response.json();
+            console.log('북마크 가져오기 성공:', user_have_posts);
             setUserHavePost(user_have_posts);
-        } catch (error) {
-            console.error('유저 학과 이름 가져오기 실패:', error);
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } catch (error : any) {
+            console.error('북마크 가져오기 실패:', error);
+
+        if (error.name === 'AbortError') {
+            console.error('요청이 타임아웃되었습니다.');
+        } else {
+            console.error('기타 오류:', error);
+        }
         }
     }
 
@@ -187,7 +212,6 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
             //keyExtractor={(item) => item.id}
             />
         </View>
-
     );
 };
 
