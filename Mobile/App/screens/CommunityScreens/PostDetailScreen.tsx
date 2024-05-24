@@ -36,7 +36,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     //포스터에 대한 정보
     const DeatilPost = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/get_post_detail', {
+            const response = await fetch('http://172.16.108.18:3000/get_post_detail', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     //댓글 리스트 가져오기
     const CommentList = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/get_comment', {
+            const response = await fetch('http://172.16.108.18:3000/get_comment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     //댓글 리스트 가져오기
     const reCommentList = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/get_recomment', {
+            const response = await fetch('http://172.16.108.18:3000/get_recomment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

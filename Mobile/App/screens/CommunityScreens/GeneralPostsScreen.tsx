@@ -47,7 +47,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     
     const Addbookmark = async (user_pk : any, post_pk : any) => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/add_book_mark', {
+            const response = await fetch('http://172.16.108.18:3000/add_book_mark', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     )};
     const getGeneralposts = async () => {
         try {
-            const response = await fetch('http://192.168.35.207:3000/generalpost');
+            const response = await fetch('http://172.16.108.18:3000/generalpost');
             const postsdata = await response.json();
             console.log(postsdata);
             setCommunityData(postsdata);
@@ -97,7 +97,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
 
     const getDepartmentposts = async () => {
         try {
-            const response = await fetch('http://192.168.35.207:3000/departmentpost');
+            const response = await fetch('http://172.16.108.18:3000/departmentpost');
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {
@@ -107,7 +107,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
 
     const AreYouHavePost = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/get_user_have_post', {
+            const response = await fetch('http://172.16.108.18:3000/get_user_have_post', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

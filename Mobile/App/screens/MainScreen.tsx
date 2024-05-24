@@ -68,7 +68,7 @@ const MainPage = ({navigation ,route} : any) => {
   
   const get_user_department = async () => {
     try {
-      const response = await fetch('http://192.168.35.207:3000/get_department_name', {
+      const response = await fetch('http://172.16.108.18:3000/get_department_name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,13 +81,13 @@ const MainPage = ({navigation ,route} : any) => {
       const userDepartment = userdepartment.userdepartment; //키값을 치면 값을 json에서 추출할 수 있다.
       setUserDepartment(userDepartment);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
+      console.error('유저 학과 이름 가져오기 실패asd:', error);
     }
   }
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://192.168.35.207:3000/MainPageSchoolPost');
+        const response = await fetch('http://172.16.108.18:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -101,7 +101,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://192.168.35.207:3000/MainPagedepartmentPost');
+        const response = await fetch('http://172.16.108.18:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -115,7 +115,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://192.168.35.207:3000/MainPagehotPost');
+        const response = await fetch('http://172.16.108.18:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
