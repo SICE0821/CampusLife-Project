@@ -37,6 +37,7 @@ const AlarmDialogScreen = () => {
       [
         { text: '취소', style: 'cancel' },
         { text: '삭제', onPress: () => deleteItem(index) },
+        
       ],
       { cancelable: true }
     );
