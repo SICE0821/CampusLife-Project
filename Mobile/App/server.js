@@ -44,7 +44,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '172.16.106.70',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -74,6 +74,8 @@ app.get('/MainPagehotPost', async (req, res) => {
 
 //메인페이지에 학과 게시글 데이터를 가져온다.
 app.get('/MainPagedepartmentPost', async (req, res) => {
+
+  
     try {
        // console.log("학과 페이지로 http로 잘 전송됨")
         const rows = await getdeparmentpostdata();

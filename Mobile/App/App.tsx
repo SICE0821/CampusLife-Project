@@ -10,7 +10,9 @@ function App(): React.JSX.Element {
 
   return (
      <NavigationContainer>
-        <RootStackNavigator></RootStackNavigator>
+        <RootStackNavigator>
+
+        </RootStackNavigator>
      </NavigationContainer>
   );
 }
