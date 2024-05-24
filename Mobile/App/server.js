@@ -13,15 +13,17 @@ const { getGeneralPosts,
         get_event_objcet,
         getBarcordMaxNum,
         PostItem,
+        get_university_name,
+        DeleteUser,
+        Updateaccount,
         UpdateItem,
         DeleteItem,
-        get_department_name,
-        DeleteUser,
+        UpdateImg,
         get_user_have_posts,
         add_book_mark,
         delete_book_mark,
         get_post_detail,
-        getComment } = require('./db.js'); // db 파일에서 함수 가져오기
+        get_department_name, } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -44,13 +46,21 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
   connectionLimit: 5,
   database: 'campuslife',
 });
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 
 //메인페이지에 핫 게시글 데이터를 가져온다.
@@ -146,7 +156,7 @@ app.post('/get_user_data', async(req, res) => {
     department_pk: rows[0].department_id,
     email: rows[0].email,
     grade: rows[0].grade,
-    birth: rows[0].birth,
+    birth: formatDate(rows[0].birth),
     point: rows[0].point,
     currentstatus: rows[0].currentstatus,
   };
@@ -329,6 +339,59 @@ app.post('/get_department_name', async (req, res) => {
   res.json(Department);
   
   console.log("학과 PK성공적으로 넣음");
+});
+
+//학교 이름 가져오기
+app.post('/get_university_name', async (req, res) => {
+  const {university_name} = req.body; //데이터 가져올때 무조건 awit
+  const rows = await get_university_name(university_name);
+  const University = {
+    useruniversity: rows[0].name
+  };
+  res.json(University);
+  
+  console.log("학교 PK성공적으로 넣음");
+});
+
+//계정 삭제
+app.post('/delete_user', async (req, res) => {
+  const { user_pk } = req.body;
+  try {
+      await DeleteUser(user_pk);
+      console.log("계정 삭제 완료");
+      res.status(200).send({ message: "계정 삭제가 완료되었습니다." }); // 클라이언트에 응답 전송
+  } catch (error) {
+      console.error("계정 삭제 실패:", error);
+      res.status(500).send({ message: "계정 삭제 실패" }); // 클라이언트에 응답 전송
+  }
+});
+
+//계정 업데이트
+app.post('/updateAccount', async (req, res) => {
+  const { email, grade, currentstatus, student_id } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    Updateaccount(email, grade, currentstatus, student_id);
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "계정 업데이트가 완료되었습니다." }); // 클라이언트에 응답 전송
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "계정 업데이트 실패" }); // 클라이언트에 응답 전송
+  }
+});
+
+//이미지 업데이트
+app.post('/updateImg', async (req, res) => {
+  const { profilePhoto, user_id } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    UpdateImg(profilePhoto, user_id);
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "이미지 업데이트가 완료되었습니다." }); // 클라이언트에 응답 전송
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "이미지 업데이트 실패" }); // 클라이언트에 응답 전송
+  }
 });
 
 //사용자의 현제 책갈피 정보를 가져옴

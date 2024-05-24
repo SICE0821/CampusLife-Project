@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '172.16.106.75',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -295,6 +295,7 @@ async function DeleteUser(user_pk) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
 //학과 이름가져오기
 async function get_department_name(department_name) {
     let conn;
@@ -312,6 +313,95 @@ async function get_department_name(department_name) {
     }
 }
 
+async function get_university_name(university_name) {
+    let conn;
+
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "SELECT campus.name FROM campus WHERE campus_id = ?"
+        const result = await conn.query(query, [university_name]);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//계정 삭제하기
+async function DeleteUser(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "DELETE FROM user "
+                     + "WHERE user_id = ?"
+        const result = await conn.query(query, [user_pk]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+        alert(data.message);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
+//계정 업데이트
+async function Updateaccount(email, grade, currentstatus, student_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "UPDATE student SET" 
+                        + " email = ?, grade = ?, currentstatus = ? WHERE student_id = ?"
+        const result = await conn.query(query, [email, grade, currentstatus, student_id]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//이미지 경로 수정
+async function UpdateImg(profilePhoto, user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "UPDATE user SET profilePhoto = ? WHERE user_id = ?"
+        const result = await conn.query(query, [profilePhoto, user_id]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//이미지 경로 삭제
+async function DeleteImg(profilePhoto) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "DELETE FROM user "
+                     + "WHERE profilePhoto = ? "
+        const result = await conn.query(query, [profilePhoto]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
 //유저가 소유한 포스터 가져오기
 async function get_user_have_posts(user_pk) {
     let conn;
@@ -421,7 +511,6 @@ async function getComment(post_ida) {
 }
 
 
-
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -438,10 +527,15 @@ module.exports = {
     UpdateItem,
     DeleteItem,
     get_department_name,
+    get_university_name,
     DeleteUser,
+    Updateaccount,
+    UpdateImg,
+    DeleteImg,
     get_user_have_posts,
     add_book_mark,
     delete_book_mark,
     get_post_detail,
-    getComment
+    getComment,
+    //getstudentInfo
 };
