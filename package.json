@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@anatolyk/react-native-week-view": "^1.0.8",
+    "@howljs/calendar-kit": "^1.13.2",
+    "react-native-big-calendar": "^4.12.0"
+  }
+}
