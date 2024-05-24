@@ -23,7 +23,8 @@ const { getGeneralPosts,
         add_book_mark,
         delete_book_mark,
         get_post_detail,
-        get_department_name, } = require('./db.js'); // db 파일에서 함수 가져오기
+        get_department_name,
+        getComment } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -46,7 +47,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '172.16.106.173',
   port: 3306,
   user: 'root',
   password: '1214',
