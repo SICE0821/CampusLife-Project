@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Image,
@@ -20,7 +20,7 @@ function LoginScreen({ navigation }: any) {
 
   const get_user_data = async () => {
     try {
-      const response = await fetch('http://172.16.117.122:3000/get_user_data', {
+      const response = await fetch('http://192.168.35.207:3000/get_user_data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ function LoginScreen({ navigation }: any) {
   const handleLogin = async () => {
 
     try {
-      const response = await fetch('http://172.16.117.122:3000/login', {
+      const response = await fetch('http://192.168.35.207:3000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,6 +68,7 @@ function LoginScreen({ navigation }: any) {
     }
 
   };
+
 
   const navigateToRegister = () => {
     navigation.navigate('RegisterPage');

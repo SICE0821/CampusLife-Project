@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ScrollView,
@@ -21,6 +21,7 @@ import IconE from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Fontisto';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
+import IconI from 'react-native-vector-icons/FontAwesome5';
 
 const attendancepng = require('../assets/handup.jpg');
 const friendsinvitepng = require('../assets/friend3.jpg');
@@ -67,7 +68,7 @@ const MainPage = ({navigation ,route} : any) => {
   
   const get_user_department = async () => {
     try {
-      const response = await fetch('http://172.16.117.122:3000/get_department_name', {
+      const response = await fetch('http://192.168.35.207:3000/get_department_name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ const MainPage = ({navigation ,route} : any) => {
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.122:3000/MainPageSchoolPost');
+        const response = await fetch('http://192.168.35.207:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -100,7 +101,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.122:3000/MainPagedepartmentPost');
+        const response = await fetch('http://192.168.35.207:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -114,7 +115,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.122:3000/MainPagehotPost');
+        const response = await fetch('http://192.168.35.207:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -130,11 +131,12 @@ const MainPage = ({navigation ,route} : any) => {
     }
 
     const StudentInfo = async () => {
-      navigation.navigate('StudentInfoNavigator', {userdata});
+      console.log(userData);
+      navigation.navigate('StudentInfoNavigator', {userData, Userdepartment});
     }
 
     const AcademicInfo = async () =>{
-      navigation.navigate('AcademicInfoNavigator', {userdata});
+      navigation.navigate('AcademicInfoNavigator', {userData});
     }
     useFocusEffect(
       React.useCallback(() => {
@@ -143,8 +145,12 @@ const MainPage = ({navigation ,route} : any) => {
         fetchhotpostData();
         settingUserData();
         get_user_department();
-      }, [])
-    );
+        if (navigation.getState().routes[navigation.getState().index].params?.updatedUserData) {
+          const updatedUserData = navigation.getState().routes[navigation.getState().index].params.updatedUserData;
+          setUserData(updatedUserData);
+      }
+      }, [navigation])
+    )
   return (
     <View style = {styles.container}>
       <ScrollView>
@@ -153,7 +159,14 @@ const MainPage = ({navigation ,route} : any) => {
               <View style = {styles.cardtop}>
                 <View style = {styles.profile}>
                   <View style = {styles.profilePicture}>
-                    <Image source={{ uri: userData.profile_photo }} style={{width : 85, height : 85, borderRadius : 50,}} resizeMode="contain"/>
+                  {userData.profile_photo ? (
+                    <Image
+                      source={{ uri: userData.profile_photo }}
+                      style={{ width: 85, height: 85, borderRadius: 50 }}
+                    />
+                  ) : (
+                    <IconI name="user" size={40} color="black" style={{width: 85, height: 85, borderRadius: 50, marginLeft : 50, marginTop : 40,}}/>
+                  )}
                   </View>
                 </View>
                 <View style = {styles.info}>
@@ -488,7 +501,8 @@ const styles = StyleSheet.create({
     justifyContent : 'center',
     alignItems : 'center',
     borderWidth : 1,
-    borderColor: 'lightgray'
+    borderColor: 'lightgray',
+    
   },
 
   info : {

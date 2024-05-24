@@ -4,6 +4,7 @@ import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-cam
 
 const FullScreenCamera = ({navigation}: any) => {
   const [isCameraActive, setIsCameraActive] = useState(true);
+  const [isScanning, setIsScanning] = useState(true);
   const device = useCameraDevice('back'); // 후면 카메라를 사용하도록 가정합니다.
 
   const codeScanner = useCodeScanner({
