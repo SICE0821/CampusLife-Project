@@ -3,11 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-<<<<<<< HEAD
     host: '172.16.106.173',
-=======
-    host: '127.0.0.1',
->>>>>>> dev
     port: 3306,
     user: 'yuhwan',
     password: '0000',
