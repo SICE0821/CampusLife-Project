@@ -1,7 +1,11 @@
 {
   "dependencies": {
+<<<<<<< HEAD
+    "deprecated-react-native-prop-types": "^5.0.0"
+=======
     "@anatolyk/react-native-week-view": "^1.0.8",
     "@howljs/calendar-kit": "^1.13.2",
     "react-native-big-calendar": "^4.12.0"
+>>>>>>> 384b622737aac6bcb2f2988e26c870c55e245739
   }
 }

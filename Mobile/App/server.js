@@ -13,6 +13,7 @@ const { getGeneralPosts,
         get_event_objcet,
         getBarcordMaxNum,
         PostItem,
+        get_department_name,
         get_university_name,
         DeleteUser,
         Updateaccount,
@@ -23,8 +24,7 @@ const { getGeneralPosts,
         add_book_mark,
         delete_book_mark,
         get_post_detail,
-        get_department_name,
-        getComment } = require('./db.js'); // db 파일에서 함수 가져오기
+        getComment, } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -54,14 +54,6 @@ const pool = mariadb.createPool({
   connectionLimit: 5,
   database: 'campuslife',
 });
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
 
 
 //메인페이지에 핫 게시글 데이터를 가져온다.

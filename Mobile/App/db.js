@@ -537,5 +537,4 @@ module.exports = {
     delete_book_mark,
     get_post_detail,
     getComment,
-    //getstudentInfo
 };

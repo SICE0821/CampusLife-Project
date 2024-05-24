@@ -81,7 +81,7 @@ const MainPage = ({navigation ,route} : any) => {
       const userDepartment = userdepartment.userdepartment; //키값을 치면 값을 json에서 추출할 수 있다.
       setUserDepartment(userDepartment);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
+      console.error('유저 학과 이름 가져오기 실패asd:', error);
     }
   }
 

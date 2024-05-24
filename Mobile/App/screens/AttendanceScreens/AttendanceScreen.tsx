@@ -108,7 +108,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   const fetchLectureData = async () => {
     try {
-      const response = await fetch('http://192.168.35.207:3000/getlecture');
+      const response = await fetch('http://172.16.108.18:3000/getlecture');
       if (!response.ok) {
         throw new Error('서버 응답 실패');
       }

@@ -45,9 +45,9 @@ const widthArrs = [width * 0.2, width * 0.4, width * 0.4];
 const tableBorderColor = 'gray';
 
 const SchoolInfoScreen = () => {
-  const [visibleBuildings, setVisibleBuildings] = useState({});
+    const [visibleBuildings, setVisibleBuildings] = useState<{ [key: string]: boolean }>({});
 
-  const toggleInfoDataVisibility = (buildingName) => {
+  const toggleInfoDataVisibility = (buildingName : string) => {
     setVisibleBuildings((prev) => ({
       ...prev,
       [buildingName]: !prev[buildingName],
