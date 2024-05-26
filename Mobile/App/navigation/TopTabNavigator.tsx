@@ -243,7 +243,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
             <CommunityTopBottomTab.Screen name='책갈피'
                 component={BookmarkScreen}
-                initialParams={{ department_check: department_check }}
+                initialParams={{ department_check, userdata }}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,

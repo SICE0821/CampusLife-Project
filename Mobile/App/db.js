@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '14.6.152.64',
+    host: '172.16.106.173',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -295,6 +295,7 @@ async function DeleteUser(user_pk) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
 //학과 이름가져오기
 async function get_department_name(department_name) {
     let conn;
@@ -314,6 +315,7 @@ async function get_department_name(department_name) {
 
 async function get_university_name(university_name) {
     let conn;
+
     try {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
@@ -346,6 +348,7 @@ async function DeleteUser(user_pk) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
 
 //계정 업데이트
 async function Updateaccount(email, grade, currentstatus, student_id) {
@@ -382,6 +385,131 @@ async function UpdateImg(profilePhoto, user_id) {
     }
 }
 
+//이미지 경로 삭제
+async function DeleteImg(profilePhoto) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = "DELETE FROM user "
+                     + "WHERE profilePhoto = ? "
+        const result = await conn.query(query, [profilePhoto]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+//유저가 소유한 포스터 가져오기
+async function get_user_have_posts(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "SELECT * FROM user_have_post WHERE user_id = ?"
+        const result = await conn.query(query, [user_pk]);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//책갈피 추가하기
+async function add_book_mark(user_id, post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "INSERT INTO user_have_post (user_id, post_id) VALUES (?, ?)"
+        const result = await conn.query(query, [user_id, post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//책갈피 삭제하기
+async function delete_book_mark(user_id, post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM user_have_post WHERE user_id = ? AND post_id = ?"
+        const result = await conn.query(query, [user_id, post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//디테일 포스트의 정보를 서버에서 가져오는 함수
+async function get_post_detail(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const rows = await conn.query("SELECT "
+            +"student.name AS student_name, department.name AS department_name,"
+            +"post.date, post.title,"
+            +"post.`contents`, post.`like`,"
+            +"post.`view`, user.profilePhoto "
+            +"FROM "
+            +"student "
+            +"LEFT JOIN "
+            +"user ON student.student_id = user.student_id "
+            +"LEFT JOIN "
+            +"department ON department.department_id = student.department_id "
+            +"LEFT JOIN post ON post.user_id = user.user_id "
+            +"WHERE post.post_id = ?", post_id)
+        //console.log(rows);
+        return rows;
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//댓글 리스트 가져오기
+async function getComment(post_ida) {
+    console.log(post_ida);
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const query = `
+            SELECT 
+                comment.comment_id, comment.contents, comment.date, comment.\`like\`,
+                student.name AS student_name, department.name AS department_name, 
+                user.id, post.post_id
+            FROM 
+                user
+                LEFT JOIN student ON user.student_id = student.student_id
+                LEFT JOIN department ON student.department_id = department.department_id
+                LEFT JOIN comment ON comment.user_id = user.user_id
+                LEFT JOIN post ON comment.post_id = post.post_id
+            WHERE 
+                post.post_id = ?`;
+
+        const rows = await conn.query(query, [post_ida]);
+        //console.log(rows);
+        return rows;
+        
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -403,4 +531,10 @@ module.exports = {
     DeleteUser,
     Updateaccount,
     UpdateImg,
+    DeleteImg,
+    get_user_have_posts,
+    add_book_mark,
+    delete_book_mark,
+    get_post_detail,
+    getComment,
 };

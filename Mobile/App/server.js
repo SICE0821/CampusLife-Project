@@ -24,7 +24,7 @@ const { getGeneralPosts,
         add_book_mark,
         delete_book_mark,
         get_post_detail,
-        get_department_name, } = require('./db.js'); // db 파일에서 함수 가져오기
+        getComment, } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -47,21 +47,13 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '172.16.106.173',
   port: 3306,
   user: 'root',
   password: '1214',
   connectionLimit: 5,
   database: 'campuslife',
 });
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
 
 
 //메인페이지에 핫 게시글 데이터를 가져온다.
@@ -85,6 +77,8 @@ app.get('/MainPagehotPost', async (req, res) => {
 
 //메인페이지에 학과 게시글 데이터를 가져온다.
 app.get('/MainPagedepartmentPost', async (req, res) => {
+
+  
     try {
        // console.log("학과 페이지로 http로 잘 전송됨")
         const rows = await getdeparmentpostdata();
