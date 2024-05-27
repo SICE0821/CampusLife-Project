@@ -90,7 +90,6 @@ const SchoolInfoScreen = () => {
           </View>
         ))}
       </ScrollView>
-      <View style={styles.bottomArea}></View>
     </View>
   );
 };
