@@ -59,7 +59,6 @@ const TimetableRow = ({ time, courses, days }: { time: string; courses: Course[]
 
 const App = () => {
   const [selectedGradeAndSemester, setSelectedGradeAndSemester] = useState('1학년 1학기');
-
   const days = ['월', '화', '수', '목', '금'];
   const times = Array.from({ length: 10 }, (_, i) => `${i + 9}:00`);
 
@@ -135,7 +134,7 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
   pickerContainer: {
     flexDirection: 'row',
