@@ -129,6 +129,7 @@
             includeExif: true,
           });
           const profile_photo = res.map(image => image.path);
+          console.log(profile_photo);
           setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: profile_photo[0] })); // 첫 번째 사진 경로로 업데이트
           // 여기서 UpdateImg 함수를 호출하여 변경된 userdata를 서버에 업데이트할 수 있습니다.
         } catch (error) {

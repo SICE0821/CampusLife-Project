@@ -32,10 +32,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     const [communityData, setCommunityData] = useState<PostData[]>([]);
     const [userData, setUserData] = useState<UserData>(userdata);
     const [userHavePost, setUserHavePost] = useState<any[]>([]);
-    const [scrollPosition, setScrollPosition] = useState(0);
     const [isSwipeableOpen, setIsSwipeableOpen] = useState(false);
-    const swipeableRef = useRef<Swipeable>(null);
-    const [swipeableRefs, setSwipeableRefs] = useState<Array<Swipeable>>([]);
     const [refreshing, setRefreshing] = useState(false);
 
     const onRefresh = async () => {
@@ -45,11 +42,11 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
       };
     
     
-    const Addbookmark = async (user_pk : any, post_pk : any) => {
+      const Addbookmark = async (user_pk : number, post_pk : number) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://172.16.117.211:3000/add_book_mark', {
+            const response = await fetch('http://175.212.187.92:3000/add_book_mark', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -59,27 +56,90 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                     post_id: post_pk,
                 }),
                 signal: controller.signal
-            })
+            });
             clearTimeout(timeoutId);
-
+    
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
+    
+            const result = await response.json();
 
-            const result= await response.json();
-        } catch (error) {
-            console.error('유저 학과 이름 가져오기 실패:', error);
+            if (result.message === "북마크 추가 완료") {
+                console.log('북마크가 성공적으로 추가되었습니다.');
+            }else {
+                console.log('알 수 없는 응답:', result);
+            }
+        } catch (error : any) {
+            if (error.name === 'AbortError') {
+                console.error('요청이 타임아웃되었습니다.');
+            } else {
+                console.error('북마크 추가 요청 실패:', error);
+            }
         }
-    }
+    };
+
+    const RemoveBookmark = async (user_pk : number, post_pk : number) => {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const response = await fetch('http://175.212.187.92:3000/add_book_mark', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user_pk,
+                    post_id: post_pk,
+                }),
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const result = await response.json();
+
+            if (result.message === "북마크 추가 완료") {
+                console.log('북마크가 성공적으로 추가되었습니다.');
+            }else {
+                console.log('알 수 없는 응답:', result);
+            }
+        } catch (error : any) {
+            if (error.name === 'AbortError') {
+                console.error('요청이 타임아웃되었습니다.');
+            } else {
+                console.error('북마크 추가 요청 실패:', error);
+            }
+        }
+    };
+
+    const handleBookmark = async (item: PostData) => {
+        try {
+          if (userHavePost.some(posts => item.post_id === posts.post_id)) {
+            // 이미 북마크에 있는 경우, 북마크를 삭제합니다.
+            await RemoveBookmark(userData.user_pk, item.post_id);
+            // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
+            setUserHavePost((prev) => prev.filter(post => post.post_id !== item.post_id));
+          } else {
+            // 북마크에 없는 경우, 북마크를 추가합니다.
+            await Addbookmark(userData.user_pk, item.post_id);
+            // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
+            setUserHavePost((prev) => [...prev, item]);
+          }
+        } catch (error) {
+          // 오류 처리
+          console.error("Bookmark 처리 실패:", error);
+        }
+      };
 
     const renderRightActions = (item: PostData) => {
         return(
         // 왼쪽으로 스와이프할 때 나타날 컴포넌트
         <TouchableOpacity
-            onPress={() => {
-                Addbookmark(userData.user_pk, item.post_id);
-                //onRefresh();
-               }}
+            onPress={() => handleBookmark(item)}
             style={{
                 backgroundColor: '#FFDFC1',
                 justifyContent: 'center',
@@ -94,19 +154,29 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         </TouchableOpacity>
     )};
     const getGeneralposts = async () => {
+        const controller = new AbortController(); // AbortController 인스턴스 생성
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후 요청을 중단하기 위한 setTimeout 설정
+    
         try {
-            const response = await fetch('http://172.16.108.18:3000/generalpost');
+            const response = await fetch('http://175.212.187.92:3000/generalpost', {
+                signal: controller.signal // fetch 요청에 signal 옵션 추가
+            });
+            if (!response.ok) { // 응답 상태 확인
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const postsdata = await response.json();
-            console.log(postsdata);
+            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
-            console.error(error)
+            console.error(error);
+        } finally {
+            clearTimeout(timeoutId); // 요청이 완료되면 setTimeout을 취소
         }
     }
-
+    
     const getDepartmentposts = async () => {
         try {
-            const response = await fetch('http://172.16.108.18:3000/departmentpost');
+            const response = await fetch('http://175.212.187.92:3000/departmentpost');
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {
@@ -118,7 +188,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://172.16.117.211:3000/get_user_have_post', {
+            const response = await fetch('http://175.212.187.92:3000/get_user_have_post', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

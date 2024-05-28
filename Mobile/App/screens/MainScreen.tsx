@@ -59,16 +59,39 @@ const MainPage = ({navigation ,route} : any) => {
       mediaType: 'photo',
       includeBase64: true,
       includeExif: true,
-      }).then(res => {
-        const imagePaths = res.map(image => image.path);
-        console.log(imagePaths);
-        setimagepath(imagePaths[0]);
+    }).then(res => {
+      const formData = new FormData();
+      res.forEach(image => {
+        formData.append('images', {
+          uri: image.path,
+          type: 'image/jpeg',
+          name: `${Date.now()}_${image.filename || userData.user_pk}`,
+        });
+      });
+      uploadImages(formData);
     });
+  };
+
+  const uploadImages = async (formData : FormData)  => {
+    try {
+      const response = await fetch('http://175.212.187.92:3000/upload', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (response.ok) {
+        console.log('Images uploaded successfully');
+      } else {
+        console.error('Error uploading images');
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error);
+    }
   };
   
   const get_user_department = async () => {
     try {
-      const response = await fetch('http://172.16.106.173:3000/get_department_name', {
+      const response = await fetch('http://175.212.187.92:3000/get_department_name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,13 +104,13 @@ const MainPage = ({navigation ,route} : any) => {
       const userDepartment = userdepartment.userdepartment; //키값을 치면 값을 json에서 추출할 수 있다.
       setUserDepartment(userDepartment);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패asd:', error);
+      console.error('유저 학과 이름 가져오기 실패:', error);
     }
   }
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.16.106.173:3000/MainPageSchoolPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -101,7 +124,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.16.106.173:3000/MainPagedepartmentPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -115,7 +138,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.16.106.173:3000/MainPagehotPost');
+        const response = await fetch('http://175.212.187.92:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -158,16 +181,18 @@ const MainPage = ({navigation ,route} : any) => {
             <View style = {styles.card}>
               <View style = {styles.cardtop}>
                 <View style = {styles.profile}>
-                  <View style = {styles.profilePicture}>
+                  <TouchableOpacity
+                  onPress={() => getPhotos()} 
+                  style = {styles.profilePicture}>
                   {userData.profile_photo ? (
                     <Image
-                      source={{ uri: userData.profile_photo }}
-                      style={{ width: 85, height: 85, borderRadius: 50 }}
+                      source={{ uri: 'http://localhost:3000//1716816118569-1716816117562_6.png' }}
+                      style={{ width: 85, height: 85, borderRadius: 50, justifyContent : 'center', alignItems: 'center' }}
                     />
                   ) : (
                     <IconI name="user" size={40} color="black" style={{width: 85, height: 85, borderRadius: 50, marginLeft : 50, marginTop : 40,}}/>
                   )}
-                  </View>
+                  </TouchableOpacity>
                 </View>
                 <View style = {styles.info}>
                   <View style ={styles.name}>

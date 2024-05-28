@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '172.16.106.173',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -510,6 +510,57 @@ async function getComment(post_ida) {
     }
 }
 
+//대댓글 가져오기
+async function getReComment(comment_id) {
+    console.log(comment_id);
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const query = `
+        SELECT 
+        recomment.recomment_id, recomment.\`contents\`, recomment.date, recomment.\`like\`,
+        student.name AS student_name, department.name AS department_name, comment.comment_id,user.user_id
+        FROM
+        recomment
+        LEFT JOIN
+        comment ON recomment.comment_id = comment.comment_id
+        LEFT JOIN
+        user ON user.user_id = recomment.user_id
+        LEFT JOIN
+        student ON student.student_id = user.student_id
+        LEFT JOIN
+        department ON department.department_id = student.department_id
+        WHERE comment.comment_id = ?;`;
+
+        const rows = await conn.query(query, [comment_id]);
+        return rows;
+        
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function updateUserImg(user_pk, photopath) {
+    let conn;
+    try {
+        console.log(photopath);
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const query = `UPDATE user
+        SET profilePhoto = ?
+        WHERE user_id = ?;`
+        await conn.query(query, [photopath, user_pk]);
+        console.log("업데이트 성공");    
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -537,4 +588,6 @@ module.exports = {
     delete_book_mark,
     get_post_detail,
     getComment,
+    getReComment,
+    updateUserImg,
 };

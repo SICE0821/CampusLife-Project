@@ -1,4 +1,5 @@
 const express = require("express");
+const multer = require('multer');
 const app = express();
 const PORT = 3000;
 const mariadb = require('mariadb');
@@ -24,8 +25,11 @@ const { getGeneralPosts,
         add_book_mark,
         delete_book_mark,
         get_post_detail,
-        getComment, } = require('./db.js'); // db 파일에서 함수 가져오기
+        getComment,
+        getReComment,
+        updateUserImg } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
+app.use(express.static('./App/images/'));
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -47,13 +51,24 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.173',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
   connectionLimit: 5,
   database: 'campuslife',
 });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './App/images/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({ storage });
 
 
 //메인페이지에 핫 게시글 데이터를 가져온다.
@@ -403,18 +418,37 @@ app.post('/get_user_have_post', async (req, res) => {
   console.log("책갈피 정보를 가져옴");
 });
 
-//책갈피 추가 및 삭제
+//책갈피 추가 삭제
 app.post('/add_book_mark', async (req, res) => {
-  const {user_id, post_id} = req.body; //데이터 가져올때 무조건 awit
+  try {
+    const { user_id, post_id } = req.body; //1번 body에서 값 추출
 
-  const result = await add_book_mark(user_id, post_id);
-  if(result == true) {
-    console.log("추가완료");
-  }else if(result == false) {
-    const result = await delete_book_mark(user_id, post_id);;
-    console.log("삭제됨");
+    const result = await add_book_mark(user_id, post_id); //2번 db실행
+    if (result === true) {
+      console.log("추가완료");
+      res.status(200).send({ message: "북마크 추가 완료" });
+    } 
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
   }
 });
+
+//책갈피 삭제
+app.post('delete_book_mark', async (req, res) => {
+  try {
+    const { user_id, post_id } = req.body; //1번 body에서 값 추출
+
+    const deleteResult = await delete_book_mark(user_id, post_id);
+    if (result === true) {
+      console.log("삭제완료");
+      res.status(200).send({ message: "북마크 삭제 완료" });
+    } 
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
+  }
+})
 
 //포스트 디테일 페이지 정보 불러오기
 app.post('/get_post_detail', async (req, res) => {
@@ -442,7 +476,7 @@ app.post('/get_comment', async (req, res) => {
       const commentdata = rows.map(item => ({
           comment_id : item.comment_id,
           content : item.contents,
-          date : item.date,
+          date : formatDate(item.date),
           like : item.like,
           student_name : item.student_name,
           department_name : item.department_name,
@@ -453,7 +487,39 @@ app.post('/get_comment', async (req, res) => {
       console.log("성공적으로 댓글 데이터 보냄");
 });
 
-  
+//포스터 대댓글 하나 가져오기
+app.post('/get_recomment', async (req, res) => {
+  const {comment_id} = req.body; //데이터 가져올때 무조건 awit
+  const rows = await getReComment(comment_id);
+      const recommentdata = rows.map(item => ({
+          recomment_id : item.recomment_id,
+          comment_id : item.comment_id,
+          student_name : item.student_name,
+          department_name : item.department_name,
+          content : item.contents,
+          user_id : item.user_id,
+          date : formatDate(item.date),
+          like : item.like,
+      }));
+      res.json(recommentdata);
+      console.log(recommentdata);
+});
+
+//이미지 업로드 및 DB저장
+app.post('/upload', upload.array('images'), (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).send('No files uploaded');
+  }
+
+  const filePaths = req.files.map(file => file.path);
+  const filePathsString = filePaths.join(', ');
+  const lastChar = filePathsString.slice(-1);
+  const user_pk = parseInt(lastChar, 10);
+  updateUserImg(user_pk, filePathsString);
+});
+
+
+
 //서버 시작
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}/`);

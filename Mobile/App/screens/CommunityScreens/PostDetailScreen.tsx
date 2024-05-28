@@ -5,17 +5,8 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import IconD from 'react-native-vector-icons/EvilIcons';
 import IconC from 'react-native-vector-icons/Feather';
 import { useFocusEffect } from '@react-navigation/native';
-import { PostDeatilData, PostCommentData } from "../../types/type"
+import { PostDeatilData, PostCommentData, CommentsWithRecomments } from "../../types/type"
 
-type SubItem = {
-    id: number;
-    text: string;
-}
-
-type Item = {
-    id: number;
-    subItems: SubItem[];
-}
 
 const PostDetailScreen: React.FC = ({ route }: any) => {
     const { item, userData } = route.params; //유저 정보와, 커뮤니티정보
@@ -23,20 +14,23 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const [inputheight, setinputheight] = useState(40);
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>();
     const [commentData, setCommentData] = useState<PostCommentData[]>([]);
-    const [data, setData] = useState<Item[]>([]);
+    const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
+    
+    
 
     useFocusEffect(
         React.useCallback(() => {
             //console.log(item.post_id);
             DeatilPost();
             CommentList();
+            //loadCommentsWithRecomments();
         }, [])
     );
 
     //포스터에 대한 정보
     const DeatilPost = async () => {
         try {
-            const response = await fetch('http://172.16.108.18:3000/get_post_detail', {
+            const response = await fetch('http://175.212.187.92:3000/get_post_detail', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -55,7 +49,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     //댓글 리스트 가져오기
     const CommentList = async () => {
         try {
-            const response = await fetch('http://172.16.108.18:3000/get_comment', {
+            const response = await fetch('http://175.212.187.92:3000/get_comment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -65,31 +59,56 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 })
             })
             const get_comment = await response.json();
-            setCommentData(get_comment);
+            const commentsWithRecomments = await Promise.all(
+                get_comment.map(async (comment :any ) => {
+                  const recommentData = await fetchRecommentData(comment.comment_id);
+                  return { ...comment, recomments: recommentData };
+                })
+              );
+            setComments(commentsWithRecomments);
         } catch (error) {
-            console.error('유저 학과 이름 가져오기 실패:', error);
+            console.error('댓글리스트 가져오기 실패:', error);
         }
     }
 
-    //댓글 리스트 가져오기
-    const reCommentList = async () => {
+    //대댓글 리스트 가져오기(잘 작동하고.)
+    const fetchRecommentData = async (comment_pk : any) => {
         try {
-            const response = await fetch('http://172.16.108.18:3000/get_recomment', {
+            const response = await fetch('http://175.212.187.92:3000/get_recomment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    post_ida: item.post_id
+                    comment_id : comment_pk
                 })
             })
-            const get_recomment = await response.json();
-            setCommentData(get_recomment);
+            const recomment = await response.json();
+            return recomment;
         } catch (error) {
-            console.error('유저 학과 이름 가져오기 실패:', error);
+            console.error('대댓글 하나 가져오기 실패:', error);
         }
     }
 
+    /*
+    const loadCommentsWithRecomments = async () => {
+        try {
+          const commentsWithRecomments = await Promise.all(
+            commentData.map(async (comment) => {
+              const recommentData = await fetchRecommentData(comment.comment_id);
+              console.log(recommentData);
+              return { ...comment, recomments: recommentData };
+            })
+          );
+          console.log(commentsWithRecomments);
+          return commentsWithRecomments;
+
+        } catch (error) {
+          console.error('Failed to load recomment data:', error);
+        }
+      };
+      */
+    
     const handleContentSizeChange = (e: any) => {
         const maxlineHeight = 112;
         const currentlineHeight = e.nativeEvent.contentSize.height;
@@ -143,7 +162,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 </View>
                 {
                 
-                commentData.map(item => (
+                comments.map(item => (
                     <View key={item.comment_id} style={styles.comentcontainer}>
                         <View style={styles.comentTopsection}>
                             <View style={styles.infobox}>
@@ -182,8 +201,8 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                 {item.like}
                             </Text>
                         </View>
-                        {commentData.map(subItem => (
-                            <View key={subItem.comment_id} style={styles.subcommentbox}>
+                        {item.recomments.map(subitem => (
+                            <View key={subitem.recomment_id} style={styles.subcommentbox}>
                                 <View style={styles.enterspace}>
                                     <Text style={{ color: 'black' }}> <IconC name="corner-down-right" size={30} /></Text>
                                 </View>
@@ -195,8 +214,8 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                                 </View>
                                             </View>
                                             <View style={styles.infotextbox}>
-                                                <Text style={{ fontSize: 20, color: 'black', marginLeft: 5 }}>엄준식</Text>
-                                                <Text style={{ fontSize: 13, color: 'black', marginLeft: 5 }}>컴퓨터소프트웨어과</Text>
+                                                <Text style={{ fontSize: 20, color: 'black', marginLeft: 5 }}>{subitem.student_name}</Text>
+                                                <Text style={{ fontSize: 13, color: 'black', marginLeft: 5 }}>{subitem.department_name}</Text>
                                             </View>
                                         </View>
                                         <View style={styles.listbox2}>
@@ -211,15 +230,15 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                         </View>
                                     </View>
                                     <Text style={{ fontSize: 20, color: 'black', marginLeft: 20, marginRight: 20, }}>
-                                        에브리바디 해체!
+                                        {subitem.content}
                                     </Text>
                                     <View style={styles.dataandlike}>
                                         <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 18 }}>
-                                            01/26 25:00
+                                            {subitem.date}
                                         </Text>
                                         <Text style={{ marginTop: 2 }}><IconD size={30} color="black" name={"like"} /></Text>
                                         <Text style={{ fontSize: 19, marginTop: 2, }}>
-                                            30
+                                            {subitem.like}
                                         </Text>
                                     </View>
                                 </View>
