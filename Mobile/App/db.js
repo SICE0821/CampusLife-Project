@@ -460,7 +460,7 @@ async function get_post_detail(post_id) {
             +"student.name AS student_name, department.name AS department_name,"
             +"post.date, post.title,"
             +"post.`contents`, post.`like`,"
-            +"post.`view`, user.profilePhoto "
+            +"post.`view`, user.profilePhoto, post.post_id "
             +"FROM "
             +"student "
             +"LEFT JOIN "
@@ -480,7 +480,6 @@ async function get_post_detail(post_id) {
 
 //댓글 리스트 가져오기
 async function getComment(post_ida) {
-    console.log(post_ida);
     let conn;
     try {
         conn = await pool.getConnection();
@@ -489,7 +488,7 @@ async function getComment(post_ida) {
             SELECT 
                 comment.comment_id, comment.contents, comment.date, comment.\`like\`,
                 student.name AS student_name, department.name AS department_name, 
-                user.id, post.post_id
+                user.id, post.post_id, user.profilePhoto
             FROM 
                 user
                 LEFT JOIN student ON user.student_id = student.student_id
@@ -497,10 +496,9 @@ async function getComment(post_ida) {
                 LEFT JOIN comment ON comment.user_id = user.user_id
                 LEFT JOIN post ON comment.post_id = post.post_id
             WHERE 
-                post.post_id = ?`;
+                post.post_id = ? ORDER BY comment.date DESC`;
 
         const rows = await conn.query(query, [post_ida]);
-        //console.log(rows);
         return rows;
         
     } catch (err) {
@@ -520,7 +518,7 @@ async function getReComment(comment_id) {
         const query = `
         SELECT 
         recomment.recomment_id, recomment.\`contents\`, recomment.date, recomment.\`like\`,
-        student.name AS student_name, department.name AS department_name, comment.comment_id,user.user_id
+        student.name AS student_name, department.name AS department_name, comment.comment_id,user.user_id, user.profilePhoto
         FROM
         recomment
         LEFT JOIN
@@ -560,6 +558,38 @@ async function updateUserImg(user_pk, photopath) {
     }
 }
 
+async function post_comment(post_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO comment (post_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [post_id, user_id, contents]);
+        //console.log("댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+//대댓글 달기
+async function post_recomment(comment_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO recomment (comment_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [comment_id, user_id, contents]);
+        console.log("대댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('대댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -589,4 +619,6 @@ module.exports = {
     getComment,
     getReComment,
     updateUserImg,
+    post_comment,
+    post_recomment
 };

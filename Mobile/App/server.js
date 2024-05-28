@@ -27,7 +27,9 @@ const { getGeneralPosts,
         get_post_detail,
         getComment,
         getReComment,
-        updateUserImg } = require('./db.js'); // db 파일에서 함수 가져오기
+        updateUserImg,
+        post_comment,
+        post_recomment } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
 
@@ -464,6 +466,7 @@ app.post('/get_post_detail', async (req, res) => {
     like : row[0].like,
     view: row[0].view,
     writer_propile: row[0].profilePhoto,
+    post_id : row[0].post_id,
   };
   res.json(userData);
 
@@ -481,7 +484,8 @@ app.post('/get_comment', async (req, res) => {
           student_name : item.student_name,
           department_name : item.department_name,
           user_id : item.user_id,
-          post_id : item.post_id
+          post_id : item.post_id,
+          user_profile : item.profilePhoto
       }));
       res.json(commentdata);
       console.log("성공적으로 댓글 데이터 보냄");
@@ -500,13 +504,15 @@ app.post('/get_recomment', async (req, res) => {
           user_id : item.user_id,
           date : formatDate(item.date),
           like : item.like,
+          user_profile : item.profilePhoto,
       }));
       res.json(recommentdata);
-      console.log(recommentdata);
+      //console.log(recommentdata);
 });
 
 //이미지 업로드 및 DB저장
 app.post('/upload', upload.array('images'), (req, res) => {
+  console.log("일단 서버에는 잘 들어와");
   if (!req.files || req.files.length === 0) {
     return res.status(400).send('No files uploaded');
   }
@@ -523,7 +529,46 @@ app.post('/upload', upload.array('images'), (req, res) => {
   res.send(fileNamesString);
 });
 
+//게시물 댓글 달기
+app.post('/writecomment', async (req, res) => {
+  try {
+    
+    const { post_id, user_id, contents} = req.body;
+    //console.log(post_id);
+    const result = await post_comment(post_id, user_id, contents);
+    if(result == true) {
+      console.log("댓글 달림");
+      res.json(result);
+    }else if(result == false) {
+      console.log("댓글 안달림");
+      res.json(result);
+    }
+  } catch (error) {
+    console.error("댓글달기 실패:", error);
+  }
+});
 
+//게시물 대댓글 달기
+app.post('/rewritecomment', async (req, res) => {
+  try {
+    const { comment_id, user_id, contents} = req.body;
+    console.log(comment_id);
+    console.log(user_id);
+    console.log(contents);
+    //console.log(post_id);
+    const result = await post_recomment(comment_id, user_id, contents);
+    console.log(result);
+    if(result == true) {
+      console.log("대댓글 달림");
+      res.json(result);
+    }else if(result == false) {
+      console.log("대댓글 안달림");
+      res.json(result);
+    }
+  } catch (error) {
+    console.error("대댓글달기 실패:", error);
+  }
+});
 
 //서버 시작
 app.listen(PORT, () => {

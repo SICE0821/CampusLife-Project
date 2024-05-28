@@ -35,6 +35,7 @@ export type PostDeatilData = {
   like: number,
   view: number,
   writer_propile: string,
+  post_id : number,
 }
 
 export type PostCommentData = {
@@ -46,6 +47,7 @@ export type PostCommentData = {
   department_name: string,
   user_id: number,
   post_id: number,
+  user_profile : string,
 }
 
 export type CommentsWithRecomments = {
@@ -57,6 +59,7 @@ export type CommentsWithRecomments = {
   department_name: string,
   user_id: number,
   post_id: number,
+  user_profile : string,
   recomments: {
     comment_id: number;
     content: string;
@@ -66,5 +69,6 @@ export type CommentsWithRecomments = {
     recomment_id: number;
     student_name: string; // 대댓글에도 student_name이 포함될 것으로 예상되어 추가했습니다.
     user_id: number; // 대댓글에도 user_id가 포함될 것으로 예상되어 추가했습니다.
+    user_profile : string,
   }[];
 }

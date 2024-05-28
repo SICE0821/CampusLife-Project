@@ -17,12 +17,11 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
     const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
     const [selectedstatus, setSelectedstatus] = useState<string | null>(null);  // 선택된 학년을 추적하는 state
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-    const [imageName, setImageName] = useState("");
-    const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
+    const [imageUrl, setImageUrl] = useState(`http://10.0.2.2:3000/${userData.profile_photo}`);
 
     const get_user_university = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/get_university_name', {
+            const response = await fetch('http://175.212.187.92:3000/get_university_name', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,7 +41,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const DeleteUser = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/delete_user', {
+            const response = await fetch('http://175.212.187.92:3000/delete_user', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -70,7 +69,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const UpdateAccount = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/updateAccount', {
+            const response = await fetch('http://175.212.187.92:3000/updateAccount', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -106,7 +105,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const UpdateImg = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/updateImg', {
+            const response = await fetch('http://175.212.187.92:3000/updateImg', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -144,40 +143,45 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const getPhotos = async () => {
         ImageCropPicker.openPicker({
-          multiple: true,
-          mediaType: 'photo',
-          includeBase64: true,
-          includeExif: true,
+            multiple: true,
+            mediaType: 'photo',
+            includeBase64: true,
+            includeExif: true,
         }).then(res => {
-          const formData = new FormData();
-          res.forEach(image => {
-            formData.append('images', {
-              uri: image.path,
-              type: 'image/jpeg',
-              name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
+            const formData = new FormData();
+            res.forEach(image => {
+                formData.append('images', {
+                    uri: image.path,
+                    type: 'image/jpeg',
+                    name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
+                });
             });
-          });
-          uploadImages(formData);
+            uploadImages(formData);
         });
-      };
-    
-      const uploadImages = async (formData : FormData)  => {
+    };
+
+    const uploadImages = async (formData: FormData) => {
         try {
-          const response = await fetch('http://172.16.117.211:3000/upload', {
-            method: 'POST',
-            body: formData,
-          });
-          const imageName = await response.text();
-          setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: imageName }));
-          if (response.ok) {
-            console.log('Images uploaded successfully');
-          } else {
-            console.error('Error uploading images');
-          }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const response = await fetch('http://175.212.187.92:3000/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            clearTimeout(timeoutId);
+            const imageName = await response.text();
+            console.log(imageName);
+            setImageUrl(`http://10.0.2.2:3000/${imageName}`);
+            setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: imageName }));
+            if (response.ok) {
+                console.log('Images uploaded successfully');
+            } else {
+                console.error('Error uploading images');
+            }
         } catch (error) {
-          console.error('Error uploading images:', error);
+            console.error('Error uploading images:', error);
         }
-      };
+    };
 
 
     const handleGradeSelect = (grade: number) => {
@@ -255,7 +259,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             <View style={styles.container}>
                 <View style={styles.profilePicture}>
                     {userdata.profile_photo ? (
-                        <Image source={{ uri: `http://10.0.2.2:3000/${userData.profile_photo}` }} style={styles.image} />
+                        <Image source={{ uri: imageUrl }} style={styles.image} />
                     ) : (
                         <IconA name="user" size={50} color="black" style={styles.image} />
                     )}
