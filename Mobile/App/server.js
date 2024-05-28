@@ -435,12 +435,12 @@ app.post('/add_book_mark', async (req, res) => {
 });
 
 //책갈피 삭제
-app.post('delete_book_mark', async (req, res) => {
+app.post('/delete_book_mark', async (req, res) => {
   try {
     const { user_id, post_id } = req.body; //1번 body에서 값 추출
 
     const deleteResult = await delete_book_mark(user_id, post_id);
-    if (result === true) {
+    if (deleteResult === true) {
       console.log("삭제완료");
       res.status(200).send({ message: "북마크 삭제 완료" });
     } 
@@ -511,11 +511,16 @@ app.post('/upload', upload.array('images'), (req, res) => {
     return res.status(400).send('No files uploaded');
   }
 
-  const filePaths = req.files.map(file => file.path);
-  const filePathsString = filePaths.join(', ');
-  const lastChar = filePathsString.slice(-1);
-  const user_pk = parseInt(lastChar, 10);
-  updateUserImg(user_pk, filePathsString);
+  const fileNames = req.files.map(file => file.filename); // 파일 이름 추출
+  const fileNamesString = fileNames.join(', '); // 파일 이름을 문자열로 결합
+
+  // 파일 이름에서 마지막 숫자 추출
+  const lastChar = fileNamesString.match(/\d/g).pop(); // 파일 이름에서 모든 숫자를 찾아 마지막 숫자 추출
+  const user_pk = parseInt(lastChar, 10); // 마지막 문자를 정수로 변환
+
+  console.log(fileNamesString);
+  updateUserImg(user_pk, fileNamesString);
+  res.send(fileNamesString);
 });
 
 

@@ -46,7 +46,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://175.212.187.92:3000/add_book_mark', {
+            const response = await fetch('http://172.16.117.211:3000/add_book_mark', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://175.212.187.92:3000/add_book_mark', {
+            const response = await fetch('http://172.16.117.211:3000/delete_book_mark', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후 요청을 중단하기 위한 setTimeout 설정
     
         try {
-            const response = await fetch('http://175.212.187.92:3000/generalpost', {
+            const response = await fetch('http://172.16.117.211:3000/generalpost', {
                 signal: controller.signal // fetch 요청에 signal 옵션 추가
             });
             if (!response.ok) { // 응답 상태 확인
@@ -176,7 +176,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     
     const getDepartmentposts = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/departmentpost');
+            const response = await fetch('http://172.16.117.211:3000/departmentpost');
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {
@@ -188,7 +188,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://175.212.187.92:3000/get_user_have_post', {
+            const response = await fetch('http://172.16.117.211:3000/get_user_have_post', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

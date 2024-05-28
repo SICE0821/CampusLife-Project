@@ -52,6 +52,7 @@ const MainPage = ({navigation ,route} : any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const [Userdepartment, setUserDepartment] = useState();
   const [imagepath, setimagepath] = useState<string>();
+  const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
   
   const getPhotos = async () => {
     ImageCropPicker.openPicker({
@@ -65,7 +66,7 @@ const MainPage = ({navigation ,route} : any) => {
         formData.append('images', {
           uri: image.path,
           type: 'image/jpeg',
-          name: `${Date.now()}_${image.filename || userData.user_pk}`,
+          name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
         });
       });
       uploadImages(formData);
@@ -74,7 +75,7 @@ const MainPage = ({navigation ,route} : any) => {
 
   const uploadImages = async (formData : FormData)  => {
     try {
-      const response = await fetch('http://175.212.187.92:3000/upload', {
+      const response = await fetch('http://172.16.117.211:3000/upload', {
         method: 'POST',
         body: formData,
       });
@@ -91,7 +92,7 @@ const MainPage = ({navigation ,route} : any) => {
   
   const get_user_department = async () => {
     try {
-      const response = await fetch('http://175.212.187.92:3000/get_department_name', {
+      const response = await fetch('http://172.16.117.211:3000/get_department_name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ const MainPage = ({navigation ,route} : any) => {
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://175.212.187.92:3000/MainPageSchoolPost');
+        const response = await fetch('http://172.16.117.211:3000/MainPageSchoolPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -124,7 +125,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://175.212.187.92:3000/MainPagedepartmentPost');
+        const response = await fetch('http://172.16.117.211:3000/MainPagedepartmentPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -138,7 +139,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://175.212.187.92:3000/MainPagehotPost');
+        const response = await fetch('http://172.16.117.211:3000/MainPagehotPost');
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -186,7 +187,7 @@ const MainPage = ({navigation ,route} : any) => {
                   style = {styles.profilePicture}>
                   {userData.profile_photo ? (
                     <Image
-                      source={{ uri: 'http://localhost:3000//1716816118569-1716816117562_6.png' }}
+                      source={{ uri: fileUri }}
                       style={{ width: 85, height: 85, borderRadius: 50, justifyContent : 'center', alignItems: 'center' }}
                     />
                   ) : (

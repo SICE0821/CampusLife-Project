@@ -546,7 +546,6 @@ async function getReComment(comment_id) {
 async function updateUserImg(user_pk, photopath) {
     let conn;
     try {
-        console.log(photopath);
         conn = await pool.getConnection();
         // 데이터 삽입 쿼리 작성
         const query = `UPDATE user
