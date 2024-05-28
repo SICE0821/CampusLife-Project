@@ -47,7 +47,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
 
     const Addbookmark = async (user_pk: any, post_pk: any) => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/add_book_mark', {
+            const response = await fetch('http://172.16.108.2:3000/add_book_mark', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
     //HOT 일반 게시물을 가져오는 DB
     const getGeneralposts = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/generalpost');
+            const response = await fetch('http://172.16.108.2:3000/generalpost');
             const postsdata = await response.json();
             console.log(postsdata);
             setCommunityData(postsdata);
@@ -99,7 +99,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
     //HOT 학과 게시물을 가져오는 DB
     const getDepartmentposts = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/departmentpost');
+            const response = await fetch('http://172.16.108.2:3000/departmentpost');
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {
@@ -109,7 +109,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
 
     const AreYouHavePost = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/get_user_have_post', {
+            const response = await fetch('http://172.16.108.2:3000/get_user_have_post', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

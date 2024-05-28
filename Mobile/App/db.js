@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '172.16.106.173',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -510,6 +510,37 @@ async function getComment(post_ida) {
     }
 }
 
+//학교 정보 가져오기
+async function get_campus_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                department.department_id,
+                department.name AS department_name, 
+                campus.campus_id, 
+                campus.name AS campus_name, 
+                campus_have_department.department_phone, 
+                campus_have_department.department_floor, 
+                campus_have_department.department_building
+            FROM 
+                campus_have_department
+            JOIN 
+                department ON campus_have_department.department_id = department.department_id
+            JOIN 
+                campus ON campus_have_department.campus_id = campus.campus_id;
+        `;
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -537,4 +568,5 @@ module.exports = {
     delete_book_mark,
     get_post_detail,
     getComment,
+    get_campus_Info,
 };

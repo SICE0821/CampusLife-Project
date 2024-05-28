@@ -24,7 +24,8 @@ const { getGeneralPosts,
         add_book_mark,
         delete_book_mark,
         get_post_detail,
-        getComment, } = require('./db.js'); // db 파일에서 함수 가져오기
+        getComment,
+        get_campus_Info, } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -47,7 +48,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.173',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -451,6 +452,27 @@ app.post('/get_comment', async (req, res) => {
       }));
       res.json(commentdata);
       console.log("성공적으로 댓글 데이터 보냄");
+});
+
+// 학교 정보 가져오기
+app.get('/getSchoolInfo', async (req, res) => {
+  try {
+      const rows = await get_campus_Info();
+      const processedData = rows.map(item => ({
+          department_id: item.department_id,
+          department_name: item.department_name,
+          campus_id: item.campus_id,
+          campus_name: item.campus_name,
+          department_phone: item.department_phone,
+          department_floor: item.department_floor,
+          department_building: item.department_building
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
   
