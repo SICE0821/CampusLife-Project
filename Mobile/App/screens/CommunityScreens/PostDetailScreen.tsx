@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Image, Keyboard } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Image, Keyboard, Alert } from 'react-native';
 import IconA from 'react-native-vector-icons/Entypo';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconD from 'react-native-vector-icons/EvilIcons';
@@ -38,7 +38,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     //포스터에 대한 정보
     const DeatilPost = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/get_post_detail', {
+            const response = await fetch('http://172.16.117.211:3000/get_post_detail', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://175.212.187.92:3000/get_comment', {
+            const response = await fetch('http://172.16.117.211:3000/get_comment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     //댓글달기
     const writecomment = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/writecomment', {
+            const response = await fetch('http://172.16.117.211:3000/writecomment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const writerecomment = async () => {
         console.log(commentspk);
         try {
-            const response = await fetch('http://175.212.187.92:3000/rewritecomment', {
+            const response = await fetch('http://172.16.117.211:3000/rewritecomment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     //대댓글 리스트 가져오기(잘 작동하고.)
     const fetchRecommentData = async (comment_pk: any) => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/get_recomment', {
+            const response = await fetch('http://172.16.117.211:3000/get_recomment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -153,6 +153,111 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         }
     }
 
+    //포스트 좋아요 누르기
+    const like_num_up = async (post_id: any) => {
+        try {
+            const response = await fetch('http://172.16.117.211:3000/post_like_up', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: post_id
+                })
+            })
+            const result = await response.json();
+            await DeatilPost();
+            console.log("포스트 좋아요 누르기 성공!")
+        } catch (error) {
+            console.error('포스트 좋아요 누르기 실패', error);
+        }
+    }
+
+    //댓글 좋아요 누르기
+    const comment_like_num_up = async (comment_id: any) => {
+        try {
+            const response = await fetch('http://172.16.117.211:3000/comment_like_up', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    comment_id: comment_id
+                })
+            })
+            const result = await response.json();
+            await CommentList();
+            console.log("댓글 좋아요 누르기 성공!")
+        } catch (error) {
+            console.error('댓글 좋아요 누르기 실패', error);
+        }
+    }
+
+        //댓글 좋아요 누르기
+        const recomment_like_num_up = async (recomment_id: any) => {
+            try {
+                const response = await fetch('http://172.16.117.211:3000/recomment_like_up', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        recomment_id: recomment_id
+                    })
+                })
+                const result = await response.json();
+                await CommentList();
+                console.log("대댓글 좋아요 누르기 성공!")
+            } catch (error) {
+                console.error('대댓글 좋아요 누르기 실패', error);
+            }
+        }
+
+    const Post_Like_alert = (post_id: any) => {
+        Alert.alert(
+            "좋아요!!",
+            "좋아요를 누르시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    onPress: () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                { text: "확인", onPress: () => like_num_up(post_id) }
+            ]
+        );
+    };
+
+    const comment_Like_alert = (comment_id: any) => {
+        Alert.alert(
+            "댓글 좋아요!!",
+            "댓글에 좋아요를 누르시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    onPress: () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                { text: "확인", onPress: () => comment_like_num_up(comment_id) }
+            ]
+        );
+    };
+
+
+    const recomment_Like_alert = (recomment_id: any) => {
+        Alert.alert(
+            "대댓글 좋아요!!",
+            "대댓글에 좋아요를 누르시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    onPress: () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                { text: "확인", onPress: () => recomment_like_num_up(recomment_id) }
+            ]
+        );
+    };
     /*
     const loadCommentsWithRecomments = async () => {
         try {
@@ -232,10 +337,12 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     {postDetailInfo?.contents}
                 </Text>
                 <View style={styles.postslikeandlook}>
-                    <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
-                    <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> {postDetailInfo?.view}</Text>
+                    <TouchableOpacity onPress={() => Post_Like_alert(postDetailInfo?.post_id)}>
+                        <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
+                    </TouchableOpacity>
+                    <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> {postDetailInfo?.like}</Text>
                     <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}><IconB name="eyeo" size={24} /></Text>
-                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}> {postDetailInfo?.like} </Text>
+                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}>{postDetailInfo?.view}</Text>
                 </View>
                 {
 
@@ -252,7 +359,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                         </View>
                                     </View>
                                     <View style={styles.infotextbox}>
-                                        <Text style={{ fontSize: 17, color: 'black', fontWeight : "bold", }}>{item.student_name}</Text>
+                                        <Text style={{ fontSize: 17, color: 'black', fontWeight: "bold", }}>{item.student_name}</Text>
                                         <Text style={{ fontSize: 15, color: 'black' }}>{item.department_name}</Text>
                                     </View>
                                 </View>
@@ -267,7 +374,9 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                             }}>
                                             <Text><IconD size={27} color="black" name={"comment"} /></Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity style={styles.likebox}>
+                                        <TouchableOpacity 
+                                            style={styles.likebox}
+                                            onPress={() => comment_Like_alert(item.comment_id)}>
                                             <Text><IconD size={29} color="black" name={"like"} /></Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={styles.reallistbox}>
@@ -305,18 +414,20 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                                     </View>
                                                 </View>
                                                 <View style={styles.infotextbox}>
-                                                    <Text style={{ fontSize: 17, color: 'black', marginLeft: 5, fontWeight : 'bold' }}>{subitem.student_name}</Text>
+                                                    <Text style={{ fontSize: 17, color: 'black', marginLeft: 5, fontWeight: 'bold' }}>{subitem.student_name}</Text>
                                                     <Text style={{ fontSize: 15, color: 'black', marginLeft: 5 }}>{subitem.department_name}</Text>
                                                 </View>
                                             </View>
                                             <View style={styles.listbox2}>
                                                 <View style={styles.LikeListBox2}>
-                                                    <View style={styles.likebox2}>
+                                                    <TouchableOpacity 
+                                                        style={styles.likebox2}
+                                                        onPress={() => recomment_Like_alert(subitem.recomment_id)}>
                                                         <Text><IconD size={29} color="black" name={"like"} /></Text>
-                                                    </View>
-                                                    <View style={styles.reallistbox2}>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity style={styles.reallistbox2}>
                                                         <Text><IconA size={19} color="black" name={"dots-three-vertical"} /></Text>
-                                                    </View>
+                                                    </TouchableOpacity>
                                                 </View>
                                             </View>
                                         </View>
@@ -559,18 +670,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#CED4DA',
     },
     likebox2: {
-        flex: 0.5,
+        width : 37,
         //backgroundColor : 'yellow',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        marginTop : 2,
     },
     reallistbox2: {
-        flex: 0.5,
+        width : 37,
         //backgroundColor : 'blue'
         justifyContent: 'center',
         alignItems: 'center',
         borderLeftWidth: 0.5,
         borderColor: '#333',
+        marginTop : 4,
     },
     listbox2: {
         flex: 0.25,

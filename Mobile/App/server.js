@@ -29,7 +29,13 @@ const { getGeneralPosts,
         getReComment,
         updateUserImg,
         post_comment,
-        post_recomment } = require('./db.js'); // db 파일에서 함수 가져오기
+        post_recomment,
+        post_like_up,
+        comment_like_up,
+        recomment_like_up,
+        write_post,
+        getHotPosts,
+        getBookmarkPosts } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
 
@@ -53,7 +59,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '172.16.106.204',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -214,7 +220,7 @@ res.json(event_object_datas);
 });
 
 
-//게시글화면에서 전체 게시글을 가져온다.
+//게시글화면에서 전체 전체 게시글을 가져온다.
 app.get('/generalpost', async (req, res) => {
     try {
         const rows = await getGeneralPosts();
@@ -236,6 +242,54 @@ app.get('/generalpost', async (req, res) => {
     }
 });
 
+//게시글화면에서 전체 핫 게시글을 가져온다.
+app.get('/Hotpost', async (req, res) => {
+  try {
+      const rows = await getHotPosts();
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//게시글화면에서 전체 북마크 게시글을 가져온다.
+app.post('/bookmark', async (req, res) => {
+  const { user_id } = req.body;
+  console.log(user_id);
+  try {
+      const rows = await getBookmarkPosts(user_id);
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+//게시글화면에서 학과 전체 게시글을 가져온다
 app.get('/departmentpost', async (req, res) => {
   try {
       const rows = await getDepartmentPosts();
@@ -256,6 +310,7 @@ app.get('/departmentpost', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 
 //회원가입
 app.post('/register', async (req, res) => {
@@ -552,9 +607,6 @@ app.post('/writecomment', async (req, res) => {
 app.post('/rewritecomment', async (req, res) => {
   try {
     const { comment_id, user_id, contents} = req.body;
-    console.log(comment_id);
-    console.log(user_id);
-    console.log(contents);
     //console.log(post_id);
     const result = await post_recomment(comment_id, user_id, contents);
     console.log(result);
@@ -569,6 +621,73 @@ app.post('/rewritecomment', async (req, res) => {
     console.error("대댓글달기 실패:", error);
   }
 });
+
+app.post('/post_like_up', async (req, res) => {
+  try {
+    const { post_id } = req.body; //1번 body에서 값 추출
+    const result = await post_like_up(post_id); 
+
+    if (result === true) {
+      console.log("포스터 좋아요 누르기 성공");
+      res.status(200).send({ message: "포스터 좋아요 누르기 성공" });
+    } 
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
+  }
+});
+
+app.post('/comment_like_up', async (req, res) => {
+  try {
+    const { comment_id } = req.body; //1번 body에서 값 추출
+    const result = await comment_like_up(comment_id); 
+
+    if (result === true) {
+      console.log("댓글 좋아요 누르기 성공");
+      res.status(200).send({ message: "댓글 좋아요 누르기 성공" });
+    } 
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
+  }
+});
+
+app.post('/recomment_like_up', async (req, res) => {
+  try {
+    const { recomment_id } = req.body; //1번 body에서 값 추출
+    const result = await recomment_like_up(recomment_id); 
+
+    if (result === true) {
+      console.log("대댓글 좋아요 누르기 성공");
+      res.status(200).send({ message: "대댓글 좋아요 누르기 성공" });
+    } 
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
+  }
+});
+
+app.post('/write_post', async (req, res) => {
+  try {
+    const { user_id, department_check, inform_check, title, contents} = req.body;
+    console.log(title);
+    console.log(contents);
+    console.log(inform_check);
+    console.log(department_check);
+    console.log(user_id);
+    const result = await write_post(user_id, department_check, inform_check, title, contents);
+    if(result == true) {
+      console.log("게시물 쓰기 성공");
+      res.json(result);
+    }else if(result == false) {
+      console.log("게시물 쓰기 실패");
+      res.json(result);
+    }
+  } catch (error) {
+    console.error("게시물 쓰기 실패:", error);
+  }
+});
+
 
 //서버 시작
 app.listen(PORT, () => {

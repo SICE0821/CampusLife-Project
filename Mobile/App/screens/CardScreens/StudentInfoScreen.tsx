@@ -21,7 +21,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const get_user_university = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/get_university_name', {
+            const response = await fetch('http://172.16.117.211:3000/get_university_name', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const DeleteUser = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/delete_user', {
+            const response = await fetch('http://172.16.117.211:3000/delete_user', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const UpdateAccount = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/updateAccount', {
+            const response = await fetch('http://172.16.117.211:3000/updateAccount', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const UpdateImg = async () => {
         try {
-            const response = await fetch('http://175.212.187.92:3000/updateImg', {
+            const response = await fetch('http://172.16.117.211:3000/updateImg', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://175.212.187.92:3000/upload', {
+            const response = await fetch('http://172.16.117.211:3000/upload', {
                 method: 'POST',
                 body: formData,
             });

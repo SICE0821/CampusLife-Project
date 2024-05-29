@@ -267,7 +267,7 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                     ),
                     headerRight: () => (
                         <View style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity onPress={() => navigation.navigate("WritePostScreen")}>
+                            <TouchableOpacity onPress={() => navigation.navigate("WritePostScreen", {userdata})}>
                                 <IconD style={{ marginRight: 10 }} name="form" size={30} color="white" />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={() => navigation.navigate("SearchPostScreen")}>

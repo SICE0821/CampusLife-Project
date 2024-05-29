@@ -1,75 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
+import { UserData } from '../../types/type'
 
-const WritePostPage: React.FC = () => {
-  const navigation = useNavigation();
+const WritePostPage: React.FC = ({ navigation, route }: any) => {
+  const { userdata } = route.params;
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [selectallposter, setselectapllposterOption] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
   const [selectdepartmentposter, setselectdepartmentposter] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
   const [postfontoption, setpostfontoption] = useState("게시판을 정해주세요");
   const [titletext, settitleText] = useState('');
   const [maintext, setmainText] = useState('');
-  const [post_id, setpost_id] = useState(285);
+  const [userData, setUserData] = useState<UserData>(userdata);
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       changeHeaderRightContent();
-    }, [])
+    }, [selectdepartmentposter, titletext, maintext])
   );
-
-  const changeHeaderRightContent = () => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity onPress={() => sendDataToServer()}>
-          <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
-            <Text style={{ color: 'white', fontSize: 17, fontWeight: "bold" }}>완료</Text>
-          </View>
-        </TouchableOpacity>
-      )
-    });
-  };
 
   const checkopenModal = () => {
     setIsModalVisible(true); // 모달 열기
   };
 
-  const checkcloseModal = () => {
+  const goback = () => {
     navigation.goBack();
-  };
-
-  const sendDataToServer = async () => {
-    const post = {
-      post_id: 601,
-      user_id: 6,
-      department_check: selectdepartmentposter,
-      inform_check: 0,
-      title: titletext,
-      contents: maintext,
-      data: "?",
-      view: 0,
-      like: 0,
-    };
-
-    try {
-      const response = await fetch('http://172.16.108.18:3000/post', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(post),
-      });
-      const responseData = await response.json();
-      //console.log(responseData);
-      checkopenModal();
-    } catch (error) {
-      console.error('Error:'); // error.message를 사용하여 오류 메시지를 출력합니다.
-    }
   };
 
   useEffect(() => {
@@ -108,6 +68,54 @@ const WritePostPage: React.FC = () => {
   const handlemainTextChange = (inputText: string) => {
     setmainText(inputText);
   };
+
+  const changeHeaderRightContent = () => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => {
+          write_post();
+        }}>
+          <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
+            <Text style={{ color: 'white', fontSize: 17, fontWeight: "bold" }}>완료</Text>
+          </View>
+        </TouchableOpacity>
+      )
+    });
+  };
+
+  const ok_go = () => {
+    Alert.alert(
+      "게시물 작성",
+      "게시물 작성을 완료했습니다!",
+      [
+        { text: "확인", onPress: () => goback() }
+      ]
+    );
+  };
+
+  const write_post = async () => {
+    try {
+      const response = await fetch('http://172.16.117.211:3000/write_post', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userData.user_pk,
+          department_check: selectdepartmentposter,
+          inform_check: 0,
+          title: titletext,
+          contents: maintext,
+        })
+      });
+      console.log("게시글 작성완료!");
+      const value = await response.json();
+      ok_go();
+
+    } catch (error) {
+      console.error('게시글 쓰기 실패!', error);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -169,7 +177,7 @@ const WritePostPage: React.FC = () => {
         <View style={styles.modalContainer}>
           <Text style={styles.title}>등록 확인</Text>
           <Text style={styles.message}>글이 등록되었습니다.</Text>
-          <TouchableOpacity style={styles.confirmButton} onPress={checkcloseModal}>
+          <TouchableOpacity style={styles.confirmButton} onPress={goback}>
             <Text style={styles.confirmButtonText}>확인</Text>
           </TouchableOpacity>
         </View>

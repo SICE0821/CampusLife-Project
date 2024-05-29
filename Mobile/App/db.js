@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '14.6.152.64',
+    host: '172.16.106.204',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -30,6 +30,74 @@ async function getGeneralPosts() {
             + "post.department_check = 0 AND post.inform_check =0 "
             + "ORDER BY post.date DESC"
         );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//전체 게시판에서 핫 게시물을 가져오는 쿼리
+async function getHotPosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " 
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 0 AND post.inform_check =0 AND post.`like` >= 30 "
+            + "ORDER BY post.date DESC"
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//전체 게시판에서 책갈피한 게시물을 가져오는 쿼리
+async function getBookmarkPosts(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT 
+            post.post_id, 
+            post.title, 
+            post.contents, 
+            post.date, 
+            post.view, 
+            post.\`like\`, 
+            student.name, 
+            user.admin_check
+        FROM 
+            post
+        LEFT JOIN 
+            user ON post.user_id = user.user_id
+        LEFT JOIN 
+            student ON user.student_id = student.student_id
+        LEFT JOIN 
+            user_have_post ON post.post_id = user_have_post.post_id
+        WHERE 
+            post.department_check = 0 
+            AND post.inform_check = 0 
+            AND user_have_post.user_id = ?
+        GROUP BY 
+            post.post_id
+        ORDER BY 
+            COUNT(user_have_post.post_id) DESC;`
+        );
+        const rows = await conn.query(query, [user_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -590,6 +658,76 @@ async function post_recomment(comment_id, user_id, contents) {
     }
 }
 
+async function post_like_up(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET \`like\` = \`like\` + 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function comment_like_up(comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE comment
+        SET \`like\` = \`like\` + 1
+        WHERE comment_id = ?`
+        const result = await conn.query(query, [comment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
+async function recomment_like_up(recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE recomment
+        SET \`like\` = \`like\` + 1
+        WHERE recomment_id = ?`
+        const result = await conn.query(query, [recomment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function write_post(user_id, department_check, inform_check, title, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
+        VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
+        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -620,5 +758,11 @@ module.exports = {
     getReComment,
     updateUserImg,
     post_comment,
-    post_recomment
+    post_recomment,
+    post_like_up,
+    comment_like_up,
+    recomment_like_up,
+    write_post,
+    getHotPosts,
+    getBookmarkPosts
 };
