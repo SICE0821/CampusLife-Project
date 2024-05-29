@@ -31,7 +31,7 @@ const SchoolInfoScreen = () => {
 
   const fetchSchoolData = async () => {
     try {
-      const response = await fetch('http://172.16.108.2:3000/getSchoolInfo');
+      const response = await fetch('http://192.168.35.12:3000/getSchoolInfo');
       if (!response.ok) {
         throw new Error('서버 응답 실패');
       }

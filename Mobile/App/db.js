@@ -174,18 +174,36 @@ async function getuserpk(user_id, user_passwd) {
 }
 
 // 과목의 정보를 가져오는 쿼리
-async function getlecturelist() {
+async function getLectureList(studentId) {
     let conn;
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(`
-            SELECT lecture_id, professor.name AS professor_name, credit, lecture_name, lecture_room, lecture_time, week 
-            FROM lecture
-            JOIN professor ON lecture.professor_id = professor.professor_id
-            LIMIT 5;
-        `);
+            SELECT 
+                lecture.lecture_id, 
+                professor.name, 
+                lecture.credit, 
+                lecture.lecture_name, 
+                lecture.lecture_room, 
+                lecture.lecture_time, 
+                lecture.week, 
+                lecture_have_object.nonattendance, 
+                lecture_have_object.attendance, 
+                lecture_have_object.tardy, 
+                lecture_have_object.absent,
+                lecture_have_object.weeknum 
+            FROM 
+                lecture
+            JOIN 
+                professor ON lecture.professor_id = professor.professor_id
+            JOIN 
+                lecture_have_object ON lecture.lecture_id = lecture_have_object.lecture_id
+            WHERE 
+                lecture_have_object.student_id = ?
+        `, [studentId]);
         return rows;
     } catch (err) {
+        console.error(err);
         throw err;
     } finally {
         if (conn) conn.end();
@@ -510,7 +528,7 @@ async function getComment(post_ida) {
     }
 }
 
-//학교 정보 가져오기
+//학교의 정보 가져오기
 async function get_campus_Info() {
     let conn;
     try {
@@ -541,6 +559,32 @@ async function get_campus_Info() {
     }
 }
 
+//학생의 과목 출결, 미출결 등 업데이트
+async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `
+            UPDATE lecture_have_object 
+            SET 
+                nonattendance = ?, 
+                attendance = ?, 
+                tardy = ?, 
+                absent = ?,
+                weeknum = ? 
+            WHERE student_id = ? AND lecture_id = ?
+        `;
+        const result = await conn.query(query, [nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -551,7 +595,7 @@ module.exports = {
     getschoolpostdata,
     insertDataIntoDB,
     getuserpk,
-    getlecturelist,
+    getLectureList,
     get_event_objcet,
     getBarcordMaxNum,
     PostItem,
@@ -569,4 +613,5 @@ module.exports = {
     get_post_detail,
     getComment,
     get_campus_Info,
+    Updatelecture,
 };
