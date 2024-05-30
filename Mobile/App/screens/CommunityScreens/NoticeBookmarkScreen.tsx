@@ -27,7 +27,7 @@ const renderEmptyItem = () => {
 }
 
 //화면.
-const HotPostsScreen = ({ route, navigation }: any) => {
+const NoticeBookmarkScreen = ({ route, navigation }: any) => {
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { department_check, userdata } = route.params;
@@ -37,7 +37,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
     const [isSwipeableOpen, setIsSwipeableOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const swipeableRef  = useRef<Swipeable>(null);
-
+    
     const closebookmark = useCallback((index : any) => {
         //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
         swipeableRefs.current[index]?.close();
@@ -48,25 +48,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
         await AreYouHavePost();
         setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
       };
-    
-      const view_count_up = async (post_id: any) => {
-        try {
-            const response = await fetch(`${config.serverUrl}/view_count_up`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    post_id: post_id
-                })
-            })
-            const result = await response.json();
-            console.log("포스트 View 올리기 성공!")
-        } catch (error) {
-            console.error('포스트 View 올리기 누르기 실패', error);
-        }
-    }
-    
+
       const Addbookmark = async (user_pk : number, post_pk : number) => {
         try {
             const controller = new AbortController();
@@ -103,6 +85,24 @@ const HotPostsScreen = ({ route, navigation }: any) => {
             }
         }
     };
+
+    const view_count_up = async (post_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/view_count_up`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: post_id
+                })
+            })
+            const result = await response.json();
+            console.log("포스트 View 올리기 성공!")
+        } catch (error) {
+            console.error('포스트 View 올리기 누르기 실패', error);
+        }
+    }
 
     const RemoveBookmark = async (user_pk : number, post_pk : number) => {
         try {
@@ -146,9 +146,10 @@ const HotPostsScreen = ({ route, navigation }: any) => {
           if (userHavePost.some(posts => item.post_id === posts.post_id)) {
             // 이미 북마크에 있는 경우, 북마크를 삭제합니다.
             await RemoveBookmark(userData.user_pk, item.post_id);
+            await getNoticeBookmarkposts();
+            closebookmark(index);
             // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
             setUserHavePost((prev) => prev.filter(post => post.post_id !== item.post_id));
-            closebookmark(index);
           } else {
             // 북마크에 없는 경우, 북마크를 추가합니다.
             await Addbookmark(userData.user_pk, item.post_id);
@@ -166,7 +167,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
         return(
         // 왼쪽으로 스와이프할 때 나타날 컴포넌트
         <TouchableOpacity
-        onPress={() => handleBookmark(item, index)}
+            onPress={() => handleBookmark(item, index)}
             style={{
                 backgroundColor: '#FFDFC1',
                 justifyContent: 'center',
@@ -180,34 +181,42 @@ const HotPostsScreen = ({ route, navigation }: any) => {
             )}
         </TouchableOpacity>
     )};
-    const getHotposts = async () => {
-        const controller = new AbortController(); // AbortController 인스턴스 생성
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후 요청을 중단하기 위한 setTimeout 설정
-    
+    const getNoticeBookmarkposts = async () => {
         try {
-            const response = await fetch(`${config.serverUrl}/Hotpost`, {
-                signal: controller.signal // fetch 요청에 signal 옵션 추가
-            });
-            if (!response.ok) { // 응답 상태 확인
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+            const response = await fetch(`${config.serverUrl}/Noticebookmark`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userData.user_pk
+                }),
+            })
             const postsdata = await response.json();
             //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error);
         } finally {
-            clearTimeout(timeoutId); // 요청이 완료되면 setTimeout을 취소
         }
     }
-    
-    const getDepartmenHotposts = async () => {
+    const getNoticeDepartmentBookmarkposts = async () => {
         try {
-            const response = await fetch(`${config.serverUrl}/departmentHotpost`);
+            const response = await fetch(`${config.serverUrl}/NoticeDepartmentbookmark`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userData.user_pk
+                }),
+            })
             const postsdata = await response.json();
+            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
-            //console.error(error)
+            console.error(error);
+        } finally {
         }
     }
 
@@ -248,9 +257,9 @@ const HotPostsScreen = ({ route, navigation }: any) => {
     useFocusEffect(
         React.useCallback(() => {
             if (department_check == 0) {
-                getHotposts();
+                getNoticeBookmarkposts();
             } else if (department_check == 1) {
-                getDepartmenHotposts();
+                getNoticeDepartmentBookmarkposts();
             }
             setUserData(userdata);
             AreYouHavePost();
@@ -268,7 +277,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
                 onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
-                        navigation.navigate("PostDetailScreen", { item, userData })}}>
+                        navigation.navigate("NoticePostDetailScreen", { item, userData })}}>
                     <View style={styles.writeboxcontainer}>
                         <View style={styles.writetitle}>
                             <View style={styles.titlebox}>
@@ -394,4 +403,5 @@ const styles = StyleSheet.create({
 
 }
 )
-export default HotPostsScreen;
+
+export default NoticeBookmarkScreen;

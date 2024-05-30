@@ -12,6 +12,7 @@ import {
 import Swiper from 'react-native-swiper';
 import {UserData} from '../types/type'
 import ImageCropPicker from 'react-native-image-crop-picker';
+import config from '../config';
 
 import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconB from 'react-native-vector-icons/AntDesign';
@@ -75,7 +76,7 @@ const MainPage = ({navigation ,route} : any) => {
 
   const uploadImages = async (formData : FormData)  => {
     try {
-      const response = await fetch('http://172.16.117.211:3000/upload', {
+      const response = await fetch(`${config.serverUrl}/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -92,7 +93,7 @@ const MainPage = ({navigation ,route} : any) => {
   
   const get_user_department = async () => {
     try {
-      const response = await fetch('http://172.16.117.211:3000/get_department_name', {
+      const response = await fetch(`${config.serverUrl}/get_department_name`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,7 +112,7 @@ const MainPage = ({navigation ,route} : any) => {
 
   const fetchschoolpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.211:3000/MainPageSchoolPost');
+        const response = await fetch(`${config.serverUrl}/MainPageSchoolPost`);
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -125,7 +126,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchdepartmentpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.211:3000/MainPagedepartmentPost');
+        const response = await fetch(`${config.serverUrl}/MainPagedepartmentPost`);
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }
@@ -139,7 +140,7 @@ const MainPage = ({navigation ,route} : any) => {
 
     const fetchhotpostData = async () => {
       try {
-        const response = await fetch('http://172.16.117.211:3000/MainPagehotPost');
+        const response = await fetch(`${config.serverUrl}/MainPagehotPost`);
         if (!response.ok) {
           throw new Error('서버 응답 실패');
         }

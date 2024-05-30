@@ -7,6 +7,7 @@ import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { UserData } from "../../types/type"
+import config from '../../config';
 
 const StudentInfoScreen = ({ route, navigation }: any) => {
     const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -21,7 +22,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const get_user_university = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/get_university_name', {
+            const response = await fetch(`${config.serverUrl}/get_university_name`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const DeleteUser = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/delete_user', {
+            const response = await fetch(`${config.serverUrl}/delete_user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const UpdateAccount = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/updateAccount', {
+            const response = await fetch(`${config.serverUrl}/updateAccount`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,7 +106,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
     const UpdateImg = async () => {
         try {
-            const response = await fetch('http://172.16.117.211:3000/updateImg', {
+            const response = await fetch(`${config.serverUrl}/updateImg`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -164,7 +165,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch('http://172.16.117.211:3000/upload', {
+            const response = await fetch(`${config.serverUrl}/upload`, {
                 method: 'POST',
                 body: formData,
             });

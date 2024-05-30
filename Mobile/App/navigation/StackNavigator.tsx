@@ -16,6 +16,7 @@ import EventShopScreen from '../screens/EventScreens/EventShopScreen'
 import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
+import NoticePostDetailScreen from '../screens/CommunityScreens/NoticePostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import DailyEventScreen from '../screens/EventScreens/DailyEventScreen';
@@ -30,7 +31,7 @@ import { UserData } from "../types/type";
 import { PostTopTabNavigator } from './TopTabNavigator';
 import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
-import { TopbTabNavigator } from './TopTabNavigator'
+import { TopbTabNavigator, NoticeTopbTabNavigator } from './TopTabNavigator'
 import ItemRegistration from '../admin_screen/ItemRegistration.tsx/ItemRegistration'
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -41,6 +42,7 @@ const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
 const MainStack = createStackNavigator();
 const CoummunityStack = createStackNavigator();
+const NoticeStack = createStackNavigator();
 const EventStack = createStackNavigator();
 const AttendanceStack = createStackNavigator();
 const TimetableStack = createStackNavigator();
@@ -90,6 +92,23 @@ export const RootStackNavigator = (route : any) => {
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '커뮤니티',
+                })}
+            />
+            <RootStack.Screen
+                name="NoticePostDetailScreen"
+                component={NoticePostDetailScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("NoticeScreenStackNavigator")}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '공지사항',
                 })}
             />
             <RootStack.Screen name="SearchPostScreen"
@@ -270,7 +289,7 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                             <TouchableOpacity onPress={() => navigation.navigate("WritePostScreen", {userdata})}>
                                 <IconD style={{ marginRight: 10 }} name="form" size={30} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate("SearchPostScreen")}>
+                            <TouchableOpacity onPress={() => navigation.navigate("SearchPostScreen", {userdata})}>
                                 <IconD style={{ marginRight: 10 }} name="search1" size={30} color="white" />
                             </TouchableOpacity>
                         </View>
@@ -281,6 +300,42 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                 }}
             />
         </CoummunityStack.Navigator>
+
+    );
+};
+
+//공지사항 스택 네비게이터
+export const NoticeScreenStackNavigator = ({ route, navigation }: any) => {
+    const { userdata } = route.params;
+    return (
+        <NoticeStack.Navigator>
+            <NoticeStack.Screen
+                name="NoticePostTopTabNavigator"
+                component={NoticeTopbTabNavigator}
+                initialParams = {{userdata}}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerRight: () => (
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity onPress={() => navigation.navigate("SearchPostScreen", {userdata})}>
+                                <IconD style={{ marginRight: 10 }} name="search1" size={30} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '공지사항',
+                }}
+            />
+        </NoticeStack.Navigator>
 
     );
 };

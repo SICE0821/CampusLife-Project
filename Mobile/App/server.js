@@ -35,9 +35,21 @@ const { getGeneralPosts,
         recomment_like_up,
         write_post,
         getHotPosts,
-        getBookmarkPosts } = require('./db.js'); // db 파일에서 함수 가져오기
+        getBookmarkPosts,
+        getdepartmentHotPosts,
+        getdepartmentBookmarkPosts,
+        searchPost,
+        view_count_up,
+        getNoticePosts,
+        getNoticeDepartmentPosts,
+        getNoticeHotPosts,
+        getNoticeDepartmentHotPosts,
+        getNoticeBookmarkPosts,
+        getNoticeDepartmentBookmarkPosts } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
+
+
 
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -59,11 +71,11 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.204',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
-  connectionLimit: 5,
+  connectionLimit: 10,
   database: 'campuslife',
 });
 
@@ -219,6 +231,145 @@ app.post('/get_event_obj', async(req, res) => {
 res.json(event_object_datas);
 });
 
+//학교 전체 공지사항
+app.get('/noticeschoolpost', async (req, res) => {
+  try {
+      const rows = await getNoticePosts();
+      const processedData = rows.map(item => ({
+          post_id: item.post_id,
+          title: item.title,
+          contents: item.contents,
+          date: formatDate(item.date),
+          view: item.view,
+          like: item.like,
+          name: item.name,
+          admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//학교 학과 공지사항
+app.get('/noticedepartmentpost', async (req, res) => {
+  try {
+      const rows = await getNoticeDepartmentPosts();
+      const processedData = rows.map(item => ({
+          post_id: item.post_id,
+          title: item.title,
+          contents: item.contents,
+          date: formatDate(item.date),
+          view: item.view,
+          like: item.like,
+          name: item.name,
+          admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//학교 핫 공지사항
+app.get('/NoticeHotpost', async (req, res) => {
+  try {
+      const rows = await getNoticeHotPosts();
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+//학과 핫 공지사항
+app.get('/NoticeDepartmentHotpost', async (req, res) => {
+  try {
+      const rows = await getNoticeDepartmentHotPosts();
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+//공지사항에서 학교 북마크 게시글 가져오기
+app.post('/Noticebookmark', async (req, res) => {
+  const { user_id } = req.body;
+  console.log(user_id);
+  try {
+      const rows = await getNoticeBookmarkPosts(user_id);
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//공지사항에서 학과 북마크 게시글 가져오기
+app.post('/NoticeDepartmentbookmark', async (req, res) => {
+  const { user_id } = req.body;
+  console.log(user_id);
+  try {
+      const rows = await getNoticeDepartmentBookmarkPosts(user_id);
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 
 //게시글화면에서 전체 전체 게시글을 가져온다.
 app.get('/generalpost', async (req, res) => {
@@ -293,6 +444,52 @@ app.post('/bookmark', async (req, res) => {
 app.get('/departmentpost', async (req, res) => {
   try {
       const rows = await getDepartmentPosts();
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//게시글화면에서 학과 핫 게시글을 가져온다
+app.get('/departmentHotpost', async (req, res) => {
+  try {
+      const rows = await getdepartmentHotPosts();
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//게시글화면에서 학과 책갈피 게시글을 가져온다
+app.post('/departmentbookmark', async (req, res) => {
+  const { user_id } = req.body;
+  console.log(user_id);
+  try {
+      const rows = await getdepartmentBookmarkPosts(user_id);
       const processedData = rows.map(item => ({
         post_id: item.post_id,
         title: item.title,
@@ -688,6 +885,45 @@ app.post('/write_post', async (req, res) => {
   }
 });
 
+
+
+//게시물 찾기
+app.post('/search_post', async (req, res) => {
+  const { search_text } = req.body;
+  try {
+      const rows = await searchPost(search_text);
+      const processedData = rows.map(item => ({
+        post_id: item.post_id,
+        title: item.title,
+        contents: item.contents,
+        date: formatDate(item.date),
+        view: item.view,
+        like: item.like,
+        name: item.name,
+        admin_check: item.admin_check,
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/view_count_up', async (req, res) => {
+  try {
+    const { post_id } = req.body; //1번 body에서 값 추출
+    const result = await view_count_up(post_id); 
+
+    if (result === true) {
+      console.log("view 횟수 증가!");
+      res.status(200).send({ message: "view 횟수 증가!" });
+    } 
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
+  }
+});
 
 //서버 시작
 app.listen(PORT, () => {

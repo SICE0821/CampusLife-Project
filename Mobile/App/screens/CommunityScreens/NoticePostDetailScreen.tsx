@@ -451,27 +451,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
 
                     ))}
             </ScrollView>
-            <View style={styles.commentbox}>
-                <View style={[styles.inputtext, { height: inputheight }]}>
-                    <TextInput
-                        ref={inputRef}
-                        style={{ paddingLeft: 20, fontSize: 20, }}
-                        onChangeText={handleInputChange}
-                        onBlur={() => setIsCommentorRecomment(0)}
-                        onContentSizeChange={handleContentSizeChange}
-                        value={commenttext}
-                        multiline={true}
-                        placeholder="텍스트를 입력하세요"
-                    />
-                </View>
-                <TouchableOpacity
-                    onPress={() => {
-                        writeComment();
-                    }}
-                    style={styles.sendspace}>
-                    <Text style={{ color: '#F29F05', justifyContent: 'flex-end' }}> <IconC name="send" size={34} /></Text>
-                </TouchableOpacity>
-            </View>
         </View>
     );
 };

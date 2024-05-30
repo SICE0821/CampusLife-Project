@@ -1,10 +1,12 @@
 import GeneralPostsScreen from '../screens/CommunityScreens/GeneralPostsScreen'
+import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPostsScreen'
+import NoticeHotPostsScreen from '../screens/CommunityScreens/NoticeHotPostsScreen'
+import NoticeBookmarkScreen from '../screens/CommunityScreens/NoticeBookmarkScreen'
 import BookmarkScreen from '../screens/CommunityScreens/BookmarkScreen'
 import HotPostsScreen from '../screens/CommunityScreens/HotPostsScreen'
 import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen';
-import DepartmentPostsScreen from '../screens/CommunityScreens/DepartmentPostsScreen'
 import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
 import AcademicRecord from '../screens/CardScreens/AcademicScreens/AcademicRecordScreen';
@@ -14,7 +16,9 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import React, { useState, useLayoutEffect } from 'react';
 const CommunityTopTab = createBottomTabNavigator();
+const NoticeTopTab = createBottomTabNavigator();
 const CommunityTopBottomTab = createBottomTabNavigator();
+const NoticeCommunityTopBottomTab = createBottomTabNavigator();
 const EventTopTab = createMaterialTopTabNavigator();
 const PostTopTab = createMaterialTopTabNavigator();
 const PostDetailTopTab = createMaterialTopTabNavigator();
@@ -254,6 +258,73 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
     )
 }
 
+export const NoticeTopBottomTabNavigator = ({ navigation, route }: any) => {
+    const { department_check, userdata } = route.params
+    //전체, HOT게시글, 책갈피 상단 탭 네비게이션
+    return (
+        <NoticeCommunityTopBottomTab.Navigator
+            screenOptions={{
+                tabBarStyle: {
+                    shadowOffset: {
+                        width: 0,
+                        height: 0, // for iOS
+                    },
+                    elevation: 5,
+                    zIndex: 0,
+                    //borderWidth: 1,
+                    borderRadius : 5,
+                    backgroundColor: 'white',
+                    width : 210,
+                    height : 34,
+                    position : 'absolute',
+                    top : 80,
+                    marginLeft : 10,
+    
+                },
+                tabBarLabelStyle: {
+                    //backgroundColor : '#9A9EFF',
+                    fontSize: 17,
+                    fontWeight: 'bold',
+                    //paddingVertical: 8, // 위아래 여백 추가
+                    //paddingHorizontal: 16, // 좌우 여백 추가
+                    borderRadius : 5,
+                    //elevation : 5,
+                    marginBottom : 6,
+                },
+                tabBarActiveTintColor: 'black'
+
+            }}>
+            <NoticeCommunityTopBottomTab.Screen name='전체'
+                component={NoticeSchoolPostsScreen}
+                initialParams={{department_check, userdata }}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }}>
+            </NoticeCommunityTopBottomTab.Screen>
+
+            <NoticeCommunityTopBottomTab.Screen name='HOT'
+                component={NoticeHotPostsScreen}
+                initialParams={{department_check, userdata }}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }} >
+            </NoticeCommunityTopBottomTab.Screen>
+
+            <NoticeCommunityTopBottomTab.Screen name='책갈피'
+                component={NoticeBookmarkScreen}
+                initialParams={{ department_check, userdata }}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }} >
+            </NoticeCommunityTopBottomTab.Screen>
+        </NoticeCommunityTopBottomTab.Navigator>
+
+    )
+}
+
 //커뮤니티 전체, 학과 게시판 상단 탭 네비게이션
 export const TopbTabNavigator = ({ route, navigation }: any) => {
     const { userdata } = route.params;
@@ -307,6 +378,62 @@ export const TopbTabNavigator = ({ route, navigation }: any) => {
                     tabBarIcon: () => null,
                 }} />
         </CommunityTopTab.Navigator>
+    );
+}
+
+//공지사항 학교 학과 상단 탭 네비게이션
+export const NoticeTopbTabNavigator = ({ route, navigation }: any) => {
+    const { userdata } = route.params;
+    return (
+        <NoticeTopTab.Navigator
+            screenOptions={{
+                tabBarStyle: {
+                    shadowOffset: {
+                        width: 0,
+                        height: 0, // for iOS
+                    },
+                    elevation: 5,
+                    backgroundColor: 'white',
+                    height: 50,
+                    width: 290,
+                    //borderBottomWidth : 1,
+                    zIndex: 0,
+                    //borderWidth : 1,
+                    marginLeft : 10,
+                    marginTop : 10,
+                    borderRadius : 5,
+                    position : 'absolute',
+                    top : 5
+
+
+                },
+                tabBarLabelStyle: {
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                    borderRadius : 16,
+                    //elevation : 5,
+                    marginBottom : 9,
+                },
+                tabBarActiveTintColor: 'black'
+
+            }}>
+            <NoticeTopTab.Screen name="학교 공지사항"
+                initialParams={{ department_check: 0, userdata }}
+                component={NoticeTopBottomTabNavigator}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }}
+            />
+
+            <NoticeTopTab.Screen name="학과 공지사항"
+                initialParams={{ department_check: 1, userdata }}
+                component={NoticeTopBottomTabNavigator}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                }} />
+        </NoticeTopTab.Navigator>
     );
 }
 

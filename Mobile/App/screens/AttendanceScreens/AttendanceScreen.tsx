@@ -9,6 +9,7 @@ import { Camera,
   useCameraDevice, 
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
+import config from '../../config';
 
 type Lecture = {
     credit : number;
@@ -108,7 +109,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   const fetchLectureData = async () => {
     try {
-      const response = await fetch('http://172.16.108.18:3000/getlecture');
+      const response = await fetch(`${config.serverUrl}/getlecture`);
       if (!response.ok) {
         throw new Error('서버 응답 실패');
       }

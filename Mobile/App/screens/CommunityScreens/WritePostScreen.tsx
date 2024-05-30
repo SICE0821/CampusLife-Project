@@ -5,6 +5,7 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 import { UserData } from '../../types/type'
+import config from '../../config';
 
 const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const { userdata } = route.params;
@@ -33,6 +34,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   };
 
   useEffect(() => {
+    
     // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
     if (selectallposter === 1) {
       setpostfontoption("전체 게시판");
@@ -95,7 +97,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
 
   const write_post = async () => {
     try {
-      const response = await fetch('http://172.16.117.211:3000/write_post', {
+      const response = await fetch(`${config.serverUrl}/write_post`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

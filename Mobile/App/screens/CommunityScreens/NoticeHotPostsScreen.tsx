@@ -6,7 +6,6 @@ import IconC from 'react-native-vector-icons/FontAwesome';
 import { UserData } from '../../types/type'
 import { Swipeable, GestureHandlerRootView, RectButton } from 'react-native-gesture-handler';
 import config from '../../config';
-
 type PostData = {
     post_id: number,
     title: string,
@@ -27,7 +26,7 @@ const renderEmptyItem = () => {
 }
 
 //화면.
-const HotPostsScreen = ({ route, navigation }: any) => {
+const NoticeHotPostsScreen = ({ route, navigation }: any) => {
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { department_check, userdata } = route.params;
@@ -180,12 +179,12 @@ const HotPostsScreen = ({ route, navigation }: any) => {
             )}
         </TouchableOpacity>
     )};
-    const getHotposts = async () => {
+    const getNoticeHotposts = async () => {
         const controller = new AbortController(); // AbortController 인스턴스 생성
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후 요청을 중단하기 위한 setTimeout 설정
     
         try {
-            const response = await fetch(`${config.serverUrl}/Hotpost`, {
+            const response = await fetch(`${config.serverUrl}/NoticeHotpost`, {
                 signal: controller.signal // fetch 요청에 signal 옵션 추가
             });
             if (!response.ok) { // 응답 상태 확인
@@ -201,13 +200,24 @@ const HotPostsScreen = ({ route, navigation }: any) => {
         }
     }
     
-    const getDepartmenHotposts = async () => {
+    const getNoticeDepartmentHotposts = async () => {
+        const controller = new AbortController(); // AbortController 인스턴스 생성
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후 요청을 중단하기 위한 setTimeout 설정
+    
         try {
-            const response = await fetch(`${config.serverUrl}/departmentHotpost`);
+            const response = await fetch(`${config.serverUrl}/NoticeDepartmentHotpost`, {
+                signal: controller.signal // fetch 요청에 signal 옵션 추가
+            });
+            if (!response.ok) { // 응답 상태 확인
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const postsdata = await response.json();
+            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
-            //console.error(error)
+            console.error(error);
+        } finally {
+            clearTimeout(timeoutId); // 요청이 완료되면 setTimeout을 취소
         }
     }
 
@@ -248,9 +258,9 @@ const HotPostsScreen = ({ route, navigation }: any) => {
     useFocusEffect(
         React.useCallback(() => {
             if (department_check == 0) {
-                getHotposts();
+                getNoticeHotposts();
             } else if (department_check == 1) {
-                getDepartmenHotposts();
+                getNoticeDepartmentHotposts();
             }
             setUserData(userdata);
             AreYouHavePost();
@@ -268,7 +278,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
                 onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
-                        navigation.navigate("PostDetailScreen", { item, userData })}}>
+                        navigation.navigate("NoticePostDetailScreen", { item, userData })}}>
                     <View style={styles.writeboxcontainer}>
                         <View style={styles.writetitle}>
                             <View style={styles.titlebox}>
@@ -394,4 +404,4 @@ const styles = StyleSheet.create({
 
 }
 )
-export default HotPostsScreen;
+export default NoticeHotPostsScreen;
