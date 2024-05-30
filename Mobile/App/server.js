@@ -9,7 +9,7 @@ const { getGeneralPosts,
         getschoolpostdata, 
         insertDataIntoDB,
         getuserpk,
-        getlecturelist,
+        getLectureList,
         get_event_objcet,
         getBarcordMaxNum,
         PostItem,
@@ -26,7 +26,11 @@ const { getGeneralPosts,
         get_post_detail,
         getComment,
         get_campus_Info,
+<<<<<<< HEAD
         get_campus_building_Info } = require('./db.js'); // db 파일에서 함수 가져오기
+=======
+        Updatelecture, } = require('./db.js'); // db 파일에서 함수 가져오기
+>>>>>>> ad207083af697c8d8033f8090fd1358765a9c97e
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -278,19 +282,29 @@ app.post('/login', async (req, res) => {
   });
 
 // 과목 가져오기
-app.get('/getlecture', async (req, res) => {
+app.post('/getlecture', async (req, res) => {
+  const studentId = req.body.student_pk; // POST 요청에서 student_id를 가져옴
+  if (!studentId) {
+      return res.status(400).json({ error: 'student_id is required' });
+  }
+
   try {
-      const rows = await getlecturelist();
+      const rows = await getLectureList(studentId);
       const processedData = rows.map(item => ({
           lecture_id: item.lecture_id,
-          professor_name : item.professor_name,
+          professor_name: item.name, 
           credit: item.credit,
-          lecture_name : item.lecture_name,
-          lecture_room : item.lecture_room,
-          lecture_time : item.lecture_time,
-          week: item.week
+          lecture_name: item.lecture_name,
+          lecture_room: item.lecture_room,
+          lecture_time: item.lecture_time,
+          week: item.week,
+          nonattendance: item.nonattendance,
+          attendance: item.attendance,
+          tardy: item.tardy,
+          absent: item.absent,
+          weeknum : item.weeknum
       }));
-      res.json(processedData);
+      res.json({ data: processedData });
       console.log("성공적으로 데이터 보냄");
   } catch (error) {
       console.error(error); 
@@ -464,6 +478,7 @@ app.get('/getSchoolInfo', async (req, res) => {
           department_name: item.department_name,
           campus_id: item.campus_id,
           campus_name: item.campus_name,
+          campus_place: item.campus_place,
           department_phone: item.department_phone,
           department_floor: item.department_floor,
           department_building: item.department_building
@@ -476,6 +491,7 @@ app.get('/getSchoolInfo', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 // 학교 건물 정보 가져오기
 app.get('/getSchoolBuildingInfo', async (req, res) => {
   try {
@@ -495,6 +511,21 @@ app.get('/getSchoolBuildingInfo', async (req, res) => {
   }
 });
 
+=======
+//힉생의 과목 업데이트
+app.post('/updatelecture', async (req, res) => {
+  const { nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "과목 업데이트가 완료되었습니다." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "과목 업데이트 실패" });
+  }
+});
+>>>>>>> ad207083af697c8d8033f8090fd1358765a9c97e
   
 //서버 시작
 app.listen(PORT, () => {
