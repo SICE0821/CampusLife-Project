@@ -55,7 +55,7 @@ const SchoolInfoScreen = () => {
       const data = await response.json();
       setSchoolData(data);
     } catch (error) {
-      console.error('학교 정보를 가져오는 중 오류 발생:', error);
+      //console.error('학교 정보를 가져오는 중 오류 발생:', error);
     }
   };
 
@@ -66,7 +66,7 @@ const SchoolInfoScreen = () => {
       const data = await response.json();
       setSchoolBuildingData(data);
     } catch (error) {
-      console.error('학교 건물 정보를 가져오는 중 오류 발생:', error);
+      //console.error('학교 건물 정보를 가져오는 중 오류 발생:', error);
     }
   };
 
@@ -106,12 +106,12 @@ const SchoolInfoScreen = () => {
     campus: {
       latitude: 37.48943025,
       longitude: 126.77881105,
-      zoom: 17,
+      zoom: 16.5,
     },
     sosaCampus: {
       latitude: 37.4635299631291,
       longitude: 126.8038623428179,
-      zoom: 17,
+      zoom: 16.5,
     },
   };
 
@@ -121,7 +121,7 @@ const SchoolInfoScreen = () => {
     <View style={styles.container}>
       <Picker
         selectedValue={selectedCampus}
-        style={{ height: 50, width: 150 }}
+        style={{ height: 50, width: 150, color: 'black', backgroundColor: 'gray' }}
         onValueChange={handleCampusChange}
       >
         <Picker.Item label="본캠퍼스" value="본캠퍼스" />
@@ -176,6 +176,7 @@ const SchoolInfoScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: width,
     backgroundColor: 'white',
   },
   map: {
@@ -199,6 +200,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontSize: 24,
     fontWeight: 'bold',
+    color: 'black'
   },
   infodata: {
     alignSelf: 'center',

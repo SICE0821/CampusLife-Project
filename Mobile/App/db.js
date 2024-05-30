@@ -539,7 +539,6 @@ async function get_campus_Info() {
                 department.name AS department_name, 
                 campus.campus_id, 
                 campus.name AS campus_name,
-                campus_have_department.campus_place,
                 campus_have_department.department_phone, 
                 campus_have_department.department_floor, 
                 campus_have_department.department_building

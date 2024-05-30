@@ -474,7 +474,6 @@ app.get('/getSchoolInfo', async (req, res) => {
           department_name: item.department_name,
           campus_id: item.campus_id,
           campus_name: item.campus_name,
-          campus_place: item.campus_place,
           department_phone: item.department_phone,
           department_floor: item.department_floor,
           department_building: item.department_building
