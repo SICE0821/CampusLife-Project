@@ -560,25 +560,26 @@ async function get_campus_Info() {
     }
 }
 
-//학생의 과목 출결, 미출결 등 업데이트
-async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum) {
+//학교 건물 정보 가져오기
+async function get_campus_building_Info() {
     let conn;
     try {
         conn = await pool.getConnection();
-        // 데이터 업데이트 쿼리 작성
         const query = `
-            UPDATE lecture_have_object 
-            SET 
-                nonattendance = ?, 
-                attendance = ?, 
-                tardy = ?, 
-                absent = ?,
-                weeknum = ? 
-            WHERE student_id = ? AND lecture_id = ?
+            SELECT 
+                campus.campus_id, 
+                campus_building.building_name, 
+                campus_building.campus_place, 
+                campus_building.latitude,
+                campus_building.longitude
+            FROM 
+                campus_building
+            JOIN 
+                campus ON campus_building.campus_id = campus.campus_id;
         `;
-        const result = await conn.query(query, [nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id]);
-        // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -614,5 +615,5 @@ module.exports = {
     get_post_detail,
     getComment,
     get_campus_Info,
-    Updatelecture,
+    get_campus_building_Info
 };
