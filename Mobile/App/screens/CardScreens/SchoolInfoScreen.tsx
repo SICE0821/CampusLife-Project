@@ -1,75 +1,159 @@
-import React, { useState } from 'react';
-import { Dimensions, Text, View, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Dimensions, Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, Row, Rows } from "react-native-table-component";
+import { Picker } from '@react-native-picker/picker';
+import { NaverMapView, Camera, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
+import IconA from 'react-native-vector-icons/FontAwesome6';
 
 const width = Dimensions.get("window").width * 0.98;
 
-const bcuimage = require('../../assets/img-bcu-logo.png'); // 학교 로고
+export type SchoolData = {
+  department_name: string,
+  campus_name: string,
+  department_phone: string,
+  department_floor: string,
+  department_building: string
+};
+
+export type SchoolBuildingData = {
+  building_name: string,
+  campus_place: string,
+  latitude: string,
+  longitude: string,
+};
 
 const info_data_head = ["층", "학과 홈페이지", "학과 사무실 전화번호"];
-
-const info_building = ['한길관', '꿈집', '세미나관', '공학권', '에지관', '밀레니엄관'];
-
-const info_data = [
-  [
-    ["B1", "실내건축디자인학과", "010-1234-5678"],
-    ["B1", "실내건축디자인학과", "010-1234-5678"],
-    ["B1", "실내건축디자인학과", "010-1234-5678"],
-    ["B1", "실내건축디자인학과", "010-1234-5678"],
-    ["B1", "실내건축디자인학과", "010-1234-5678"],
-    ["B1", "실내건축디자인학과", "010-1234-5678"],
-    ["B1", "실내건축디자인학과", "010-1234-5678"],
-  ],
-  [
-    ["2F", "건축학과", "010-8765-4321"],
-    ["2F", "건축학과", "010-8765-4321"],
-    ["2F", "건축학과", "010-8765-4321"],
-    ["2F", "건축학과", "010-8765-4321"],
-    ["2F", "건축학과", "010-8765-4321"],
-    ["2F", "건축학과", "010-8765-4321"],
-    ["2F", "건축학과", "010-8765-4321"],
-  ],
-  [
-    ["3F", "컴퓨터공학과", "010-1357-2468"],
-    ["3F", "컴퓨터공학과", "010-1357-2468"],
-    ["3F", "컴퓨터공학과", "010-1357-2468"],
-    ["3F", "컴퓨터공학과", "010-1357-2468"],
-    ["3F", "컴퓨터공학과", "010-1357-2468"],
-    ["3F", "컴퓨터공학과", "010-1357-2468"],
-    ["3F", "컴퓨터공학과", "010-1357-2468"],
-  ],
-  
-];
-
 const widthArrs = [width * 0.2, width * 0.4, width * 0.4];
 const tableBorderColor = 'gray';
 
 const SchoolInfoScreen = () => {
-    const [visibleBuildings, setVisibleBuildings] = useState<{ [key: string]: boolean }>({});
+  const [visibleBuilding, setVisibleBuilding] = useState<string | null>(null);
+  const [schoolData, setSchoolData] = useState<SchoolData[]>([]);
+  const [schoolBuildingData, setSchoolBuildingData] = useState<SchoolBuildingData[]>([]);
+  const [selectedCampus, setSelectedCampus] = useState('본캠퍼스');
+  const [filteredBuildings, setFilteredBuildings] = useState<SchoolBuildingData[]>([]);
 
-  const toggleInfoDataVisibility = (buildingName : string) => {
-    setVisibleBuildings((prev) => ({
-      ...prev,
-      [buildingName]: !prev[buildingName],
-    }));
+  const scrollViewRef = useRef<ScrollView>(null);
+  const buildingRefs = useRef<{ [key: string]: View | null }>({});
+
+  const toggleInfoDataVisibility = (buildingName: string) => {
+    setVisibleBuilding((prev) => (prev === buildingName ? null : buildingName));
+    if (buildingRefs.current[buildingName]) {
+      buildingRefs.current[buildingName]?.measureLayout(
+        scrollViewRef.current as unknown as number,
+        (x, y, width, height) => {
+          (scrollViewRef.current as unknown as ScrollView)?.scrollTo({ y: y - 10, animated: true });
+        },
+      );
+    }
   };
+
+  const fetchSchoolData = async () => {
+    try {
+      const response = await fetch('http://192.168.219.106:3000/getSchoolInfo');
+      if (!response.ok) throw new Error('서버 응답 실패');
+      const data = await response.json();
+      setSchoolData(data);
+    } catch (error) {
+      //console.error('학교 정보를 가져오는 중 오류 발생:', error);
+    }
+  };
+
+  const fetchSchoolBuildingData = async () => {
+    try {
+      const response = await fetch('http://192.168.219.106:3000/getSchoolBuildingInfo');
+      if (!response.ok) throw new Error('서버 응답 실패');
+      const data = await response.json();
+      setSchoolBuildingData(data);
+    } catch (error) {
+      //console.error('학교 건물 정보를 가져오는 중 오류 발생:', error);
+    }
+  };
+
+  const renderDepartmentList = (buildingName: string) => (
+    schoolData
+      .filter(item => item.department_building === buildingName)
+      .sort((a, b) => parseInt(a.department_floor) - parseInt(b.department_floor))
+      .map((item, idx) => (
+        <Rows
+          key={idx}
+          data={[[item.department_floor, item.department_name, item.department_phone]]}
+          style={{ width, height: 40 }}
+          textStyle={{ textAlign: "center", fontWeight: 'bold', color: 'black' }}
+          widthArr={widthArrs}
+        />
+      ))
+  );
+
+  useEffect(() => {
+    fetchSchoolData();
+    fetchSchoolBuildingData();
+  }, []);
+
+  useEffect(() => {
+    const filtered = schoolBuildingData.filter(
+      building => building.campus_place === selectedCampus && building.building_name !== building.campus_place
+    );
+    setFilteredBuildings(filtered);
+  }, [schoolBuildingData, selectedCampus]);
+
+  const handleCampusChange = (itemValue: string) => {
+    setSelectedCampus(itemValue);
+    setCamera(itemValue === '본캠퍼스' ? Cameras.campus : Cameras.sosaCampus);
+  };
+
+  const Cameras = {
+    campus: {
+      latitude: 37.48943025,
+      longitude: 126.77881105,
+      zoom: 16.5,
+    },
+    sosaCampus: {
+      latitude: 37.4635299631291,
+      longitude: 126.8038623428179,
+      zoom: 16.5,
+    },
+  };
+
+  const [camera, setCamera] = useState<Camera>(Cameras.campus);
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-        <View style={styles.map}>
-          <Text>맵</Text>
-        </View>
-        <View style={styles.logoArea}>
-          <Image style={styles.logo} source={bcuimage} />
-          <Text style={styles.logoText}>(031-432-789)</Text>
-        </View>
-        {info_building.map((building, index) => (
-          <View key={index}>
-            <TouchableOpacity style={styles.infoArea} onPress={() => toggleInfoDataVisibility(building)}>
-              <Text style={styles.infoText}>{building}</Text>
+      <Picker
+        selectedValue={selectedCampus}
+        style={{ height: 50, width: 150, color: 'black', backgroundColor: 'gray' }}
+        onValueChange={handleCampusChange}
+      >
+        <Picker.Item label="본캠퍼스" value="본캠퍼스" />
+        <Picker.Item label="소사캠퍼스" value="소사캠퍼스" />
+      </Picker>
+      <ScrollView ref={scrollViewRef}>
+        <NaverMapView style={styles.map} camera={camera}>
+          {filteredBuildings.map((building, index) => (
+            <NaverMapMarkerOverlay
+              key={index}
+              latitude={parseFloat(building.latitude)}
+              longitude={parseFloat(building.longitude)}
+              onTap={() => toggleInfoDataVisibility(building.building_name)}
+              anchor={{ x: 0.3, y: 0.5 }}
+              caption={{ text: building.building_name }}
+              subCaption={{ text: building.campus_place }}
+              width={32}
+              height={32}
+            >
+              <IconA name="location-dot" size={32} color="black" />
+            </NaverMapMarkerOverlay>
+          ))}
+        </NaverMapView>
+        {filteredBuildings.map((building, index) => (
+          <View
+            key={index}
+            ref={(el) => { buildingRefs.current[building.building_name] = el; }}
+          >
+            <TouchableOpacity style={styles.infoArea} onPress={() => toggleInfoDataVisibility(building.building_name)}>
+              <Text style={styles.infoText}>{building.building_name}</Text>
             </TouchableOpacity>
-            {visibleBuildings[building] && (
+            {visibleBuilding === building.building_name && (
               <View style={styles.infodata}>
                 <Table borderStyle={{ borderWidth: 1, borderColor: tableBorderColor }}>
                   <Row
@@ -78,19 +162,13 @@ const SchoolInfoScreen = () => {
                     textStyle={{ textAlign: "center", fontWeight: "bold", color: 'black' }}
                     widthArr={widthArrs}
                   />
-                  <Rows
-                    data={info_data[index]}
-                    style={{ width: width, height: 40 }}
-                    textStyle={{ textAlign: "center", fontWeight: 'bold', color: 'black' }}
-                    widthArr={widthArrs}
-                  />
+                  {renderDepartmentList(building.building_name)}
                 </Table>
               </View>
             )}
           </View>
         ))}
       </ScrollView>
-      <View style={styles.bottomArea}></View>
     </View>
   );
 };
@@ -98,27 +176,14 @@ const SchoolInfoScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: width,
     backgroundColor: 'white',
   },
   map: {
     width: '100%',
     height: 700,
-    backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  logoArea: {
-    margin: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logo: {
-    resizeMode: 'contain',
-  },
-  logoText: {
-    fontSize: 22,
-    fontWeight: '900',
-    marginLeft: 10,
   },
   infoArea: {
     alignSelf: 'center',
@@ -135,13 +200,10 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     fontSize: 24,
     fontWeight: 'bold',
+    color: 'black'
   },
   infodata: {
     alignSelf: 'center',
-  },
-  bottomArea: {
-    width: '100%',
-    height: 90,
   },
 });
 

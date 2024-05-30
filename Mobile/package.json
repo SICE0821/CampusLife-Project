@@ -12,6 +12,7 @@
   "dependencies": {
     "@anatolyk/react-native-week-view": "^1.0.8",
     "@kichiyaki/react-native-barcode-generator": "^0.6.7",
+    "@mj-studio/react-native-naver-map": "^1.5.9",
     "@react-native-community/datetimepicker": "^8.0.1",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-community/viewpager": "^5.0.11",
@@ -67,7 +68,7 @@
     "@react-native/babel-preset": "0.73.21",
     "@react-native/eslint-config": "0.73.2",
     "@react-native/metro-config": "0.73.5",
-    "@react-native/typescript-config": "0.73.1",
+    "@react-native/typescript-config": "^0.73.1",
     "@types/react": "^18.2.6",
     "@types/react-native-check-box": "^2.1.6",
     "@types/react-native-modalbox": "^1.4.14",

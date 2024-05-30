@@ -23,6 +23,7 @@ const Tab = createBottomTabNavigator();
 export const MainTabNavigator = ({ route }: any) => {
   const navigation: any = useNavigation();
   const { userdata } = route.params;
+  
   return (
     <Tab.Navigator
       screenOptions={{
@@ -120,6 +121,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <Text style={{ fontSize: 13, marginBottom: 5 }}>출석</Text>
           )
         }}
+        initialParams={{ userdata }}
       />
 
       <Tab.Screen

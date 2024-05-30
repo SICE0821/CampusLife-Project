@@ -437,10 +437,12 @@ export const ReqularEventScreenNavigator = ({ navigation, route }: any) => {
 
 //출석체크 페이지 관련 스택 네비게이터
 export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
+    const { userdata } = route.params;
+    //console.log(userdata);
     return (
         <AttendanceStack.Navigator> 
-            <AttendanceStack.Screen name="AttendanceScreen"
-                component={AttendanceScreen}
+            <AttendanceStack.Screen name="AttendanceScreen" 
+                component={AttendanceScreen} initialParams={{ userdata} }
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

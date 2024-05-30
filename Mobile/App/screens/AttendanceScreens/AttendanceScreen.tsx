@@ -9,25 +9,32 @@ import { Camera,
   useCameraDevice, 
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
+import { UserData } from '../../types/type'
 import config from '../../config';
 
 type Lecture = {
+    lecture_id : number,
     credit : number;
     professor_name : string;
     lecture_name : string;
     lecture_room : string;
     lecture_time : string;
     week : string;
+    nonattendance : number,
+    attendance : number,
+    tardy : number,
+    absent : number,
+    weeknum : number,
 }
 
 const AttendanceScreen = ({navigation, route}: any) => {
+  const { userdata } = route.params;
+  const [userData, setUserData] = useState<UserData>(userdata);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const { hasPermission, requestPermission } = useCameraPermission()
   const [isCameraButton, setIsCameraButton] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
   const [lectureList, setLectureList] = useState<Lecture[]>([]);
-  const [currentWeek, setCurrentWeek] = useState(0);
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
   const [lastScannedTime, setLastScannedTime] = useState<null | Date>(null);
   const [isScanned, setIsScanned] = useState(false); // QR 코드가 스캔되었는지 추적
@@ -104,25 +111,79 @@ const AttendanceScreen = ({navigation, route}: any) => {
     }
   
     return timeRanges;
+
   };
+
+  const updateAttendanceStatus = async (lecture: Lecture) => {
+    const periods = generateTimeRanges(lecture.lecture_time).length;
+    const updatedLectureList = lectureList.map((lec) => {
+      if (lec.lecture_name === lecture.lecture_name) {
+        return {
+          ...lec,
+          nonattendance: lec.nonattendance - periods,
+          attendance: lec.attendance + periods,
+          weeknum : lec.weeknum + 1,
+        };
+      }
+      return lec;
+    });
+    setLectureList(updatedLectureList);
+    Updatelecture(updatedLectureList);
+  };
+  
 
 
   const fetchLectureData = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/getlecture`);
-      if (!response.ok) {
-        throw new Error('서버 응답 실패');
-      }
+      const response = await fetch(`${config.serverUrl}/getlecture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_pk : userData.student_pk
+        })
+      })
       const data = await response.json();
-      setLectureList(data); // 서버로부터 받은 강의 목록을 상태에 저장
+      const Data = data.data; //키값을 치면 값을 json에서 추출할 수 있다.
+      setLectureList(Data);
     } catch (error) {
-      console.error('데이터를 가져오는 중 오류 발생:', error);
+      console.error('과목 가져오기 실패:', error);
+    }
+  }
+
+  const Updatelecture = async (lecture: Lecture[]) => {
+    try {
+      const promises = lecture.map(async (lec) => {
+        const response = await fetch('http://192.168.35.12:3000/updatelecture', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            student_id: userData.student_pk,
+            lecture_id : lec.lecture_id,
+            nonattendance: lec.nonattendance,
+            attendance: lec.attendance,
+            tardy: lec.tardy,
+            absent: lec.absent,
+            weeknum : lec.weeknum
+          }),
+        });
+        const data = await response.json();
+        console.log("출석 정보 업데이트 성공:", data);
+      });
+  
+      await Promise.all(promises);
+    } catch (error) {
+      console.log('출석 정보 업데이트 실패:', error);
     }
   };
-
+  
   const openModal = (lecture: Lecture) => {
     setSelectedLecture(lecture);
     setIsModalOpen(true);
+    
   };
 
   const closeModal = () => {
@@ -161,18 +222,18 @@ const AttendanceScreen = ({navigation, route}: any) => {
   }, [route.params?.scannedCode]);
 
   useEffect(() => {
-    if (scannedCode) {
-      setCurrentWeek((prevWeek) => prevWeek + 1);
-      setLastScannedTime(new Date());
-      setIsScanned(true);
-      Alert.alert(
-        'QR 코드 스캔됨',
-        `스캔된 코드: ${scannedCode}`,
-        [{ text: '확인', onPress: () => console.log('확인 버튼 눌림') }],
-        { cancelable: false }
-      );
-    }
-  }, [scannedCode]);
+    if (scannedCode && selectedLecture) {
+    updateAttendanceStatus(selectedLecture);
+    setLastScannedTime(new Date());
+    setIsScanned(true);
+    Alert.alert(
+      'QR 코드 스캔됨',
+      `스캔된 코드: ${scannedCode}`,
+      [{ text: '확인', onPress: () => console.log("asd") }],
+      { cancelable: false }
+    );
+  }
+}, [scannedCode]);
 
   useEffect(() => {
     fetchLectureData(); // 페이지가 로드될 때 강의 목록을 가져옴
@@ -192,7 +253,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
               <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                    미출결: 45 출결: 0 지각: 0 결석: 0</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                    미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )
@@ -206,7 +267,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer2}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
               <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                   미출결: 45 출결: 0 지각: 0 결석: 0</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                   미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )
@@ -233,7 +294,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
               </View>
               <View>
                 <View>
-                  <Text style={styles.ListInfo2}>미출결 : 45  출결 : 0  지각 : 0  결석 : 0</Text>
+                  <Text style={styles.ListInfo2}>미출결: {selectedLecture?.nonattendance}  출결: {selectedLecture?.attendance}  지각: {selectedLecture?.tardy}  결석: {selectedLecture?.absent}</Text>
                 </View>
               </View>
             </View>
@@ -251,7 +312,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
                             <Text style={styles.timeText}>{index + 1}차시            {timeRange}</Text>
                           </View>
                           <View style={styles.Box}>
-                            <View style={[styles.realBox, { backgroundColor: weekIndex < currentWeek ? "#00FF00" : "#909090" }]}>
+                            <View style={[styles.realBox, { backgroundColor: weekIndex < selectedLecture.weeknum ? "#00FF00" : "#909090" }]}>
                             </View>
                           </View>
                         </View>

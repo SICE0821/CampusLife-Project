@@ -1,19 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Text, Alert } from 'react-native';
 import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 
 const FullScreenCamera = ({navigation}: any) => {
   const [isCameraActive, setIsCameraActive] = useState(true);
-  const [isScanning, setIsScanning] = useState(true);
+  const [hasScanned, setHasScanned] = useState(false);
   const device = useCameraDevice('back'); // 후면 카메라를 사용하도록 가정합니다.
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes) => {
-      console.log("QR 인식 됨");
-      navigation.navigate('AttendanceScreen', { scannedCode: codes });
-    }
-  })
+      if (!hasScanned) { 
+        setHasScanned(true);
+        console.log("QR code scanned");
+        navigation.navigate('AttendanceScreen', { scannedCode: codes });
+      }
+    },
+  });
+
+  useEffect(() => {
+    setHasScanned(false); // Reset the scan state when the component mounts
+  }, []);
+
   return (
     <View style={{ flex: 1 }}>
       {/* 전체 화면 카메라 표시 */}

@@ -80,7 +80,7 @@ const ItemRegistration: React.FC = ({ route, navigation }: any) => {
 
   const get_event_obj = async () => {
     try {
-      const response = await fetch('http://192.168.35.207:3000/get_event_obj', {
+      const response = await fetch('http:// 172.16.108.2:3000/get_event_obj', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ const ItemRegistration: React.FC = ({ route, navigation }: any) => {
   };
   const getBarcordMaxNum = async () => {
     try {
-      const response = await fetch('http://192.168.35.207:3000/getMaxBarcordNum');
+      const response = await fetch('http:// 172.16.108.2:3000/getMaxBarcordNum');
       if (!response.ok) {
         throw new Error('서버 응답 실패');
       }
@@ -135,7 +135,7 @@ const ItemRegistration: React.FC = ({ route, navigation }: any) => {
   const PostItemObject = async () => {
     const maxbarcordnum = getBarcordMaxNum();
     try {
-      const response = await fetch('http://192.168.35.207:3000/postItem', {
+      const response = await fetch('http://192.168.35.194:3000/postItem', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ const ItemRegistration: React.FC = ({ route, navigation }: any) => {
 
   const DeleteItemOject = async (itemData : any) => {
     try {
-      const response = await fetch('http://192.168.35.207:3000/deleteItem', {
+      const response = await fetch('http://192.168.35.194:3000/deleteItem', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ const ItemRegistration: React.FC = ({ route, navigation }: any) => {
 
   const UpdateItemOject = async () => {
     try {
-      const response = await fetch('http://192.168.35.207:3000/updateItem', {
+      const response = await fetch('http://192.168.35.194:3000/updateItem', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

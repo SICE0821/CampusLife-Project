@@ -501,18 +501,36 @@ async function getuserpk(user_id, user_passwd) {
 }
 
 // 과목의 정보를 가져오는 쿼리
-async function getlecturelist() {
+async function getLectureList(studentId) {
     let conn;
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(`
-            SELECT lecture_id, professor.name AS professor_name, credit, lecture_name, lecture_room, lecture_time, week 
-            FROM lecture
-            JOIN professor ON lecture.professor_id = professor.professor_id
-            LIMIT 5;
-        `);
+            SELECT 
+                lecture.lecture_id, 
+                professor.name, 
+                lecture.credit, 
+                lecture.lecture_name, 
+                lecture.lecture_room, 
+                lecture.lecture_time, 
+                lecture.week, 
+                lecture_have_object.nonattendance, 
+                lecture_have_object.attendance, 
+                lecture_have_object.tardy, 
+                lecture_have_object.absent,
+                lecture_have_object.weeknum 
+            FROM 
+                lecture
+            JOIN 
+                professor ON lecture.professor_id = professor.professor_id
+            JOIN 
+                lecture_have_object ON lecture.lecture_id = lecture_have_object.lecture_id
+            WHERE 
+                lecture_have_object.student_id = ?
+        `, [studentId]);
         return rows;
     } catch (err) {
+        console.error(err);
         throw err;
     } finally {
         if (conn) conn.end();
@@ -868,7 +886,277 @@ async function getReComment(comment_id) {
     }
 }
 
+//학교의 정보 가져오기
+async function get_campus_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                department.department_id,
+                department.name AS department_name, 
+                campus.campus_id, 
+                campus.name AS campus_name,
+                campus_have_department.department_phone, 
+                campus_have_department.department_floor, 
+                campus_have_department.department_building
+            FROM 
+                campus_have_department
+            JOIN 
+                department ON campus_have_department.department_id = department.department_id
+            JOIN 
+                campus ON campus_have_department.campus_id = campus.campus_id;
+        `;
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//학교 건물 정보 가져오기
+async function get_campus_building_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                campus.campus_id, 
+                campus_building.building_name, 
+                campus_building.campus_place, 
+                campus_building.latitude,
+                campus_building.longitude
+            FROM 
+                campus_building
+            JOIN 
+                campus ON campus_building.campus_id = campus.campus_id;
+        `;
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//학교의 정보 가져오기
+async function get_campus_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                department.department_id,
+                department.name AS department_name, 
+                campus.campus_id, 
+                campus.name AS campus_name,
+                campus_have_department.department_phone, 
+                campus_have_department.department_floor, 
+                campus_have_department.department_building
+            FROM 
+                campus_have_department
+            JOIN 
+                department ON campus_have_department.department_id = department.department_id
+            JOIN 
+                campus ON campus_have_department.campus_id = campus.campus_id;
+        `;
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//학교 건물 정보 가져오기
+async function get_campus_building_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                campus.campus_id, 
+                campus_building.building_name, 
+                campus_building.campus_place, 
+                campus_building.latitude,
+                campus_building.longitude
+            FROM 
+                campus_building
+            JOIN 
+                campus ON campus_building.campus_id = campus.campus_id;
+        `;
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 async function updateUserImg(user_pk, photopath) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const query = `UPDATE user
+        SET profilePhoto = ?
+        WHERE user_id = ?;`
+        await conn.query(query, [photopath, user_pk]);
+        console.log("업데이트 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function post_comment(post_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO comment (post_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [post_id, user_id, contents]);
+        //console.log("댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+//대댓글 달기
+async function post_recomment(comment_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO recomment (comment_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [comment_id, user_id, contents]);
+        console.log("대댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('대댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function post_like_up(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET \`like\` = \`like\` + 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function comment_like_up(comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE comment
+        SET \`like\` = \`like\` + 1
+        WHERE comment_id = ?`
+        const result = await conn.query(query, [comment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
+async function recomment_like_up(recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE recomment
+        SET \`like\` = \`like\` + 1
+        WHERE recomment_id = ?`
+        const result = await conn.query(query, [recomment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function write_post(user_id, department_check, inform_check, title, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
+        VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
+        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//학과 게시판에서 전체 게시글을 가져오는 쿼리
+async function searchPost(search_text) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " +
+            "FROM post " +
+            "LEFT JOIN user ON post.user_id = user.user_id " +
+            "LEFT JOIN student ON user.student_id = student.student_id " +
+            "WHERE post.contents LIKE ? OR post.title LIKE ? " +
+            "ORDER BY post.date DESC;",
+            [`%${search_text}%`, `%${search_text}%`]
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function view_count_up(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET view = view + 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}async function updateUserImg(user_pk, photopath) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -1033,7 +1321,7 @@ module.exports = {
     getschoolpostdata,
     insertDataIntoDB,
     getuserpk,
-    getlecturelist,
+    getLectureList,
     get_event_objcet,
     getBarcordMaxNum,
     PostItem,
@@ -1050,6 +1338,8 @@ module.exports = {
     delete_book_mark,
     get_post_detail,
     getComment,
+    get_campus_Info,
+    get_campus_building_Info,
     getReComment,
     updateUserImg,
     post_comment,
