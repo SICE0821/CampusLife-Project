@@ -155,7 +155,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const Updatelecture = async (lecture: Lecture[]) => {
     try {
       const promises = lecture.map(async (lec) => {
-        const response = await fetch('http://192.168.35.12:3000/updatelecture', {
+        const response = await fetch(`${config.serverUrl}/updatelecture`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ import { Table, Row, Rows } from "react-native-table-component";
 import { Picker } from '@react-native-picker/picker';
 import { NaverMapView, Camera, NaverMapMarkerOverlay } from "@mj-studio/react-native-naver-map";
 import IconA from 'react-native-vector-icons/FontAwesome6';
+import config from '../../config';
 
 const width = Dimensions.get("window").width * 0.98;
 
@@ -50,7 +51,7 @@ const SchoolInfoScreen = () => {
 
   const fetchSchoolData = async () => {
     try {
-      const response = await fetch('http://192.168.219.106:3000/getSchoolInfo');
+      const response = await fetch(`${config.serverUrl}/getSchoolInfo`);
       if (!response.ok) throw new Error('서버 응답 실패');
       const data = await response.json();
       setSchoolData(data);
@@ -61,7 +62,7 @@ const SchoolInfoScreen = () => {
 
   const fetchSchoolBuildingData = async () => {
     try {
-      const response = await fetch('http://192.168.219.106:3000/getSchoolBuildingInfo');
+      const response = await fetch(`${config.serverUrl}/getSchoolBuildingInfo`);
       if (!response.ok) throw new Error('서버 응답 실패');
       const data = await response.json();
       setSchoolBuildingData(data);

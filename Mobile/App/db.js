@@ -649,7 +649,7 @@ async function get_department_name(department_name) {
         // 데이터 업데이트 쿼리 작성
         const query = "SELECT department.name FROM department WHERE department_id = ?"
         const result = await conn.query(query, [department_name]);
-        console.log(result);
+        //console.log(result);
         return result;
     } catch (err) {
         console.error('Error updating data:', err);

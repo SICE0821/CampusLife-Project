@@ -27,7 +27,27 @@ const { getGeneralPosts,
         get_post_detail,
         getComment,
         get_campus_Info,
-        get_campus_building_Info } = require('./db.js'); // db 파일에서 함수 가져오기
+        get_campus_building_Info,
+        getReComment,
+        updateUserImg,
+        post_comment,
+        post_recomment,
+        post_like_up,
+        comment_like_up,
+        recomment_like_up,
+        write_post,
+        getHotPosts,
+        getBookmarkPosts,
+        getdepartmentHotPosts,
+        getdepartmentBookmarkPosts,
+        searchPost,
+        view_count_up,
+        getNoticePosts,
+        getNoticeDepartmentPosts,
+        getNoticeHotPosts,
+        getNoticeDepartmentHotPosts,
+        getNoticeBookmarkPosts,
+        getNoticeDepartmentBookmarkPosts } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
 
@@ -594,7 +614,7 @@ app.post('/get_department_name', async (req, res) => {
   };
   res.json(Department);
   
-  console.log("학과 PK성공적으로 넣음");
+  //console.log("학과 PK성공적으로 넣음");
 });
 
 //학교 이름 가져오기
@@ -606,7 +626,7 @@ app.post('/get_university_name', async (req, res) => {
   };
   res.json(University);
   
-  console.log("학교 PK성공적으로 넣음");
+  //console.log("학교 PK성공적으로 넣음");
 });
 
 //계정 삭제
@@ -735,26 +755,6 @@ app.post('/get_comment', async (req, res) => {
       console.log("성공적으로 댓글 데이터 보냄");
 });
 
-// 학교 정보 가져오기
-app.get('/getSchoolInfo', async (req, res) => {
-  try {
-      const rows = await get_campus_Info();
-      const processedData = rows.map(item => ({
-          department_id: item.department_id,
-          department_name: item.department_name,
-          campus_id: item.campus_id,
-          campus_name: item.campus_name,
-          department_phone: item.department_phone,
-          department_floor: item.department_floor,
-          department_building: item.department_building
-      }));
-      res.json(processedData);
-      console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-      console.error(error); 
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 // 학교 건물 정보 가져오기
 app.get('/getSchoolBuildingInfo', async (req, res) => {
@@ -796,24 +796,6 @@ app.get('/getSchoolInfo', async (req, res) => {
   }
 });
 
-// 학교 건물 정보 가져오기
-app.get('/getSchoolBuildingInfo', async (req, res) => {
-  try {
-      const rows = await get_campus_building_Info();
-      const processedData = rows.map(item => ({
-          campus_id: item.campus_id,
-          building_name: item.building_name,
-          campus_place: item.campus_place,
-          latitude: item.latitude,
-          longitude: item.longitude
-      }));
-      res.json(processedData);
-      console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-      console.error(error); 
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
 
 //포스터 대댓글 하나 가져오기
 app.post('/get_recomment', async (req, res) => {
