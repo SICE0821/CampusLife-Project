@@ -20,11 +20,7 @@ function LoginScreen({ navigation }: any) {
 
   const get_user_data = async () => {
     try {
-<<<<<<< HEAD
       const response = await fetch('http://192.168.219.106:3000/get_user_data', {
-=======
-      const response = await fetch('http://192.168.35.12:3000/get_user_data', {
->>>>>>> ad207083af697c8d8033f8090fd1358765a9c97e
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -50,11 +46,7 @@ function LoginScreen({ navigation }: any) {
   const handleLogin = async () => {
 
     try {
-<<<<<<< HEAD
       const response = await fetch('http://192.168.219.106:3000/login', {
-=======
-      const response = await fetch('http://192.168.35.12:3000/login', {
->>>>>>> ad207083af697c8d8033f8090fd1358765a9c97e
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

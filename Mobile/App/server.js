@@ -26,11 +26,7 @@ const { getGeneralPosts,
         get_post_detail,
         getComment,
         get_campus_Info,
-<<<<<<< HEAD
         get_campus_building_Info } = require('./db.js'); // db 파일에서 함수 가져오기
-=======
-        Updatelecture, } = require('./db.js'); // db 파일에서 함수 가져오기
->>>>>>> ad207083af697c8d8033f8090fd1358765a9c97e
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -491,7 +487,6 @@ app.get('/getSchoolInfo', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 // 학교 건물 정보 가져오기
 app.get('/getSchoolBuildingInfo', async (req, res) => {
   try {
@@ -511,21 +506,6 @@ app.get('/getSchoolBuildingInfo', async (req, res) => {
   }
 });
 
-=======
-//힉생의 과목 업데이트
-app.post('/updatelecture', async (req, res) => {
-  const { nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id } = req.body;
-  console.log("성공적으로 값 넣음");
-  try {
-    await Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum); // await 추가
-    console.log("성공적으로 업데이트 됨");
-    res.status(200).send({ message: "과목 업데이트가 완료되었습니다." });
-  } catch (error) {
-    console.error("계정 업데이트 실패", error);
-    res.status(500).send({ message: "과목 업데이트 실패" });
-  }
-});
->>>>>>> ad207083af697c8d8033f8090fd1358765a9c97e
   
 //서버 시작
 app.listen(PORT, () => {
