@@ -26,7 +26,7 @@ const { getGeneralPosts,
         get_post_detail,
         getComment,
         get_campus_Info,
-        Updatelecture, } = require('./db.js'); // db 파일에서 함수 가져오기
+        get_campus_building_Info } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 
 function formatDate(dateString) {
@@ -489,19 +489,25 @@ app.get('/getSchoolInfo', async (req, res) => {
   }
 });
 
-//힉생의 과목 업데이트
-app.post('/updatelecture', async (req, res) => {
-  const { nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id } = req.body;
-  console.log("성공적으로 값 넣음");
+// 학교 건물 정보 가져오기
+app.get('/getSchoolBuildingInfo', async (req, res) => {
   try {
-    await Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum); // await 추가
-    console.log("성공적으로 업데이트 됨");
-    res.status(200).send({ message: "과목 업데이트가 완료되었습니다." });
+      const rows = await get_campus_building_Info();
+      const processedData = rows.map(item => ({
+          campus_id: item.campus_id,
+          building_name: item.building_name,
+          campus_place: item.campus_place,
+          latitude: item.latitude,
+          longitude: item.longitude
+      }));
+      res.json(processedData);
+      console.log("성공적으로 데이터 보냄");
   } catch (error) {
-    console.error("계정 업데이트 실패", error);
-    res.status(500).send({ message: "과목 업데이트 실패" });
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
   
 //서버 시작
 app.listen(PORT, () => {
