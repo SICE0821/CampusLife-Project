@@ -12,6 +12,7 @@ import {
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import { UserData } from "../../types/type"
+import config from '../../config';
 
 function LoginScreen({ navigation }: any) {
   const [username, setUsername] = useState('');
@@ -20,7 +21,7 @@ function LoginScreen({ navigation }: any) {
 
   const get_user_data = async () => {
     try {
-      const response = await fetch('http://192.168.35.83:3000/get_user_data', {
+      const response = await fetch(`${config.serverUrl}/get_user_data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -46,7 +47,7 @@ function LoginScreen({ navigation }: any) {
   const handleLogin = async () => {
 
     try {
-      const response = await fetch('http://192.168.35.83:3000/login', {
+      const response = await fetch(`${config.serverUrl}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

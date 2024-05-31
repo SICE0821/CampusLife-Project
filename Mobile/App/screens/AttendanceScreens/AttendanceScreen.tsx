@@ -10,6 +10,7 @@ import { Camera,
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
 import { UserData,Lecture } from '../../types/type'
+import config from '../../config';
 
 const AttendanceScreen = ({navigation, route}: any) => {
   const { userdata } = route.params;
@@ -119,7 +120,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   const fetchLectureData = async () => {
     try {
-      const response = await fetch('http://192.168.35.83:3000/getlecture', {
+      const response = await fetch(`${config.serverUrl}/getlecture`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +140,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const Updatelecture = async (lecture: Lecture[]) => {
     try {
       const promises = lecture.map(async (lec) => {
-        const response = await fetch('http://192.168.35.83:3000/updatelecture', {
+        const response = await fetch(`${config.serverUrl}/updatelecture`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

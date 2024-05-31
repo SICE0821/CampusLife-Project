@@ -3,9 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-import {PostTopTabNavigator} from "../navigation/TopTabNavigator"
+import { PostTopTabNavigator } from "../navigation/TopTabNavigator"
 import { MainScreenStackNavigator } from './StackNavigator';
-import { CommunityScreenStackNavigator } from './StackNavigator';
+import { CommunityScreenStackNavigator, NoticeScreenStackNavigator } from './StackNavigator';
 import { EventTopTabNavigator } from './TopTabNavigator'
 import { EventScreenStackNavigator } from './StackNavigator';
 import { AttendanceScreenStackNavigator } from './StackNavigator';
@@ -56,7 +56,7 @@ export const MainTabNavigator = ({ route }: any) => {
       />
       <Tab.Screen
         name="CommunityScreenStackNavigator"
-        component = {CommunityScreenStackNavigator}
+        component={CommunityScreenStackNavigator}
         options={{
           headerShown: false,
           //tabBarStyle : {display : 'none'},
@@ -65,6 +65,22 @@ export const MainTabNavigator = ({ route }: any) => {
           ),
           tabBarLabel: () => (
             <Text style={{ fontSize: 13, marginBottom: 5 }}>커뮤니티</Text>
+          )
+        }}
+        initialParams={{ userdata }}
+      />
+      
+      <Tab.Screen
+        name="NoticeScreenStackNavigator"
+        component={NoticeScreenStackNavigator}
+        options={{
+          headerShown: false,
+          //tabBarStyle : {display : 'none'},
+          tabBarIcon: ({ color, size }) => (
+            <IconA name="megaphone" size={30} color={color} />
+          ),
+          tabBarLabel: () => (
+            <Text style={{ fontSize: 13, marginBottom: 5 }}>공지사항</Text>
           )
         }}
         initialParams={{ userdata }}

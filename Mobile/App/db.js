@@ -11,13 +11,204 @@ const pool = mariadb.createPool({
     database: 'campuslife',
 });
 
+
+//학교 공지사항에서 전체 게시글 가져오는 쿼리
+async function getNoticePosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 0 AND post.inform_check = 1 "
+            + "ORDER BY post.date DESC"
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//학교 공지사항에서 학과 게시글 가져오는 쿼리
+async function getNoticeDepartmentPosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 1 AND post.inform_check = 1 "
+            + "ORDER BY post.date DESC"
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//학교 게시판에서 핫 게시물을 가져오는 쿼리
+async function getNoticeHotPosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 0 AND post.inform_check = 1 AND post.`like` >= 30 "
+            + "ORDER BY post.date DESC"
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//학교 게시판에서 핫 게시물을 가져오는 쿼리
+async function getNoticeDepartmentHotPosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 1 AND post.inform_check = 1 AND post.`like` >= 30 "
+            + "ORDER BY post.date DESC"
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//학교 공지사항에서 책갈피 가져오기
+async function getNoticeBookmarkPosts(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT 
+            post.post_id, 
+            post.title, 
+            post.contents, 
+            post.date, 
+            post.view, 
+            post.\`like\`, 
+            student.name, 
+            user.admin_check
+        FROM 
+            post
+        LEFT JOIN 
+            user ON post.user_id = user.user_id
+        LEFT JOIN 
+            student ON user.student_id = student.student_id
+        LEFT JOIN 
+            user_have_post ON post.post_id = user_have_post.post_id
+        WHERE 
+            post.department_check = 0 
+            AND post.inform_check = 1 
+            AND user_have_post.user_id = ?
+        GROUP BY 
+            post.post_id
+        ORDER BY 
+            COUNT(user_have_post.post_id) DESC;`
+        );
+        const rows = await conn.query(query, [user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//학과 공지사항에서 책갈피 가져오기
+async function getNoticeDepartmentBookmarkPosts(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT 
+            post.post_id, 
+            post.title, 
+            post.contents, 
+            post.date, 
+            post.view, 
+            post.\`like\`, 
+            student.name, 
+            user.admin_check
+        FROM 
+            post
+        LEFT JOIN 
+            user ON post.user_id = user.user_id
+        LEFT JOIN 
+            student ON user.student_id = student.student_id
+        LEFT JOIN 
+            user_have_post ON post.post_id = user_have_post.post_id
+        WHERE 
+            post.department_check = 1 
+            AND post.inform_check = 1 
+            AND user_have_post.user_id = ?
+        GROUP BY 
+            post.post_id
+        ORDER BY 
+            COUNT(user_have_post.post_id) DESC;`
+        );
+        const rows = await conn.query(query, [user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //전체 게시판에서 전체 게시글을 가져오는 쿼리
 async function getGeneralPosts() {
     let conn;
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " 
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -38,13 +229,81 @@ async function getGeneralPosts() {
     }
 }
 
+//전체 게시판에서 핫 게시물을 가져오는 쿼리
+async function getHotPosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 0 AND post.inform_check =0 AND post.`like` >= 30 "
+            + "ORDER BY post.date DESC"
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//전체 게시판에서 책갈피한 게시물을 가져오는 쿼리
+async function getBookmarkPosts(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT 
+            post.post_id, 
+            post.title, 
+            post.contents, 
+            post.date, 
+            post.view, 
+            post.\`like\`, 
+            student.name, 
+            user.admin_check
+        FROM 
+            post
+        LEFT JOIN 
+            user ON post.user_id = user.user_id
+        LEFT JOIN 
+            student ON user.student_id = student.student_id
+        LEFT JOIN 
+            user_have_post ON post.post_id = user_have_post.post_id
+        WHERE 
+            post.department_check = 0 
+            AND post.inform_check = 0 
+            AND user_have_post.user_id = ?
+        GROUP BY 
+            post.post_id
+        ORDER BY 
+            COUNT(user_have_post.post_id) DESC;`
+        );
+        const rows = await conn.query(query, [user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //학과 게시판에서 전체 게시글을 가져오는 쿼리
 async function getDepartmentPosts() {
     let conn;
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " 
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -57,6 +316,74 @@ async function getDepartmentPosts() {
             + "post.department_check = 1 AND post.inform_check =0 "
             + "ORDER BY post.date DESC"
         );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//학과 게시판에서 핫 게시물을 가져오는 쿼리
+async function getdepartmentHotPosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 1 AND post.inform_check = 0 AND post.`like` >= 30 "
+            + "ORDER BY post.date DESC"
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+// 게시판에서 책갈피한 게시물을 가져오는 쿼리
+async function getdepartmentBookmarkPosts(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT 
+            post.post_id, 
+            post.title, 
+            post.contents, 
+            post.date, 
+            post.view, 
+            post.\`like\`, 
+            student.name, 
+            user.admin_check
+        FROM 
+            post
+        LEFT JOIN 
+            user ON post.user_id = user.user_id
+        LEFT JOIN 
+            student ON user.student_id = student.student_id
+        LEFT JOIN 
+            user_have_post ON post.post_id = user_have_post.post_id
+        WHERE 
+            post.department_check = 1 
+            AND post.inform_check = 0 
+            AND user_have_post.user_id = ?
+        GROUP BY 
+            post.post_id
+        ORDER BY 
+            COUNT(user_have_post.post_id) DESC;`
+        );
+        const rows = await conn.query(query, [user_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -164,7 +491,7 @@ async function getuserpk(user_id, user_passwd) {
         student ON user.student_id = student.student_id
         WHERE
         user.id = ? AND user.passwd = ?`, [user_id, user_passwd]);
-        
+
         return rows;
     } catch (err) {
         console.error('Error inserting data:', err);
@@ -266,8 +593,8 @@ async function UpdateItem(name, newname, price, using_time, image_num, sell_chec
     try {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
-        const query = "UPDATE event_object SET" 
-                        + " name = ?, price = ?, using_time = ?, image_num = ?, sell_check = ?, `explain` = ? WHERE NAME = ?"
+        const query = "UPDATE event_object SET"
+            + " name = ?, price = ?, using_time = ?, image_num = ?, sell_check = ?, `explain` = ? WHERE NAME = ?"
         const result = await conn.query(query, [newname, price, using_time, image_num, sell_check, explain, name]);
         // 쿼리 실행
         console.log('Data updated successfully:', result);
@@ -285,8 +612,8 @@ async function DeleteItem(name, deltenum) {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
         const query = "DELETE FROM event_object "
-                     + "WHERE name = ? "
-                     + "LIMIT ?"
+            + "WHERE name = ? "
+            + "LIMIT ?"
         const result = await conn.query(query, [name, deltenum]);
         // 쿼리 실행
         console.log('Data updated successfully:', result);
@@ -304,7 +631,7 @@ async function DeleteUser(user_pk) {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
         const query = "DELETE FROM user "
-                     + "WHERE user_id = ?"
+            + "WHERE user_id = ?"
         const result = await conn.query(query, [user_pk]);
         // 쿼리 실행
         console.log('Data updated successfully:', result);
@@ -323,7 +650,7 @@ async function get_department_name(department_name) {
         // 데이터 업데이트 쿼리 작성
         const query = "SELECT department.name FROM department WHERE department_id = ?"
         const result = await conn.query(query, [department_name]);
-        console.log(result);
+        //console.log(result);
         return result;
     } catch (err) {
         console.error('Error updating data:', err);
@@ -356,7 +683,7 @@ async function DeleteUser(user_pk) {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
         const query = "DELETE FROM user "
-                     + "WHERE user_id = ?"
+            + "WHERE user_id = ?"
         const result = await conn.query(query, [user_pk]);
         // 쿼리 실행
         console.log('Data updated successfully:', result);
@@ -375,8 +702,8 @@ async function Updateaccount(email, grade, currentstatus, student_id) {
     try {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
-        const query = "UPDATE student SET" 
-                        + " email = ?, grade = ?, currentstatus = ? WHERE student_id = ?"
+        const query = "UPDATE student SET"
+            + " email = ?, grade = ?, currentstatus = ? WHERE student_id = ?"
         const result = await conn.query(query, [email, grade, currentstatus, student_id]);
         // 쿼리 실행
         console.log('Data updated successfully:', result);
@@ -411,7 +738,7 @@ async function DeleteImg(profilePhoto) {
         conn = await pool.getConnection();
         // 데이터 업데이트 쿼리 작성
         const query = "DELETE FROM user "
-                     + "WHERE profilePhoto = ? "
+            + "WHERE profilePhoto = ? "
         const result = await conn.query(query, [profilePhoto]);
         // 쿼리 실행
         console.log('Data updated successfully:', result);
@@ -476,18 +803,18 @@ async function get_post_detail(post_id) {
         conn = await pool.getConnection();
         // 데이터 삽입 쿼리 작성
         const rows = await conn.query("SELECT "
-            +"student.name AS student_name, department.name AS department_name,"
-            +"post.date, post.title,"
-            +"post.`contents`, post.`like`,"
-            +"post.`view`, user.profilePhoto "
-            +"FROM "
-            +"student "
-            +"LEFT JOIN "
-            +"user ON student.student_id = user.student_id "
-            +"LEFT JOIN "
-            +"department ON department.department_id = student.department_id "
-            +"LEFT JOIN post ON post.user_id = user.user_id "
-            +"WHERE post.post_id = ?", post_id)
+            + "student.name AS student_name, department.name AS department_name,"
+            + "post.date, post.title,"
+            + "post.`contents`, post.`like`,"
+            + "post.`view`, user.profilePhoto, post.post_id "
+            + "FROM "
+            + "student "
+            + "LEFT JOIN "
+            + "user ON student.student_id = user.student_id "
+            + "LEFT JOIN "
+            + "department ON department.department_id = student.department_id "
+            + "LEFT JOIN post ON post.user_id = user.user_id "
+            + "WHERE post.post_id = ?", post_id)
         //console.log(rows);
         return rows;
     } catch (err) {
@@ -499,7 +826,6 @@ async function get_post_detail(post_id) {
 
 //댓글 리스트 가져오기
 async function getComment(post_ida) {
-    console.log(post_ida);
     let conn;
     try {
         conn = await pool.getConnection();
@@ -508,7 +834,7 @@ async function getComment(post_ida) {
             SELECT 
                 comment.comment_id, comment.contents, comment.date, comment.\`like\`,
                 student.name AS student_name, department.name AS department_name, 
-                user.id, post.post_id
+                user.id, post.post_id, user.profilePhoto
             FROM 
                 user
                 LEFT JOIN student ON user.student_id = student.student_id
@@ -516,12 +842,44 @@ async function getComment(post_ida) {
                 LEFT JOIN comment ON comment.user_id = user.user_id
                 LEFT JOIN post ON comment.post_id = post.post_id
             WHERE 
-                post.post_id = ?`;
+                post.post_id = ? ORDER BY comment.date DESC`;
 
         const rows = await conn.query(query, [post_ida]);
-        //console.log(rows);
         return rows;
-        
+
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//대댓글 가져오기
+async function getReComment(comment_id) {
+    console.log(comment_id);
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const query = `
+        SELECT 
+        recomment.recomment_id, recomment.\`contents\`, recomment.date, recomment.\`like\`,
+        student.name AS student_name, department.name AS department_name, comment.comment_id,user.user_id, user.profilePhoto
+        FROM
+        recomment
+        LEFT JOIN
+        comment ON recomment.comment_id = comment.comment_id
+        LEFT JOIN
+        user ON user.user_id = recomment.user_id
+        LEFT JOIN
+        student ON student.student_id = user.student_id
+        LEFT JOIN
+        department ON department.department_id = student.department_id
+        WHERE comment.comment_id = ?;`;
+
+        const rows = await conn.query(query, [comment_id]);
+        return rows;
+
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -540,7 +898,6 @@ async function get_campus_Info() {
                 department.name AS department_name, 
                 campus.campus_id, 
                 campus.name AS campus_name,
-                campus_have_department.campus_place,
                 campus_have_department.department_phone, 
                 campus_have_department.department_floor, 
                 campus_have_department.department_building
@@ -588,6 +945,373 @@ async function get_campus_building_Info() {
     }
 }
 
+//학교의 정보 가져오기
+async function get_campus_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                department.department_id,
+                department.name AS department_name, 
+                campus.campus_id, 
+                campus.name AS campus_name,
+                campus_have_department.department_phone, 
+                campus_have_department.department_floor, 
+                campus_have_department.department_building
+            FROM 
+                campus_have_department
+            JOIN 
+                department ON campus_have_department.department_id = department.department_id
+            JOIN 
+                campus ON campus_have_department.campus_id = campus.campus_id;
+        `;
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//학교 건물 정보 가져오기
+async function get_campus_building_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                campus.campus_id, 
+                campus_building.building_name, 
+                campus_building.campus_place, 
+                campus_building.latitude,
+                campus_building.longitude
+            FROM 
+                campus_building
+            JOIN 
+                campus ON campus_building.campus_id = campus.campus_id;
+        `;
+        const result = await conn.query(query);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function updateUserImg(user_pk, photopath) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const query = `UPDATE user
+        SET profilePhoto = ?
+        WHERE user_id = ?;`
+        await conn.query(query, [photopath, user_pk]);
+        console.log("업데이트 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function post_comment(post_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO comment (post_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [post_id, user_id, contents]);
+        //console.log("댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+//대댓글 달기
+async function post_recomment(comment_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO recomment (comment_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [comment_id, user_id, contents]);
+        console.log("대댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('대댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function post_like_up(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET \`like\` = \`like\` + 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function comment_like_up(comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE comment
+        SET \`like\` = \`like\` + 1
+        WHERE comment_id = ?`
+        const result = await conn.query(query, [comment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
+async function recomment_like_up(recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE recomment
+        SET \`like\` = \`like\` + 1
+        WHERE recomment_id = ?`
+        const result = await conn.query(query, [recomment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function write_post(user_id, department_check, inform_check, title, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
+        VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
+        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//학과 게시판에서 전체 게시글을 가져오는 쿼리
+async function searchPost(search_text) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " +
+            "FROM post " +
+            "LEFT JOIN user ON post.user_id = user.user_id " +
+            "LEFT JOIN student ON user.student_id = student.student_id " +
+            "WHERE post.contents LIKE ? OR post.title LIKE ? " +
+            "ORDER BY post.date DESC;",
+            [`%${search_text}%`, `%${search_text}%`]
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function view_count_up(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET view = view + 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}async function updateUserImg(user_pk, photopath) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 삽입 쿼리 작성
+        const query = `UPDATE user
+        SET profilePhoto = ?
+        WHERE user_id = ?;`
+        await conn.query(query, [photopath, user_pk]);
+        console.log("업데이트 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function post_comment(post_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO comment (post_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [post_id, user_id, contents]);
+        //console.log("댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+//대댓글 달기
+async function post_recomment(comment_id, user_id, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO recomment (comment_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
+        await conn.query(query, [comment_id, user_id, contents]);
+        console.log("대댓글달기 성공!");
+        return true;
+    } catch (err) {
+        //console.error('대댓글달기 실패!:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function post_like_up(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET \`like\` = \`like\` + 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function comment_like_up(comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE comment
+        SET \`like\` = \`like\` + 1
+        WHERE comment_id = ?`
+        const result = await conn.query(query, [comment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
+async function recomment_like_up(recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE recomment
+        SET \`like\` = \`like\` + 1
+        WHERE recomment_id = ?`
+        const result = await conn.query(query, [recomment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function write_post(user_id, department_check, inform_check, title, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
+        VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
+        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//학과 게시판에서 전체 게시글을 가져오는 쿼리
+async function searchPost(search_text) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " +
+            "FROM post " +
+            "LEFT JOIN user ON post.user_id = user.user_id " +
+            "LEFT JOIN student ON user.student_id = student.student_id " +
+            "WHERE post.contents LIKE ? OR post.title LIKE ? " +
+            "ORDER BY post.date DESC;",
+            [`%${search_text}%`, `%${search_text}%`]
+        );
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function view_count_up(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET view = view + 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -616,5 +1340,25 @@ module.exports = {
     get_post_detail,
     getComment,
     get_campus_Info,
-    get_campus_building_Info
+    get_campus_building_Info,
+    getReComment,
+    updateUserImg,
+    post_comment,
+    post_recomment,
+    post_like_up,
+    comment_like_up,
+    recomment_like_up,
+    write_post,
+    getHotPosts,
+    getBookmarkPosts,
+    getdepartmentHotPosts,
+    getdepartmentBookmarkPosts,
+    searchPost,
+    view_count_up,
+    getNoticePosts,
+    getNoticeDepartmentPosts,
+    getNoticeHotPosts,
+    getNoticeDepartmentHotPosts,
+    getNoticeBookmarkPosts,
+    getNoticeDepartmentBookmarkPosts,
 };

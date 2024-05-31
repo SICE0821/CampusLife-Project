@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Image, Text, TextInput, TouchableOpacity, Alert} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import config from '../../config';
 
 const Register = ({navigation}: any) => {
   const [username, setUsername] = useState('');
@@ -12,7 +13,7 @@ const Register = ({navigation}: any) => {
 
   const handleRegister = async ({navigation} :any) => {
     try {
-      const response = await fetch('http://192.168.35.83:3000/register', {
+      const response = await fetch(`${config.serverUrl}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
