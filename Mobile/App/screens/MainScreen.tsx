@@ -207,7 +207,7 @@ const MainPage = ({navigation ,route} : any) => {
                     <Text style = {{marginLeft : 2,marginBottom : 6, color : 'black'}}> <IconA name="payments" size ={36} /></Text>
                     <Text style = {{fontSize : 24, marginLeft : 5, marginBottom : 11, color : 'black'}}>{userData.point}</Text>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate("EventScreenStackNavigator")}>
+                      onPress={() => navigation.navigate("전체")}>
                       <Text style = {{marginBottom : 9, color : 'black'}}><IconB name = {"caretright"} size = {22}/></Text>
                     </TouchableOpacity>
                   </View>
@@ -289,7 +289,10 @@ const MainPage = ({navigation ,route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학교 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('NoticeSchoolPostsScreen')}>
+              <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            </TouchableOpacity>
+            
             <Text style = {{marginTop : 26,}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -347,7 +350,9 @@ const MainPage = ({navigation ,route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학사 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <TouchableOpacity onPress={() => console.log("이동시켜주라")}>
+              <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            </TouchableOpacity>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>

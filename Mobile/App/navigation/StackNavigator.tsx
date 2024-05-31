@@ -33,6 +33,7 @@ import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator, NoticeTopbTabNavigator } from './TopTabNavigator'
 import ItemRegistration from '../admin_screen/ItemRegistration.tsx/ItemRegistration'
+import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPostsScreen'
 
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -96,8 +97,8 @@ export const RootStackNavigator = (route: any) => {
                 })}
             />
             <RootStack.Screen
-                name="NoticePostDetailScreen"
-                component={NoticePostDetailScreen}
+                name="NoticeSchoolPostsScreen"
+                component={NoticeSchoolPostsScreen}
                 options={({ navigation }: any) => ({
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -300,6 +301,15 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerTitleAlign: 'center',
                     title: '이벤트',
                 }} />
+
+                 <MainStack.Screen
+                name="NoticeScreenStackNavigator"
+                component={NoticeScreenStackNavigator}
+                initialParams={{ department_check : 0, userdata}}
+                options={{
+                    headerShown : false,
+                }} />
+                
         </MainStack.Navigator>
     );
 };
