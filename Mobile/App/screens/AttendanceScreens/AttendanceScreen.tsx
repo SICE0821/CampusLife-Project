@@ -9,7 +9,7 @@ import { Camera,
   useCameraDevice, 
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
-import { UserData,Lecture } from '../../types/type'
+import { UserData, Lecture } from '../../types/type'
 import config from '../../config';
 
 const AttendanceScreen = ({navigation, route}: any) => {
