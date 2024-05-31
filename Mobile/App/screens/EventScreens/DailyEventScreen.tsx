@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Calendar } from 'react-native-calendars';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, TouchableHighlight } from 'react-native';
 
-const DailyEventScreen: React.FC = () => {
+const DailyEventScreen = (naviagation : any) => {
   const today = new Date();
   const year = today.getFullYear().toString();
   const month = (today.getMonth() + 1).toString().padStart(2, '0');
