@@ -73,7 +73,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '172.16.106.55',
   port: 3306,
   user: 'root',
   password: '1214',
