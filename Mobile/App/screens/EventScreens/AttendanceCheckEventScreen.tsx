@@ -4,7 +4,7 @@ import { Modal, View, Text, StyleSheet, TouchableOpacity, TouchableHighlight } f
 
 const AttendanceCheckEventScreen = () => {
   return (
-    <View>
+    <View style = {styles.container}>
       <Text>출석 체크 이벤트 페이지</Text>
     </View>
   );
