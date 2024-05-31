@@ -206,6 +206,10 @@ const MainPage = ({navigation ,route} : any) => {
                   <View style = {styles.point}>
                     <Text style = {{marginLeft : 2,marginBottom : 6, color : 'black'}}> <IconA name="payments" size ={36} /></Text>
                     <Text style = {{fontSize : 24, marginLeft : 5, marginBottom : 11, color : 'black'}}>{userData.point}</Text>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("전체")}>
+                      <Text style = {{marginBottom : 9, color : 'black'}}><IconB name = {"caretright"} size = {22}/></Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -240,18 +244,22 @@ const MainPage = ({navigation ,route} : any) => {
             <Text style = {{marginTop : 1, marginLeft : 5, color : "#FFC700"}}><IconF name = "ticket" size = {27}/></Text>
           </View>
           <Swiper loop = {true}>
-            <View style = {styles.eventbox}>
-              <View style = {styles.eventpicture}>
-                <Image style = {{width : 430, height : 260, backgroundColor : 'red'}}
-                        source={attendancepng}
-                        />
+              <TouchableOpacity
+                onPress={() => navigation.navigate("AttendanceCheckEventScreen")} 
+                style = {styles.eventbox}>
+                <View style = {styles.eventpicture}>
+                  <Image style = {{width : 430, height : 260}}
+                          source={attendancepng}
+                          />
+                  </View>
+                <View style = {styles.eventtext}>
+                  <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>출석체크 이벤트!</Text>
+                  <Text style = {{marginLeft : 10,}}>앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!</Text>
                 </View>
-              <View style = {styles.eventtext}>
-                <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>출석체크 이벤트!</Text>
-                <Text style = {{marginLeft : 10,}}>앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!</Text>
-              </View>
-            </View>
-            <View style = {styles.eventbox}>
+              </TouchableOpacity>
+            <TouchableOpacity 
+              style = {styles.eventbox}
+              onPress={() => navigation.navigate("FriendCodeEventScreen")}>
               <View style = {styles.eventpicture}>
                 <Image style = {{width : 430, height : 260}}
                         source = {friendsinvitepng}
@@ -261,8 +269,10 @@ const MainPage = ({navigation ,route} : any) => {
                 <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>친구코드 이벤트!</Text>
                 <Text style = {{marginLeft : 10,}}>친구에게 나의 코드를 보낼시에 포인트를 제공해 드립니다!</Text>
               </View>
-            </View>
-            <View style = {styles.eventbox}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("DeadlineEventScreen")} 
+              style = {styles.eventbox}>
               <View style = {styles.eventpicture}>
                 <Image style = {{width : 430, height : 250}}
                         source = {volunteerpng}
@@ -272,14 +282,17 @@ const MainPage = ({navigation ,route} : any) => {
                 <Text style = {{fontSize : 20, fontWeight : 'bold', margin : 8, color : 'black'}}>봉사활동 이벤트!</Text>
                 <Text style = {{marginLeft : 10,}}>봉사활동을 하고 인증해주시면 포인트를 제공해 드립니다!</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </Swiper>
           </View>
         <View style = {styles.noticecontainer}>
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학교 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('NoticeSchoolPostsScreen')}>
+              <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            </TouchableOpacity>
+            
             <Text style = {{marginTop : 26,}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -337,7 +350,9 @@ const MainPage = ({navigation ,route} : any) => {
           <View style = {styles.noticeheader}>
             <Text style = {styles.noticeheadertext}>학사 공지사항</Text>
             <Text style = {{marginTop : 15, marginLeft : 5, color : "#FFC700"}}><IconG name = "file-document-multiple" size = {28}/></Text>
-            <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            <TouchableOpacity onPress={() => console.log("이동시켜주라")}>
+              <Text style = {{marginLeft : 130, marginTop : 25, fontSize : 17,}}>더보기</Text>
+            </TouchableOpacity>
             <Text style = {{marginTop : 26}}><IconB name = {"caretright"} size = {17}/></Text>
           </View>
           <View style = {styles.noticetextcontainer}>
@@ -550,7 +565,8 @@ const styles = StyleSheet.create({
   point : {
     flexDirection : 'row',
     flex : 0.4,
-    alignItems: 'center'
+    alignItems: 'center',
+    //backgroundColor : 'red'
   },
   
   cardchoice : {

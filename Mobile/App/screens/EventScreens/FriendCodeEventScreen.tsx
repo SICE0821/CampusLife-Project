@@ -3,11 +3,11 @@ import { View, Text, Button, StyleSheet, Image, TouchableOpacity } from 'react-n
 import { useNavigation } from '@react-navigation/native';
 import Swiper from 'react-native-swiper';
 
-const DeadlineEventScreen = () => {
+const FriendCodeEventScreen = ({navigation} : any) => {
   return (
-      <View style = {styles.container}>
-        <Text>한정 이벤트 페이지</Text>
-      </View>
+    <View style = {styles.container}>
+      <Text>친구 코드 이벤트 페이지</Text>
+    </View>
   );
 };
 
@@ -19,4 +19,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default DeadlineEventScreen;
+export default FriendCodeEventScreen;

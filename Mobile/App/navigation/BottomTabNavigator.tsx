@@ -6,7 +6,6 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { PostTopTabNavigator } from "../navigation/TopTabNavigator"
 import { MainScreenStackNavigator } from './StackNavigator';
 import { CommunityScreenStackNavigator, NoticeScreenStackNavigator } from './StackNavigator';
-import { EventTopTabNavigator } from './TopTabNavigator'
 import { EventScreenStackNavigator } from './StackNavigator';
 import { AttendanceScreenStackNavigator } from './StackNavigator';
 import { TimetableScreenStackNavigator } from './StackNavigator';
@@ -84,24 +83,6 @@ export const MainTabNavigator = ({ route }: any) => {
           )
         }}
         initialParams={{ userdata }}
-      />
-      <Tab.Screen
-        name="EventStackNavigator"
-        component={EventScreenStackNavigator}
-        options={{
-          title: '이벤트',
-          tabBarStyle: { display: 'none' },
-          headerStyle: {
-            backgroundColor: '#F27405',
-          },
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <IconB name="ticket" size={30} color={color} />
-          ),
-          tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5 }}>이벤트</Text>
-          )
-        }}
       />
       <Tab.Screen
         name="AttendanceStackNavigator"

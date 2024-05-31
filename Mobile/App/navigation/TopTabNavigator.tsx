@@ -4,13 +4,12 @@ import NoticeHotPostsScreen from '../screens/CommunityScreens/NoticeHotPostsScre
 import NoticeBookmarkScreen from '../screens/CommunityScreens/NoticeBookmarkScreen'
 import BookmarkScreen from '../screens/CommunityScreens/BookmarkScreen'
 import HotPostsScreen from '../screens/CommunityScreens/HotPostsScreen'
-import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen';
 import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
 import AcademicRecord from '../screens/CardScreens/AcademicScreens/AcademicRecordScreen';
-import { EventShopScreenStackNavigator, ReqularEventScreenNavigator } from '../navigation/StackNavigator'
+import { EventShopScreenStackNavigator} from '../navigation/StackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
@@ -434,44 +433,5 @@ export const NoticeTopbTabNavigator = ({ route, navigation }: any) => {
                     tabBarIcon: () => null,
                 }} />
         </NoticeTopTab.Navigator>
-    );
-}
-
-export const EventTopTabNavigator = ({ navigation, route }: any) => {
-    React.useLayoutEffect(() => {
-        const routeName = getFocusedRouteNameFromRoute(route);
-        if (routeName === "이벤트 상점") {
-            //console.log(routeName);
-            navigation.setOptions({ tabBarStyle: { display: 'none' } });
-        }
-    }, [navigation, route])
-    return (
-        <EventTopTab.Navigator screenOptions={{
-            swipeEnabled: false,
-
-            tabBarLabelStyle: {
-                fontSize: 20,
-                fontWeight: 'bold',
-            },
-        }}>
-            <EventTopTab.Screen name="정기 이벤트"
-                component={ReqularEventScreenNavigator}
-                options={{
-                    //headerShown : false,
-                    //tabBarIcon: () => null,
-                }}
-            />
-            <EventTopTab.Screen name="한정 이벤트"
-                component={DeadlineEventScreen}
-                options={{
-
-                }} />
-            <EventTopTab.Screen name="이벤트 상점"
-                component={EventShopScreenStackNavigator}
-                options={{
-                    //headerShown : false,
-                    //tabBarIcon: () => null,
-                }} />
-        </EventTopTab.Navigator>
     );
 }
