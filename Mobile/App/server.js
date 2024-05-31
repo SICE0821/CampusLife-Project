@@ -563,6 +563,7 @@ app.post('/getlecture', async (req, res) => {
           lecture_room: item.lecture_room,
           lecture_time: item.lecture_time,
           week: item.week,
+          semester : item.semester,
           nonattendance: item.nonattendance,
           attendance: item.attendance,
           tardy: item.tardy,
@@ -570,6 +571,7 @@ app.post('/getlecture', async (req, res) => {
           weeknum : item.weeknum
       }));
       res.json({ data: processedData });
+      console.log(processedData)
       console.log("성공적으로 데이터 보냄");
   } catch (error) {
       console.error(error); 

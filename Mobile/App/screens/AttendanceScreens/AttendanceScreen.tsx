@@ -9,23 +9,8 @@ import { Camera,
   useCameraDevice, 
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
-import { UserData } from '../../types/type'
+import { UserData,Lecture } from '../../types/type'
 import config from '../../config';
-
-type Lecture = {
-    lecture_id : number,
-    credit : number;
-    professor_name : string;
-    lecture_name : string;
-    lecture_room : string;
-    lecture_time : string;
-    week : string;
-    nonattendance : number,
-    attendance : number,
-    tardy : number,
-    absent : number,
-    weeknum : number,
-}
 
 const AttendanceScreen = ({navigation, route}: any) => {
   const { userdata } = route.params;
@@ -253,7 +238,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
               <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                    미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}               미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )
@@ -267,7 +252,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer2}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
               <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                   미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}              미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )

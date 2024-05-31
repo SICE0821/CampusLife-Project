@@ -72,3 +72,18 @@ export type CommentsWithRecomments = {
     user_profile : string,
   }[];
 }
+
+export type Lecture = {
+  lecture_id: number;
+  credit: number;
+  professor_name: string;
+  lecture_name: string;
+  lecture_room: string;
+  lecture_time: string;
+  week: string;
+  nonattendance: number;
+  attendance: number;
+  tardy: number;
+  absent: number;
+  weeknum: number;
+};
