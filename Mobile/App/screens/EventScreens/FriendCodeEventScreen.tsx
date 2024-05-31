@@ -6,7 +6,7 @@ import Swiper from 'react-native-swiper';
 const calendarpng = require('../../assets/calendar.png');
 const friendcodepng = require('../../assets/friendcode.png');
 
-const RegularEventScreen: React.FC = ({navigation} : any) => {
+const FriendCodeEventScreen = ({navigation} : any) => {
 
   const handleButtonPress = () => {
     // 버튼이 눌렸을 때 실행할 동작을 정의합니다.
@@ -128,4 +128,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegularEventScreen;
+export default FriendCodeEventScreen;
