@@ -49,7 +49,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -294,6 +294,7 @@ app.post('/getlecture', async (req, res) => {
           lecture_room: item.lecture_room,
           lecture_time: item.lecture_time,
           week: item.week,
+          semester : item.semester,
           nonattendance: item.nonattendance,
           attendance: item.attendance,
           tardy: item.tardy,
@@ -301,6 +302,7 @@ app.post('/getlecture', async (req, res) => {
           weeknum : item.weeknum
       }));
       res.json({ data: processedData });
+      console.log(processedData)
       console.log("성공적으로 데이터 보냄");
   } catch (error) {
       console.error(error); 

@@ -41,9 +41,25 @@
       comment_id : number,
       content : string,
       date : string,
-      like : number
+      like : number,
       student_name : string,
       department_name : string,
       user_id : number,
       post_id : number,
     }
+
+    export type Lecture = {
+      lecture_id : number,
+      credit : number,
+      professor_name : string,
+      lecture_name : string,
+      lecture_room : string,
+      lecture_time : string,
+      week : string,
+      semester : number,
+      nonattendance : number,
+      attendance : number,
+      tardy : number,
+      absent : number,
+      weeknum : number,
+  }

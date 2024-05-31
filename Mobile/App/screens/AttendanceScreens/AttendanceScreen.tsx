@@ -9,22 +9,7 @@ import { Camera,
   useCameraDevice, 
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
-import { UserData } from '../../types/type'
-
-type Lecture = {
-    lecture_id : number,
-    credit : number;
-    professor_name : string;
-    lecture_name : string;
-    lecture_room : string;
-    lecture_time : string;
-    week : string;
-    nonattendance : number,
-    attendance : number,
-    tardy : number,
-    absent : number,
-    weeknum : number,
-}
+import { UserData,Lecture } from '../../types/type'
 
 const AttendanceScreen = ({navigation, route}: any) => {
   const { userdata } = route.params;
@@ -134,7 +119,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   const fetchLectureData = async () => {
     try {
-      const response = await fetch('http://192.168.35.12:3000/getlecture', {
+      const response = await fetch('http://192.168.35.83:3000/getlecture', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +139,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const Updatelecture = async (lecture: Lecture[]) => {
     try {
       const promises = lecture.map(async (lec) => {
-        const response = await fetch('http://192.168.35.12:3000/updatelecture', {
+        const response = await fetch('http://192.168.35.83:3000/updatelecture', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -252,7 +237,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
               <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                    미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}               미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )
@@ -266,7 +251,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer2}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
               <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                   미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
+              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}              미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )
