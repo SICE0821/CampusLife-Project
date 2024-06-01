@@ -1,231 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, FlatList, StyleSheet, Alert } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { Dimensions, ScrollView, View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 
-const StudyRoomScreen = ({ navigation }) => {
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
-  const [bookings, setBookings] = useState({});
-  const [cancelledTimeSlots, setCancelledTimeSlots] = useState([]); // 추가: 취소된 예약 시간대를 관리하는 상태 변수
-  const rooms = ['(본교 몽당도서관 3층) 스터디룸1', '(본교 몽당도서관 3층) 스터디룸2', '학과 스터디룸 1', '학과 스터디룸 2'];
-  const timeSlots = [
-    '09:00 - 10:00',
-    '10:00 - 11:00',
-    '11:00 - 12:00',
-    '12:00 - 13:00',
-    '13:00 - 14:00',
-    '14:00 - 15:00',
-    '15:00 - 16:00',
-    '16:00 - 17:00',
-    '17:00 - 18:00',
-  ];
+const width = Dimensions.get("window").width;
 
-  useEffect(() => {
-    // Fetch existing bookings from the database when the component mounts
-    fetchBookings();
-  }, []);
+const studyroom1Image = require('../../assets/studyroom1.png'); // 기본 알람 이미지
+const studyroom2Image = require('../../assets/studyroom2.png'); // 기본 알람 이미지
 
-  const fetchBookings = async () => {
-    try {
-      const response = await axios.get('YOUR_API_ENDPOINT'); // Replace with your API endpoint
-      setBookings(response.data);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-    }
+const images = [studyroom1Image, studyroom2Image];
+const studyroomInfo = [
+  { place: '본캠퍼스', name: '스터디룸1', maxHeadCount: 12, minHeadCount: 4, image: images[0] },
+  { place: '본캠퍼스', name: '스터디룸2', maxHeadCount: 12, minHeadCount: 4, image: images[0] },
+  { place: '본캠퍼스', name: '스터디룸3', maxHeadCount: 12, minHeadCount: 4, image: images[0] },
+  { place: '소사캠퍼스', name: '스터디룸4', maxHeadCount: 12, minHeadCount: 4, image: images[1] },
+  { place: '소사캠퍼스', name: '스터디룸5', maxHeadCount: 12, minHeadCount: 4, image: images[1] },
+  { place: '소사캠퍼스', name: '스터디룸6', maxHeadCount: 12, minHeadCount: 4, image: images[1] },
+];
+const campus = ['전체', '본캠퍼스', '소사캠퍼스'];
+const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
+
+const StudyRoomScreen = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedCampus, setSelectedCampus] = useState(campus[0]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const onDateChange = (event: DateTimePickerEvent, date?: Date) => {
+    const currentDate = date || new Date();
+    setShowDatePicker(false);
+    setSelectedDate(currentDate);
   };
 
-  const handleDayPress = (day) => {
-    const today = new Date();
-    const selectedDate = new Date(day.dateString);
-    if (selectedDate <= today) {
-      Alert.alert('Invalid Date', 'You can only select dates from tomorrow onwards.');
-      return;
-    }
-    setSelectedDay(day.dateString);
+  const handleCampusSelect = (campusName: React.SetStateAction<string>) => {
+    setSelectedCampus(campusName);
   };
-
-  const handleRoomSelect = (room) => {
-    setSelectedRoom(room);
-  };
-
-  const handleTimeSlotSelect = (timeSlot) => {
-    // 예약된 시간대는 선택할 수 없도록 함
-    if (bookings[selectedDay]?.[selectedRoom]?.[timeSlot]) {
-      Alert.alert('Already Booked', 'This time slot has already been booked. Please select an available time slot.');
-      return;
-    }
-
-    if (selectedTimeSlots.includes(timeSlot)) {
-      setSelectedTimeSlots(selectedTimeSlots.filter((slot) => slot !== timeSlot));
-    } else {
-      setSelectedTimeSlots([...selectedTimeSlots, timeSlot]);
-    }
-  };
-
-  const handleBooking = async () => {
-    if (!selectedDay || !selectedRoom || selectedTimeSlots.length === 0) {
-      Alert.alert('Incomplete Information', 'Please select a date, room, and at least one time slot to complete the booking.');
-      return;
-    }
-
-    const allBooked = selectedTimeSlots.every((timeSlot) => {
-      return !bookings[selectedDay]?.[selectedRoom]?.[timeSlot];
-    });
-
-    if (!allBooked) {
-      Alert.alert('Already Booked', 'One or more selected time slots have already been booked. Please select available time slots.');
-      return;
-    }
-
-    const updatedBookings = { ...bookings }; // 예약 하기 ~~~~~~~~~~~~~~~~
-    selectedTimeSlots.forEach((timeSlot) => {
-      if (!updatedBookings[selectedDay]) {
-        updatedBookings[selectedDay] = {};
-      }
-      if (!updatedBookings[selectedDay][selectedRoom]) {
-        updatedBookings[selectedDay][selectedRoom] = {};
-      }
-      updatedBookings[selectedDay][selectedRoom][timeSlot] = true;
-    });
-
-    try {
-      await axios.post('YOUR_API_ENDPOINT', { // Replace with your API endpoint
-        date: selectedDay,
-        room: selectedRoom,
-        timeSlots: selectedTimeSlots,
-      });
-      setBookings(updatedBookings);
-      setSelectedTimeSlots([]);
-      Alert.alert('Booking Successful', `Your reservations for ${selectedRoom} on ${selectedDay} at the selected time slots have been confirmed.`);
-    } catch (error) {
-      console.error('Error making booking:', error);
-      Alert.alert('Booking Failed', 'There was an error processing your booking. Please try again.');
-    }
-  };
-
-  const cancelBooking = async (timeSlot) => {  // 예약 취소~~~~~~~~~~~
-    const updatedBookings = { ...bookings };
-    delete updatedBookings[selectedDay]?.[selectedRoom]?.[timeSlot];
-    setBookings(updatedBookings);
-
-    setCancelledTimeSlots([...cancelledTimeSlots, timeSlot]); // 취소된 예약 시간대를 추가
-
-    try {
-      await axios.delete('YOUR_API_ENDPOINT', { // Replace with your API endpoint
-        data: {
-          date: selectedDay,
-          room: selectedRoom,
-          timeSlot: timeSlot,
-        },
-      });
-      Alert.alert('Booking Cancelled', `Your reservation for ${selectedRoom} on ${selectedDay} at ${timeSlot} has been cancelled.`);
-    } catch (error) {
-      console.error('Error cancelling booking:', error);
-      Alert.alert('Cancellation Failed', 'There was an error processing your cancellation. Please try again.');
-    }
-  };
-
-  const renderRoom = ({ item }) => (
-    <View style={{marginLeft:10, marginRight:10}}>
-      <TouchableOpacity
-      style={[
-        styles.roomButton,
-        selectedRoom === item ? styles.selectedRoom : null,
-      ]}
-      onPress={() => handleRoomSelect(item)}
-    >
-      <Text style={styles.roomText}>{item}</Text>
-    </TouchableOpacity>
-    </View>
-    
-  );
-
-  const renderTimeSlot = ({ item }) => (
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <TouchableOpacity
-        style={[
-          styles.timeSlot,
-          selectedTimeSlots.includes(item) ? styles.selectedTimeSlot : null,
-          bookings[selectedDay]?.[selectedRoom]?.[item] ? styles.booked : null,
-          cancelledTimeSlots.includes(item) ? styles.cancelled : null,
-        ]}
-        onPress={() => handleTimeSlotSelect(item)}
-        disabled={bookings[selectedDay]?.[selectedRoom]?.[item]}
-      >
-        <Text style={styles.timeSlotText}>{item}</Text>
-      </TouchableOpacity>
-      {bookings[selectedDay]?.[selectedRoom]?.[item] && (
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => cancelBooking(item)}
-        >
-          <Text style={styles.cancelButtonText}>Cancel</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
-
-
-
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const minDate = tomorrow.toISOString().split('T')[0];
-  const maxDate = new Date();
-  maxDate.setDate(today.getDate() + 20);
-
 
   return (
     <View style={styles.container}>
-      <Calendar
-        onDayPress={handleDayPress}
-        minDate={minDate}
-        maxDate={maxDate} // 최대 선택 가능한 날짜 범위 설정
-        monthFormat={'M월'}
-        markedDates={{
-          ...Object.keys(bookings).reduce((acc, date) => {
-            acc[date] = { marked: true, dotColor: 'blue' };
-            return acc;
-          }, {}),
-          ...(selectedDay ? { [selectedDay]: { selected: true, selectedColor: 'blue' } } : {}),
-        }}
-      />
-
-      {selectedDay && (
-        <>
-          <View style={styles.roomsContainer}>
-            <Text style={styles.roomsTitle}>선택된 날짜 : {selectedDay}</Text>
-            <FlatList
-              horizontal
-              data={rooms}
-              renderItem={renderRoom}
-              keyExtractor={(item) => item}
-            />
-          </View>
-          {selectedRoom && (
-            <>
-              <Text style={styles.timeSlotsTitle}>선택된 스터디 룸 : {selectedRoom}</Text>
-              <FlatList
-                data={timeSlots}
-                renderItem={renderTimeSlot}
-                keyExtractor={(item) => item}
-                numColumns={3} // time slots in rows of 3, change as needed
-                contentContainerStyle={styles.timeSlotsContainer}
-              />
-            </>
-          )}
-          {selectedTimeSlots.length > 0 && (
-            <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
-              <Text style={styles.bookButtonText}>예약하기</Text>
-            </TouchableOpacity>
-          )}
-        </>
+      <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
+        <Text style={styles.dateText}>{format(selectedDate, "yyyy년 M월 d일")}</Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={selectedDate}
+          mode="date"
+          display="compact"
+          onChange={onDateChange}
+        />
       )}
-      <View style={styles.bottomArea}>
-
-      </View>
+      <ScrollView>
+        <View style={styles.campusSelectArea}>
+          {campus.map((campusName, index) => (
+            <TouchableOpacity key={index} onPress={() => handleCampusSelect(campusName)}>
+              <View style={[styles.campusBox, selectedCampus === campusName && styles.selectedCampus]}>
+                <Text style={[styles.campusText, selectedCampus === campusName && styles.selectedCampusText]}>{campusName}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+        {studyroomInfo.map((room, index) => (
+          room.place === selectedCampus || selectedCampus === '전체' ? (
+            <View key={index} style={styles.studyroomArea}>
+              <View style={styles.infoText}>
+                <Text style={styles.studyroomName}>{room.name}</Text>
+                <View style={styles.studyroomHeadcount}>
+                  <Text style={styles.labelText}>정원 </Text>
+                  <Text style={[styles.numText, { color: 'blue' }]}>{room.maxHeadCount}</Text>
+                  <Text style={styles.labelText}> 최소인원 </Text>
+                  <Text style={[styles.numText, { color: 'red' }]}>{room.minHeadCount}</Text>
+                </View>
+              </View>
+              <View style={styles.selectArea}>
+                <View style={styles.imageArea}>
+                  <Image style={styles.image} source={room.image} />
+                </View>
+                <View style={styles.timeArea}>
+                  {time.map((hour, index) => (
+                    <TouchableOpacity key={index}>
+                      <View style={styles.timeBox}>
+                        <Text style={styles.timeText}>{hour}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </View>
+          ) : null
+        ))}
+      </ScrollView>
+      <TouchableOpacity>
+        <View style={styles.reserveArea}>
+          <Text style={styles.reserveText}>예약하기</Text>
+        </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -234,101 +101,116 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    alignItems: 'center'
   },
-  roomsContainer: {
-    height: 135,
-    paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 20,
-    alignSelf: 'center'
-  },
-  roomsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  roomButton: {
-    alignSelf: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
+  datePicker: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: 'gray',
     borderRadius: 5,
-    marginRight: 10,
-    marginBottom: 10,
-    backgroundColor: '#f0f0f0',
-  },
-  selectedRoom: {
-    backgroundColor: '#add8e6',
-  },
-  roomText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  timeSlotsContainer: {
-    paddingVertical: 20,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  timeSlotsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  timeSlot: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    marginBottom: 10,
-    backgroundColor: '#f0f0f0',
-  },
-  booked: {
-    backgroundColor: '#d3d3d3',
-  },
-  timeSlotText: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  selectedTimeSlot: {
-    backgroundColor: '#7fffd4',
-  },
-  bookButton: {
-    backgroundColor: '#4169e1',
-    padding: 15,
-    borderRadius: 5,
-    marginHorizontal: 20,
-    marginBottom: 20,
     alignItems: 'center',
   },
-  bookButtonText: {
+  dateText: {
     color: '#fff',
     fontSize: 18,
+  },
+  campusSelectArea: {
+    borderWidth: 1,
+    marginBottom: 10
+  },
+  campusBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 35
+  },
+  campusText: {
+    color: 'gray',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  selectedCampus: {
+    backgroundColor: 'lightblue', // 선택된 캠퍼스의 배경색
+  },
+  selectedCampusText: {
+    color: 'white', // 선택된 캠퍼스의 텍스트 색상
+  },
+  studyroomArea: {
+    //backgroundColor: 'red',
+    width: width - 10,
+    height: 'auto',
+    padding: 5,
+    borderWidth: 1,
+    marginVertical: 5
+  },
+  infoText: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    margin: 5
+  },
+  studyroomName: {
+    color: 'black',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  studyroomHeadcount: {
+    flexDirection: 'row',
+  },
+  labelText: {
+    color: 'black',
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  numText: {
+    color: 'black',
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  cancelButton: {
-    backgroundColor: 'red',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+  selectArea: {
+    flexDirection: 'row',
   },
-  cancelButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
+  imageArea: {
+    //backgroundColor: 'red',
+    marginHorizontal: 10
   },
-  bottomArea: {
-    width: '100%',
-    height: 80,
+  image: {
+    width: 50,
+    height: 50,
+    resizeMode: 'stretch',
   },
+  timeArea: {
+    //backgroundColor: 'green',
+    flex: 1,
+    marginLeft: 10,
+    marginRight: 10,
+    height: 'auto',
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  timeBox: {
+    width: 60,
+    height: 45,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    margin: 5
+  },
+  timeText: {
+    color: 'gray',
+    fontSize: 22,
+    fontWeight: 'bold'
+  },
+  reserveArea:{
+    width: width,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'lightgreen'
+  },
+  reserveText:{
+    color: 'black',
+    fontSize: 22,
+    fontWeight: 'bold'
+  }
 });
-
 
 export default StudyRoomScreen;
