@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
 
   eventcontainer : {
     height : 420,
-    //backgroundColor : 'green',
+    backgroundColor : 'green',
     marginBottom : 35,
   
   },
