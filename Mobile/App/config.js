@@ -1,5 +1,5 @@
 const config = {
-    serverUrl: 'http://172.16.108.2:3000'
+    serverUrl: 'http://192.168.35.146:3000'
 };
 
 export default config;

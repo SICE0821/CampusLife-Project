@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { UserData , Lecture } from '../types/type';
 
 // 타입 정의
 type Course = {
@@ -57,52 +58,100 @@ const TimetableRow = ({ time, courses, days }: { time: string; courses: Course[]
   </View>
 );
 
-const App = () => {
-  const [selectedGradeAndSemester, setSelectedGradeAndSemester] = useState('1학년 1학기');
+const originalColors = ['#7469B6', '#AD88C6', '#E1AFD1', '#FFE6E6', '#FFF9D0', '#CAF4FF', '#A0DEFF', '#5AB2FF', '#40A578', '#9DDE8B'];
+let usedColors: string[] = [];
 
-  const days = ['월', '화', '수', '목', '금'];
+const getRandomColor = (): string => {
+  // Reset colors if all colors are used
+  if (usedColors.length === originalColors.length) {
+    usedColors = [];
+  }
+
+  // Get available colors
+  const availableColors = originalColors.filter(color => !usedColors.includes(color));
+  const randomIndex = Math.floor(Math.random() * availableColors.length);
+  const color = availableColors[randomIndex];
+
+  // Mark color as used
+  usedColors.push(color);
+  return color;
+};
+
+
+const formatTime = (time: string): string => {
+  // 시간과 분을 추출
+  const [hourString, minuteString] = time.split(':');
+  const hour = parseInt(hourString);
+  const minute = parseInt(minuteString);
+
+  // 시간과 분이 유효한지 확인
+  if (isNaN(hour) || isNaN(minute)) {
+    // 유효하지 않은 경우 기본값으로 리턴
+    return '00:00';
+  }
+
+  // 시간과 분을 기반으로 새로운 시간을 생성
+  const newHour = hour < 10 ? `0${hour}` : `${hour}`;
+  const newTime = `${newHour}:00`; // 항상 분을 00으로 설정
+
+  return newTime;
+};
+
+const App = ({ route }: any) => {
+  const [selectedGradeAndSemester, setSelectedGradeAndSemester] = useState('1학년 1학기');
+  const { userdata, LectureData } = route.params;
+  const [userData, setUserData] = useState<UserData>(userdata);
+  const [userLecture, setUserLecture] = useState<Lecture>(LectureData);
+  const [semesters, setSemesters] = useState<string[]>([]);
+  
+
+  const days = ['월요일', '화요일', '수요일', '목요일', '금요일'];
   const times = Array.from({ length: 10 }, (_, i) => `${i + 9}:00`);
 
-  const timetableData: TimetableData = {
-    '1학년 1학기': [
-      { day: '월', time: '14:00', duration: 1, course: '진로탐색', professor: '문주영', room: 'PC1', color: '#FFDDC1' },
-      { day: '월', time: '15:00', duration: 1, course: '영문기술서이해', professor: 'Ian', room: 'PC4', color: '#FFD700' },
-      { day: '화', time: '10:00', duration: 3, course: '정보처리실습', professor: '임제영', room: 'B1110', color: '#FF6347' },
-      { day: '화', time: '14:00', duration: 3, course: '소프트웨어원리', professor: '임웅택', room: 'B0608', color: '#ADFF2F' },
-      { day: '수', time: '10:00', duration: 3, course: '컴퓨터그래픽', professor: '임제영', room: 'E0416', color: '#40E0D0' },
-      { day: '수', time: '14:00', duration: 1, course: '대인관계', professor: '문주영', room: '온라인', color: '#FA8072' },
-      { day: '금', time: '10:00', duration: 3, course: '컴퓨터구조', professor: '홍성옥', room: 'B0611', color: '#8A2BE2' },
-    ],
-    '1학년 2학기': [
-      { day: '월', time: '11:00', duration: 2, course: '물리', professor: '박철수', room: 'A102', color: '#FFDDC1' },
-      { day: '화', time: '14:00', duration: 3, course: '화학', professor: '김유신', room: 'B202', color: '#FFD700' },
-      { day: '수', time: '16:00', duration: 2, course: '생물', professor: '최영희', room: 'B203', color: '#FF6347' },
-    ],
-    '2학년 1학기': [
-      { day: '월', time: '09:00', duration: 2, course: '역사', professor: '정약용', room: 'C101', color: '#ADFF2F' },
-      { day: '화', time: '12:00', duration: 3, course: '지리', professor: '안중근', room: 'C201', color: '#40E0D0' },
-      { day: '수', time: '14:00', duration: 2, course: '문학', professor: '윤동주', room: 'C301', color: '#FA8072' },
-    ],
-    '2학년 2학기': [
-      { day: '월', time: '10:00', duration: 2, course: '철학', professor: '서재필', room: 'D101', color: '#8A2BE2' },
-      { day: '화', time: '13:00', duration: 3, course: '경제', professor: '김구', room: 'D201', color: '#FFDDC1' },
-      { day: '수', time: '15:00', duration: 2, course: '정치', professor: '안창호', room: 'D301', color: '#FFD700' },
-    ],
-    '3학년 1학기': [
-      { day: '월', time: '10:00', duration: 2, course: '수학', professor: '홍길동', room: 'A101', color: '#FF6347' },
-      { day: '화', time: '13:00', duration: 3, course: '영어', professor: '이순신', room: 'B201', color: '#ADFF2F' },
-      { day: '수', time: '15:00', duration: 2, course: '과학', professor: '우규희', room: 'B201', color: '#40E0D0' },
-    ],
-    '3학년 2학기': [
-      { day: '월', time: '11:00', duration: 2, course: '물리', professor: '박철수', room: 'A102', color: '#FA8072' },
-      { day: '화', time: '14:00', duration: 3, course: '화학', professor: '김유신', room: 'B202', color: '#8A2BE2' },
-      { day: '수', time: '16:00', duration: 2, course: '생물', professor: '최영희', room: 'B203', color: '#FFDDC1' },
-    ],
-    '4학년 1학기': [],
-    '4학년 2학기': [],
-  };
+  const timetableData: TimetableData = {};
+  
+  userLecture.forEach((lecture: Lecture) => {
+    const semesterKey = `${lecture.lecture_grade}학년 ${lecture.lecture_semester}학기`;
 
-  const courses = timetableData[selectedGradeAndSemester];
+    if (!timetableData[semesterKey]) {
+      timetableData[semesterKey] = []; // Initialize as an empty array if undefined
+    }
+
+    timetableData[semesterKey].push({
+      day: lecture.week,
+      time: formatTime(lecture.lecture_time),
+      duration: lecture.credit,
+      course: lecture.lecture_name,
+      professor: lecture.professor_name,
+      room: lecture.lecture_room,
+      color: getRandomColor(),
+    });
+  });
+
+  useEffect(() => {
+    // Generate the list of semesters based on college value
+    const generateSemesters = (college: number): string[] => {
+      const allSemesters = [
+        '1학년 1학기',
+        '1학년 2학기',
+        '2학년 1학기',
+        '2학년 2학기',
+        '3학년 1학기',
+        '3학년 2학기',
+        '4학년 1학기',
+        '4학년 2학기',
+      ];
+      return allSemesters.slice(0, college * 2);
+    };
+
+    setSemesters(generateSemesters(userData.college));
+  }, [userData]);
+
+  const courses = timetableData[selectedGradeAndSemester] || [];
+
+  useEffect(() => {
+    
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
@@ -112,14 +161,9 @@ const App = () => {
           style={styles.picker}
           onValueChange={(itemValue) => setSelectedGradeAndSemester(itemValue)}
         >
-          <Picker.Item label="1학년 1학기" value="1학년 1학기" />
-          <Picker.Item label="1학년 2학기" value="1학년 2학기" />
-          <Picker.Item label="2학년 1학기" value="2학년 1학기" />
-          <Picker.Item label="2학년 2학기" value="2학년 2학기" />
-          <Picker.Item label="3학년 1학기" value="3학년 1학기" />
-          <Picker.Item label="3학년 2학기" value="3학년 2학기" />
-          <Picker.Item label="4학년 1학기" value="4학년 1학기" />
-          <Picker.Item label="4학년 2학기" value="4학년 2학기" />
+          {semesters.map((semester, index) => (
+            <Picker.Item key={index} label={semester} value={semester} />
+          ))}
         </Picker>
       </View>
       <View style={styles.table}>
@@ -178,7 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f0f0f0',
   },
   headerText: {
-    fontWeight: 'bold',
+    fontWeight: 'bold', 
   },
   courseText: {
     fontSize: 12,
@@ -193,7 +237,7 @@ const styles = StyleSheet.create({
   },
   roomText: {
     fontSize: 12,
-    color: 'black'
+    color: 'black',
   },
 });
 

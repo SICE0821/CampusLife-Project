@@ -10,7 +10,7 @@ import {
   Image,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
-import {UserData} from '../types/type'
+import {UserData, Lecture} from '../types/type'
 import ImageCropPicker from 'react-native-image-crop-picker';
 import config from '../config';
 
@@ -46,15 +46,16 @@ type mainpagehptdata = {
 }
 
 const MainPage = ({navigation ,route} : any) => {
-  const { userdata } = route.params;
+  const { userdata, LectureData } = route.params;
   const [schoolpostdata, setschollpostdata] = useState<mainpagepostdata[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<mainpagepostdata[]>([]);
   const [hotpostdata, sethotpostdata] = useState<mainpagehptdata[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
+  const [lectureList, setLectureList] = useState<Lecture>(LectureData);
   const [Userdepartment, setUserDepartment] = useState();
   const [imagepath, setimagepath] = useState<string>();
   const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
-  
+
   const getPhotos = async () => {
     ImageCropPicker.openPicker({
       multiple: true,
@@ -151,6 +152,8 @@ const MainPage = ({navigation ,route} : any) => {
         console.error('데이터를 가져오는 중 오류 발생:', error);
       }
     };
+
+    
     const settingUserData = () => {
       setUserData(userdata);
     }
@@ -176,6 +179,7 @@ const MainPage = ({navigation ,route} : any) => {
       }
       }, [navigation])
     )
+
   return (
     <View style = {styles.container}>
       <ScrollView>

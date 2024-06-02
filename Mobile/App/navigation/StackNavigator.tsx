@@ -137,7 +137,7 @@ export const LoginScreenStackNavigator = () => {
 //메인 페이지 관련 스택 네비게이터
 export const MainScreenStackNavigator = ({ route }: any) => {
     const navigation: any = useNavigation();
-    const { userdata } = route.params;
+    const { userdata, LectureData } = route.params;
 
     React.useLayoutEffect(() => {
         const routeName = getFocusedRouteNameFromRoute(route);
@@ -160,7 +160,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
 
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata }} />
+            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata,LectureData }} />
             <MainStack.Screen
                 name="StudentInfoNavigator"
                 component={StudentInfoScreen}
@@ -458,12 +458,12 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
 
 //출석체크 페이지 관련 스택 네비게이터
 export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
-    const { userdata } = route.params;
+    const { userdata, LectureData } = route.params;
     //console.log(userdata);
     return (
         <AttendanceStack.Navigator>
             <AttendanceStack.Screen name="AttendanceScreen"
-                component={AttendanceScreen} initialParams={{ userdata }}
+                component={AttendanceScreen} initialParams={{ userdata, LectureData }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -485,10 +485,11 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
 };
 
 //시간표 페이지 관련 스택 네비게이터
-export const TimetableScreenStackNavigator = () => {
+export const TimetableScreenStackNavigator = ({route} : any) => {
+    const { userdata, LectureData } = route.params;
     return (
         <TimetableStack.Navigator>
-            <TimetableStack.Screen name="TimetableScreen" component={TimetableScreen} />
+            <TimetableStack.Screen name="TimetableScreen" component={TimetableScreen} initialParams={{ userdata, LectureData }}/>
         </TimetableStack.Navigator>
     );
 };

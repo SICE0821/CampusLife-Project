@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   StyleSheet,
   Image,
@@ -11,13 +12,25 @@ import {
 } from 'react-native';
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { UserData } from "../../types/type"
+import { UserData, Lecture } from "../../types/type"
 import config from '../../config';
 
 function LoginScreen({ navigation }: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [userData, setUserData] = useState<UserData>();
+  const [lectureList, setLectureList] = useState<Lecture>();
  
+
+  const IsUser = () => {
+    if(userData?.admin_check == true) {
+      console.log(userData);
+      navigation.navigate('AdminTabNavigator', { userdata : userData});
+    }else {
+      console.log(userData);
+      navigation.navigate('MainTabNavigator', {userdata : userData});
+    }
+  }
 
   const get_user_data = async () => {
     try {
@@ -32,20 +45,14 @@ function LoginScreen({ navigation }: any) {
         })
       })
       const userdata = await response.json();
-      console.log(userdata);
-      if (userdata.admin_check == true) {
-        navigation.navigate('AdminTabNavigator', {userdata});
-      } else {
-        navigation.navigate('MainTabNavigator', {userdata});
-      }
+      return(userdata)
     } catch (error) {
       console.error('유저 정보 가져오기 실패:', error);
     }
   }
 
 
-  const handleLogin = async () => {
-
+  const handleLogin = async (userdata : UserData, LectureData : Lecture) => {
     try {
       const response = await fetch(`${config.serverUrl}/login`, {
         method: 'POST',
@@ -59,7 +66,7 @@ function LoginScreen({ navigation }: any) {
       });
       const data = await response.text();
       if (data === 'success') {
-        await get_user_data();
+        navigation.navigate('MainTabNavigator', {userdata : userdata, LectureData : LectureData});
       } else {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
       }
@@ -67,9 +74,31 @@ function LoginScreen({ navigation }: any) {
       console.error('로그인 오류:', error);
       Alert.alert('로그인 오류');
     }
-
   };
 
+  const fetchLectureData = async (userData : UserData) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/getlecture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_pk : userData.student_pk
+        })
+      })
+      const data = await response.json();
+      const Data = data.data; //키값을 치면 값을 json에서 추출할 수 있다.
+      return Data;
+    } catch (error) {
+      console.error('과목 가져오기 실패:', error);
+    }
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+    }, [])
+  )
 
   const navigateToRegister = () => {
     navigation.navigate('RegisterPage');
@@ -127,7 +156,11 @@ function LoginScreen({ navigation }: any) {
         />
       </View>
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+      <TouchableOpacity style={styles.loginButton} onPress={async () => {
+          const userdata = await get_user_data();
+          const LectureData = await fetchLectureData(userdata);
+          handleLogin(userdata, LectureData);
+          }}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
