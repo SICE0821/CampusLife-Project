@@ -25,6 +25,8 @@ export type UserData = {
   currentstatus: string,
   profile_photo: string | null,
   id: string,
+  student_semester : number, 
+  college : number,
 }
 export type PostDeatilData = {
   post_writer: string,
@@ -86,4 +88,6 @@ export type Lecture = {
   tardy: number;
   absent: number;
   weeknum: number;
+  lecture_grade : number;
+  lecture_semester : number;
 };

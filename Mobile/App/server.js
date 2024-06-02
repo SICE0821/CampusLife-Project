@@ -47,7 +47,8 @@ const { getGeneralPosts,
         getNoticeHotPosts,
         getNoticeDepartmentHotPosts,
         getNoticeBookmarkPosts,
-        getNoticeDepartmentBookmarkPosts } = require('./db.js'); // db 파일에서 함수 가져오기
+        getNoticeDepartmentBookmarkPosts,
+              } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
 
@@ -191,6 +192,8 @@ app.post('/get_user_data', async(req, res) => {
     birth: formatDate(rows[0].birth),
     point: rows[0].point,
     currentstatus: rows[0].currentstatus,
+    student_semester : rows[0].student_semester,
+    college: rows[0].college,
   };
   res.json(userData);
 })
@@ -563,12 +566,13 @@ app.post('/getlecture', async (req, res) => {
           lecture_room: item.lecture_room,
           lecture_time: item.lecture_time,
           week: item.week,
-          semester : item.semester,
           nonattendance: item.nonattendance,
           attendance: item.attendance,
           tardy: item.tardy,
           absent: item.absent,
-          weeknum : item.weeknum
+          weeknum : item.weeknum,
+          lecture_grade : item.lecture_grade,
+          lecture_semester : item.lecture_semester
       }));
       res.json({ data: processedData });
       console.log(processedData)
@@ -981,6 +985,7 @@ app.post('/view_count_up', async (req, res) => {
     res.status(500).send({ message: "서버 오류" });
   }
 });
+
 
 //서버 시작
 app.listen(PORT, () => {
