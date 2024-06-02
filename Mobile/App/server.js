@@ -47,8 +47,7 @@ const { getGeneralPosts,
         getNoticeHotPosts,
         getNoticeDepartmentHotPosts,
         getNoticeBookmarkPosts,
-        getNoticeDepartmentBookmarkPosts,
-              } = require('./db.js'); // db 파일에서 함수 가져오기
+        getNoticeDepartmentBookmarkPosts } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
 
@@ -559,21 +558,21 @@ app.post('/getlecture', async (req, res) => {
   try {
       const rows = await getLectureList(studentId);
       const processedData = rows.map(item => ({
-          lecture_id: item.lecture_id,
-          professor_name: item.name, 
-          credit: item.credit,
-          lecture_name: item.lecture_name,
-          lecture_room: item.lecture_room,
-          lecture_time: item.lecture_time,
-          week: item.week,
-          nonattendance: item.nonattendance,
-          attendance: item.attendance,
-          tardy: item.tardy,
-          absent: item.absent,
-          weeknum : item.weeknum,
-          lecture_grade : item.lecture_grade,
-          lecture_semester : item.lecture_semester
-      }));
+        lecture_id: item.lecture_id,
+        professor_name: item.name, 
+        credit: item.credit,
+        lecture_name: item.lecture_name,
+        lecture_room: item.lecture_room,
+        lecture_time: item.lecture_time,
+        week: item.week,
+        nonattendance: item.nonattendance,
+        attendance: item.attendance,
+        tardy: item.tardy,
+        absent: item.absent,
+        weeknum : item.weeknum,
+        lecture_grade : item.lecture_grade,
+        lecture_semester : item.lecture_semester
+    }));
       res.json({ data: processedData });
       console.log(processedData)
       console.log("성공적으로 데이터 보냄");
@@ -985,7 +984,6 @@ app.post('/view_count_up', async (req, res) => {
     res.status(500).send({ message: "서버 오류" });
   }
 });
-
 
 //서버 시작
 app.listen(PORT, () => {
