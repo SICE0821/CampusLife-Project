@@ -203,15 +203,17 @@ const styles = StyleSheet.create({
   datePicker: {
     marginVertical: 10,
     padding: 10,
-    backgroundColor: 'gray',
+    backgroundColor: 'skyblue',
     borderRadius: 5,
     alignItems: 'center',
   },
   dateText: {
     color: '#fff',
     fontSize: 18,
+    fontWeight: 'bold'
   },
   campusSelectArea: {
+    alignSelf: 'center',
     flexDirection: 'row',
     borderWidth: 1,
     marginBottom: 10,
@@ -220,15 +222,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 35,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
   },
   campusText: {
-    color: 'gray',
-    fontSize: 18,
+    color: 'black',
+    fontSize: 20,
     fontWeight: 'bold',
   },
   selectedCampus: {
-    backgroundColor: 'lightblue',
+    backgroundColor: 'skyblue',
   },
   selectedCampusText: {
     color: 'white',
@@ -294,7 +296,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   selectedTimeBox: {
-    backgroundColor: 'red',
+    backgroundColor: 'lightpink',
   },
   selectedTimeText: {
     color: 'white',

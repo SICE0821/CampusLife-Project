@@ -76,6 +76,7 @@ export type CommentsWithRecomments = {
 }
 
 export type Lecture = {
+  [x: string]: any;
   lecture_id: number;
   credit: number;
   professor_name: string;
