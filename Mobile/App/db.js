@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '14.6.152.64',
+    host: '127.0.0.1',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -475,29 +475,22 @@ async function getuserpk(user_id, user_passwd) {
     try {
         conn = await pool.getConnection();
         // 데이터 삽입 쿼리 작성
-        const rows = await conn.query(`
-            SELECT user.user_id, 
-                user.student_id, user.friend_code, 
-                user.point, user.admin_check, 
-                user.profilePhoto,
-                user.id,
-                student.name, student.campus_id, 
-                student.department_id, student.email, 
-                student.grade,
-                student.birth,
-                student.currentstatus,
-                student.student_semester,
-                department_have_object.college
-            FROM 
-                user 
-            LEFT JOIN 
-                student ON user.student_id = student.student_id
-            LEFT JOIN
-                department_have_object ON student.campus_id = department_have_object.campus_id
-                AND student.department_id = department_have_object.department_id
-            WHERE
-                user.id = ? AND user.passwd = ?
-        `, [user_id, user_passwd]);
+        const rows = await conn.query(`SELECT user.user_id, 
+        user.student_id, user.friend_code, 
+        user.point, user.admin_check, 
+        user.profilePhoto,
+        user.id,
+        student.name, student.campus_id, 
+        student.department_id, student.email, 
+        student.grade,
+        student.birth,
+        student.currentstatus
+        FROM 
+        user 
+        LEFT JOIN 
+        student ON user.student_id = student.student_id
+        WHERE
+        user.id = ? AND user.passwd = ?`, [user_id, user_passwd]);
 
         return rows;
     } catch (err) {
@@ -521,13 +514,12 @@ async function getLectureList(studentId) {
                 lecture.lecture_room, 
                 lecture.lecture_time, 
                 lecture.week,
+                lecture.semester, 
                 lecture_have_object.nonattendance, 
                 lecture_have_object.attendance, 
                 lecture_have_object.tardy, 
                 lecture_have_object.absent,
-                lecture_have_object.weeknum,
-                lecture_have_object.lecture_grade,
-                lecture_have_object.lecture_semester
+                lecture_have_object.weeknum 
             FROM 
                 lecture
             JOIN 
