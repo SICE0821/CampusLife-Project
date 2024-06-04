@@ -25,7 +25,7 @@ import IconH from 'react-native-vector-icons/Foundation';
 import IconI from 'react-native-vector-icons/FontAwesome5';
 
 const attendancepng = require('../assets/handup.jpg');
-const friendsinvitepng = require('../assets/friend3.jpg');
+const friendsinvitepng = require('../assets/friend3.png');
 const volunteerpng = require('../assets/animation.gif');
 
 
@@ -265,7 +265,7 @@ const MainPage = ({ navigation, route }: any) => {
               style={styles.eventbox}
               onPress={() => navigation.navigate("FriendCodeEventScreen")}>
               <View style={styles.eventpicture}>
-                <Image style={{ width: 430, height: 260 }}
+                <Image style={{ width: 430, height: 260, overflow: 'hidden' }}
                   source={friendsinvitepng}
                 />
               </View>
@@ -664,7 +664,6 @@ const styles = StyleSheet.create({
 
   eventcontainer: {
     height: 420,
-    backgroundColor: 'green',
     marginBottom: 35,
 
   },
