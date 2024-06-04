@@ -1,333 +1,123 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Entypo';
 import { Table, Row, Rows } from "react-native-table-component";
+import { UserData, Lecture } from '../../../types/type';
 
-{
-    var boxColor = '#999999'
-}
+const AcademicRecord = ({route} : any) => {
+    const { userdata, LectureData } = route.params;
+    const [userData, setUserData] = useState<UserData>(userdata);
+    const [userLecture, setUserLecture] = useState<Lecture[]>(LectureData);
 
-{ // 테이블 관련 설정
-    var widthArrs = [ 200, 60, 70, 60, 80, 70 ] // 테이블 간격
-    var tableBorderWidth = 2 // 테이블 border 크기
-    var tableBorderColor = 'black' // 테이블 bordder 색
-}
+    const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
 
-{ // 학년 학기별 과목명, 구분, 학점, 성적 요기
-    var tableHead = [ "과목명", "구분", "담당교수", "학점", "수업시간", "온라인유무" ];
-    var credit_data_1_1 = [
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-    ]
-    var credit_data_1_2 = [
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-    ]
-    var credit_data_2_1 = [
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-    ]
-    var credit_data_2_2 = [
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-    ]
-    var credit_data_3_1 = [
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-    ]
-    var credit_data_3_2 = [
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-    ]
-    var credit_data_4_1 = [
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "비대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-        [ "Subject name", "Division", "professor", "Grades", "lectureTime", "대면" ],
-    ]
-    var credit_data_4_2 = [
-    ]
-}
+    useEffect(() => {
+        const semesters: number[] = [];
+        for (let year = 1; year <= userData.college; year++) {
+            semesters.push(year * 2 - 1); // Odd semester
+            semesters.push(year * 2); // Even semester
+        }
+        setVisibleSemesters(semesters);
+    }, [userData.college]);
 
-const AcademicRecord = () => {
-    // 1학년 1학기
-    const [detailCreditAreaVisible11, setDetailCreditAreaVisible11] = useState(true);
-    const toggleDetailCreditAreaVisibility11 = () => {
-        setDetailCreditAreaVisible11(!detailCreditAreaVisible11);
+    const semesterLabels: Record<number, string> = {
+        1: '1학년 1학기',
+        2: '1학년 2학기',
+        3: '2학년 1학기',
+        4: '2학년 2학기',
+        5: '3학년 1학기',
+        6: '3학년 2학기',
+        7: '4학년 1학기',
+        8: '4학년 2학기',
     };
-    // 1학년 2학기
-    const [detailCreditAreaVisible12, setDetailCreditAreaVisible12] = useState(true);
-    const toggleDetailCreditAreaVisibility12 = () => {
-        setDetailCreditAreaVisible12(!detailCreditAreaVisible12);
+
+    const semesterData: Record<number, Lecture[]> = {
+        1: userLecture.filter(lecture => lecture.lecture_grade === 1 && lecture.lecture_semester === 1),
+        2: userLecture.filter(lecture => lecture.lecture_grade === 1 && lecture.lecture_semester === 2),
+        3: userLecture.filter(lecture => lecture.lecture_grade === 2 && lecture.lecture_semester === 1),
+        4: userLecture.filter(lecture => lecture.lecture_grade === 2 && lecture.lecture_semester === 2),
+        5: userLecture.filter(lecture => lecture.lecture_grade === 3 && lecture.lecture_semester === 1),
+        6: userLecture.filter(lecture => lecture.lecture_grade === 3 && lecture.lecture_semester === 2),
+        7: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 1),
+        8: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 2),
     };
-    // 2학년 1학기
-    const [detailCreditAreaVisible21, setDetailCreditAreaVisible21] = useState(true);
-    const toggleDetailCreditAreaVisibility21 = () => {
-        setDetailCreditAreaVisible21(!detailCreditAreaVisible21);
+
+    const [visibility, setVisibility] = useState<Record<number, boolean>>({});
+
+    const toggleVisibility = (semester: number) => {
+        setVisibility(prev => ({
+            ...prev,
+            [semester]: !prev[semester]
+        }));
     };
-    // 2학년 2학기
-    const [detailCreditAreaVisible22, setDetailCreditAreaVisible22] = useState(true);
-    const toggleDetailCreditAreaVisibility22 = () => {
-        setDetailCreditAreaVisible22(!detailCreditAreaVisible22);
-    };
-    // 3학년 1학기
-    const [detailCreditAreaVisible31, setDetailCreditAreaVisible31] = useState(true);
-    const toggleDetailCreditAreaVisibility31 = () => {
-        setDetailCreditAreaVisible31(!detailCreditAreaVisible31);
-    };
-    // 3학년 2학기
-    const [detailCreditAreaVisible32, setDetailCreditAreaVisible32] = useState(true);
-    const toggleDetailCreditAreaVisibility32 = () => {
-        setDetailCreditAreaVisible32(!detailCreditAreaVisible32);
-    };
+
+    // 초기에 모든 학기를 숨김 상태로 설정
+    useEffect(() => {
+        const initialVisibility: Record<number, boolean> = {};
+        visibleSemesters.forEach(semester => {
+            initialVisibility[semester] = false;
+        });
+        setVisibility(initialVisibility);
+    }, [visibleSemesters]);
+
 
     return (
-        <View style = {styles.container}>
+        <View style={styles.container}>
             <ScrollView>
-                <View style = {styles.area}>
-                    {/* 학기별 상세 성적 확인용 영역 */}
-                    <View style={styles.detail_credit_box}>
-                        <Text style={styles.semester_text}>1학년 1학기</Text>
-                        <TouchableOpacity onPress={toggleDetailCreditAreaVisibility11}>
-                            <Icon name={detailCreditAreaVisible11 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                        </TouchableOpacity>
-                    </View>
-                    {/* 학기 상세 성적 확인 */}
-                    {!detailCreditAreaVisible11 && (
-                        <ScrollView horizontal={true} alwaysBounceHorizontal={true} >
-                            <View style={styles.detail_credit_area}>
-                                <View style={styles.table}>
-                                    <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                        <Row
-                                            data={tableHead}
-                                            style={{ height: 30, backgroundColor: "#dddddd" }}
-                                            textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                            widthArr={widthArrs}
-                                        />
-                                        <Rows 
-                                            data={credit_data_1_1}  
-                                            style={styles.tableRows} 
-                                            textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                            widthArr={widthArrs}
+                {visibleSemesters.map((semester) => (
+                    <View key={semester} style={styles.area}>
+                        <View style={styles.detail_credit_box}>
+                            <Text style={styles.semester_text}>{semesterLabels[semester]}</Text>
+                            <TouchableOpacity onPress={() => toggleVisibility(semester)}>
+                                <Icon name={visibility[semester] ? "chevron-up" : "chevron-down"} style={styles.semester_button} />
+                            </TouchableOpacity>
+                        </View>
+                        {visibility[semester] && (
+                            <ScrollView horizontal={true} alwaysBounceHorizontal={true}>
+                                <View style={styles.detail_credit_area}>
+                                    <View style={styles.table}>
+                                        <Table borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
+                                            <Row
+                                                data={["과목명", "구분", "담당교수", "학점", "수업시간", "강의실"]}
+                                                style={{ height: 30, backgroundColor: "#dddddd" }}
+                                                textStyle={{ textAlign: "center", fontWeight: "bold" }}
+                                                widthArr={[200, 60, 70, 60, 80, 70]}
                                             />
-                                    </Table>
-                                </View>
-                            </View>
-                        </ScrollView>
-                    )}
-
-                    {/* 학기별 상세 성적 확인용 영역 */}
-                    <View style={styles.detail_credit_box}>
-                        <Text style={styles.semester_text}>1학년 2학기</Text>
-                        <TouchableOpacity onPress={toggleDetailCreditAreaVisibility12}>
-                            <Icon name={detailCreditAreaVisible12 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                        </TouchableOpacity>
-                    </View>
-                    {/* 학기 상세 성적 확인 */}
-                    {!detailCreditAreaVisible12 && (
-                        <ScrollView horizontal={true} >
-                            <View style={styles.detail_credit_area}>
-                                <View style={styles.table}>
-                                    <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                        <Row
-                                            data={tableHead}
-                                            style={{ height: 30, backgroundColor: "#dddddd" }}
-                                            textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                            widthArr={widthArrs}
-                                        />
-                                        <Rows 
-                                            data={credit_data_1_2}  
-                                            style={styles.tableRows} 
-                                            textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                            widthArr={widthArrs}
+                                            <Rows
+                                                data={semesterData[semester].map(lecture => [
+                                                    lecture.lecture_name,
+                                                    lecture.division,
+                                                    lecture.professor_name,
+                                                    lecture.credit,
+                                                    lecture.lecture_time,
+                                                    lecture.lecture_room
+                                                ])}
+                                                style={styles.tableRows}
+                                                textStyle={{ textAlign: "center", fontWeight: 'bold' }}
+                                                widthArr={[200, 60, 70, 60, 80, 70]}
                                             />
-                                    </Table>
+                                        </Table>
+                                    </View>
                                 </View>
-                            </View>
-                        </ScrollView>
-                    )}
-
-                    {/* 학기별 상세 성적 확인용 영역 */}
-                    <View style={styles.detail_credit_box}>
-                        <Text style={styles.semester_text}>2학년 1학기</Text>
-                        <TouchableOpacity onPress={toggleDetailCreditAreaVisibility21}>
-                            <Icon name={detailCreditAreaVisible21 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                        </TouchableOpacity>
+                            </ScrollView>
+                        )}
                     </View>
-                    {/* 학기 상세 성적 확인 */}
-                    {!detailCreditAreaVisible21 && (
-                        <ScrollView horizontal={true} alwaysBounceHorizontal={true} >
-                            <View style={styles.detail_credit_area}>
-                                <View style={styles.table}>
-                                    <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                        <Row
-                                            data={tableHead}
-                                            style={{ height: 30, backgroundColor: "#dddddd" }}
-                                            textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                            widthArr={widthArrs}
-                                        />
-                                        <Rows 
-                                            data={credit_data_2_1}  
-                                            style={styles.tableRows} 
-                                            textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                            widthArr={widthArrs}
-                                            />
-                                    </Table>
-                                </View>
-                            </View>
-                        </ScrollView>
-                    )}
-
-                    {/* 학기별 상세 성적 확인용 영역 */}
-                    <View style={styles.detail_credit_box}>
-                        <Text style={styles.semester_text}>2학년 2학기</Text>
-                        <TouchableOpacity onPress={toggleDetailCreditAreaVisibility22}>
-                            <Icon name={detailCreditAreaVisible22 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                        </TouchableOpacity>
-                    </View>
-                    {/* 학기 상세 성적 확인 */}
-                    {!detailCreditAreaVisible22 && (
-                        <ScrollView horizontal={true} >
-                            <View style={styles.detail_credit_area}>
-                                <View style={styles.table}>
-                                    <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                        <Row
-                                            data={tableHead}
-                                            style={{ height: 30, backgroundColor: "#dddddd" }}
-                                            textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                            widthArr={widthArrs}
-                                        />
-                                        <Rows 
-                                            data={credit_data_2_2}  
-                                            style={styles.tableRows} 
-                                            textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                            widthArr={widthArrs}
-                                            />
-                                    </Table>
-                                </View>
-                            </View>
-                        </ScrollView>
-                    )}
-
-                    {/* 학기별 상세 성적 확인용 영역 */}
-                    <View style={styles.detail_credit_box}>
-                        <Text style={styles.semester_text}>3학년 1학기</Text>
-                        <TouchableOpacity onPress={toggleDetailCreditAreaVisibility31}>
-                            <Icon name={detailCreditAreaVisible31 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                        </TouchableOpacity>
-                    </View>
-                    {/* 학기 상세 성적 확인 */}
-                    {!detailCreditAreaVisible31 && (
-                        <ScrollView horizontal={true} alwaysBounceHorizontal={true} >
-                            <View style={styles.detail_credit_area}>
-                                <View style={styles.table}>
-                                    <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                        <Row
-                                            data={tableHead}
-                                            style={{ height: 30, backgroundColor: "#dddddd" }}
-                                            textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                            widthArr={widthArrs}
-                                        />
-                                        <Rows 
-                                            data={credit_data_3_1}  
-                                            style={styles.tableRows} 
-                                            textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                            widthArr={widthArrs}
-                                            />
-                                    </Table>
-                                </View>
-                            </View>
-                        </ScrollView>
-                    )}
-
-                    {/* 학기별 상세 성적 확인용 영역 */}
-                    <View style={styles.detail_credit_box}>
-                        <Text style={styles.semester_text}>3학년 2학기</Text>
-                        <TouchableOpacity onPress={toggleDetailCreditAreaVisibility32}>
-                            <Icon name={detailCreditAreaVisible32 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                        </TouchableOpacity>
-                    </View>
-                    {/* 학기 상세 성적 확인 */}
-                    {!detailCreditAreaVisible32 && (
-                        <ScrollView horizontal={true} >
-                            <View style={styles.detail_credit_area}>
-                                <View style={styles.table}>
-                                    <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                        <Row
-                                            data={tableHead}
-                                            style={{ height: 30, backgroundColor: "#dddddd" }}
-                                            textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                            widthArr={widthArrs}
-                                        />
-                                        <Rows 
-                                            data={credit_data_3_2}  
-                                            style={styles.tableRows} 
-                                            textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                            widthArr={widthArrs}
-                                            />
-                                    </Table>
-                                </View>
-                            </View>
-                        </ScrollView>
-                    )}
-                    
-                </View>
+                ))}
             </ScrollView>
         </View>
-
     );
 };
 
 const styles = StyleSheet.create({
-    container : {
-        flex : 1,
-        backgroundColor : 'white',
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
     },
     area: {
-        marginTop: 20
+        marginTop: 20,
     },
-    detail_credit_box: { // 학기별 상세 성적 박스 영역
-        backgroundColor: boxColor,
+    detail_credit_box: {
+        backgroundColor: '#999999',
         width: '100%',
         height: 70,
         flexDirection: 'row',
@@ -336,25 +126,22 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginTop: 20,
     },
-    semester_text: { // 박스 내 텍스트
+    semester_text: {
         fontSize: 32,
         marginLeft: 15,
         fontWeight: 'bold',
     },
-    semester_button: { // 박스 내 버튼
+    semester_button: {
         fontSize: 50,
-        marginRight: 15
+        marginRight: 15,
     },
-    detail_credit_area: { // 상세 성적 테이블 영역
-
-    },
-    table: { // 테이블
+    detail_credit_area: {},
+    table: {
         margin: 10,
     },
-    tableRows:{ // 테이블 열
-        height: 50
+    tableRows: {
+        height: 50,
     },
-    }
-)
+});
 
 export default AcademicRecord;

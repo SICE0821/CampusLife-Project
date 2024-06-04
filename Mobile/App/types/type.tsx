@@ -28,6 +28,7 @@ export type UserData = {
   student_semester : number, 
   college : number,
 }
+
 export type PostDeatilData = {
   post_writer: string,
   writer_department: string,
@@ -102,7 +103,7 @@ export type CommentsWithRecomments = {
 }
 
 export type Lecture = {
-  [x: string]: any;
+  forEach: any;
   lecture_id: number;
   credit: number;
   professor_name: string;
@@ -110,6 +111,7 @@ export type Lecture = {
   lecture_room: string;
   lecture_time: string;
   week: string;
+  division : string;
   nonattendance: number;
   attendance: number;
   tardy: number;
@@ -117,4 +119,7 @@ export type Lecture = {
   weeknum: number;
   lecture_grade : number;
   lecture_semester : number;
-};
+  lecture_credit : number;
+  lecture_grades : string;
+}
+

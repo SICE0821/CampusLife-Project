@@ -1,8 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Swiper from 'react-native-swiper';
-
+import { View, Text, StyleSheet, } from 'react-native';
 const DeadlineEventScreen = () => {
   return (
       <View style = {styles.container}>

@@ -27,8 +27,7 @@ import { UserData } from '../types/type';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export const AcademicTopTabNavigator = ({route} : any) => {
-    const { userdata } = route.params;
-    console.log(userdata);
+    const { userdata, LectureData } = route.params;
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             <AcademicTopTab.Navigator
@@ -65,11 +64,13 @@ export const AcademicTopTabNavigator = ({route} : any) => {
                 <AcademicTopTab.Screen
                     name="학적"
                     component={AcademicInfoScreen}
-                    initialParams={{ userdata }} />
+                    initialParams={{ userdata,LectureData }} 
+                    />
                 <AcademicTopTab.Screen
                     name="수강신청이력"
-                    component={AcademicRecord}
-                    initialParams={{ userdata }} />
+                    component={AcademicRecord} 
+                    initialParams={{ userdata,LectureData }}
+                    />
             </AcademicTopTab.Navigator>
         </View>
     )

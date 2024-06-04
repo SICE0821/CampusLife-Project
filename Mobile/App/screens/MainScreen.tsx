@@ -62,7 +62,6 @@ const MainPage = ({ navigation, route }: any) => {
   const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
-  const [lectureList, setLectureList] = useState<Lecture>(LectureData);
   const [Userdepartment, setUserDepartment] = useState();
   const [imagepath, setimagepath] = useState<string>();
   const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
@@ -212,20 +211,20 @@ const MainPage = ({ navigation, route }: any) => {
     navigation.navigate('StudentInfoNavigator', { userData, Userdepartment });
   }
 
-  const AcademicInfo = async () => {
-    navigation.navigate('AcademicInfoNavigator');
-  }
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchschoolpostData();
-      fetchdepartmentpostData();
-      fetchhotpostData();
-      settingUserData();
-      get_user_department();
-      get_user_point();
-      if (navigation.getState().routes[navigation.getState().index].params?.updatedUserData) {
-        const updatedUserData = navigation.getState().routes[navigation.getState().index].params.updatedUserData;
-        setUserData(updatedUserData);
+    const AcademicInfo = async () =>{
+      navigation.navigate('AcademicInfoNavigator', {userData, LectureData});
+    }
+    useFocusEffect(
+      React.useCallback(() => {
+        fetchschoolpostData();
+        fetchdepartmentpostData();
+        fetchhotpostData();
+        settingUserData();
+        get_user_department();
+        get_user_point();
+        if (navigation.getState().routes[navigation.getState().index].params?.updatedUserData) {
+          const updatedUserData = navigation.getState().routes[navigation.getState().index].params.updatedUserData;
+          setUserData(updatedUserData);
       }
     }, [navigation])
   )
