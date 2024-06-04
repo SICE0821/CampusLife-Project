@@ -209,11 +209,6 @@ const AttendanceScreen = ({navigation, route}: any) => {
   }
 }, [scannedCode]);
 
-useFocusEffect(
-  React.useCallback(() => {
-    setLectureList(LectureData)
-  }, [])
-)
 
 useEffect(() => {
   // 학년과 학기에 맞는 과목만 필터링하여 설정

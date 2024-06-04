@@ -149,9 +149,6 @@ const App = ({ route }: any) => {
 
   const courses = timetableData[selectedGradeAndSemester] || [];
 
-  useEffect(() => {
-    
-  }, []);
 
   return (
     <ScrollView style={styles.container}>

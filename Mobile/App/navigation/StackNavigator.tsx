@@ -140,7 +140,6 @@ export const LoginScreenStackNavigator = () => {
 export const MainScreenStackNavigator = ({ route }: any) => {
     const navigation: any = useNavigation();
     const { userdata, LectureData } = route.params;
-
     React.useLayoutEffect(() => {
         const routeName = getFocusedRouteNameFromRoute(route);
         if (routeName === "MainScreen" || routeName === undefined) {
@@ -180,7 +179,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen
                 name="AcademicInfoNavigator"
                 component={AcademicTopTabNavigator}
-                initialParams={{ userdata }}
+                initialParams={{ userdata, LectureData}}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -397,21 +397,13 @@ async function gethotpostdata() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
-            + "FROM "
-            + "post "
-            + "LEFT JOIN "
-            + "user "
-            + "ON post.user_id = user.user_id "
-            + "LEFT JOIN "
-            + "student "
-            + "ON user.student_id = student.student_id "
-            + "WHERE "
-            + "post.department_check = 0 AND post.inform_check =0 AND post.`like` >= 30 "
-            + "ORDER BY post.date DESC "
-            + "LIMIT 5"
-        );
+        const rows = await conn.query(`
+            SELECT post_id, title, view, \`like\`
+            FROM post 
+            WHERE department_check = 0 AND inform_check = 0 
+            ORDER BY \`like\` DESC 
+            LIMIT 5
+        `);
         return rows;
     } catch (err) {
         throw err;
@@ -420,27 +412,18 @@ async function gethotpostdata() {
     }
 }
 
-
-//메인 화면에서 학교 학과 게시글을 가져오는 쿼리
+//메인 화면에서 학과 게시글을 가져오는 쿼리
 async function getdeparmentpostdata() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
-            + "FROM "
-            + "post "
-            + "LEFT JOIN "
-            + "user "
-            + "ON post.user_id = user.user_id "
-            + "LEFT JOIN "
-            + "student "
-            + "ON user.student_id = student.student_id "
-            + "WHERE "
-            + "post.department_check = 1 AND post.inform_check = 1 "
-            + "ORDER BY post.date DESC "
-            + "LIMIT 5"
-        );
+        const rows = await conn.query(`
+            SELECT post_id, title, view 
+            FROM post 
+            WHERE department_check = 1 AND inform_check = 1 
+            ORDER BY post_id DESC 
+            LIMIT 5
+        `);
         return rows;
     } catch (err) {
         throw err;
@@ -449,27 +432,18 @@ async function getdeparmentpostdata() {
     }
 }
 
-
-//메인화면에서 학교 전체 공지사항 가져오는 쿼리
+//메인 화면에서 학교 게시글을 가져오는 쿼리
 async function getschoolpostdata() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
-            + "FROM "
-            + "post "
-            + "LEFT JOIN "
-            + "user "
-            + "ON post.user_id = user.user_id "
-            + "LEFT JOIN "
-            + "student "
-            + "ON user.student_id = student.student_id "
-            + "WHERE "
-            + "post.department_check = 0 AND post.inform_check = 1 "
-            + "ORDER BY post.date DESC "
-            + "LIMIT 5"
-        );
+        const rows = await conn.query(`
+            SELECT post_id, title, view 
+            FROM post 
+            WHERE department_check = 0 AND inform_check = 1 
+            ORDER BY post_id DESC 
+            LIMIT 5
+        `);
         return rows;
     } catch (err) {
         throw err;
@@ -572,13 +546,39 @@ async function getLectureList(studentId) {
     }
 }
 
+//과목 업데이트 
+async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `
+            UPDATE lecture_have_object 
+            SET 
+                nonattendance = ?, 
+                attendance = ?, 
+                tardy = ?, 
+                absent = ?,
+                weeknum = ? 
+            WHERE student_id = ? AND lecture_id = ?
+        `;
+        const result = await conn.query(query, [nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 async function get_event_objcet(campus_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(`
-            SELECT * FROM event_object WHERE campus_id = ? AND sell_check = 0
-        `, [campus_id]);
+        const rows = await conn.query(
+            `SELECT * FROM event_object WHERE campus_id = ? AND sell_check = 0`
+        , [campus_id]);
         return rows;
 
     } catch (err) {
@@ -587,6 +587,7 @@ async function get_event_objcet(campus_id) {
         if (conn) conn.end();
     }
 }
+
 //바코드 최댓값 가져오기
 async function getBarcordMaxNum() {
     let conn;
@@ -926,8 +927,8 @@ async function get_campus_Info() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `
-            SELECT 
+        const query = 
+            `SELECT 
                 department.department_id,
                 department.name AS department_name, 
                 campus.campus_id, 
@@ -957,8 +958,8 @@ async function get_campus_building_Info() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `
-            SELECT 
+        const query = 
+            `SELECT 
                 campus.campus_id, 
                 campus_building.building_name, 
                 campus_building.campus_place, 
@@ -979,63 +980,7 @@ async function get_campus_building_Info() {
     }
 }
 
-//학교의 정보 가져오기
-async function get_campus_Info() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const query = `
-            SELECT 
-                department.department_id,
-                department.name AS department_name, 
-                campus.campus_id, 
-                campus.name AS campus_name,
-                campus_have_department.department_phone, 
-                campus_have_department.department_floor, 
-                campus_have_department.department_building
-            FROM 
-                campus_have_department
-            JOIN 
-                department ON campus_have_department.department_id = department.department_id
-            JOIN 
-                campus ON campus_have_department.campus_id = campus.campus_id;
-        `;
-        const result = await conn.query(query);
-        console.log(result);
-        return result;
-    } catch (err) {
-        console.error('Error updating data:', err);
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
 
-//학교 건물 정보 가져오기
-async function get_campus_building_Info() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const query = `
-            SELECT 
-                campus.campus_id, 
-                campus_building.building_name, 
-                campus_building.campus_place, 
-                campus_building.latitude,
-                campus_building.longitude
-            FROM 
-                campus_building
-            JOIN 
-                campus ON campus_building.campus_id = campus.campus_id;
-        `;
-        const result = await conn.query(query);
-        console.log(result);
-        return result;
-    } catch (err) {
-        console.error('Error updating data:', err);
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
 
 async function updateUserImg(user_pk, photopath) {
     let conn;
@@ -1053,6 +998,29 @@ async function updateUserImg(user_pk, photopath) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
+async function Get_One_Event_Item(item_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT *
+            FROM event_object eo
+            WHERE eo.object_id = (
+                SELECT MIN(eo2.object_id)
+                FROM event_object eo2
+                WHERE eo2.name = ? AND eo2.sell_check = 0
+            );`
+        );
+        const rows = await conn.query(query, [item_name]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 
 async function post_comment(post_id, user_id, contents) {
     let conn;
@@ -1347,26 +1315,35 @@ async function view_count_up(post_id) {
     }
 }
 
-
-async function Get_One_Event_Item(item_name) {
+//로그인할때(유저 PK값 가져오기)
+async function getyourpoint(user_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = (
-            `SELECT *
-            FROM event_object eo
-            WHERE eo.object_id = (
-                SELECT MIN(eo2.object_id)
-                FROM event_object eo2
-                WHERE eo2.name = ? AND eo2.sell_check = 0
-            );`
-        );
-        const rows = await conn.query(query, [item_name]);
+        // 데이터 삽입 쿼리 작성
+        const rows = await conn.query(
+            'SELECT user.point FROM user WHERE user_id = ?', [user_id]);
+        console.log(rows);
         return rows;
     } catch (err) {
-        throw err;
+        console.error('Error inserting data:', err);
     } finally {
-        if (conn) conn.end();
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function update_user_point(user_pk, price) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET point = point - ? WHERE user_id = ?'
+        const result = await conn.query(query, [price, user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
     }
 }
 
@@ -1403,33 +1380,6 @@ async function insert_user_have_object(user_id, object_id) {
     }
 }
 
-//전체 게시판에서 전체 게시글을 가져오는 쿼리
-async function getGeneralPosts() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
-            + "FROM "
-            + "post "
-            + "LEFT JOIN "
-            + "user "
-            + "ON post.user_id = user.user_id "
-            + "LEFT JOIN "
-            + "student "
-            + "ON user.student_id = student.student_id "
-            + "WHERE "
-            + "post.department_check = 0 AND post.inform_check =0 "
-            + "ORDER BY post.date DESC"
-        );
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.end();
-    }
-}
-
 // 게시판에서 책갈피한 게시물을 가져오는 쿼리
 async function getUserHaveCoupon(user_id) {
     let conn;
@@ -1461,41 +1411,6 @@ async function getUserHaveCoupon(user_id) {
         throw err;
     } finally {
         if (conn) conn.end();
-    }
-}
-
-//로그인할때(유저 PK값 가져오기)
-async function getyourpoint(user_id) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        // 데이터 삽입 쿼리 작성
-        const rows = await conn.query(
-            `SELECT user.point FROM user WHERE user_id = ?;`, [user_id]);
-        
-        console.log(rows);
-        return rows;
-    } catch (err) {
-        console.error('Error inserting data:', err);
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
-
-async function update_user_point(user_pk, price) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const query = `UPDATE user
-        SET point = point - ?
-        WHERE user_id = ?`
-        const result = await conn.query(query, [price, user_pk]);
-        return true;
-    } catch (err) {
-        console.error('Error updating data:', err);
-        return false;
-    } finally {
-        if (conn) conn.release(); // 연결 해제
     }
 }
 
@@ -1547,10 +1462,13 @@ module.exports = {
     getNoticeDepartmentHotPosts,
     getNoticeBookmarkPosts,
     getNoticeDepartmentBookmarkPosts,
+    getyourpoint,
+    update_user_point,
     Get_One_Event_Item,
     update_object,
     insert_user_have_object,
     getUserHaveCoupon,
     getyourpoint,
-    update_user_point
+    update_user_point,
+    Updatelecture,
 };
