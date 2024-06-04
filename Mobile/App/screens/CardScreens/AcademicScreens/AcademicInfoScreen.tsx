@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import ProgressCircle from 'react-native-progress-circle';
 import Icon from 'react-native-vector-icons/Entypo';
@@ -11,132 +11,162 @@ import {
     ContributionGraph,
     StackedBarChart
 } from "react-native-chart-kit";
+import { UserData, Lecture } from '../../../types/type';
 
-{ // 학점 정보 데이터 요기
-    var circle1_data = 4.0; // 전체 평점 데이터
-    var circle1_percent = (circle1_data / 4.5) * 100; // 전체 평점 퍼센트
+const AcademicInfoScreen = ({route} : any) => {
+    const { userdata, LectureData } = route.params;
+    const [userData, setUserData] = useState<UserData>(userdata);
+    const [userLecture, setUserLecture] = useState<Lecture[]>(LectureData);
+    const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
 
-    var circle2_data = 3.2; // 전공 평점 데이터
-    var circle2_percent = (circle2_data / 4.5) * 100; // 전공 평점 퍼센트
+    const [circle1Data, setCircle1Data] = useState(0);
+    const [circle2Data, setCircle2Data] = useState(0);
+    const [circle3Data, setCircle3Data] = useState(0);
+    const [circle4Data, setCircle4Data] = useState(0);
+    const [circle5Data, setCircle5Data] = useState(0);
+    const [circle6Data, setCircle6Data] = useState(0);
 
-    var circle3_data = 3.25; // 교양 평점 데이터
-    var circle3_percent = (circle3_data / 4.5) * 100; // 교양 평점 퍼센트
+    // 성적 데이터 초기화
+    let datas = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // A+부터 F까지의 갯수를 담을 배열
 
-    var circle4_data = 84; // 전체 학점 데이터
-    var credit_max = 120; // 최대 학점 데이터
-    var circle4_percent = (circle4_data / credit_max) * 100; // 전체 학점 퍼센트
+    // userLecture 배열을 순회하면서 성적을 확인하고 datas 배열 업데이트
+    userLecture.forEach(lecture => {
+        // 성적에 따라 datas 배열 업데이트
+        switch (lecture.lecture_grades) {
+            case 'A+':
+                datas[0]++;
+                break;
+            case 'A':
+                datas[1]++;
+                break;
+            case 'B+':
+                datas[2]++;
+                break;
+            case 'B':
+                datas[3]++;
+                break;
+            case 'C+':
+                datas[4]++;
+                break;
+            case 'C':
+                datas[5]++;
+                break;
+            case 'D+':
+                datas[6]++;
+                break;
+            case 'D':
+                datas[7]++;
+                break;
+            case 'F':
+                datas[8]++;
+                break;
+            default:
+                break;
+        }
+    });
 
-    var circle5_data = 60; // 전공 학점 데이터
-    var major_credit_max = 80; // 최대 전공 학점 데이터
-    var circle5_percent = (circle5_data / major_credit_max) * 100; // 전공 평점 퍼센트
+    useEffect(() => {
+        const totalCredits = userLecture.reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
+        const averageCredits = parseFloat((totalCredits / userLecture.length).toFixed(2));
 
-    var circle6_data = 24; // 교양 학점 데이터
-    var culture_credit_max = 80; // 최대 교양 학점 데이터
-    var circle6_percent = (circle6_data / culture_credit_max) * 100; // 교양 평점 퍼센트
-}
+        const majorCredits = userLecture.filter(lecture => lecture.division === '전공').reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
+        const majorCount = userLecture.filter(lecture => lecture.division === '전공').length;
+        const majorAverageCredits = parseFloat((majorCredits / majorCount).toFixed(2));
 
-{ // 학점 Circle 데이터
-    var circleRadius = 60;
-    var circleBorderWidth = 8;
-    var circleColor = "#000000";
-    var circlShadowColor = "#EEEEEE";
-}
+        const cultureCredits = userLecture.filter(lecture => lecture.division === '교양').reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
+        const cultureCount = userLecture.filter(lecture => lecture.division === '교양').length;
+        const cultureAverageCredits = parseFloat((cultureCredits / cultureCount).toFixed(2));
+        
+        const totalCredits2 = userLecture.reduce((sum, lecture) => sum + lecture.credit, 0);
+        const majorCredits2 = userLecture.filter(lecture => lecture.division === '전공').reduce((sum, lecture) => sum + lecture.credit, 0);
+        const cultureCredits2 = userLecture.filter(lecture => lecture.division === '교양').reduce((sum, lecture) => sum + lecture.credit, 0);
 
-// 학점 등급별 갯수 데이터 요기
-var datas = [1, 2, 3, 4, 5, 5, 3, 2, 1, 0,];
-//           A+ A  A- B+ B  B- C+ C  C- F
+        setCircle1Data(averageCredits);
+        setCircle2Data(majorAverageCredits);
+        setCircle3Data(cultureAverageCredits);
+        setCircle4Data(totalCredits2);
+        setCircle5Data(majorCredits2);
+        setCircle6Data(cultureCredits2);
+    }, [userLecture]);
 
+    const circleRadius = 60;
+    const circleBorderWidth = 8;
+    const circleColor = "#000000";
+    const circlShadowColor = "#EEEEEE";
 
-{ // 테이블 관련 설정
-    var widthArrs = [240,70,70,70] // 테이블 간격
-    var tableBorderWidth = 3 // 테이블 border 크기
-    var tableBorderColor = 'gray' // 테이블 bordder 색
-}
+    const creditMax = 120; // 최대 학점 데이터
+    const majorCreditMax = 80; // 최대 전공 학점 데이터
+    const cultureCreditMax = 20; // 최대 교양 학점 데이터
 
-{ // 학년 학기별 과목명, 구분, 학점, 성적 요기
-    var tableHead = ["과목명", "구분", "학점", "성적"];
-    var credit_data_1_1 = [
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-    ]
-    var credit_data_1_2 = [
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-    ]
-    var credit_data_2_1 = [
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-    ]
-    var credit_data_2_2 = [
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-    ]
-    var credit_data_3_1 = [
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-    ]
-    var credit_data_3_2 = [
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-    ]
-    var credit_data_4_1 = [
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-        [ "Subject name", "Division", "Credit", "Grades" ],
-    ]
-    var credit_data_4_2 = [
-    ]
-}
+    const circle1_percent = (circle1Data / 4.5) * 100;
+    const circle2_percent = (circle2Data / 4.5) * 100;
+    const circle3_percent = (circle3Data / 4.5) * 100;
+    const circle4_percent = (circle4Data / creditMax) * 100;
+    const circle5_percent = (circle5Data / majorCreditMax) * 100;
+    const circle6_percent = (circle6Data / cultureCreditMax) * 100;
 
-const AcademicInfoScreen = () => {
-    // 1학년 1학기
-    const [detailCreditAreaVisible11, setDetailCreditAreaVisible11] = useState(true);
-    const toggleDetailCreditAreaVisibility11 = () => {
-        setDetailCreditAreaVisible11(!detailCreditAreaVisible11);
+    
+    useEffect(() => {
+        const semesters: number[] = [];
+        for (let year = 1; year <= userData.college; year++) {
+            const maxSemester = year === userData.college ? 2 : 2; // 만약 학년이 현재 학년이면 userData.student_semester까지, 아니면 2학기까지만 보이도록 조절
+            for (let semester = 1; semester <= maxSemester; semester++) {
+                semesters.push((year - 1) * 2 + semester); // 학년과 학기를 조합하여 배열에 추가
+            }
+        }
+        setVisibleSemesters(semesters);
+    }, [userData.college, userData.student_semester]);
+
+    const semesterLabels: Record<number, string> = {
+        1: '1학년 1학기',
+        2: '1학년 2학기',
+        3: '2학년 1학기',
+        4: '2학년 2학기',
+        5: '3학년 1학기',
+        6: '3학년 2학기',
+        7: '4학년 1학기',
+        8: '4학년 2학기',
     };
-    // 1학년 2학기
-    const [detailCreditAreaVisible12, setDetailCreditAreaVisible12] = useState(true);
-    const toggleDetailCreditAreaVisibility12 = () => {
-        setDetailCreditAreaVisible12(!detailCreditAreaVisible12);
+
+    const semesterData: Record<number, Lecture[]> = {
+        1: userLecture.filter(lecture => lecture.lecture_grade === 1 && lecture.lecture_semester === 1),
+        2: userLecture.filter(lecture => lecture.lecture_grade === 1 && lecture.lecture_semester === 2),
+        3: userLecture.filter(lecture => lecture.lecture_grade === 2 && lecture.lecture_semester === 1),
+        4: userLecture.filter(lecture => lecture.lecture_grade === 2 && lecture.lecture_semester === 2),
+        5: userLecture.filter(lecture => lecture.lecture_grade === 3 && lecture.lecture_semester === 1),
+        6: userLecture.filter(lecture => lecture.lecture_grade === 3 && lecture.lecture_semester === 2),
+        7: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 1),
+        8: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 2),
     };
-    // 2학년 1학기
-    const [detailCreditAreaVisible21, setDetailCreditAreaVisible21] = useState(true);
-    const toggleDetailCreditAreaVisibility21 = () => {
-        setDetailCreditAreaVisible21(!detailCreditAreaVisible21);
+    
+    const [detailCreditAreaVisible, setDetailCreditAreaVisible] = useState<Record<number, boolean>>({
+        1: true,
+        2: true,
+        3: true,
+        4: true,
+        5: true,
+        6: true,
+        7: true,
+        8: true,
+    });
+
+    const toggleDetailCreditAreaVisibility = (semesterKey: number) => {
+        setDetailCreditAreaVisible({
+            ...detailCreditAreaVisible,
+            [semesterKey]: !detailCreditAreaVisible[semesterKey],
+        });
     };
-    // 2학년 2학기
-    const [detailCreditAreaVisible22, setDetailCreditAreaVisible22] = useState(true);
-    const toggleDetailCreditAreaVisibility22 = () => {
-        setDetailCreditAreaVisible22(!detailCreditAreaVisible22);
-    };
-    // 3학년 1학기
-    const [detailCreditAreaVisible31, setDetailCreditAreaVisible31] = useState(true);
-    const toggleDetailCreditAreaVisibility31 = () => {
-        setDetailCreditAreaVisible31(!detailCreditAreaVisible31);
-    };
-    // 3학년 2학기
-    const [detailCreditAreaVisible32, setDetailCreditAreaVisible32] = useState(true);
-    const toggleDetailCreditAreaVisibility32 = () => {
-        setDetailCreditAreaVisible32(!detailCreditAreaVisible32);
-    };
+
+    const tableHead = ["과목명", "구분", "학점", "성적"];
+    const widthArrs = [240,70,70,70]; // 테이블 간격
+    const tableBorderWidth = 3; // 테이블 border 크기
+    const tableBorderColor = 'gray'; // 테이블 bordder 색
 
     return (
         <View style={styles.container}>
             <View style={{borderBottomWidth: 2, marginTop: 5, borderColor: "black"}}></View>
             <ScrollView>
+                
                 {/* 학점 Circle 데이터 영역 */}
                 <View style={styles.circleArea}>
                     {/* 학점 Circle 열 영역 */}
@@ -154,7 +184,7 @@ const AcademicInfoScreen = () => {
                                 {/* Circle안의 텍스트 설정 */}
                                 <Text style={styles.circleText}>
                                     {'전체 평점' + '\n'}
-                                    {circle1_data + '/' + 4.5}
+                                    {circle1Data + '/' + 4.5}
                                 </Text>
                             </ProgressCircle>
                         </View>
@@ -171,7 +201,7 @@ const AcademicInfoScreen = () => {
                                 {/* Circle안의 텍스트 설정 */}
                                 <Text style={styles.circleText}>
                                     {'전공 평점' + '\n'}
-                                    {circle2_data + '/' + 4.5}
+                                    {circle2Data + '/' + 4.5}
                                 </Text>
                             </ProgressCircle>
                         </View>
@@ -188,7 +218,7 @@ const AcademicInfoScreen = () => {
                                 {/* Circle안의 텍스트 설정 */}
                                 <Text style={styles.circleText}>
                                     {'교양 평점' + '\n'}
-                                    {circle3_data + '/' + 4.5}
+                                    {circle3Data + '/' + 4.5}
                                 </Text>
                             </ProgressCircle>
                         </View>
@@ -208,7 +238,7 @@ const AcademicInfoScreen = () => {
                                 {/* Circle안의 텍스트 설정 */}
                                 <Text style={styles.circleText}>
                                     {'전체 학점' + '\n'}
-                                    {circle4_data + '/' + credit_max}
+                                    {circle4Data + '/' + creditMax}
                                 </Text>
                             </ProgressCircle>
                         </View>
@@ -225,7 +255,7 @@ const AcademicInfoScreen = () => {
                                 {/* Circle안의 텍스트 설정 */}
                                 <Text style={styles.circleText}>
                                     {'전공 학점' + '\n'}
-                                    {circle5_data + '/' + major_credit_max}
+                                    {circle5Data + '/' + majorCreditMax}
                                 </Text>
                             </ProgressCircle>
                         </View>
@@ -242,7 +272,7 @@ const AcademicInfoScreen = () => {
                                 {/* Circle안의 텍스트 설정 */}
                                 <Text style={styles.circleText}>
                                     {'교양 학점' + '\n'}
-                                    {circle6_data + '/' + culture_credit_max}
+                                    {circle6Data + '/' + cultureCreditMax}
                                 </Text>
                             </ProgressCircle>
                         </View>
@@ -252,7 +282,7 @@ const AcademicInfoScreen = () => {
                 <View style={styles.area}>
                     <BarChart
                         data={{
-                            labels: ["A", "A0", "A-", "B+", "B0", "B-", "C+", "C0", "C-", "F"],
+                            labels: ["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"],
                             datasets: [
                                 {
                                     data: datas
@@ -286,179 +316,44 @@ const AcademicInfoScreen = () => {
 
 
                 {/* 학기별 상세 성적 확인용 영역 */}
-                <View style={styles.detail_credit_box}>
-                    <Text style={styles.semester_text}>1학년 1학기</Text>
-                    <TouchableOpacity onPress={toggleDetailCreditAreaVisibility11}>
-                        <Icon name={detailCreditAreaVisible11 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                    </TouchableOpacity>
-                </View>
-                {/* 학기 상세 성적 확인 */}
-                {!detailCreditAreaVisible11 && (
-                    <View style={styles.detail_credit_area}>
-                        <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                <Row
-                                    data={tableHead}
-                                    style={{ height: 30, backgroundColor: "#dddddd" }}
-                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                    widthArr={widthArrs}
-                                />
-                                <Rows 
-                                    data={credit_data_1_1}  
-                                    style={styles.tableRows} 
-                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                    widthArr={widthArrs}
-                                    />
-                            </Table>
+                {visibleSemesters.map((semesterKey) => {
+                    const semesterLabel = semesterLabels[semesterKey];
+                    const lectures = semesterData[semesterKey];
+                    
+                    return (
+                        <View key={semesterKey}>
+                            <View style={styles.detail_credit_box}>
+                                <Text style={styles.semester_text}>{semesterLabel}</Text>
+                                <TouchableOpacity onPress={() => toggleDetailCreditAreaVisibility(semesterKey)}>
+                                    <Icon name={detailCreditAreaVisible[semesterKey] ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
+                                </TouchableOpacity>
+                            </View>
+                            {!detailCreditAreaVisible[semesterKey] && (
+                                <View style={styles.detail_credit_area}>
+                                    <View style={styles.table}>
+                                        <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
+                                            <Row
+                                                data={tableHead}
+                                                style={{ height: 30, backgroundColor: "#dddddd" }}
+                                                textStyle={{ textAlign: "center", fontWeight: "bold" }}
+                                                widthArr={widthArrs}
+                                            />
+                                            {lectures.map((lecture, index) => (
+                                                <Row 
+                                                    key={index}
+                                                    data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]}  
+                                                    style={styles.tableRows} 
+                                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
+                                                    widthArr={widthArrs}
+                                                />
+                                            ))}
+                                        </Table>
+                                    </View>
+                                </View>
+                            )}
                         </View>
-                    </View>
-                )}
-
-                {/* 학기별 상세 성적 확인용 영역 */}
-                <View style={styles.detail_credit_box}>
-                    <Text style={styles.semester_text}>1학년 2학기</Text>
-                    <TouchableOpacity onPress={toggleDetailCreditAreaVisibility12}>
-                        <Icon name={detailCreditAreaVisible12 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                    </TouchableOpacity>
-                </View>
-                {/* 학기 상세 성적 확인 */}
-                {!detailCreditAreaVisible12 && (
-                    <View style={styles.detail_credit_area}>
-                        <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                <Row
-                                    data={tableHead}
-                                    style={{ height: 30, backgroundColor: "#dddddd" }}
-                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                    widthArr={widthArrs}
-                                />
-                                <Rows 
-                                    data={credit_data_1_1}  
-                                    style={styles.tableRows} 
-                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                    widthArr={widthArrs}
-                                    />
-                            </Table>
-                        </View>
-                    </View>
-                )}
-
-                {/* 학기별 상세 성적 확인용 영역 */}
-                <View style={styles.detail_credit_box}>
-                    <Text style={styles.semester_text}>2학년 1학기</Text>
-                    <TouchableOpacity onPress={toggleDetailCreditAreaVisibility21}>
-                        <Icon name={detailCreditAreaVisible21 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                    </TouchableOpacity>
-                </View>
-                {/* 학기 상세 성적 확인 */}
-                {!detailCreditAreaVisible21 && (
-                    <View style={styles.detail_credit_area}>
-                        <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                <Row
-                                    data={tableHead}
-                                    style={{ height: 30, backgroundColor: "#dddddd" }}
-                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                    widthArr={widthArrs}
-                                />
-                                <Rows 
-                                    data={credit_data_1_1}  
-                                    style={styles.tableRows} 
-                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                    widthArr={widthArrs}
-                                    />
-                            </Table>
-                        </View>
-                    </View>
-                )}
-
-                {/* 학기별 상세 성적 확인용 영역 */}
-                <View style={styles.detail_credit_box}>
-                    <Text style={styles.semester_text}>2학년 2학기</Text>
-                    <TouchableOpacity onPress={toggleDetailCreditAreaVisibility22}>
-                        <Icon name={detailCreditAreaVisible22 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                    </TouchableOpacity>
-                </View>
-                {/* 학기 상세 성적 확인 */}
-                {!detailCreditAreaVisible22 && (
-                    <View style={styles.detail_credit_area}>
-                        <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                <Row
-                                    data={tableHead}
-                                    style={{ height: 30, backgroundColor: "#dddddd" }}
-                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                    widthArr={widthArrs}
-                                />
-                                <Rows 
-                                    data={credit_data_1_1}  
-                                    style={styles.tableRows} 
-                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                    widthArr={widthArrs}
-                                    />
-                            </Table>
-                        </View>
-                    </View>
-                )}
-
-                {/* 학기별 상세 성적 확인용 영역 */}
-                <View style={styles.detail_credit_box}>
-                    <Text style={styles.semester_text}>3학년 1학기</Text>
-                    <TouchableOpacity onPress={toggleDetailCreditAreaVisibility31}>
-                        <Icon name={detailCreditAreaVisible31 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                    </TouchableOpacity>
-                </View>
-                {/* 학기 상세 성적 확인 */}
-                {!detailCreditAreaVisible31 && (
-                    <View style={styles.detail_credit_area}>
-                        <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                <Row
-                                    data={tableHead}
-                                    style={{ height: 30, backgroundColor: "#dddddd" }}
-                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                    widthArr={widthArrs}
-                                />
-                                <Rows 
-                                    data={credit_data_1_1}  
-                                    style={styles.tableRows} 
-                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                    widthArr={widthArrs}
-                                    />
-                            </Table>
-                        </View>
-                    </View>
-                )}
-
-                {/* 학기별 상세 성적 확인용 영역 */}
-                <View style={styles.detail_credit_box}>
-                    <Text style={styles.semester_text}>3학년 2학기</Text>
-                    <TouchableOpacity onPress={toggleDetailCreditAreaVisibility32}>
-                        <Icon name={detailCreditAreaVisible32 ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                    </TouchableOpacity>
-                </View>
-                {/* 학기 상세 성적 확인 */}
-                {!detailCreditAreaVisible32 && (
-                    <View style={styles.detail_credit_area}>
-                        <View style={styles.table}>
-                            <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                <Row
-                                    data={tableHead}
-                                    style={{ height: 30, backgroundColor: "#dddddd" }}
-                                    textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                    widthArr={widthArrs}
-                                />
-                                <Rows 
-                                    data={credit_data_3_2}  
-                                    style={styles.tableRows} 
-                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                    widthArr={widthArrs}
-                                    />
-                            </Table>
-                        </View>
-                    </View>
-                )}
-
+                    );
+                })}
 
                 <View style={styles.bottom_area}>
                     {/* 바텀 탭 때문에 공간 만들려고 만들었다. */}

@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Dimensions, ScrollView, View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
+import config from '../../config';
+
+export type SchoolBuildingData = {
+  building_name: string,
+  campus_place: string,
+  latitude: string,
+  longitude: string,
+  study_room_name : string,
+};
 
 const width = Dimensions.get("window").width;
 
@@ -20,7 +29,7 @@ const studyroomInfo = [
 const campus = ['전체', '본캠퍼스', '소사캠퍼스'];
 const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
 
-const reservedTimes = {
+const reservedTimes: { [key: string]: { [key: string]: string[] } } = {
   '2024-06-03': {
     '스터디룸1': ['09', '10', '11'],
     '스터디룸2': ['14', '15', '16'],
@@ -45,8 +54,20 @@ const StudyRoomScreen = () => {
   const [selectedCampus, setSelectedCampus] : any = useState(campus[0]);
   const [selectedTimes, setSelectedTimes] : any = useState({});
   const [showDatePicker, setShowDatePicker] : any = useState(false);
+  const [schoolBuildingData, setSchoolBuildingData] = useState<SchoolBuildingData[]>([]);
 
-  const onDateChange = (event: any, date: Date) => {
+  const fetchSchoolBuildingData = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/getSchoolBuildingInfo`);
+      if (!response.ok) throw new Error('서버 응답 실패');
+      const data = await response.json();
+      setSchoolBuildingData(data);
+    } catch (error) {
+      //console.error('학교 건물 정보를 가져오는 중 오류 발생:', error);
+    }
+  };
+
+  const onDateChange = (event: any, date?: Date) => {
     const currentDate = date || new Date();
     setShowDatePicker(false);
     setSelectedDate(currentDate);
@@ -168,6 +189,10 @@ const StudyRoomScreen = () => {
     ))
   );
 
+  useEffect(() => {
+    fetchSchoolBuildingData();
+  }, []);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.datePicker}>
@@ -178,6 +203,8 @@ const StudyRoomScreen = () => {
           value={selectedDate}
           mode="date"
           display="compact"
+          minimumDate={new Date()} // Today's date
+          maximumDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)} // Today + 7 days
           onChange={onDateChange}
         />
       )}

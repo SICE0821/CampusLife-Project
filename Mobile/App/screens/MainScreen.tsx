@@ -51,7 +51,6 @@ const MainPage = ({navigation ,route} : any) => {
   const [departmentpostdata, setdepartmentpostdata] = useState<mainpagepostdata[]>([]);
   const [hotpostdata, sethotpostdata] = useState<mainpagehptdata[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
-  const [lectureList, setLectureList] = useState<Lecture>(LectureData);
   const [Userdepartment, setUserDepartment] = useState();
   const [imagepath, setimagepath] = useState<string>();
   const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
@@ -164,7 +163,7 @@ const MainPage = ({navigation ,route} : any) => {
     }
 
     const AcademicInfo = async () =>{
-      navigation.navigate('AcademicInfoNavigator', {userData});
+      navigation.navigate('AcademicInfoNavigator', {userData, LectureData});
     }
     useFocusEffect(
       React.useCallback(() => {

@@ -74,7 +74,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -558,22 +558,25 @@ app.post('/getlecture', async (req, res) => {
 
   try {
       const rows = await getLectureList(studentId);
-      const processedData = rows.map(item => ({
-          lecture_id: item.lecture_id,
-          professor_name: item.name, 
-          credit: item.credit,
-          lecture_name: item.lecture_name,
-          lecture_room: item.lecture_room,
-          lecture_time: item.lecture_time,
-          week: item.week,
-          nonattendance: item.nonattendance,
-          attendance: item.attendance,
-          tardy: item.tardy,
-          absent: item.absent,
-          weeknum : item.weeknum,
-          lecture_grade : item.lecture_grade,
-          lecture_semester : item.lecture_semester
-      }));
+        const processedData = rows.map(item => ({
+            lecture_id: item.lecture_id,
+            professor_name: item.name, 
+            credit: item.credit,
+            lecture_name: item.lecture_name,
+            lecture_room: item.lecture_room,
+            lecture_time: item.lecture_time,
+            week: item.week,
+            division : item.division,
+            nonattendance: item.nonattendance,
+            attendance: item.attendance,
+            tardy: item.tardy,
+            absent: item.absent,
+            weeknum : item.weeknum,
+            lecture_grade : item.lecture_grade,
+            lecture_semester : item.lecture_semester,
+            lecture_credit : item.lecture_credit,
+            lecture_grades : item.lecture_grades
+        }));
       res.json({ data: processedData });
       console.log(processedData)
       console.log("성공적으로 데이터 보냄");
@@ -771,7 +774,8 @@ app.get('/getSchoolBuildingInfo', async (req, res) => {
           building_name: item.building_name,
           campus_place: item.campus_place,
           latitude: item.latitude,
-          longitude: item.longitude
+          longitude: item.longitude,
+          study_room_name : item.study_room_name
       }));
       res.json(processedData);
       console.log("성공적으로 데이터 보냄");

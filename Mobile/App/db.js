@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -521,13 +521,16 @@ async function getLectureList(studentId) {
                 lecture.lecture_room, 
                 lecture.lecture_time, 
                 lecture.week,
+                lecture.division,
                 lecture_have_object.nonattendance, 
                 lecture_have_object.attendance, 
                 lecture_have_object.tardy, 
                 lecture_have_object.absent,
                 lecture_have_object.weeknum,
                 lecture_have_object.lecture_grade,
-                lecture_have_object.lecture_semester
+                lecture_have_object.lecture_semester,
+                lecture_have_object.lecture_credit,
+                lecture_have_object.lecture_grades
             FROM 
                 lecture
             JOIN 
@@ -927,21 +930,24 @@ async function get_campus_Info() {
 }
 
 //학교 건물 정보 가져오기
-async function get_campus_building_Info() {
+async function get_campus_building_Info(campus_pk) {
     let conn;
     try {
         conn = await pool.getConnection();
         const query = `
-            SELECT 
-                campus.campus_id, 
-                campus_building.building_name, 
-                campus_building.campus_place, 
-                campus_building.latitude,
-                campus_building.longitude
-            FROM 
-                campus_building
-            JOIN 
-                campus ON campus_building.campus_id = campus.campus_id;
+        SELECT 
+        campus.campus_id, 
+        campus_building.building_name, 
+        campus_building.campus_place, 
+        campus_building.latitude,
+        campus_building.longitude,
+        study_room.study_room_name
+    FROM 
+        campus_building
+    JOIN 
+        campus ON campus_building.campus_id = campus.campus_id
+    JOIN
+        study_room ON campus_building.campus_id = study_room.campus_id;
         `;
         const result = await conn.query(query);
         console.log(result);
@@ -991,15 +997,18 @@ async function get_campus_building_Info() {
         conn = await pool.getConnection();
         const query = `
             SELECT 
-                campus.campus_id, 
+                campus_building.campus_id, 
                 campus_building.building_name, 
                 campus_building.campus_place, 
                 campus_building.latitude,
-                campus_building.longitude
+                campus_building.longitude,
+                study_room.study_room_name
             FROM 
                 campus_building
             JOIN 
-                campus ON campus_building.campus_id = campus.campus_id;
+                campus ON campus_building.campus_id = campus.campus_id
+            JOIN
+                study_room ON campus_building.campus_id = study_room.campus_id;
         `;
         const result = await conn.query(query);
         console.log(result);
