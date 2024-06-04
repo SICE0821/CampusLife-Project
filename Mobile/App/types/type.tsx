@@ -39,6 +39,7 @@ export type PostDeatilData = {
   view: number,
   writer_propile: string,
   post_id : number,
+  user_id : number
 }
 
 export type PostCommentData = {
@@ -121,5 +122,26 @@ export type Lecture = {
   lecture_semester : number;
   lecture_credit : number;
   lecture_grades : string;
+}
+
+export type aramData = {
+  aram_id : number,
+  user_id : number,
+  target_id : number,
+  title : string,
+  target_type : string,
+  time : string,
+  post_comment_id : number,
+  post_comment_title : string,
+  hot_post_id : number,
+  hot_post_title : string,
+  school_notice_id : number,
+  school_notice_title : string,
+  department_notice_id : number,
+  department_notice_title : string,
+  my_post_like_id : number,
+  my_post_like_title : string,
+  new_event_id : number,
+  new_event_name : string,
 }
 

@@ -1,29 +1,101 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { UserData } from '../../types/type'
+import config from '../../config';
 
 const width = Dimensions.get("window").width;
 
-const myPoint = 50;
 
-const AttendanceCheckEventScreen = () => {
+const AttendanceCheckEventScreen = ({route} : any) => {
+  const { userdata } = route.params;
+  const [userData, setUserData] = useState<UserData>(userdata);
   const [attendanceChecked, setAttendanceChecked] = useState(false);
-  const selectedDates = [
-    '2024-06-01',
-    '2024-06-02',
-  ];
+  const [selectedDates, setSelectedDates] : any = useState([]);
+  //console.log(userdata);
+  useFocusEffect(
+    React.useCallback(() => {
+        setUserData(userdata);
+        getAppAttendanceDate();
+    }, [])
+);
+
+  const getAppAttendanceDate = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/getAppAttendanceDate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userData.user_pk
+        }),
+      })
+      const AppAttendanceDate = await response.json();
+      console.log(AppAttendanceDate);
+      const checkdate = AppAttendanceDate.map((item : any) => item.date);
+      setSelectedDates(checkdate);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  const addAppAttendanceDate = async (today : any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/addAppAttendanceDate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userData.user_pk,
+          date : today
+        }),
+      })
+      await getAppAttendanceDate();
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  const user_update_point = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/user_update_point_2`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          point : 100
+        })
+      })
+      console.log("포인트 올리기 성공")
+      userData.point = userData.point + 100
+    } catch (error) {
+      console.error('포인트 올리기 실패', error);
+    }
+  }
+
 
   const markedDates: { [date: string]: { marked: boolean; selected?: boolean } } = selectedDates.reduce((acc: { [date: string]: { marked: boolean; selected?: boolean } }, date: string) => {
     acc[date] = { marked: true, selected: true };
     return acc;
   }, {});
 
-  const handleAttendanceCheck = () => {
+  const handleAttendanceCheck = async () => {
     const today = new Date().toISOString().split('T')[0];
+    console.log(today);
+
     if (selectedDates.includes(today)) {
       Alert.alert('이미 출석체크를 하셨습니다.');
     } else {
       setAttendanceChecked(true);
+      addAppAttendanceDate(today);
+      user_update_point();
       Alert.alert('출석체크가 완료되었습니다.');
     }
   };
@@ -39,7 +111,7 @@ const AttendanceCheckEventScreen = () => {
     <View style={styles.container}>
       <View style={styles.topInfo}>
         <Text style={styles.topText}>매일매일 출석체크!</Text>
-        <Text style={styles.pointText}>현재 포인트 : {myPoint}P</Text>
+        <Text style={styles.pointText}>현재 포인트 : {userData.point}P</Text>
       </View>
       <Calendar
         style={styles.calendar}
@@ -73,7 +145,9 @@ const AttendanceCheckEventScreen = () => {
           );
         }}
       />
-      <TouchableOpacity onPress={handleAttendanceCheck}>
+      <TouchableOpacity onPress={async () => {
+        handleAttendanceCheck();
+        getAppAttendanceDate();}}>
         <View style={styles.buttonArea}>
           <Text style={styles.buttonText}>출석체크</Text>
         </View>
