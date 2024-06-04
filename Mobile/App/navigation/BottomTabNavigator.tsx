@@ -21,7 +21,7 @@ const Tab = createBottomTabNavigator();
 //메인 바텀 탭 네비게이션
 export const MainTabNavigator = ({ route }: any) => {
   const navigation: any = useNavigation();
-  const { userdata } = route.params;
+  const { userdata, LectureData } = route.params;
   
   return (
     <Tab.Navigator
@@ -51,7 +51,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <Text style={{ fontSize: 13, marginBottom: 5 }}>홈</Text>
           )
         }}
-        initialParams={{ userdata }}
+        initialParams={{ userdata , LectureData}}
       />
       <Tab.Screen
         name="CommunityScreenStackNavigator"
@@ -102,7 +102,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <Text style={{ fontSize: 13, marginBottom: 5 }}>출석</Text>
           )
         }}
-        initialParams={{ userdata }}
+        initialParams={{ userdata, LectureData}}
       />
 
       <Tab.Screen
@@ -117,6 +117,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <Text style={{ fontSize: 13, marginBottom: 5 }}>시간표</Text>
           )
         }}
+        initialParams={{ userdata, LectureData }}
       />
     </Tab.Navigator>
   );
@@ -220,6 +221,7 @@ export const AdminTabNavigator = ({ route }: any) => {
             <Text style={{ fontSize: 13, marginBottom: 5 }}>시간표</Text>
           )
         }}
+        initialParams={{ userdata }}
       />
     </Tab.Navigator>
   );

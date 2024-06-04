@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { Alert, SafeAreaView, View, Text, Button, StyleSheet, TouchableOpacity, ScrollView, Dimensions} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import ModalBox from 'react-native-modalbox';
 import Modal from 'react-native-modal';
 import IconA from 'react-native-vector-icons/FontAwesome5';
@@ -9,26 +10,11 @@ import { Camera,
   useCameraDevice, 
   useCameraPermission, 
   useCodeScanner } from 'react-native-vision-camera';
-import { UserData } from '../../types/type'
+import { UserData, Lecture } from '../../types/type'
 import config from '../../config';
 
-type Lecture = {
-    lecture_id : number,
-    credit : number;
-    professor_name : string;
-    lecture_name : string;
-    lecture_room : string;
-    lecture_time : string;
-    week : string;
-    nonattendance : number,
-    attendance : number,
-    tardy : number,
-    absent : number,
-    weeknum : number,
-}
-
 const AttendanceScreen = ({navigation, route}: any) => {
-  const { userdata } = route.params;
+  const { userdata, LectureData } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const { hasPermission, requestPermission } = useCameraPermission()
@@ -38,6 +24,14 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
   const [lastScannedTime, setLastScannedTime] = useState<null | Date>(null);
   const [isScanned, setIsScanned] = useState(false); // QR 코드가 스캔되었는지 추적
+
+  const filterLectures = (lectures: Lecture[]) => {
+    return lectures.filter(
+      (lecture) =>
+        lecture.lecture_grade === userData.grade &&
+        lecture.lecture_semester === userData.student_semester
+    );
+  };
   
 
   const getCurrentDate = () => {
@@ -132,26 +126,6 @@ const AttendanceScreen = ({navigation, route}: any) => {
   };
   
 
-
-  const fetchLectureData = async () => {
-    try {
-      const response = await fetch(`${config.serverUrl}/getlecture`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          student_pk : userData.student_pk
-        })
-      })
-      const data = await response.json();
-      const Data = data.data; //키값을 치면 값을 json에서 추출할 수 있다.
-      setLectureList(Data);
-    } catch (error) {
-      console.error('과목 가져오기 실패:', error);
-    }
-  }
-
   const Updatelecture = async (lecture: Lecture[]) => {
     try {
       const promises = lecture.map(async (lec) => {
@@ -235,9 +209,17 @@ const AttendanceScreen = ({navigation, route}: any) => {
   }
 }, [scannedCode]);
 
-  useEffect(() => {
-    fetchLectureData(); // 페이지가 로드될 때 강의 목록을 가져옴
-  }, []);
+useFocusEffect(
+  React.useCallback(() => {
+    setLectureList(LectureData)
+  }, [])
+)
+
+useEffect(() => {
+  // 학년과 학기에 맞는 과목만 필터링하여 설정
+  const filteredLectures = filterLectures(LectureData);
+  setLectureList(filteredLectures);
+}, [LectureData]);
 
   const nowday = getCurrentDay();
 
@@ -248,12 +230,12 @@ const AttendanceScreen = ({navigation, route}: any) => {
         <Text style={styles.date}>{getCurrentDate()}</Text>
       </View>
 
-      {lectureList.map((lecture, index) => (
-        lecture.week === nowday && (
+      {lectureList.map((Lecture, index) => (
+        Lecture.week === nowday && (
           <View key={index} style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
-              <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                    미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
+            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(Lecture)}>
+              <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
+              <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}               미출결: {Lecture.nonattendance} 출결: {Lecture.attendance} 지각: {Lecture.tardy} 결석: {Lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )
@@ -262,12 +244,12 @@ const AttendanceScreen = ({navigation, route}: any) => {
       <View style={styles.textContainer2}>
         <Text style={styles.title2}>출석 현황</Text>
       </View>
-      {lectureList.map((lecture, index) => (
-        lecture.week !== nowday && (
+      {lectureList.map((Lecture, index) => (
+        Lecture.week !== nowday && (
           <View key={index} style={styles.buttonContainer2}>
-            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(lecture)}>
-              <Text style={styles.ListText}>{lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{lecture.professor_name} | {lecture.lecture_room}                   미출결: {lecture.nonattendance} 출결: {lecture.attendance} 지각: {lecture.tardy} 결석: {lecture.absent}</Text>
+            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(Lecture)}>
+              <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
+              <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}              미출결: {Lecture.nonattendance} 출결: {Lecture.attendance} 지각: {Lecture.tardy} 결석: {Lecture.absent}</Text>
             </TouchableOpacity>
           </View>
         )

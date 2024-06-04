@@ -12,13 +12,14 @@ import {
 } from 'react-native';
 import 'react-native-gesture-handler';
 import BouncyCheckbox from "react-native-bouncy-checkbox";
-import { UserData } from "../../types/type"
+import { UserData, Lecture } from "../../types/type"
 import config from '../../config';
 
 function LoginScreen({ navigation }: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [userData, setUserData] = useState<UserData>();
+  const [lectureList, setLectureList] = useState<Lecture>();
  
 
   const IsUser = () => {
@@ -51,7 +52,7 @@ function LoginScreen({ navigation }: any) {
   }
 
 
-  const handleLogin = async (userdata : UserData) => {
+  const handleLogin = async (userdata : UserData, LectureData : Lecture) => {
     try {
       const response = await fetch(`${config.serverUrl}/login`, {
         method: 'POST',
@@ -65,7 +66,7 @@ function LoginScreen({ navigation }: any) {
       });
       const data = await response.text();
       if (data === 'success') {
-        navigation.navigate('MainTabNavigator', {userdata : userdata});
+        navigation.navigate('MainTabNavigator', {userdata : userdata, LectureData : LectureData});
       } else {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
       }
@@ -74,6 +75,25 @@ function LoginScreen({ navigation }: any) {
       Alert.alert('로그인 오류');
     }
   };
+
+  const fetchLectureData = async (userData : UserData) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/getlecture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_pk : userData.student_pk
+        })
+      })
+      const data = await response.json();
+      const Data = data.data; //키값을 치면 값을 json에서 추출할 수 있다.
+      return Data;
+    } catch (error) {
+      console.error('과목 가져오기 실패:', error);
+    }
+  }
 
   useFocusEffect(
     React.useCallback(() => {
@@ -100,6 +120,7 @@ function LoginScreen({ navigation }: any) {
       <TextInput
         style={styles.input}
         placeholder="아이디"
+        placeholderTextColor={'gray'}
         value={username}
         onChangeText={(text) => setUsername(text)}
       />
@@ -107,6 +128,7 @@ function LoginScreen({ navigation }: any) {
       <TextInput
         style={styles.input}
         placeholder="비밀번호"
+        placeholderTextColor={'gray'}
         secureTextEntry={true}
         value={password}
         onChangeText={(text) => setPassword(text)}
@@ -138,7 +160,8 @@ function LoginScreen({ navigation }: any) {
 
       <TouchableOpacity style={styles.loginButton} onPress={async () => {
           const userdata = await get_user_data();
-          handleLogin(userdata);
+          const LectureData = await fetchLectureData(userdata);
+          handleLogin(userdata, LectureData);
           }}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
@@ -177,6 +200,7 @@ const styles = StyleSheet.create({
     marginTop: -80,
     marginBottom: 15,
     fontSize: 14,
+    color: 'black'
   },
 
   input: {
@@ -188,6 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     margin: 8,
     paddingLeft: 10,
+    color: 'black'
   },
 
   ContainerBox: {

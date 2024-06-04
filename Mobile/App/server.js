@@ -80,7 +80,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '127.0.0.1',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -211,6 +211,8 @@ app.post('/get_user_data', async (req, res) => {
     birth: formatDate(rows[0].birth),
     point: rows[0].point,
     currentstatus: rows[0].currentstatus,
+    student_semester : rows[0].student_semester,
+    college: rows[0].college,
   };
   res.json(userData);
 })
@@ -574,23 +576,26 @@ app.post('/getlecture', async (req, res) => {
   }
 
   try {
-    const rows = await getLectureList(studentId);
-    const processedData = rows.map(item => ({
-      lecture_id: item.lecture_id,
-      professor_name: item.name,
-      credit: item.credit,
-      lecture_name: item.lecture_name,
-      lecture_room: item.lecture_room,
-      lecture_time: item.lecture_time,
-      week: item.week,
-      nonattendance: item.nonattendance,
-      attendance: item.attendance,
-      tardy: item.tardy,
-      absent: item.absent,
-      weeknum: item.weeknum
+      const rows = await getLectureList(studentId);
+      const processedData = rows.map(item => ({
+        lecture_id: item.lecture_id,
+        professor_name: item.name, 
+        credit: item.credit,
+        lecture_name: item.lecture_name,
+        lecture_room: item.lecture_room,
+        lecture_time: item.lecture_time,
+        week: item.week,
+        nonattendance: item.nonattendance,
+        attendance: item.attendance,
+        tardy: item.tardy,
+        absent: item.absent,
+        weeknum : item.weeknum,
+        lecture_grade : item.lecture_grade,
+        lecture_semester : item.lecture_semester
     }));
-    res.json({ data: processedData });
-    console.log("성공적으로 데이터 보냄");
+      res.json({ data: processedData });
+      console.log(processedData)
+      console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });

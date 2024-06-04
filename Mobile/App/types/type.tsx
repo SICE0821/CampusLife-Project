@@ -25,6 +25,8 @@ export type UserData = {
   currentstatus: string,
   profile_photo: string | null,
   id: string,
+  student_semester : number, 
+  college : number,
 }
 export type PostDeatilData = {
   post_writer: string,
@@ -98,3 +100,21 @@ export type CommentsWithRecomments = {
     user_profile : string,
   }[];
 }
+
+export type Lecture = {
+  [x: string]: any;
+  lecture_id: number;
+  credit: number;
+  professor_name: string;
+  lecture_name: string;
+  lecture_room: string;
+  lecture_time: string;
+  week: string;
+  nonattendance: number;
+  attendance: number;
+  tardy: number;
+  absent: number;
+  weeknum: number;
+  lecture_grade : number;
+  lecture_semester : number;
+};

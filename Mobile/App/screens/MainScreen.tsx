@@ -10,7 +10,7 @@ import {
   Image,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { UserData } from '../types/type'
+import {UserData, Lecture} from '../types/type'
 import ImageCropPicker from 'react-native-image-crop-picker';
 import config from '../config';
 
@@ -62,6 +62,7 @@ const MainPage = ({ navigation, route }: any) => {
   const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
+  const [lectureList, setLectureList] = useState<Lecture>(LectureData);
   const [Userdepartment, setUserDepartment] = useState();
   const [imagepath, setimagepath] = useState<string>();
   const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
