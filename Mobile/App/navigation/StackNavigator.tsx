@@ -96,15 +96,16 @@ export const RootStackNavigator = (route: any) => {
                     title: '커뮤니티',
                 })}
             />
+
             <RootStack.Screen
-                name="NoticeSchoolPostsScreen"
-                component={NoticeSchoolPostsScreen}
+                name="NoticePostDetailScreen"
+                component={NoticePostDetailScreen}
                 options={({ navigation }: any) => ({
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("NoticeScreenStackNavigator")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("CommunityScreenStackNavigator")}>
                             <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -179,6 +180,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen
                 name="AcademicInfoNavigator"
                 component={AcademicTopTabNavigator}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -248,8 +250,8 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen
                 name="EventScreenStackNavigator"
                 component={EventScreenStackNavigator}
+                initialParams={{ userdata }}
                 options={{
-
                     headerShown: false
                 }} />
 
@@ -301,15 +303,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerTitleAlign: 'center',
                     title: '이벤트',
                 }} />
-
-                 <MainStack.Screen
-                name="NoticeScreenStackNavigator"
-                component={NoticeScreenStackNavigator}
-                initialParams={{ department_check : 0, userdata}}
-                options={{
-                    headerShown : false,
-                }} />
-                
         </MainStack.Navigator>
     );
 };
@@ -343,6 +336,7 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
     return (
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
+
                 name="PostTopTabNavigator"
                 component={TopbTabNavigator}
                 initialParams={{ userdata }}
@@ -414,17 +408,12 @@ export const NoticeScreenStackNavigator = ({ route, navigation }: any) => {
 
 //이벤트 페이지 관련 스택 네비게이터
 export const EventScreenStackNavigator = ({ navigation, route }: any) => {
-    React.useLayoutEffect(() => {
-        const routeName = getFocusedRouteNameFromRoute(route);
-        if (routeName === "EventHaveCouponScreen") {
-            //console.log(routeName);
-            //navigation.setOptions({tabBarStyle: {display: 'none'}});
-        }
-    }, [navigation, route])
+    const { userdata } = route.params;
     return (
         <EventStack.Navigator>
             <EventStack.Screen name="EventShopScreenStackNavigator"
                 component={EventShopScreenStackNavigator}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -443,10 +432,12 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '이벤트',
-                }} />
+                    title: '이벤트 상점',
+                }}
+                 />
             <EventShopStack.Screen name="EventHaveCouponScreen"
                 component={EventHaveCouponScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -459,7 +450,7 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '이벤트',
+                    title: '쿠폰함',
                 }} />
         </EventStack.Navigator>
     );
@@ -504,9 +495,15 @@ export const TimetableScreenStackNavigator = () => {
 };
 
 export const EventShopScreenStackNavigator = ({ navigation, route }: any) => {
+    const { userdata } = route.params;
+    //console.log(userdata);
     return (
         <EventShopStack.Navigator>
-            <EventShopStack.Screen name="EventShopScreen" component={EventShopScreen} options={{
+            <EventShopStack.Screen 
+            name="EventShopScreen" 
+            component={EventShopScreen}
+            initialParams={{ userdata }} 
+            options={{
                 headerShown: false
             }} />
         </EventShopStack.Navigator>

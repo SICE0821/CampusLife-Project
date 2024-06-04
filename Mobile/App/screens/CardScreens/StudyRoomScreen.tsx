@@ -3,12 +3,12 @@ import { View, Text, TouchableOpacity, ScrollView, FlatList, StyleSheet, Alert }
 import { Calendar } from 'react-native-calendars';
 import axios from 'axios';
 
-const StudyRoomScreen = ({ navigation }) => {
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
-  const [bookings, setBookings] = useState({});
-  const [cancelledTimeSlots, setCancelledTimeSlots] = useState([]); // 추가: 취소된 예약 시간대를 관리하는 상태 변수
+const StudyRoomScreen = ({ navigation} : any) => {
+  const [selectedDay, setSelectedDay] : any= useState(null);
+  const [selectedRoom, setSelectedRoom] : any= useState(null);
+  const [selectedTimeSlots, setSelectedTimeSlots] : any = useState([]);
+  const [bookings, setBookings] : any = useState({});
+  const [cancelledTimeSlots, setCancelledTimeSlots] : any = useState([]); // 추가: 취소된 예약 시간대를 관리하는 상태 변수
   const rooms = ['(본교 몽당도서관 3층) 스터디룸1', '(본교 몽당도서관 3층) 스터디룸2', '학과 스터디룸 1', '학과 스터디룸 2'];
   const timeSlots = [
     '09:00 - 10:00',
@@ -36,7 +36,7 @@ const StudyRoomScreen = ({ navigation }) => {
     }
   };
 
-  const handleDayPress = (day) => {
+  const handleDayPress = (day :any) => {
     const today = new Date();
     const selectedDate = new Date(day.dateString);
     if (selectedDate <= today) {
@@ -46,11 +46,11 @@ const StudyRoomScreen = ({ navigation }) => {
     setSelectedDay(day.dateString);
   };
 
-  const handleRoomSelect = (room) => {
+  const handleRoomSelect = (room : any) => {
     setSelectedRoom(room);
   };
 
-  const handleTimeSlotSelect = (timeSlot) => {
+  const handleTimeSlotSelect = (timeSlot : any) => {
     // 예약된 시간대는 선택할 수 없도록 함
     if (bookings[selectedDay]?.[selectedRoom]?.[timeSlot]) {
       Alert.alert('Already Booked', 'This time slot has already been booked. Please select an available time slot.');
@@ -58,7 +58,7 @@ const StudyRoomScreen = ({ navigation }) => {
     }
 
     if (selectedTimeSlots.includes(timeSlot)) {
-      setSelectedTimeSlots(selectedTimeSlots.filter((slot) => slot !== timeSlot));
+      setSelectedTimeSlots(selectedTimeSlots.filter((slot : any) => slot !== timeSlot));
     } else {
       setSelectedTimeSlots([...selectedTimeSlots, timeSlot]);
     }
@@ -70,7 +70,7 @@ const StudyRoomScreen = ({ navigation }) => {
       return;
     }
 
-    const allBooked = selectedTimeSlots.every((timeSlot) => {
+    const allBooked = selectedTimeSlots.every((timeSlot : any) => {
       return !bookings[selectedDay]?.[selectedRoom]?.[timeSlot];
     });
 
@@ -80,7 +80,7 @@ const StudyRoomScreen = ({ navigation }) => {
     }
 
     const updatedBookings = { ...bookings }; // 예약 하기 ~~~~~~~~~~~~~~~~
-    selectedTimeSlots.forEach((timeSlot) => {
+    selectedTimeSlots.forEach((timeSlot : any) => {
       if (!updatedBookings[selectedDay]) {
         updatedBookings[selectedDay] = {};
       }
@@ -105,7 +105,7 @@ const StudyRoomScreen = ({ navigation }) => {
     }
   };
 
-  const cancelBooking = async (timeSlot) => {  // 예약 취소~~~~~~~~~~~
+  const cancelBooking = async (timeSlot : any) => {  // 예약 취소~~~~~~~~~~~
     const updatedBookings = { ...bookings };
     delete updatedBookings[selectedDay]?.[selectedRoom]?.[timeSlot];
     setBookings(updatedBookings);
@@ -127,7 +127,7 @@ const StudyRoomScreen = ({ navigation }) => {
     }
   };
 
-  const renderRoom = ({ item }) => (
+  const renderRoom = ({ item } : any) => (
     <View style={{marginLeft:10, marginRight:10}}>
       <TouchableOpacity
       style={[
@@ -142,16 +142,18 @@ const StudyRoomScreen = ({ navigation }) => {
     
   );
 
-  const renderTimeSlot = ({ item }) => (
+  const renderTimeSlot = ({ item } : any) => (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <TouchableOpacity
         style={[
           styles.timeSlot,
           selectedTimeSlots.includes(item) ? styles.selectedTimeSlot : null,
           bookings[selectedDay]?.[selectedRoom]?.[item] ? styles.booked : null,
-          cancelledTimeSlots.includes(item) ? styles.cancelled : null,
+          cancelledTimeSlots.includes(item) ? styles.cancelledTimeSlots : null,
         ]}
-        onPress={() => handleTimeSlotSelect(item)}
+        onPress={() => {handleTimeSlotSelect(item)
+          console.log(selectedTimeSlots);
+        }}
         disabled={bookings[selectedDay]?.[selectedRoom]?.[item]}
       >
         <Text style={styles.timeSlotText}>{item}</Text>
@@ -175,6 +177,7 @@ const StudyRoomScreen = ({ navigation }) => {
   const minDate = tomorrow.toISOString().split('T')[0];
   const maxDate = new Date();
   maxDate.setDate(today.getDate() + 20);
+  var maxDateString = maxDate.toISOString(); // ISO 형식의 문자열로 변환
 
 
   return (
@@ -182,10 +185,10 @@ const StudyRoomScreen = ({ navigation }) => {
       <Calendar
         onDayPress={handleDayPress}
         minDate={minDate}
-        maxDate={maxDate} // 최대 선택 가능한 날짜 범위 설정
+        maxDate={maxDateString} // 최대 선택 가능한 날짜 범위 설정
         monthFormat={'M월'}
         markedDates={{
-          ...Object.keys(bookings).reduce((acc, date) => {
+          ...Object.keys(bookings).reduce(({acc} : any, date) => {
             acc[date] = { marked: true, dotColor: 'blue' };
             return acc;
           }, {}),
@@ -328,6 +331,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 80,
   },
+  cancelledTimeSlots : {
+
+  }
 });
 
 

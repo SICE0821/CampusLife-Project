@@ -101,7 +101,10 @@ var datas = [1, 2, 3, 4, 5, 5, 3, 2, 1, 0,];
     ]
 }
 
-const AcademicInfoScreen = () => {
+const AcademicInfoScreen = ({route} : any) => {
+    const {userdata } = route.params;
+    console.log(userdata);
+
     // 1학년 1학기
     const [detailCreditAreaVisible11, setDetailCreditAreaVisible11] = useState(true);
     const toggleDetailCreditAreaVisibility11 = () => {

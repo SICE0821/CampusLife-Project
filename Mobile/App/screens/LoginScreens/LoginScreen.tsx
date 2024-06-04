@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   StyleSheet,
   Image,
@@ -17,7 +18,18 @@ import config from '../../config';
 function LoginScreen({ navigation }: any) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [userData, setUserData] = useState<UserData>();
  
+
+  const IsUser = () => {
+    if(userData?.admin_check == true) {
+      console.log(userData);
+      navigation.navigate('AdminTabNavigator', { userdata : userData});
+    }else {
+      console.log(userData);
+      navigation.navigate('MainTabNavigator', {userdata : userData});
+    }
+  }
 
   const get_user_data = async () => {
     try {
@@ -32,20 +44,14 @@ function LoginScreen({ navigation }: any) {
         })
       })
       const userdata = await response.json();
-      console.log(userdata);
-      if (userdata.admin_check == true) {
-        navigation.navigate('AdminTabNavigator', {userdata});
-      } else {
-        navigation.navigate('MainTabNavigator', {userdata});
-      }
+      return(userdata)
     } catch (error) {
       console.error('유저 정보 가져오기 실패:', error);
     }
   }
 
 
-  const handleLogin = async () => {
-
+  const handleLogin = async (userdata : UserData) => {
     try {
       const response = await fetch(`${config.serverUrl}/login`, {
         method: 'POST',
@@ -59,7 +65,7 @@ function LoginScreen({ navigation }: any) {
       });
       const data = await response.text();
       if (data === 'success') {
-        await get_user_data();
+        navigation.navigate('MainTabNavigator', {userdata : userdata});
       } else {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
       }
@@ -67,9 +73,12 @@ function LoginScreen({ navigation }: any) {
       console.error('로그인 오류:', error);
       Alert.alert('로그인 오류');
     }
-
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+    }, [])
+  )
 
   const navigateToRegister = () => {
     navigation.navigate('RegisterPage');
@@ -127,7 +136,10 @@ function LoginScreen({ navigation }: any) {
         />
       </View>
 
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+      <TouchableOpacity style={styles.loginButton} onPress={async () => {
+          const userdata = await get_user_data();
+          handleLogin(userdata);
+          }}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
