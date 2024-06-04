@@ -192,17 +192,17 @@ app.post('/post', async (req, res) => {
 });
 
 //아이디와 비밀번호를 받고 유저 pk값을 가져온다.
-app.post('/get_user_data', async (req, res) => {
-  const { user_id, user_pass } = req.body;
+app.post('/get_user_data', async(req, res) => {
+  const {user_id, user_pass} = req.body;
   const rows = await getuserpk(user_id, user_pass);
-
+  
   const userData = {
     user_pk: rows[0].user_id,
     student_pk: rows[0].student_id,
     friend_code: rows[0].friend_code,
     admin_check: rows[0].admin_check,
-    profile_photo: rows[0].profilePhoto,
-    id: rows[0].id,
+    profile_photo : rows[0].profilePhoto,
+    id : rows[0].id,
     name: rows[0].name,
     campus_pk: rows[0].campus_id,
     department_pk: rows[0].department_id,
@@ -572,7 +572,7 @@ app.post('/login', async (req, res) => {
 app.post('/getlecture', async (req, res) => {
   const studentId = req.body.student_pk; // POST 요청에서 student_id를 가져옴
   if (!studentId) {
-    return res.status(400).json({ error: 'student_id is required' });
+      return res.status(400).json({ error: 'student_id is required' });
   }
 
   try {
@@ -597,8 +597,8 @@ app.post('/getlecture', async (req, res) => {
       console.log(processedData)
       console.log("성공적으로 데이터 보냄");
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+      console.error(error); 
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

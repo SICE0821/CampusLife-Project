@@ -501,22 +501,29 @@ async function getuserpk(user_id, user_passwd) {
     try {
         conn = await pool.getConnection();
         // 데이터 삽입 쿼리 작성
-        const rows = await conn.query(`SELECT user.user_id, 
-        user.student_id, user.friend_code, 
-        user.point, user.admin_check, 
-        user.profilePhoto,
-        user.id,
-        student.name, student.campus_id, 
-        student.department_id, student.email, 
-        student.grade,
-        student.birth,
-        student.currentstatus
-        FROM 
-        user 
-        LEFT JOIN 
-        student ON user.student_id = student.student_id
-        WHERE
-        user.id = ? AND user.passwd = ?`, [user_id, user_passwd]);
+        const rows = await conn.query(`
+            SELECT user.user_id, 
+                user.student_id, user.friend_code, 
+                user.point, user.admin_check, 
+                user.profilePhoto,
+                user.id,
+                student.name, student.campus_id, 
+                student.department_id, student.email, 
+                student.grade,
+                student.birth,
+                student.currentstatus,
+                student.student_semester,
+                department_have_object.college
+            FROM 
+                user 
+            LEFT JOIN 
+                student ON user.student_id = student.student_id
+            LEFT JOIN
+                department_have_object ON student.campus_id = department_have_object.campus_id
+                AND student.department_id = department_have_object.department_id
+            WHERE
+                user.id = ? AND user.passwd = ?
+        `, [user_id, user_passwd]);
 
         return rows;
     } catch (err) {
@@ -526,12 +533,13 @@ async function getuserpk(user_id, user_passwd) {
     }
 }
 
+// 과목의 정보를 가져오는 쿼리
 async function getLectureList(studentId) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
-           `SELECT 
+        const rows = await conn.query(`
+            SELECT 
                 lecture.lecture_id, 
                 professor.name, 
                 lecture.credit, 
@@ -539,16 +547,13 @@ async function getLectureList(studentId) {
                 lecture.lecture_room, 
                 lecture.lecture_time, 
                 lecture.week,
-                lecture.division,
                 lecture_have_object.nonattendance, 
                 lecture_have_object.attendance, 
                 lecture_have_object.tardy, 
                 lecture_have_object.absent,
                 lecture_have_object.weeknum,
                 lecture_have_object.lecture_grade,
-                lecture_have_object.lecture_semester,
-                lecture_have_object.lecture_credit,
-                lecture_have_object.lecture_grades
+                lecture_have_object.lecture_semester
             FROM 
                 lecture
             JOIN 
@@ -556,8 +561,8 @@ async function getLectureList(studentId) {
             JOIN 
                 lecture_have_object ON lecture.lecture_id = lecture_have_object.lecture_id
             WHERE 
-                lecture_have_object.student_id = ?`
-        , [studentId]);
+                lecture_have_object.student_id = ?
+        `, [studentId]);
         return rows;
     } catch (err) {
         console.error(err);
