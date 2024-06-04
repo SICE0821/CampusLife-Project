@@ -53,7 +53,8 @@ const { getGeneralPosts,
   insert_user_have_object,
   getUserHaveCoupon,
   getyourpoint,
-  update_user_point
+  update_user_point,
+  Updatelecture,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -602,6 +603,19 @@ app.post('/getlecture', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/updatelecture', async (req, res) => {
+  const { nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "과목 업데이트가 완료되었습니다." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "과목 업데이트 실패" });
   }
 });
 
