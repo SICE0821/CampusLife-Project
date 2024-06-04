@@ -974,36 +974,6 @@ async function get_campus_building_Info() {
     }
 }
 
-//학교의 정보 가져오기
-async function get_campus_Info() {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const query = `
-            SELECT 
-                department.department_id,
-                department.name AS department_name, 
-                campus.campus_id, 
-                campus.name AS campus_name,
-                campus_have_department.department_phone, 
-                campus_have_department.department_floor, 
-                campus_have_department.department_building
-            FROM 
-                campus_have_department
-            JOIN 
-                department ON campus_have_department.department_id = department.department_id
-            JOIN 
-                campus ON campus_have_department.campus_id = campus.campus_id;
-        `;
-        const result = await conn.query(query);
-        console.log(result);
-        return result;
-    } catch (err) {
-        console.error('Error updating data:', err);
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
 
 //학교 건물 정보 가져오기
 async function get_campus_building_Info() {
