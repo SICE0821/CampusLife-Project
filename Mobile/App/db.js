@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -526,13 +526,12 @@ async function getuserpk(user_id, user_passwd) {
     }
 }
 
-// 과목의 정보를 가져오는 쿼리
 async function getLectureList(studentId) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(`
-            SELECT 
+        const rows = await conn.query(
+           `SELECT 
                 lecture.lecture_id, 
                 professor.name, 
                 lecture.credit, 
@@ -540,12 +539,16 @@ async function getLectureList(studentId) {
                 lecture.lecture_room, 
                 lecture.lecture_time, 
                 lecture.week,
-                lecture.semester, 
+                lecture.division,
                 lecture_have_object.nonattendance, 
                 lecture_have_object.attendance, 
                 lecture_have_object.tardy, 
                 lecture_have_object.absent,
-                lecture_have_object.weeknum 
+                lecture_have_object.weeknum,
+                lecture_have_object.lecture_grade,
+                lecture_have_object.lecture_semester,
+                lecture_have_object.lecture_credit,
+                lecture_have_object.lecture_grades
             FROM 
                 lecture
             JOIN 
@@ -553,8 +556,8 @@ async function getLectureList(studentId) {
             JOIN 
                 lecture_have_object ON lecture.lecture_id = lecture_have_object.lecture_id
             WHERE 
-                lecture_have_object.student_id = ?
-        `, [studentId]);
+                lecture_have_object.student_id = ?`
+        , [studentId]);
         return rows;
     } catch (err) {
         console.error(err);

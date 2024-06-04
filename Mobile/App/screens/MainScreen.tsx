@@ -57,7 +57,7 @@ type PostData = {
 }
 
 const MainPage = ({ navigation, route }: any) => {
-  const { userdata } = route.params;
+  const { userdata, LectureData } = route.params;
   const [schoolpostdata, setschollpostdata] = useState<PostData[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
