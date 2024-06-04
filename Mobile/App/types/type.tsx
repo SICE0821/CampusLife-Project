@@ -53,6 +53,32 @@ export type PostCommentData = {
   user_profile : string,
 }
 
+export type ShopItemData = {
+  code_num : string,
+  count : number,
+  explain : string,
+  image_num : number,
+  name : string,
+  object_id : number,
+  price : number,
+  sell_check : boolean,
+  using_time : string,
+}
+
+export type UserHaveCouponData = {
+  code_num : string,
+  explain : string,
+  image_num : number,
+  name : string,
+  object_id : number,
+  price : number,
+  sell_check : boolean,
+  using_time : string,
+  buy_date : string,
+  using_check : boolean,
+  using_date : boolean
+}
+
 export type CommentsWithRecomments = {
   comment_id: number,
   content: string,

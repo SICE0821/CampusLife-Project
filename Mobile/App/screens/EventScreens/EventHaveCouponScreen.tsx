@@ -1,266 +1,290 @@
-import React, {useState,} from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, } from 'react';
+import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IconD from 'react-native-vector-icons/FontAwesome6';
+import IconC from 'react-native-vector-icons/FontAwesome';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ModalBox from 'react-native-modalbox';
-import Barcode  from '@kichiyaki/react-native-barcode-generator';
+import Barcode from '@kichiyaki/react-native-barcode-generator';
+import { UserData, UserHaveCouponData } from '../../types/type'
+import config from '../../config';
 
-const datalist : any[] = [
-  {
-    itemname : "식권",
-    isused : "미사용",
-    ticketusagedate : "2024-01-26 ~ 2024-02-02" 
-  },
-  {
-    itemname : "식권",
-    isused : "미사용",
-    ticketusagedate : "2024-01-26 ~ 2024-02-02" 
-  },
-  {
-    itemname : "식권",
-    isused : "미사용",
-    ticketusagedate : "2024-01-26 ~ 2024-02-02" 
-  },
-]
 
-const EventHaveCouponScreen : React.FC = () => {
+const EventHaveCouponScreen = ({ route }: any) => {
+  const { userdata } = route.params;
+  //console.log(userdata);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const openmodal = () => {
+  const [userData, setUserData] = useState<UserData>(userdata);
+  const [userHaveCoupon, setUserHaveCoupon] = useState<UserHaveCouponData[]>([]);
+  const [SelectItem, SetSelectItem] = useState<UserHaveCouponData>();
+
+
+  useFocusEffect(
+    React.useCallback(() => {
+        setUserData(userdata);
+        getUserHaveCoupon();
+    }, [])
+);
+
+  const openmodal = (selectItem: UserHaveCouponData) => {
+    //console.log(selectItem.code_num);
+    SetSelectItem(selectItem);
     setIsModalOpen(true);
   }
   const closemodal = () => {
     setIsModalOpen(false);
   }
 
+  const getUserHaveCoupon = async () => {
+    try {
+        const response = await fetch(`${config.serverUrl}/getUserHaveCoupon`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userData.user_pk
+            }),
+        })
+        const data = await response.json();
+        setUserHaveCoupon(data);
+    } catch (error) {
+        console.error(error);
+    } finally {
+    }
+}
+
   //랜더링 할 아이템들
-  const renderItem = ({item} : any) => (
-    <TouchableOpacity 
-      style = {styles.itemcontainer}
-      onPress={openmodal}>
-      <View style = {styles.itempicturecontainer}>
-        <View style = {styles.itempicture}>
-          <Text style={{ color: 'black' }}><IconD name="ticket" size={65} /></Text>
-        </View>
-      </View>
-      <View style = {styles.iteminfobox}>
-        <View style = {styles.toptextbox}>
-          <View style = {styles.itemnamebox}>
-            <Text style = {styles.itemnamefont}>{item.itemname}</Text>
-          </View>
-          <View style = {styles.itemisusedbox}>
-            <Text style = {styles.itemisusedfont}>{item.isused}</Text>
+  const renderItem = ({ item }: any) => (
+    <TouchableOpacity
+      style={styles.itemcontainer}
+      onPress={() => {openmodal(item)}}>
+      <View style={{
+        height: 150, width: 460, borderWidth: 2, borderColor: "#F27405", flexDirection: 'row',
+        alignItems: 'center'
+      }}>
+        <View style={{ width: 140, height: 150, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 110, height: 110, }}>
+            <Image style={{ width: 110, height: 110, }} source={{ uri: `http://10.0.2.2:3000/${item.image_num}.png` }} />
           </View>
         </View>
-        <View style = {styles.bottomtextbox}>
-          <Text style = {styles.ticketusagedatefont}>{item.ticketusagedate}</Text>
+        <View style={{ height: 150, width: 200, }}>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ width: 120 }}>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginTop: 20 }}>[ {item.name} ]</Text>
+            </View>
+            <View>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ED9E2B', marginTop: 20 }}>[ {item.price}P ]</Text>
+            </View>
+          </View>
+          <Text style={{ marginTop: 5, fontSize: 16 }}>{item.explain}</Text>
+          <Text style={{ marginTop: 5, fontSize: 16 }}>{item.using_time}</Text>
+        </View>
+        <View style={{ width: 120, height: 150, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ width: 90, height: 130, backgroundColor: '#F7B02E', marginLeft: 20, justifyContent: 'center', alignItems: 'center', margin: 10 }}>
+            <Text style={{ color: 'white' }}> <IconC name="mail-forward" size={40} /></Text>
+            <Text style={{ fontSize: 18, color: 'white' }}>사용하기</Text>
+          </View>
         </View>
       </View>
+
     </TouchableOpacity>
   );
 
   //전체 뷰
   return (
     <View style={styles.container}>
-      <View style = {styles.toptitlebox}>
-        <Text style = {styles.toptitletext}>보유 쿠폰</Text>
+      <View style={styles.toptitlebox}>
+        <Text style={styles.toptitletext}>보유 쿠폰 : </Text>
+        <Text style={{ fontSize: 20, color: '#F27405', marginLeft: 5, }}>{userHaveCoupon.length}장</Text>
       </View>
-      <View style = {styles.dividingline}>
-        <FlatList 
-         data = {datalist}
-         renderItem={renderItem}
-         />
-      </View>
+      <FlatList
+        data={userHaveCoupon}
+        renderItem={renderItem}
+      />
       <ModalBox
-        isOpen = {isModalOpen}
-        style = {modalstyles.modalcontainer}
-        position='bottom'
-        swipeToClose = {false}
+        isOpen={isModalOpen}
+        style={modalstyles.modalcontainer}
+        position='center'
+        swipeToClose={false}
         onClosed={closemodal}>
-          <View style = {modalstyles.modalbox}>
-            <View style = {modalstyles.itempicturebox}>
-              <View style = {modalstyles.itempicture}>
-                <Text style={{ color: 'black' }}><IconD name="ticket" size={120} /></Text>
-              </View>
-            </View>
-            <View style = {modalstyles.itemnamebox}>
-                <Text style = {modalstyles.itemnamepont}>식권</Text>
-            </View>
-            <View style = {modalstyles.itemticketusagedatebox}>
-                <Text style = {modalstyles.itemticketusagedatefont}>
-                  2024-01-26 ~ 2024-02-02
-                </Text>
-            </View>
-            <View style = {modalstyles.barcordbox}>
-              <Barcode
-                value='02342341323213232323'
-                text = "0234234132321323232"
+          <View style = {{height : 120, justifyContent : 'center', alignItems : 'center', borderBottomWidth : 1}}>
+            <Text style ={{fontSize : 20, fontWeight : 'bold',color : 'black'}}>상품명 : {SelectItem?.name}</Text>
+            <Text style ={{fontSize : 18, }}>구매 날짜 : {SelectItem?.buy_date}</Text>
+            <Text style ={{fontSize : 18, }}>사용 기한 : {SelectItem?.using_time}</Text>
+          </View>
+          <View style = {{height : 230, justifyContent : 'center', alignItems : 'center'}}>
+            <Barcode
+                style = {{marginBottom : 20}}
+                value = {
+                  (SelectItem ? SelectItem.code_num : 0).toString().replace(/(.{4})/g, '$1 ').toString()
+                }
+                text= {
+                  (SelectItem ? SelectItem.code_num : 0).toString().replace(/(.{4})/g, '$1 ').toString()
+                }
               />
-            </View>
-            <View style = {modalstyles.comentbox}>
-              
-                <Text style = {modalstyles.comentfont}>쿠폰 기한이 일주일이므로 일주일 내로 사용하셔야 합니다.</Text>
-            </View>
+            <Text style ={{fontSize : 20, marginBottom : 30,}}>사용기한이 넘으시면 쿠폰은 자동으로 폐기 됩니다!</Text>
           </View>
       </ModalBox>
     </View>
   );
 };
 
-const styles = StyleSheet.create( {
-  container : {
-    flex : 1,
-    backgroundColor : 'white',
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
   },
-  toptitlebox : {
-    flex : 0.06,
-    //backgroundColor : "red",
-    justifyContent : 'center',
-    alignItems : 'center',
-  },
-  toptitletext : {
-    fontSize : 24,
-    color : 'black',
-  },
-  dividingline : {
-    flex : 0.93,
-    borderWidth : 1,
-    borderTopLeftRadius : 6,
-    borderTopRightRadius : 6,
-    //backgroundColor : 'blue',
-  },
-  itemcontainer : {
-    height : 100,
+  toptitlebox: {
+    height: 45,
     //backgroundColor : 'red',
-    flexDirection : 'row',
-    marginTop : 20,
-  },
-  itempicturecontainer : {
-    flex : 0.25,
-    //backgroundColor : 'blue'
-  },
-  itempicture : {
-    width : 100,
-    height : 100,
-    backgroundColor : '#FFDECF',
-    borderRadius : 8,
-    margin : 6,
-    marginLeft : 10,
-    justifyContent : 'center',
-    alignItems : 'center',
-  },
-  iteminfobox : {
-    flex : 0.75,
-    //backgroundColor : 'yellow',
-  },
-  toptextbox : {
-    flex : 0.5,
-    //backgroundColor : 'blue',
-    flexDirection : 'row',
-  },
-  bottomtextbox : {
-    flex : 0.5,
-    //backgroundColor : 'green',
-    justifyContent : 'center'
-  },
-  itemnamebox : {
-    flex : 0.68,
-    //backgroundColor : 'yellow',
-    justifyContent : 'center',
-  },
-  itemisusedbox : {
-    flex : 0.32,
-    //backgroundColor : 'red',
-    justifyContent :'center',
+    flexDirection: 'row',
     alignItems : 'center'
   },
-  itemnamefont : {
-    fontSize : 18,
-    color : 'black',
-    marginLeft : 10,
-    marginTop : 7,
+  toptitletext: {
+    fontSize: 20,
+    color: 'black',
+    marginLeft: 20,
   },
-  itemisusedfont : {
-    fontSize : 18,
-    color : 'black',
-    marginTop : 7,
+  dividingline: {
+    flex: 0.93,
+    borderWidth: 1,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
+    //backgroundColor : 'blue',
   },
-  ticketusagedatefont : {
-    fontSize : 18,
-    color : 'black',
-    marginLeft : 10,
-    marginBottom : 7,
+  itemcontainer: {
+    height: 150,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  itempicturecontainer: {
+    flex: 0.25,
+    //backgroundColor : 'blue'
+  },
+  itempicture: {
+    width: 100,
+    height: 100,
+    backgroundColor: '#FFDECF',
+    borderRadius: 8,
+    margin: 6,
+    marginLeft: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iteminfobox: {
+    flex: 0.75,
+    //backgroundColor : 'yellow',
+  },
+  toptextbox: {
+    flex: 0.5,
+    //backgroundColor : 'blue',
+    flexDirection: 'row',
+  },
+  bottomtextbox: {
+    flex: 0.5,
+    //backgroundColor : 'green',
+    justifyContent: 'center'
+  },
+  itemnamebox: {
+    flex: 0.68,
+    //backgroundColor : 'yellow',
+    justifyContent: 'center',
+  },
+  itemisusedbox: {
+    flex: 0.32,
+    //backgroundColor : 'red',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  itemnamefont: {
+    fontSize: 18,
+    color: 'black',
+    marginLeft: 10,
+    marginTop: 7,
+  },
+  itemisusedfont: {
+    fontSize: 18,
+    color: 'black',
+    marginTop: 7,
+  },
+  ticketusagedatefont: {
+    fontSize: 18,
+    color: 'black',
+    marginLeft: 10,
+    marginBottom: 7,
   },
 })
 
 const modalstyles = StyleSheet.create({
-  modalcontainer : {
-    height : 650,
-    borderTopRightRadius : 10,
-    borderTopLeftRadius : 10,
+  modalcontainer: {
+    height: 350,
+    width : 450,
+    borderRadius : 10,
   },
-  modalbox : {
-    flex : 1,
+  modalbox: {
+    flex: 1,
     //backgroundColor : 'red',
-    borderTopRightRadius : 10,
-    borderTopLeftRadius : 10,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
   },
-  itempicturebox : {
-    flex : 0.35,
+  itempicturebox: {
+    flex: 0.35,
     //backgroundColor : 'yellow',
-    borderTopRightRadius : 10,
-    borderTopLeftRadius : 10,
-    justifyContent : 'center',
-    alignItems : 'center',
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  itempicture : {
-    height : 165,
-    width : 165,
-    backgroundColor : '#FFDECF',
-    borderRadius : 20,
-    justifyContent : 'center',
-    alignItems : 'center',
-    marginTop : 40,
+  itempicture: {
+    height: 165,
+    width: 165,
+    backgroundColor: '#FFDECF',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40,
   },
-  itemnamebox : {
-    flex : 0.1,
+  itemnamebox: {
+    flex: 0.1,
     //backgroundColor : 'red',
-    justifyContent : 'center',
-    alignItems : 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  itemnamepont : {
-    fontSize : 25,
-    color : 'black',
+  itemnamepont: {
+    fontSize: 25,
+    color: 'black',
   },
-  itemticketusagedatebox : {
-    flex : 0.05,
+  itemticketusagedatebox: {
+    flex: 0.05,
     //backgroundColor : 'yellow',
-    justifyContent : 'center',
-    alignItems : 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  itemticketusagedatefont : {
-    fontSize : 20,
-    color : 'black',
+  itemticketusagedatefont: {
+    fontSize: 20,
+    color: 'black',
   },
-  barcordbox : {
-    flex : 0.25,
+  barcordbox: {
+    flex: 0.25,
     //backgroundColor : 'green',
-    justifyContent : 'center',
-    alignItems : 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  comentbox : {
-    flex : 0.25,
+  comentbox: {
+    flex: 0.25,
     //backgroundColor : 'yellow',
-    justifyContent : 'center',
-    alignItems : 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
-  comentfont : {
-    margin : 20,
-    fontSize : 20,
-    color : 'black',
-    fontWeight : 'bold',
+  comentfont: {
+    margin: 20,
+    fontSize: 20,
+    color: 'black',
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom : 70,
+    marginBottom: 70,
   }
 })
 export default EventHaveCouponScreen;

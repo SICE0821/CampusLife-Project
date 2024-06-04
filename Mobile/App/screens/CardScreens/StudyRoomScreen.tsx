@@ -207,6 +207,7 @@ const StudyRoomScreen = () => {
           maximumDate={new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)} // Today + 7 days
           onChange={onDateChange}
         />
+      
       )}
       <ScrollView>
         {renderCampusSelect()}

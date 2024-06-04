@@ -120,6 +120,7 @@ function LoginScreen({ navigation }: any) {
       <TextInput
         style={styles.input}
         placeholder="아이디"
+        placeholderTextColor={'gray'}
         value={username}
         onChangeText={(text) => setUsername(text)}
       />
@@ -127,6 +128,7 @@ function LoginScreen({ navigation }: any) {
       <TextInput
         style={styles.input}
         placeholder="비밀번호"
+        placeholderTextColor={'gray'}
         secureTextEntry={true}
         value={password}
         onChangeText={(text) => setPassword(text)}
@@ -198,6 +200,7 @@ const styles = StyleSheet.create({
     marginTop: -80,
     marginBottom: 15,
     fontSize: 14,
+    color: 'black'
   },
 
   input: {
@@ -209,6 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     margin: 8,
     paddingLeft: 10,
+    color: 'black'
   },
 
   ContainerBox: {

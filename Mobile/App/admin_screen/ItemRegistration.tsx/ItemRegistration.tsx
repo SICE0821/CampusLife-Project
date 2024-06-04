@@ -80,7 +80,7 @@ const ItemRegistration: React.FC = ({ route, navigation }: any) => {
 
   const get_event_obj = async () => {
     try {
-      const response = await fetch('http:// 172.16.108.2:3000/get_event_obj', {
+      const response = await fetch('http:// 172.16.108.2:3000/get_items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

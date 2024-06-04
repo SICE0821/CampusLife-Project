@@ -4,13 +4,12 @@ import NoticeHotPostsScreen from '../screens/CommunityScreens/NoticeHotPostsScre
 import NoticeBookmarkScreen from '../screens/CommunityScreens/NoticeBookmarkScreen'
 import BookmarkScreen from '../screens/CommunityScreens/BookmarkScreen'
 import HotPostsScreen from '../screens/CommunityScreens/HotPostsScreen'
-import ReqularEventScreen from '../screens/EventScreens/RegularEventScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
 import EventShopScreen from '../screens/EventScreens/EventShopScreen';
 import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
 import AcademicRecord from '../screens/CardScreens/AcademicScreens/AcademicRecordScreen';
-import { EventShopScreenStackNavigator, ReqularEventScreenNavigator } from '../navigation/StackNavigator'
+import { EventShopScreenStackNavigator} from '../navigation/StackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
@@ -419,10 +418,9 @@ export const NoticeTopbTabNavigator = ({ route, navigation }: any) => {
                     //elevation : 5,
                     marginBottom : 9,
                 },
-                tabBarActiveTintColor: 'black'
-
+                tabBarActiveTintColor: 'black',
             }}>
-            <NoticeTopTab.Screen name="학교 공지사항"
+            <NoticeTopTab.Screen name ="학교 공지사항"
                 initialParams={{ department_check: 0, userdata }}
                 component={NoticeTopBottomTabNavigator}
                 options={{
