@@ -55,6 +55,10 @@ const { getGeneralPosts,
   getyourpoint,
   update_user_point,
   Updatelecture,
+  getCampus,
+  insert_student_study_room,
+  get_student_study_room,
+  get_studyroom_date,
   get_aram_data,
   get_one_post,
   addCommentAram,
@@ -72,10 +76,6 @@ const { getGeneralPosts,
   last_friendCode_Info,
   addFriendCodeAram,
   user_update_point_3,
-  getCampus,
-  insert_student_study_room,
-  get_student_study_room,
-  get_studyroom_date
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1166,6 +1166,66 @@ app.post('/user_buy_action', async (req, res) => {
     res.status(500).send({ message: "서버 오류" });
   }
 });
+
+app.post('/get_campus_place', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await getCampus(campus_id);
+    const processedData = rows.map(item => ({
+      study_room_id : item.study_room_id,
+      campus_place : item.campus_place,
+      study_room_name : item.study_room_name
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
+
+app.post('/studyroomReservation', async (req, res) => {
+  const { student , study_room, study_room_date, study_room_time } = req.body;
+  const result = await insert_student_study_room(student, study_room, study_room_date, study_room_time);
+  if (result) {
+    res.json({ message: 'Data received successfully', receivedData: { student, study_room, study_room_date, study_room_time } });
+  } else {
+    res.status(500).json({ message: 'Failed to insert data' });
+  }
+});
+
+app.post('/get_study_room', async (req, res) => {
+  const { student } = req.body;
+  try {
+    const rows = await get_student_study_room(student);
+    const processedData = rows.map(item => ({
+      study_room_name : item.study_room_name,
+      study_room_date : item.study_room_date,
+      study_room_time : item.study_room_time
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
+
+app.post('/get_study_date_time', async (req, res) => {
+  try {
+    const rows = await get_studyroom_date();
+    const processedData = rows.map(item => ({
+      study_room_name : item.study_room_name,
+      study_room_date : item.study_room_date,
+      study_room_time : item.study_room_time
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
 
 //유저의 알람 정보를 가져온다.
 app.post('/get_aram_data', async (req, res) => {
