@@ -169,6 +169,9 @@ const App = ({ route }: any) => {
           <TimetableRow key={index} time={time} courses={courses} days={days} />
         ))}
       </View>
+      <View style={{height: 100}}>
+
+      </View>
     </ScrollView>
   );
 };

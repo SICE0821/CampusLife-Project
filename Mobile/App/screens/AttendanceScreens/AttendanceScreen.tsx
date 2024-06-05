@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
+    backgroundColor: 'white'
   },
   textContainer: { // 오늘의 출석, 날짜 텍스트 컨테이너
     justifyContent: 'center',
