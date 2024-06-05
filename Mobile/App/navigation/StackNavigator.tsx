@@ -275,6 +275,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen
                 name="FriendCodeEventScreen"
                 component={FriendCodeEventScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

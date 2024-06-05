@@ -33,7 +33,7 @@ const AttendanceCheckEventScreen = ({route} : any) => {
         }),
       })
       const AppAttendanceDate = await response.json();
-      console.log(AppAttendanceDate);
+      //console.log(AppAttendanceDate);
       const checkdate = AppAttendanceDate.map((item : any) => item.date);
       setSelectedDates(checkdate);
     } catch (error) {

@@ -13,6 +13,7 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import IconA from 'react-native-vector-icons/Fontisto';
 import IconC from 'react-native-vector-icons/Ionicons';
 import IconD from 'react-native-vector-icons/Entypo';
+import IconE from 'react-native-vector-icons/FontAwesome5';
 
 const AlarmDialogScreen = ({ route, navigation }: any) => {
   const { userdata } = route.params;
@@ -75,21 +76,21 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
 
   const view_count_up = async (post_id: any) => {
     try {
-        const response = await fetch(`${config.serverUrl}/view_count_up`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                post_id: post_id
-            })
+      const response = await fetch(`${config.serverUrl}/view_count_up`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          post_id: post_id
         })
-        const result = await response.json();
-        console.log("포스트 View 올리기 성공!")
+      })
+      const result = await response.json();
+      console.log("포스트 View 올리기 성공!")
     } catch (error) {
-        console.error('포스트 View 올리기 누르기 실패', error);
+      console.error('포스트 View 올리기 누르기 실패', error);
     }
-}
+  }
 
   /*
     const handleLongPress = (index : any) => {
@@ -181,6 +182,8 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={styles.content}>{item.my_post_like_title}</Text>
       case 'new_event':
         return <Text style={styles.content}>{item.new_event_name}</Text>
+      case 'friend_code':
+        return <Text style={styles.content}>{item.friend_code_my_name}님이 코드를 입력했습니다</Text>
       default:
         return null;
     }
@@ -200,7 +203,10 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={{ color: '#F29F05' }}><IconB name={"like1"} size={30} /></Text>
       case 'new_event':
         return <Text style={{ color: '#F29F05' }}><IconD name={"mail"} size={30} /></Text>
+      case 'friend_code':
+        return <Text style={{ color: '#F29F05' }}><IconE name={"user-friends"} size={30} /></Text>
       default:
+
         return null;
     }
   }

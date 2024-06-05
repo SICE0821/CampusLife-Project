@@ -63,7 +63,15 @@ const { getGeneralPosts,
   addLikeAram,
   getAppAttendanceDate,
   addAppAttendanceDate,
-  update_user_point_2
+  update_user_point_2,
+  get_invite_num,
+  allUser_friend_code,
+  addFriend_Code,
+  allUser_Friend_code2,
+  Friend_code_User_id,
+  last_friendCode_Info,
+  addFriendCodeAram,
+  user_update_point_3,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -90,7 +98,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '172.16.106.96',
   port: 3306,
   user: 'root',
   password: '1214',
@@ -782,7 +790,7 @@ app.post('/get_post_detail', async (req, res) => {
     view: row[0].view,
     writer_propile: row[0].profilePhoto,
     post_id: row[0].post_id,
-    user_id : row[0].user_id,
+    user_id: row[0].user_id,
   };
   res.json(userData);
 
@@ -1177,8 +1185,10 @@ app.post('/get_aram_data', async (req, res) => {
       department_notice_title: item.department_notice_title,
       my_post_like_id: item.my_post_like_id,
       my_post_like_title: item.my_post_like_title,
-      new_event_id : item.new_event_id,
-      new_event_name : item.new_event_name,
+      new_event_id: item.new_event_id,
+      new_event_name: item.new_event_name,
+      friend_code_id : item.friend_code_id,
+      friend_code_my_name : item.friend_code_my_name,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1267,9 +1277,9 @@ app.post('/getAppAttendanceDate', async (req, res) => {
   try {
     const rows = await getAppAttendanceDate(user_id);
     const processedData = rows.map(item => ({
-      user_id : item.user_id,
-      date : item.date,
-      attendance_check : item.attendance_check
+      user_id: item.user_id,
+      date: item.date,
+      attendance_check: item.attendance_check
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1290,7 +1300,7 @@ app.post('/addAppAttendanceDate', async (req, res) => {
   }
 });
 
-app.post('/user_update_point', async (req, res) => {
+app.post('/user_update_point2', async (req, res) => {
   const { user_id, point } = req.body;
   try {
     await update_user_point_2(user_id, point);
@@ -1301,6 +1311,109 @@ app.post('/user_update_point', async (req, res) => {
   }
 });
 
+app.post('/get_invite_num', async (req, res) => {
+  const { friend_code } = req.body;
+  console.log(friend_code);
+  try {
+    const rows = await get_invite_num(friend_code);
+    const processedData = rows.map(item => ({
+      friend_code_ID : item.friend_code_id,
+      user_id: item.user_id,
+      friend_code: item.friend_code,
+      my_name : item.my_name
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//핫 포스터 알람 전송
+app.post('/check_end_send', async (req, res) => {
+  try {
+    const { user_id, friend_code, user_name } = req.body;
+    const AlluserCode = await allUser_Friend_code2();
+    console.log(AlluserCode);
+    console.log(friend_code);
+    const isFriendCodehave = AlluserCode.some(item => item.friend_code === friend_code);
+    if (isFriendCodehave == true) {
+      const allFriendCode = await allUser_friend_code(user_id);
+      const isFriendCodeExists = allFriendCode.some(item => item.friend_code === friend_code);
+      if (isFriendCodeExists == true) {
+        res.json({ success: "중복코드" });
+      } else if (isFriendCodeExists == false) {
+        const result = await addFriend_Code(user_id, friend_code, user_name);
+        if (result == true) {
+          res.json({ success: "성공" });
+        }
+      }
+    }else {
+      res.json({ success: "코드없음" });
+    }
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
+
+app.post('/Friend_code_User_id', async (req, res) => {
+  const { friend_code } = req.body;
+  try {
+    const rows = await Friend_code_User_id(friend_code);
+    const user_pk = { user_pk : rows[0].user_id }
+    res.json(user_pk);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/last_friendCode_Info', async (req, res) => {
+  const { user_pk } = req.body;
+  try {
+    const rows = await last_friendCode_Info(user_pk);
+    const processedData = {
+      friend_code_id : rows.friend_code_id,
+      user_id: rows.user_id,
+      friend_code: rows.friend_code,
+      my_name : rows.my_name
+    };
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//친구코드 알람이 쇽쇽쇽!
+app.post('/addFriendCodeAram', async (req, res) => {
+  try {
+    const { friend_code, friend_code_id, my_name} = req.body;
+    const rows = await Friend_code_User_id(friend_code);
+    const user_pk = rows[0].user_id
+    const user_id = user_pk
+    await addFriendCodeAram(user_pk, friend_code_id, my_name);
+    await user_update_point_3(user_id, 100);
+    
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
+
+app.post('/user_update_point_3', async (req, res) => {
+  const { user_id, point } = req.body;
+  console.log("이건 들어와??");
+  try {
+    await user_update_point_3(user_id, point);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //서버 시작
 app.listen(PORT, () => {

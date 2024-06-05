@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '14.6.152.64',
+    host: '172.16.106.96',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -1440,7 +1440,9 @@ async function get_aram_data(user_id) {
             my_post_like.post_id AS my_post_like_id,
             my_post_like.title AS my_post_like_title,
             new_event.event_id AS new_event_id,
-            new_event.name AS new_event_name
+            new_event.name AS new_event_name,
+            friend_code.friend_code_id AS friend_code_id,
+            friend_code.my_name AS friend_code_my_name
         FROM
             aram
         LEFT JOIN
@@ -1455,6 +1457,8 @@ async function get_aram_data(user_id) {
             post AS my_post_like ON aram.target_type = 'my_post_like' AND aram.target_id = my_post_like.post_id
         LEFT JOIN
             event AS new_event ON aram.target_type = 'new_event' AND aram.target_id = new_event.event_id
+        LEFT JOIN
+            user_friend_code AS friend_code ON aram.target_type = 'friend_code' AND aram.target_id = friend_code.friend_code_id
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -1604,6 +1608,128 @@ async function update_user_point_2(user_id, point) {
     }
 }
 
+async function get_invite_num(friend_code) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM user_friend_code friend_code WHERE friend_code = ?`
+        );
+        const rows = await conn.query(query, [friend_code]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function allUser_friend_code(user_id) {
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const query = (
+        'SELECT friend_code FROM user_friend_code WHERE user_id = ?'
+        );
+      const user_friend_code = await conn.query(query, [user_id]);
+      return user_friend_code
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (conn) conn.release();
+    }
+  }
+
+  async function addFriend_Code(user_id, friend_code, user_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO user_friend_code (user_id, friend_code, my_name) VALUES (?, ?, ?);`
+        );
+        const rows = await conn.query(query, [user_id, friend_code, user_name]);
+        return true;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function Friend_code_User_id(friend_code) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT user_id FROM user WHERE friend_code = ?`
+        );
+        const rows = await conn.query(query, [friend_code]);
+        return rows
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function allUser_Friend_code2() {
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const userallfriendcode = await conn.query('SELECT friend_code FROM user');
+      return userallfriendcode
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (conn) conn.release();
+    }
+  }
+
+async function last_friendCode_Info(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM user_friend_code WHERE user_id = ?`
+        );
+        const rows = await conn.query(query, [user_pk]);
+        const lastRow = rows[rows.length - 1];
+        return lastRow;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function addFriendCodeAram(user_pk, friend_code_id, my_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "친구가 초대코드를 입력하셨니다!", "friend_code");`
+        await conn.query(query, [user_pk, friend_code_id, my_name]);
+        console.log("알람 보내기 성공");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function user_update_point_3(user_id, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET point = point + ? WHERE user_id = ?'
+        const result = await conn.query(query, [point, user_id]);
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -1670,5 +1796,14 @@ module.exports = {
     addLikeAram,
     getAppAttendanceDate,
     addAppAttendanceDate,
-    update_user_point_2
+    update_user_point_2,
+    get_invite_num,
+    allUser_friend_code,
+    addFriend_Code,
+    allUser_Friend_code2,
+    Friend_code_User_id,
+    last_friendCode_Info,
+    addFriendCodeAram,
+    user_update_point_3
+
 };

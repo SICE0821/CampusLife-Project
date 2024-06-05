@@ -143,5 +143,7 @@ export type aramData = {
   my_post_like_title : string,
   new_event_id : number,
   new_event_name : string,
+  friend_code_id : number,
+  friend_code_my_name : string,
 }
 
