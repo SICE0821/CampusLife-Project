@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -578,7 +578,7 @@ async function get_event_objcet(campus_id) {
         conn = await pool.getConnection();
         const rows = await conn.query(
             `SELECT * FROM event_object WHERE campus_id = ? AND sell_check = 0`
-        , [campus_id]);
+            , [campus_id]);
         return rows;
 
     } catch (err) {
@@ -839,9 +839,9 @@ async function get_post_detail(post_id) {
         // 데이터 삽입 쿼리 작성
         const rows = await conn.query("SELECT "
             + "student.name AS student_name, department.name AS department_name,"
-            + "post.date, post.title,"
+            + "post.date, post.title, "
             + "post.`contents`, post.`like`,"
-            + "post.`view`, user.profilePhoto, post.post_id "
+            + "post.`view`, user.profilePhoto, post.post_id, post.user_id "
             + "FROM "
             + "student "
             + "LEFT JOIN "
@@ -927,7 +927,7 @@ async function get_campus_Info() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = 
+        const query =
             `SELECT 
                 department.department_id,
                 department.name AS department_name, 
@@ -958,7 +958,7 @@ async function get_campus_building_Info() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = 
+        const query =
             `SELECT 
                 campus.campus_id, 
                 campus_building.building_name, 
@@ -1159,7 +1159,7 @@ async function view_count_up(post_id) {
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
-}async function updateUserImg(user_pk, photopath) {
+} async function updateUserImg(user_pk, photopath) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -1380,7 +1380,6 @@ async function insert_user_have_object(user_id, object_id) {
     }
 }
 
-// 게시판에서 책갈피한 게시물을 가져오는 쿼리
 async function getUserHaveCoupon(user_id) {
     let conn;
     try {
@@ -1407,6 +1406,321 @@ async function getUserHaveCoupon(user_id) {
         );
         const rows = await conn.query(query, [user_id]);
         return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+// 알람 전체 이리내
+async function get_aram_data(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT 
+            aram.aram_id,
+            aram.user_id,
+            aram.target_id,
+            aram.title,
+            aram.target_type,
+            aram.time,
+            post_comment.post_id AS post_comment_id,
+            post_comment.title AS post_comment_title,
+            hot_post.post_id AS hot_post_id,
+            hot_post.title AS hot_post_title,
+            school_notice.post_id AS school_notice_id,
+            school_notice.title AS school_notice_title,
+            department_notice.post_id AS department_notice_id,
+            department_notice.title AS department_notice_title,
+            my_post_like.post_id AS my_post_like_id,
+            my_post_like.title AS my_post_like_title,
+            new_event.event_id AS new_event_id,
+            new_event.name AS new_event_name,
+            friend_code.friend_code_id AS friend_code_id,
+            friend_code.my_name AS friend_code_my_name
+        FROM
+            aram
+        LEFT JOIN
+            post AS post_comment ON aram.target_type = 'my_post_comment' AND aram.target_id = post_comment.post_id
+        LEFT JOIN
+            post AS hot_post ON aram.target_type = 'hot_post' AND aram.target_id = hot_post.post_id
+        LEFT JOIN
+            post AS school_notice ON aram.target_type = 'school_notice' AND aram.target_id = school_notice.post_id
+        LEFT JOIN
+            post AS department_notice ON aram.target_type = 'department_notice' AND aram.target_id = department_notice.post_id
+        LEFT JOIN
+            post AS my_post_like ON aram.target_type = 'my_post_like' AND aram.target_id = my_post_like.post_id
+        LEFT JOIN
+            event AS new_event ON aram.target_type = 'new_event' AND aram.target_id = new_event.event_id
+        LEFT JOIN
+            user_friend_code AS friend_code ON aram.target_type = 'friend_code' AND aram.target_id = friend_code.friend_code_id
+        WHERE
+            aram.user_id = ?
+        ORDER BY
+            aram.time DESC;`
+        );
+        const rows = await conn.query(query, [user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//전체 게시판에서 전체 게시글을 가져오는 쿼리
+async function get_one_post(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.post_id = ?"
+        );
+        const rows = await conn.query(query, [post_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function addCommentAram(user_id, target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "게시물에 답글이 달렸습니다!", "my_post_comment");`
+        await conn.query(query, [user_id, target_id]);
+        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addHotAram(user_id, target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "오늘의 HOT 게시물입니다!", "hot_post");`
+        await conn.query(query, [user_id, target_id]);
+        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function allUser_id() {
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const userIds = await conn.query('SELECT user_id FROM user');
+      return userIds
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (conn) conn.release();
+    }
+  }
+
+  async function addLikeAram(user_id, target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "내 게시물에 좋아요를 눌러줬습니다!", "my_post_like");`
+        await conn.query(query, [user_id, target_id]);
+        console.log("해당 포스터의 당사자에게 좋아요를 눌러서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function getAppAttendanceDate(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM app_attendance WHERE user_id = ?`
+        );
+        const rows = await conn.query(query, [user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function addAppAttendanceDate(user_id, date) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO app_attendance (user_id, date, attendance_check) VALUES (?, ?, 1);`
+        );
+        const rows = await conn.query(query, [user_id, date]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+
+async function update_user_point_2(user_id, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET point = point + ? WHERE user_id = ?'
+        const result = await conn.query(query, [point, user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function get_invite_num(friend_code) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM user_friend_code friend_code WHERE friend_code = ?`
+        );
+        const rows = await conn.query(query, [friend_code]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function allUser_friend_code(user_id) {
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const query = (
+        'SELECT friend_code FROM user_friend_code WHERE user_id = ?'
+        );
+      const user_friend_code = await conn.query(query, [user_id]);
+      return user_friend_code
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (conn) conn.release();
+    }
+  }
+
+  async function addFriend_Code(user_id, friend_code, user_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO user_friend_code (user_id, friend_code, my_name) VALUES (?, ?, ?);`
+        );
+        const rows = await conn.query(query, [user_id, friend_code, user_name]);
+        return true;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function Friend_code_User_id(friend_code) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT user_id FROM user WHERE friend_code = ?`
+        );
+        const rows = await conn.query(query, [friend_code]);
+        return rows
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function allUser_Friend_code2() {
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const userallfriendcode = await conn.query('SELECT friend_code FROM user');
+      return userallfriendcode
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (conn) conn.release();
+    }
+  }
+
+async function last_friendCode_Info(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM user_friend_code WHERE user_id = ?`
+        );
+        const rows = await conn.query(query, [user_pk]);
+        const lastRow = rows[rows.length - 1];
+        return lastRow;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function addFriendCodeAram(user_pk, friend_code_id, my_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "친구가 초대코드를 입력하셨니다!", "friend_code");`
+        await conn.query(query, [user_pk, friend_code_id, my_name]);
+        console.log("알람 보내기 성공");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function user_update_point_3(user_id, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET point = point + ? WHERE user_id = ?'
+        const result = await conn.query(query, [point, user_id]);
     } catch (err) {
         throw err;
     } finally {
@@ -1471,4 +1785,22 @@ module.exports = {
     getyourpoint,
     update_user_point,
     Updatelecture,
+    get_aram_data,
+    get_one_post,
+    addCommentAram,
+    addHotAram,
+    allUser_id,
+    addLikeAram,
+    getAppAttendanceDate,
+    addAppAttendanceDate,
+    update_user_point_2,
+    get_invite_num,
+    allUser_friend_code,
+    addFriend_Code,
+    allUser_Friend_code2,
+    Friend_code_User_id,
+    last_friendCode_Info,
+    addFriendCodeAram,
+    user_update_point_3
+
 };

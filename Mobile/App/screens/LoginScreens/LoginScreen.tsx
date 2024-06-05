@@ -45,6 +45,7 @@ function LoginScreen({ navigation }: any) {
         })
       })
       const userdata = await response.json();
+      console.log(userdata);
       return(userdata)
     } catch (error) {
       console.error('유저 정보 가져오기 실패:', error);

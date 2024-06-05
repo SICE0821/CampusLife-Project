@@ -108,6 +108,63 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             console.error('댓글 쓰기 실패!', error);
         }
     }
+    
+
+        //댓글 작성 알람 추가
+        const addCommentAram = async () => {
+            try {
+                const response = await fetch(`${config.serverUrl}/addCommentAram`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: postDetailInfo?.user_id,
+                        target_id: postDetailInfo?.post_id,
+                    })
+                });
+                console.log("알람전송!");
+            } catch (error) {
+                console.error('알람 전송 실패', error);
+            }
+        }
+
+        //좋아요 30개가 넘으면 핫포스터로 등록되면서 모든 user에게 알람 보내기
+        const addHotAram = async () => {
+            try {
+                const response = await fetch(`${config.serverUrl}/addHotAram`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        target_id: postDetailInfo?.post_id,
+                    })
+                });
+                console.log("알람전송!");
+            } catch (error) {
+                console.error('알람 전송 실패', error);
+            }
+        }
+
+        //좋아요 눌러주면 해당 당사자에게 알람이 쑝숑쑝~
+        const addLikeAram = async () => {
+            try {
+                const response = await fetch(`${config.serverUrl}/addLikeAram`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: postDetailInfo?.user_id,
+                        target_id: postDetailInfo?.post_id,
+                    })
+                });
+                console.log("알람전송!");
+            } catch (error) {
+                console.error('알람 전송 실패', error);
+            }
+        }
 
     //대댓글 달기
     const writerecomment = async () => {
@@ -214,6 +271,8 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             }
         }
 
+
+
     const Post_Like_alert = (post_id: any) => {
         Alert.alert(
             "좋아요!!",
@@ -224,7 +283,12 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     onPress: () => console.log("취소 클릭"),
                     style: "cancel"
                 },
-                { text: "확인", onPress: () => like_num_up(post_id) }
+                { text: "확인", onPress: async () => {
+                    await like_num_up(post_id);
+                    addLikeAram();
+                    if(postDetailInfo?.like == 29) {
+                        addHotAram();
+                    } }}
             ]
         );
     };
@@ -294,8 +358,11 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const writeComment = async () => {
         if (IsCommentorRecomment == 0) {
             writecomment();
+            addCommentAram();
+
         } else if (IsCommentorRecomment == 1) {
             writerecomment();
+            addCommentAram();
         }
         setcommenttext('댓글을 입력해주세요');
         Keyboard.dismiss(); // 키보드 숨기기
