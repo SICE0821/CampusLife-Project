@@ -70,7 +70,7 @@ const DeadlineEventScreen = () => {
           <Text style={styles.eventInfo}>{eventInfo}</Text>
         </View>
         <View style={styles.eventImageArea}>
-          <Swiper showsPagination={true} loop={true}>
+          <Swiper showsPagination={true} loop={true} removeClippedSubviews={false}>
             {eventImages.map((image, index) => (
               <TouchableOpacity key={index} style={styles.eventImageBox} onPress={() => handleImagePress(image)}>
                 <Image source={image} style={styles.eventImage} />
