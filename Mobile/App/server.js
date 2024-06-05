@@ -72,6 +72,10 @@ const { getGeneralPosts,
   last_friendCode_Info,
   addFriendCodeAram,
   user_update_point_3,
+  getCampus,
+  insert_student_study_room,
+  get_student_study_room,
+  get_studyroom_date
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
