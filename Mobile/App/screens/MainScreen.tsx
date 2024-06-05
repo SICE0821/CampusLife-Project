@@ -214,7 +214,7 @@ const MainPage = ({ navigation, route }: any) => {
             <View style={styles.profileBoxTop}>
               <TouchableOpacity onPress={() => getPhotos()} style={styles.profileImageArea}>
                 {userData.profile_photo ? (
-                  <Image source={{ uri: fileUri }} style={styles.profileImage} /> 
+                  <Image source={{ uri: fileUri }} style={styles.profileImage} />
                 ) : (
                   <IconI name="user" size={40} color="black" />
                 )}
@@ -268,40 +268,40 @@ const MainPage = ({ navigation, route }: any) => {
             <IconF style={styles.eventHeadIcon} name="ticket" size={27} />
           </View>
           <View style={styles.eventSwipeArea}>
-          <Swiper loop={true} removeClippedSubviews={false}>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("AttendanceCheckEventScreen")}
-              style={styles.eventBox}>
-              <View style={styles.eventImageArea}>
-                <Image style={styles.eventImage} source={attendancepng} />
-              </View>
-              <View style={styles.eventTextArea}>
-                <Text style={styles.eventLabelText}>출석체크 이벤트!</Text>
-                <Text style={styles.eventInfoText}>앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.eventBox}
-              onPress={() => navigation.navigate("FriendCodeEventScreen")}>
-              <View style={styles.eventImageArea}>
-                <Image style={styles.eventImage} source={friendsinvitepng} />
-              </View>
-              <View style={styles.eventTextArea}>
-                <Text style={styles.eventLabelText}>친구코드 이벤트!</Text>
-                <Text style={styles.eventInfoText}>친구에게 나의 코드를 보낼시에 포인트를 제공해 드립니다!</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("DeadlineEventScreen")}
-              style={styles.eventBox}>
-              <View style={styles.eventImageArea}>
-                <Image style={styles.eventImage} source={volunteerpng} />
-              </View>
-              <View style={styles.eventTextArea}>
-                <Text style={styles.eventLabelText}>봉사활동 이벤트!</Text>
-                <Text style={styles.eventInfoText}>봉사활동을 하고 인증해주시면 포인트를 제공해 드립니다!</Text>
-              </View>
-            </TouchableOpacity>
+            <Swiper loop={true} removeClippedSubviews={false}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("AttendanceCheckEventScreen")}
+                style={styles.eventBox}>
+                <View style={styles.eventImageArea}>
+                  <Image style={styles.eventImage} source={attendancepng} />
+                </View>
+                <View style={styles.eventTextArea}>
+                  <Text style={styles.eventLabelText}>출석체크 이벤트!</Text>
+                  <Text style={styles.eventInfoText}>앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.eventBox}
+                onPress={() => navigation.navigate("FriendCodeEventScreen")}>
+                <View style={styles.eventImageArea}>
+                  <Image style={styles.eventImage} source={friendsinvitepng} />
+                </View>
+                <View style={styles.eventTextArea}>
+                  <Text style={styles.eventLabelText}>친구코드 이벤트!</Text>
+                  <Text style={styles.eventInfoText}>친구에게 나의 코드를 보낼시에 포인트를 제공해 드립니다!</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("DeadlineEventScreen")}
+                style={styles.eventBox}>
+                <View style={styles.eventImageArea}>
+                  <Image style={styles.eventImage} source={volunteerpng} />
+                </View>
+                <View style={styles.eventTextArea}>
+                  <Text style={styles.eventLabelText}>봉사활동 이벤트!</Text>
+                  <Text style={styles.eventInfoText}>봉사활동을 하고 인증해주시면 포인트를 제공해 드립니다!</Text>
+                </View>
+              </TouchableOpacity>
             </Swiper>
           </View>
         </View>
@@ -310,7 +310,7 @@ const MainPage = ({ navigation, route }: any) => {
           <View style={styles.postHeadArea}>
             <View style={styles.postHeadTextIconArea}>
               <Text style={styles.postHeadText}>학교 공지사항</Text>
-              <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28}/>
+              <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28} />
             </View>
             <TouchableOpacity onPress={() => {
               navigation.navigate('NoticeScreenStackNavigator', {
@@ -394,7 +394,7 @@ const MainPage = ({ navigation, route }: any) => {
           <View style={styles.postHeadArea}>
             <View style={styles.postHeadTextIconArea}>
               <Text style={styles.postHeadText}>학사 공지사항</Text>
-              <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28}/>
+              <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28} />
             </View>
             <TouchableOpacity onPress={() => {
               navigation.navigate('NoticeScreenStackNavigator', {
@@ -478,7 +478,7 @@ const MainPage = ({ navigation, route }: any) => {
           <View style={styles.postHeadArea}>
             <View style={styles.postHeadTextIconArea}>
               <Text style={styles.postHeadText}>인기글</Text>
-              <IconF style={styles.postHeadIcon} name="fire" size={27}/>
+              <IconF style={styles.postHeadIcon} name="fire" size={27} />
             </View>
             <TouchableOpacity onPress={() => {
               navigation.navigate('CommunityScreenStackNavigator', {
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   eventHead: {
-    width: width*0.85,
+    width: width * 0.85,
     alignSelf: 'center',
     alignItems: 'center',
     justifyContent: 'flex-start',
@@ -687,7 +687,7 @@ const styles = StyleSheet.create({
   },
   eventBox: {
     backgroundColor: 'white',
-    width: width*0.9,
+    width: width * 0.9,
     height: '85%', // 이벤트 박스 영역
     alignSelf: 'center',
     borderRadius: 20,
@@ -705,11 +705,11 @@ const styles = StyleSheet.create({
   eventTextArea: {
     width: '100%',
     height: '30%', // 이벤트 텍스트 영역
-    padding:  15
+    padding: 15
   },
   eventLabelText: {
     color: 'black',
-    fontSize: 20, 
+    fontSize: 20,
     fontWeight: 'bold',
   },
   eventInfoText: {
@@ -740,7 +740,7 @@ const styles = StyleSheet.create({
     color: "#FFC700",
     marginHorizontal: 10
   },
-  postDetailArea:{
+  postDetailArea: {
     flexDirection: 'row',
     alignItems: 'center'
   },

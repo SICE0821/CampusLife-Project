@@ -107,10 +107,13 @@ const AttendanceCheckEventScreen = ({route} : any) => {
     />
   );
 
+  
+const AttendanceCheckEvent = require('../../assets/AttendanceCheckEvent.jpg');
+
   return (
     <View style={styles.container}>
+      <Image source={AttendanceCheckEvent} style={{ flex:1, width: '100%', resizeMode: 'contain',}}/>
       <View style={styles.topInfo}>
-        <Text style={styles.topText}>매일매일 출석체크!</Text>
         <Text style={styles.pointText}>현재 포인트 : {userData.point}P</Text>
       </View>
       <Calendar
@@ -165,11 +168,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     //backgroundColor: 'red',
     padding: 15
-  },
-  topText: {
-    color: 'black',
-    fontSize: 32,
-    fontWeight: 'bold'
   },
   pointText: {
     color: 'black',

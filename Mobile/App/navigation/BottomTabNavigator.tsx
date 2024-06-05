@@ -48,7 +48,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <IconC name="house" size={size} color={color} />
           ),
           tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5 }}>홈</Text>
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>홈</Text>
           )
         }}
         initialParams={{ userdata , LectureData}}
@@ -63,7 +63,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <IconA name="chat" size={30} color={color} />
           ),
           tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5 }}>커뮤니티</Text>
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>커뮤니티</Text>
           )
         }}
         initialParams={{ userdata }}
@@ -79,7 +79,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <IconA name="megaphone" size={30} color={color} />
           ),
           tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5 }}>공지사항</Text>
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>공지사항</Text>
           )
         }}
         initialParams={{ userdata }}
@@ -99,7 +99,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <IconA name="check" size={37} color={color} />
           ),
           tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5 }}>출석</Text>
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>출석</Text>
           )
         }}
         initialParams={{ userdata, LectureData}}
@@ -114,7 +114,7 @@ export const MainTabNavigator = ({ route }: any) => {
             <IconC name="calendar-days" size={30} color={color} />
           ),
           tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5 }}>시간표</Text>
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>시간표</Text>
           )
         }}
         initialParams={{ userdata, LectureData }}

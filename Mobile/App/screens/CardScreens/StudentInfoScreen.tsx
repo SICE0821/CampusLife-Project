@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Text, TextInput, View, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
+import { Text, TextInput, View, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Dimensions } from 'react-native';
 import IconA from 'react-native-vector-icons/FontAwesome5';
 import IconB from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
@@ -8,6 +8,8 @@ import ModalBox from 'react-native-modalbox';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { UserData } from "../../types/type"
 import config from '../../config';
+
+const width = Dimensions.get('window').width;
 
 const StudentInfoScreen = ({ route, navigation }: any) => {
     const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -256,8 +258,9 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
 
     return (
-        <ScrollView>
-            <View style={styles.container}>
+
+        <View style={styles.container}>
+            <ScrollView>
                 <View style={styles.profilePicture}>
                     {userdata.profile_photo ? (
                         <Image source={{ uri: imageUrl }} style={styles.image} />
@@ -268,171 +271,185 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                         <IconA name="camera" size={32} color="black" />
                     </TouchableOpacity>
                 </View>
-                <View style={styles.containerBox}>
-                    <View style={{ marginTop: 30 }}>
-                        <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>이름</Text>
-                        <View style={styles.TextInput}>
-                            <Text style={styles.Textfont}>{userdata.name}</Text>
+
+                <View style={styles.studentInfoArea}>
+                    <View style={styles.infoArea}>
+                        <Text style={styles.infoLabelText}>이름</Text>
+                        <View style={styles.infoBox}>
+                            <Text style={styles.infoText}>{userdata.name}</Text>
                         </View>
                     </View>
-                    <View style={{ marginTop: 10 }}>
-                        <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>생년월윌</Text>
-                        <View style={styles.TextInput}>
-                            <Text style={styles.Textfont}>{userdata.birth}</Text>
+
+                    <View style={styles.infoArea}>
+                        <Text style={styles.infoLabelText}>생년월윌</Text>
+                        <View style={styles.infoBox}>
+                            <Text style={styles.infoText}>{userdata.birth}</Text>
                         </View>
                     </View>
-                    <View style={{ marginTop: 10 }}>
-                        <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>EMAIL</Text>
-                        <TextInput
-                            style={[styles.TextInput, { fontSize: 17, fontWeight: "bold", color: "black", paddingLeft: 10, }]}
-                            value={userdata.email}
-                            onChangeText={(text) => setUserData(prevuserdata => ({ ...prevuserdata, email: text }))}
-                        />
+
+                    <View style={styles.infoArea}>
+                        <Text style={styles.infoLabelText}>EMAIL</Text>
+                        <View style={styles.infoBox}>
+                            <TextInput
+                                style={styles.infoInput}
+                                value={userdata.email}
+                                onChangeText={(text) => setUserData(prevuserdata => ({ ...prevuserdata, email: text }))}
+                            />
+                        </View>
+                        <IconA name='pen' size={20} color='black' style={{ position: 'absolute', right: 10 }} />
                     </View>
-                    <View style={{ marginTop: 10 }}>
-                        <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>학교 / 학과</Text>
-                        <View style={styles.TextInput}>
-                            <Text style={styles.Textfont}>{UserUniversity} / {Userdepartment}</Text>
+
+                    <View style={styles.infoArea}>
+                        <Text style={styles.infoLabelText}>학교 / 학과</Text>
+                        <View style={styles.infoBox}>
+                            <Text style={styles.infoText}>{UserUniversity} / {Userdepartment}</Text>
                         </View>
                     </View>
-                    <View style={styles.grade}>
+
+                    <View style={styles.infoArea}>
                         {userdata.currentstatus !== "졸업" && (
-                            <View>
-                                <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>학년</Text>
-                                <View style={styles.TextInput2}>
-                                    <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 3, marginLeft: 9 }}>{userdata.grade}학년</Text>
-                                    <TouchableOpacity onPress={opengradeModal}>
-                                        <Text style={{ color: 'black' }}><IconB name="down" size={30} /></Text>
-                                    </TouchableOpacity>
-                                </View>
+                            <View style={styles.schoolInfoLabel}>
+                                <Text style={styles.schoolInfoText}>학년</Text>
+                                <TouchableOpacity onPress={opengradeModal}>
+                                    <View style={styles.listBoxArea}>
+                                        <Text style={styles.listBoxText}>{userdata.grade}학년</Text>
+                                        <IconB style={styles.listBoxIcon} name="down" size={30} />
+                                    </View>
+                                </TouchableOpacity>
                             </View>
                         )}
                         {userdata.currentstatus !== "졸업" ? (
-                            <View style={{ marginLeft: 30 }}>
-                                <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>재학상태</Text>
-                                <View style={styles.TextInput2} >
-                                    <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 3, marginLeft: 9 }}>{userdata.currentstatus}</Text>
-                                    <TouchableOpacity onPress={openStatusModal}>
-                                        <Text style={{ color: 'black' }}><IconB name="down" size={30} /></Text>
-                                    </TouchableOpacity>
-                                </View>
+                            <View style={styles.schoolInfoLabel}>
+                                <Text style={styles.schoolInfoText}>재학상태</Text>
+                                <TouchableOpacity onPress={openStatusModal}>
+                                    <View style={styles.listBoxArea}>
+                                        <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
+                                        <IconB style={styles.listBoxIcon} name="down" size={30} />
+                                    </View>
+                                </TouchableOpacity>
                             </View>
                         ) : (
-                            <View style={{ marginRight: 150 }}>
-                                <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>재학상태</Text>
-                                <View style={styles.TextInput2} >
-                                    <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 3, marginLeft: 5 }}>{userdata.currentstatus}</Text>
+                            <View>
+                                <View style={styles.schoolInfoLabel}>
+                                    <Text style={styles.schoolInfoText}>재학상태</Text>
                                     <TouchableOpacity onPress={openStatusModal}>
-                                        <Text style={{ color: 'black' }}><IconB name="down" size={30} /></Text>
+                                        <View style={styles.listBoxArea}>
+                                            <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
+                                            <IconB style={styles.listBoxIcon} name="down" size={30} />
+                                        </View>
                                     </TouchableOpacity>
                                 </View>
                             </View>
                         )}
                     </View>
 
-                    <View style={{ marginTop: 10 }}>
-                        <Text style={{ fontSize: 17, fontWeight: "bold", color: "black", marginBottom: 7, marginLeft: 10 }}>아이디</Text>
-                        <View style={styles.TextInput}>
-                            <Text style={styles.Textfont}>{userdata.id}</Text>
+                    <View style={styles.infoArea}>
+                        <Text style={styles.infoLabelText}>아이디</Text>
+                        <View style={styles.infoBox}>
+                            <Text style={styles.infoText}>{userdata.id}</Text>
                         </View>
                     </View>
-                    <TouchableOpacity style={styles.TextInput3} onPress={DeleteUser}>
-                        <Text style={{ color: 'red', fontSize: 20, fontWeight: "bold" }}>회원 탈퇴</Text>
+
+
+                    <TouchableOpacity style={[styles.infoArea, { justifyContent: 'flex-start', width: '30%', }]} onPress={DeleteUser}>
+                        <Text style={styles.button}>회원 탈퇴</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.TextInput3} onPress={Logout}>
+
+                    <TouchableOpacity style={[styles.infoArea, { justifyContent: 'flex-start', width: '30%', }]} onPress={Logout}>
                         <Text style={{ color: 'red', fontSize: 20, fontWeight: "bold" }}>로그아웃</Text>
                     </TouchableOpacity>
                 </View>
-                <ModalBox
-                    isOpen={isModalOpen}
-                    style={styles.modal}
-                    position="bottom"
-                    swipeToClose={false}
-                    onClosed={closegradeModal}
-                >
-                    <View style={styles.modalContent}>
-                        <TouchableOpacity
-                            style={[styles.gradeButton, selectedGrade === 1 && styles.selectedGrade]}
-                            onPress={() => handleGradeSelect(1)}
-                        >
-                            <Text style={[styles.gradeButtonText, selectedGrade === 1 && { color: "black" }]}>1학년</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.gradeButton, selectedGrade === 2 && styles.selectedGrade]}
-                            onPress={() => handleGradeSelect(2)}
-                        >
-                            <Text style={[styles.gradeButtonText, selectedGrade === 2 && { color: "black" }]}>2학년</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.gradeButton, selectedGrade === 3 && styles.selectedGrade]}
-                            onPress={() => handleGradeSelect(3)}
-                        >
-                            <Text style={[styles.gradeButtonText, selectedGrade === 3 && { color: "black" }]}>3학년</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={closegradeModal} style={styles.completeButton}>
-                            <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ModalBox>
-                <ModalBox
-                    isOpen={isStatusModalOpen}
-                    style={styles.modal}
-                    position="bottom"
-                    swipeToClose={false}
-                    onClosed={closeStatusModal}
-                >
-                    <View style={styles.modalContent}>
-                        <TouchableOpacity
-                            style={[styles.gradeButton, selectedstatus === "졸업" && styles.selectedGrade]}
-                            onPress={() => handlestatusSelect("졸업")}
-                        >
-                            <Text style={[styles.gradeButtonText, selectedstatus === "졸업" && { color: "black" }]}>졸업</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.gradeButton, selectedstatus === "휴학중" && styles.selectedGrade]}
-                            onPress={() => handlestatusSelect("휴학중")}
-                        >
-                            <Text style={[styles.gradeButtonText, selectedstatus === "휴학중" && { color: "black" }]}>휴학중</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.gradeButton, selectedstatus === "재학중" && styles.selectedGrade]}
-                            onPress={() => handlestatusSelect("재학중")}
-                        >
-                            <Text style={[styles.gradeButtonText, selectedstatus === "재학중" && { color: "black" }]}>재학중</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={closeStatusModal} style={styles.completeButton}>
-                            <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ModalBox>
-                <ModalBox
-                    isOpen={isCameraModalOpen}
-                    style={styles.Cameramodal}
-                    position="top"
-                    swipeToClose={false}
-                    onClosed={closeCameraModal}
-                >
-                    <View style={{ alignItems: "center", justifyContent: "center" }}>
-                        <Text style={{ fontSize: 18, color: "black", fontWeight: "bold" }}>프로필 사진 변경</Text>
-                        <TouchableOpacity onPress={getPhotos} style={{ marginTop: 20 }} >
-                            <Text style={{ fontSize: 22, color: "blue", fontWeight: "bold" }}>앨범에서 사진 선택</Text>
-                        </TouchableOpacity>
-                        <View style={{ borderColor: "black", borderWidth: 2, width: 270, marginTop: 10, marginBottom: 10, }}>
 
-                        </View>
-                        <TouchableOpacity onPress={defaultImg}>
-                            <Text style={{ fontSize: 22, color: "blue", fontWeight: "bold" }}>기본 이미지 설정</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity style={styles.modalconfirmButton} onPress={closeCameraModal} >
-                        <Text style={{ fontSize: 20, color: 'black', fontWeight: "bold" }}>닫기</Text>
+            </ScrollView>
+            <ModalBox
+                isOpen={isModalOpen}
+                style={styles.modal}
+                position="bottom"
+                swipeToClose={false}
+                onClosed={closegradeModal}
+            >
+                <View style={styles.modalContent}>
+                    <TouchableOpacity
+                        style={[styles.gradeButton, selectedGrade === 1 && styles.selectedGrade]}
+                        onPress={() => handleGradeSelect(1)}
+                    >
+                        <Text style={[styles.gradeButtonText, selectedGrade === 1 && { color: "black" }]}>1학년</Text>
                     </TouchableOpacity>
-                </ModalBox>
-                <TouchableOpacity style={styles.confirmButton} onPress={UpdateAccount}>
-                    <Text style={{ fontSize: 20, color: 'black', fontWeight: "bold" }}>확인</Text>
+                    <TouchableOpacity
+                        style={[styles.gradeButton, selectedGrade === 2 && styles.selectedGrade]}
+                        onPress={() => handleGradeSelect(2)}
+                    >
+                        <Text style={[styles.gradeButtonText, selectedGrade === 2 && { color: "black" }]}>2학년</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.gradeButton, selectedGrade === 3 && styles.selectedGrade]}
+                        onPress={() => handleGradeSelect(3)}
+                    >
+                        <Text style={[styles.gradeButtonText, selectedGrade === 3 && { color: "black" }]}>3학년</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={closegradeModal} style={styles.completeButton}>
+                        <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
+                    </TouchableOpacity>
+                </View>
+            </ModalBox>
+            <ModalBox
+                isOpen={isStatusModalOpen}
+                style={styles.modal}
+                position="bottom"
+                swipeToClose={false}
+                onClosed={closeStatusModal}
+            >
+                <View style={styles.modalContent}>
+                    <TouchableOpacity
+                        style={[styles.gradeButton, selectedstatus === "졸업" && styles.selectedGrade]}
+                        onPress={() => handlestatusSelect("졸업")}
+                    >
+                        <Text style={[styles.gradeButtonText, selectedstatus === "졸업" && { color: "black" }]}>졸업</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.gradeButton, selectedstatus === "휴학중" && styles.selectedGrade]}
+                        onPress={() => handlestatusSelect("휴학중")}
+                    >
+                        <Text style={[styles.gradeButtonText, selectedstatus === "휴학중" && { color: "black" }]}>휴학중</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.gradeButton, selectedstatus === "재학중" && styles.selectedGrade]}
+                        onPress={() => handlestatusSelect("재학중")}
+                    >
+                        <Text style={[styles.gradeButtonText, selectedstatus === "재학중" && { color: "black" }]}>재학중</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={closeStatusModal} style={styles.completeButton}>
+                        <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
+                    </TouchableOpacity>
+                </View>
+            </ModalBox>
+            <ModalBox
+                isOpen={isCameraModalOpen}
+                style={styles.Cameramodal}
+                position="top"
+                swipeToClose={false}
+                onClosed={closeCameraModal}
+            >
+                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                    <Text style={{ fontSize: 18, color: "black", fontWeight: "bold" }}>프로필 사진 변경</Text>
+                    <TouchableOpacity onPress={getPhotos} style={{ marginTop: 20 }} >
+                        <Text style={{ fontSize: 22, color: "blue", fontWeight: "bold" }}>앨범에서 사진 선택</Text>
+                    </TouchableOpacity>
+                    <View style={{ borderColor: "black", borderWidth: 2, width: 270, marginTop: 10, marginBottom: 10, }}>
+
+                    </View>
+                    <TouchableOpacity onPress={defaultImg}>
+                        <Text style={{ fontSize: 22, color: "blue", fontWeight: "bold" }}>기본 이미지 설정</Text>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity style={styles.modalconfirmButton} onPress={closeCameraModal} >
+                    <Text style={{ fontSize: 20, color: 'black', fontWeight: "bold" }}>닫기</Text>
                 </TouchableOpacity>
-            </View>
-        </ScrollView>
+            </ModalBox>
+            <TouchableOpacity style={styles.confirmButton} onPress={UpdateAccount}>
+                <Text style={{ fontSize: 20, color: 'black', fontWeight: "bold" }}>확인</Text>
+            </TouchableOpacity>
+        </View>
     );
 };
 
@@ -449,9 +466,87 @@ const styles = StyleSheet.create({
         height: 110,
         borderRadius: 60,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignSelf: 'center',
         position: 'relative',
     },
+    studentInfoArea: {
+        //backgroundColor: 'lightgray',
+        width: width * 0.95,
+        height: 500,
+        marginTop: 15,
+        //borderRadius: 20,
+        borderTopWidth: 2,
+        borderColor: 'gray'
+    },
+    infoArea: {
+        width: '100%',
+        height: '12%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 10,
+    },
+    infoLabelText: {
+        color: 'gray',
+        fontSize: 18,
+        fontWeight: 'bold',
+        width: '30%'
+    },
+    infoBox: {
+        width: '70%',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        flexDirection: 'row',
+    },
+    infoText: {
+        color: "black",
+        fontSize: 20,
+        fontWeight: "bold",
+    },
+    infoInput: {
+        width: '95%',
+        color: 'black',
+        fontSize: 20,
+        fontWeight: 'bold',
+        position: 'absolute',
+        left: -5
+    },
+    schoolInfoLabel: {
+        width: '50%',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    schoolInfoText: {
+        color: "gray",
+        fontSize: 17,
+        fontWeight: "bold",
+        marginRight: 15
+    },
+    listBoxArea: {
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderColor: "black",
+        borderWidth: 2,
+        borderRadius: 15,
+        width: 120,
+        height: 45,
+        paddingHorizontal: 10
+    },
+    listBoxText: {
+        fontSize: 17,
+        fontWeight: "bold",
+        color: "black",
+    },
+    listBoxIcon: {
+        color: 'black',
+    },
+    button: {
+        color: 'red',
+        fontSize: 20,
+        fontWeight: "bold",
+    },
+
     containerBox: {
         marginTop: 15,
         borderTopWidth: 2,
