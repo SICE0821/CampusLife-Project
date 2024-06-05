@@ -40,7 +40,7 @@ const TimetableCell = ({ course, professor, room, color }: Course) => (
 const TimetableRow = ({ time, courses, days }: { time: string; courses: Course[]; days: string[] }) => (
   <View style={styles.row}>
     <View style={styles.timeColumn}>
-      <Text>{time}</Text>
+      <Text style={{color: 'gray'}}>{time}</Text>
     </View>
     {days.map((day, index) => {
       const course = courses.find(course => course.day === day && course.time === time);
@@ -155,6 +155,7 @@ const App = ({ route }: any) => {
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={selectedGradeAndSemester}
+          dropdownIconColor={'black'}
           style={styles.picker}
           onValueChange={(itemValue) => setSelectedGradeAndSemester(itemValue)}
         >
@@ -190,6 +191,10 @@ const styles = StyleSheet.create({
   picker: {
     flex: 0.5,
     height: 50,
+    color: 'black',
+    borderWidth: 5,
+    backgroundColor: 'white',
+    elevation: 5,
   },
   table: {
     flexDirection: 'column',
@@ -223,6 +228,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontWeight: 'bold', 
+    color: 'gray'
   },
   courseText: {
     fontSize: 12,

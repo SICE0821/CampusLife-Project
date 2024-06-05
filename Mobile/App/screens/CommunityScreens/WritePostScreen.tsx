@@ -139,6 +139,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
               onChangeText={handletitleTextChange}
               value={titletext}
               placeholder="제목"
+              placeholderTextColor={'gray'}
             />
           </View>
         </View>
@@ -149,6 +150,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
             value={maintext}
             multiline={true}
             placeholder="이 곳에 글을 입력해주세요!"
+            placeholderTextColor={'gray'}
           />
         </View>
       </ScrollView>

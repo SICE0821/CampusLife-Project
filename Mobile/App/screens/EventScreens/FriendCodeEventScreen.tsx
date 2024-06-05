@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Dimensions, View, Text, StyleSheet, TextInput, TouchableOpacity, Clipboard, ToastAndroid, Image, Alert } from 'react-native';
+import { Dimensions, View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Octicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, UserHaveCouponData } from '../../types/type'
 import config from '../../config';
+import Clipboard from '@react-native-clipboard/clipboard'; 
 
 const width = Dimensions.get("window").width;
 const friendsinvitepng = require('../../assets/friend3.png');

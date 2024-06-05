@@ -1479,6 +1479,66 @@ app.post('/user_update_point_3', async (req, res) => {
   }
 });
 
+app.post('/get_campus_place', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await getCampus(campus_id);
+    const processedData = rows.map(item => ({
+      study_room_id : item.study_room_id,
+      campus_place : item.campus_place,
+      study_room_name : item.study_room_name
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
+
+app.post('/studyroomReservation', async (req, res) => {
+  const { student , study_room, study_room_date, study_room_time } = req.body;
+  const result = await insert_student_study_room(student, study_room, study_room_date, study_room_time);
+  if (result) {
+    res.json({ message: 'Data received successfully', receivedData: { student, study_room, study_room_date, study_room_time } });
+  } else {
+    res.status(500).json({ message: 'Failed to insert data' });
+  }
+});
+
+app.post('/get_study_room', async (req, res) => {
+  const { student } = req.body;
+  try {
+    const rows = await get_student_study_room(student);
+    const processedData = rows.map(item => ({
+      study_room_name : item.study_room_name,
+      study_room_date : item.study_room_date,
+      study_room_time : item.study_room_time
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
+
+app.post('/get_study_date_time', async (req, res) => {
+  try {
+    const rows = await get_studyroom_date();
+    const processedData = rows.map(item => ({
+      study_room_name : item.study_room_name,
+      study_room_date : item.study_room_date,
+      study_room_time : item.study_room_time
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
+
 //서버 시작
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);
