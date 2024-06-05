@@ -8,10 +8,9 @@ import {
   View,
   Dimensions,
   Image,
-  StatusBar,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
-import { UserData, Lecture } from '../types/type'
+import { UserData } from '../types/type'
 import ImageCropPicker from 'react-native-image-crop-picker';
 import config from '../config';
 
@@ -29,22 +28,7 @@ const attendancepng = require('../assets/handup.jpg');
 const friendsinvitepng = require('../assets/friend3.jpg');
 const volunteerpng = require('../assets/animation.gif');
 
-
 const width = Dimensions.get('window').width;
-const height = Dimensions.get('window').height;
-
-type mainpagepostdata = {
-  post_id: number,
-  title: string,
-  view: number,
-}
-
-type mainpagehptdata = {
-  post_id: number,
-  title: string,
-  view: number,
-  like: number,
-}
 
 type PostData = {
   post_id: number,
@@ -64,10 +48,7 @@ const MainPage = ({ navigation, route }: any) => {
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
   const [Userdepartment, setUserDepartment] = useState();
-  const [imagepath, setimagepath] = useState<string>();
   const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
-
-
 
   const view_count_up = async (post_id: any) => {
     try {
@@ -86,7 +67,6 @@ const MainPage = ({ navigation, route }: any) => {
       console.error('포스트 View 올리기 누르기 실패', error);
     }
   }
-
 
   const getPhotos = async () => {
     ImageCropPicker.openPicker({
@@ -113,7 +93,6 @@ const MainPage = ({ navigation, route }: any) => {
         method: 'POST',
         body: formData,
       });
-
       if (response.ok) {
         console.log('Images uploaded successfully');
       } else {
@@ -142,7 +121,6 @@ const MainPage = ({ navigation, route }: any) => {
       console.error('유저 학과 이름 가져오기 실패:', error);
     }
   }
-
 
   const fetchschoolpostData = async () => {
     try {
@@ -187,7 +165,6 @@ const MainPage = ({ navigation, route }: any) => {
   };
   const settingUserData = () => {
     setUserData(userdata);
-
   }
 
   const get_user_point = async () => {
@@ -594,7 +571,7 @@ const styles = StyleSheet.create({
   profileArea: {
     alignSelf: 'center',
     width: width * 0.9,
-    height: 190,
+    height: 190, // 상단 프로필 박스 영역
     marginVertical: 20
   },
   profileBox: {
@@ -605,7 +582,7 @@ const styles = StyleSheet.create({
   profileBoxTop: {
     backgroundColor: '#FFFADD',
     width: '100%',
-    height: '65%',
+    height: '65%', // 상단 영역
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
     borderBottomWidth: 1,
@@ -664,13 +641,12 @@ const styles = StyleSheet.create({
   },
   profileBoxBottom: {
     backgroundColor: 'white',
-    height: '35%',
+    height: '35%', // 하단 영역
     borderBottomStartRadius: 20,
     borderBottomEndRadius: 20,
     flexDirection: 'row',
   },
-  tabButton: {
-    //backgroundColor: 'red',
+  tabButton: { // 버튼
     width: '20%',
     height: '100%',
     alignItems: 'center',
