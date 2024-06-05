@@ -521,13 +521,16 @@ async function getLectureList(studentId) {
                 lecture.lecture_room, 
                 lecture.lecture_time, 
                 lecture.week,
+                lecture.division,
                 lecture_have_object.nonattendance, 
                 lecture_have_object.attendance, 
                 lecture_have_object.tardy, 
                 lecture_have_object.absent,
                 lecture_have_object.weeknum,
                 lecture_have_object.lecture_grade,
-                lecture_have_object.lecture_semester
+                lecture_have_object.lecture_semester,
+                lecture_have_object.lecture_credit,
+                lecture_have_object.lecture_grades
             FROM 
                 lecture
             JOIN 
@@ -545,7 +548,6 @@ async function getLectureList(studentId) {
         if (conn) conn.end();
     }
 }
-
 //과목 업데이트 
 async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum) {
     let conn;
