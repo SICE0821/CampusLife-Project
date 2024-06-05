@@ -120,10 +120,11 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                     </View>
                     <View style={styles.textinputbox}>
                         <TextInput
-                            style={{ flex: 1, fontSize: 16 }}
+                            style={{ flex: 1, fontSize: 16, color: 'black' }}
                             onChangeText={handlesearchTextChange}
                             value={searchtext}
                             placeholder="글 제목, 내용"
+                            placeholderTextColor={'gray'}
                             onSubmitEditing={() => getGeneralposts()}
                         />
                     </View>
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     },
     searchcontainer: {
         height: 40,
-        width: 390,
+        width: 320,
         backgroundColor: '#FFDECF',
         flexDirection: 'row',
         marginLeft: 8,
