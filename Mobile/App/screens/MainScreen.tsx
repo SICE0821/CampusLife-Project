@@ -26,7 +26,7 @@ import IconI from 'react-native-vector-icons/FontAwesome5';
 
 const attendancepng = require('../assets/handup.jpg');
 const friendsinvitepng = require('../assets/friend3.jpg');
-const volunteerpng = require('../assets/animation.gif');
+const volunteerpng = require('../assets/photo_Ex1.png');
 
 const width = Dimensions.get('window').width;
 
