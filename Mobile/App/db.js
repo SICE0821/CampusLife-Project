@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '14.6.152.64',
+    host: '127.0.0.1',
     port: 3306,
     user: 'yuhwan',
     password: '0000',
@@ -1868,7 +1868,7 @@ module.exports = {
     getCampus,
     insert_student_study_room,
     get_student_study_room,
-    get_studyroom_date
+    get_studyroom_date,
     get_aram_data,
     get_one_post,
     addCommentAram,
