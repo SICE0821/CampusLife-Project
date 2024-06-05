@@ -196,6 +196,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             />
             <MainStack.Screen
                 name="AlarmDialogScreen"
+                initialParams={{ userdata }}
                 component={AlarmDialogScreen}
                 options={{
                     headerStyle: {
@@ -258,6 +259,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen
                 name="AttendanceCheckEventScreen"
                 component={AttendanceCheckEventScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -274,6 +276,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen
                 name="FriendCodeEventScreen"
                 component={FriendCodeEventScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

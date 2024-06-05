@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import {
   ScrollView,
@@ -10,7 +10,7 @@ import {
   Image,
 } from 'react-native';
 import Swiper from 'react-native-swiper';
-import {UserData, Lecture} from '../types/type'
+import { UserData } from '../types/type'
 import ImageCropPicker from 'react-native-image-crop-picker';
 import config from '../config';
 
@@ -26,24 +26,9 @@ import IconI from 'react-native-vector-icons/FontAwesome5';
 
 const attendancepng = require('../assets/handup.jpg');
 const friendsinvitepng = require('../assets/friend3.jpg');
-const volunteerpng = require('../assets/animation.gif');
+const volunteerpng = require('../assets/photo_Ex1.png');
 
-
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
-
-type mainpagepostdata = {
-  post_id: number,
-  title: string,
-  view: number,
-}
-
-type mainpagehptdata = {
-  post_id: number,
-  title: string,
-  view: number,
-  like: number,
-}
+const width = Dimensions.get('window').width;
 
 type PostData = {
   post_id: number,
@@ -63,29 +48,25 @@ const MainPage = ({ navigation, route }: any) => {
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
   const [Userdepartment, setUserDepartment] = useState();
-  const [imagepath, setimagepath] = useState<string>();
   const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
-
-  
 
   const view_count_up = async (post_id: any) => {
     try {
-        const response = await fetch(`${config.serverUrl}/view_count_up`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                post_id: post_id
-            })
+      const response = await fetch(`${config.serverUrl}/view_count_up`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          post_id: post_id
         })
-        const result = await response.json();
-        console.log("포스트 View 올리기 성공!")
+      })
+      const result = await response.json();
+      console.log("포스트 View 올리기 성공!")
     } catch (error) {
-        console.error('포스트 View 올리기 누르기 실패', error);
+      console.error('포스트 View 올리기 누르기 실패', error);
     }
-}
-
+  }
 
   const getPhotos = async () => {
     ImageCropPicker.openPicker({
@@ -112,7 +93,6 @@ const MainPage = ({ navigation, route }: any) => {
         method: 'POST',
         body: formData,
       });
-
       if (response.ok) {
         console.log('Images uploaded successfully');
       } else {
@@ -141,7 +121,6 @@ const MainPage = ({ navigation, route }: any) => {
       console.error('유저 학과 이름 가져오기 실패:', error);
     }
   }
-
 
   const fetchschoolpostData = async () => {
     try {
@@ -186,7 +165,6 @@ const MainPage = ({ navigation, route }: any) => {
   };
   const settingUserData = () => {
     setUserData(userdata);
-
   }
 
   const get_user_point = async () => {
@@ -211,382 +189,375 @@ const MainPage = ({ navigation, route }: any) => {
     navigation.navigate('StudentInfoNavigator', { userData, Userdepartment });
   }
 
-    const AcademicInfo = async () =>{
-      navigation.navigate('AcademicInfoNavigator', {userData, LectureData});
-    }
-    useFocusEffect(
-      React.useCallback(() => {
-        fetchschoolpostData();
-        fetchdepartmentpostData();
-        fetchhotpostData();
-        settingUserData();
-        get_user_department();
-        get_user_point();
-        if (navigation.getState().routes[navigation.getState().index].params?.updatedUserData) {
-          const updatedUserData = navigation.getState().routes[navigation.getState().index].params.updatedUserData;
-          setUserData(updatedUserData);
+  const AcademicInfo = async () => {
+    navigation.navigate('AcademicInfoNavigator', { userData, LectureData });
+  }
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchschoolpostData();
+      fetchdepartmentpostData();
+      fetchhotpostData();
+      settingUserData();
+      get_user_department();
+      get_user_point();
+      if (navigation.getState().routes[navigation.getState().index].params?.updatedUserData) {
+        const updatedUserData = navigation.getState().routes[navigation.getState().index].params.updatedUserData;
+        setUserData(updatedUserData);
       }
     }, [navigation])
   )
   return (
     <View style={styles.container}>
       <ScrollView>
-        <View style={styles.cardView}>
-          <View style={styles.card}>
-            <View style={styles.cardtop}>
-              <View style={styles.profile}>
-                <TouchableOpacity
-                  onPress={() => getPhotos()}
-                  style={styles.profilePicture}>
-                  {userData.profile_photo ? (
-                    <Image
-                      source={{ uri: fileUri }}
-                      style={{ width: 85, height: 85, borderRadius: 50, justifyContent: 'center', alignItems: 'center' }}
-                    />
-                  ) : (
-                    <IconI name="user" size={40} color="black" style={{ width: 85, height: 85, borderRadius: 50, marginLeft: 50, marginTop: 40, }} />
-                  )}
-                </TouchableOpacity>
-              </View>
-              <View style={styles.info}>
-                <View style={styles.name}>
-                  <Text style={{ fontSize: 25, marginTop: 17, fontWeight: 'bold', color: 'black' }}> {userData.name} </Text>
+        <View style={styles.profileArea}>
+          <View style={styles.profileBox}>
+            <View style={styles.profileBoxTop}>
+              <TouchableOpacity onPress={() => getPhotos()} style={styles.profileImageArea}>
+                {userData.profile_photo ? (
+                  <Image source={{ uri: fileUri }} style={styles.profileImage} /> 
+                ) : (
+                  <IconI name="user" size={40} color="black" />
+                )}
+              </TouchableOpacity>
+              <View style={styles.userInfoNPointArea}>
+                <View style={styles.userInfoArea}>
+                  <Text style={styles.userName}>{userData.name}</Text>
+                  <Text style={styles.userInfo}>{Userdepartment}/{userData.grade}학년</Text>
                 </View>
-                <View style={styles.department}>
-                  <Text style={{ fontSize: 15, marginLeft: 4, marginTop: 3, color: 'black' }}> {Userdepartment}/{userData.grade}학년</Text>
-                </View>
-                <View style={styles.point}>
-                  <Text style={{ marginLeft: 2, marginBottom: 6, color: 'black' }}> <IconA name="payments" size={36} /></Text>
-                  <Text style={{ fontSize: 24, marginLeft: 5, marginBottom: 11, color: 'black' }}>{userData.point}</Text>
+                <View style={styles.pointArea}>
+                  <IconA style={styles.pointIcon} name="payments" size={36} />
+                  <Text style={styles.userPoint}>{userData.point}</Text>
                   <TouchableOpacity
                     onPress={() => navigation.navigate("EventScreenStackNavigator")}>
-                    <Text style={{ marginBottom: 9, color: 'black' }}><IconB name={"caretright"} size={22} /></Text>
+                    <IconB name={"caretright"} size={22} style={styles.pointNavigationIcon} />
                   </TouchableOpacity>
                 </View>
               </View>
-
             </View>
-            <View style={styles.cardbottom}>
-              <TouchableOpacity style={styles.cardchoice} onPress={StudentInfo}>
-                <Text style={{ color: 'black' }}><IconB name="idcard" size={30} /></Text>
-                <Text style={{ fontSize: 15, color: 'black' }}>정보변경</Text>
+            <View style={styles.profileBoxBottom}>
+              <TouchableOpacity style={styles.tabButton} onPress={StudentInfo}>
+                <IconB style={styles.tabIcon} name="idcard" size={30} />
+                <Text style={styles.tabText}>정보변경</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cardchoice} onPress={AcademicInfo}>
-                <Text style={{ color: 'black' }}><IconC name="calendar-check-o" size={30} /></Text>
-                <Text style={{ fontSize: 15, color: 'black', marginTop: 5 }}>학적확인</Text>
+
+              <TouchableOpacity style={styles.tabButton} onPress={AcademicInfo}>
+                <IconC style={styles.tabIcon} name="calendar-check-o" size={30} />
+                <Text style={styles.tabText}>학적확인</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cardchoice} onPress={() => navigation.navigate("AlarmDialogScreen")}>
-                <Text style={{ color: 'black' }}><IconD name="bell" size={30} /></Text>
-                <Text style={{ fontSize: 15, color: 'black', marginTop: 5 }}>알림</Text>
+
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AlarmDialogScreen")}>
+                <IconD style={styles.tabIcon} name="bell" size={30} />
+                <Text style={styles.tabText}>알림</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cardchoice} onPress={() => navigation.navigate("SchoolInfoScreen")}>
-                <Text style={{ color: 'black' }}><IconE name="information-circle-outline" size={30} /></Text>
-                <Text style={{ fontSize: 15, color: 'black' }}>학교정보</Text>
+
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("SchoolInfoScreen")}>
+                <IconE style={styles.tabIcon} name="information-circle-outline" size={30} />
+                <Text style={styles.tabText}>학교정보</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cardchoice} onPress={() => navigation.navigate("StudyRoomScreen")}>
-                <Text style={{ color: 'black' }}><IconF name="prescription" size={30} /></Text>
-                <Text style={{ fontSize: 15, color: 'black', marginTop: 5 }}>스터디룸</Text>
+
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("StudyRoomScreen")}>
+                <IconF style={styles.tabIcon} name="prescription" size={30} />
+                <Text style={styles.tabText}>스터디룸</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        <View style={styles.eventcontainer}>
-          <View style={styles.eventhearder}>
-            <Text style={styles.eventheadertext}>이벤트</Text>
-            <Text style={{ marginTop: 1, marginLeft: 5, color: "#FFC700" }}><IconF name="ticket" size={27} /></Text>
+        <View style={styles.eventArea}>
+          <View style={styles.eventHead}>
+            <Text style={styles.eventHeadText}>이벤트</Text>
+            <IconF style={styles.eventHeadIcon} name="ticket" size={27} />
           </View>
-          <Swiper loop={true}>
+          <View style={styles.eventSwipeArea}>
+          <Swiper loop={true} removeClippedSubviews={false}>
             <TouchableOpacity
               onPress={() => navigation.navigate("AttendanceCheckEventScreen")}
-              style={styles.eventbox}>
-              <View style={styles.eventpicture}>
-                <Image style={{ width: 430, height: 260 }}
-                  source={attendancepng}
-                />
+              style={styles.eventBox}>
+              <View style={styles.eventImageArea}>
+                <Image style={styles.eventImage} source={attendancepng} />
               </View>
-              <View style={styles.eventtext}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', margin: 8, color: 'black' }}>출석체크 이벤트!</Text>
-                <Text style={{ marginLeft: 10, }}>앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!</Text>
+              <View style={styles.eventTextArea}>
+                <Text style={styles.eventLabelText}>출석체크 이벤트!</Text>
+                <Text style={styles.eventInfoText}>앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.eventbox}
+              style={styles.eventBox}
               onPress={() => navigation.navigate("FriendCodeEventScreen")}>
-              <View style={styles.eventpicture}>
-                <Image style={{ width: 430, height: 260 }}
-                  source={friendsinvitepng}
-                />
+              <View style={styles.eventImageArea}>
+                <Image style={styles.eventImage} source={friendsinvitepng} />
               </View>
-              <View style={styles.eventtext}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', margin: 8, color: 'black' }}>친구코드 이벤트!</Text>
-                <Text style={{ marginLeft: 10, }}>친구에게 나의 코드를 보낼시에 포인트를 제공해 드립니다!</Text>
+              <View style={styles.eventTextArea}>
+                <Text style={styles.eventLabelText}>친구코드 이벤트!</Text>
+                <Text style={styles.eventInfoText}>친구에게 나의 코드를 보낼시에 포인트를 제공해 드립니다!</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigation.navigate("DeadlineEventScreen")}
-              style={styles.eventbox}>
-              <View style={styles.eventpicture}>
-                <Image style={{ width: 430, height: 250 }}
-                  source={volunteerpng}
-                  resizeMode="contain" />
+              style={styles.eventBox}>
+              <View style={styles.eventImageArea}>
+                <Image style={styles.eventImage} source={volunteerpng} />
               </View>
-              <View style={styles.eventtext}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold', margin: 8, color: 'black' }}>봉사활동 이벤트!</Text>
-                <Text style={{ marginLeft: 10, }}>봉사활동을 하고 인증해주시면 포인트를 제공해 드립니다!</Text>
+              <View style={styles.eventTextArea}>
+                <Text style={styles.eventLabelText}>봉사활동 이벤트!</Text>
+                <Text style={styles.eventInfoText}>봉사활동을 하고 인증해주시면 포인트를 제공해 드립니다!</Text>
               </View>
             </TouchableOpacity>
-          </Swiper>
+            </Swiper>
+          </View>
         </View>
-        <View style={styles.noticecontainer}>
-          <View style={styles.noticeheader}>
-            <Text style={styles.noticeheadertext}>학교 공지사항</Text>
-            <Text style={{ marginTop: 15, marginLeft: 5, color: "#FFC700" }}><IconG name="file-document-multiple" size={28} /></Text>
+
+        <View style={styles.postArea}>
+          <View style={styles.postHeadArea}>
+            <View style={styles.postHeadTextIconArea}>
+              <Text style={styles.postHeadText}>학교 공지사항</Text>
+              <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28}/>
+            </View>
             <TouchableOpacity onPress={() => {
               navigation.navigate('NoticeScreenStackNavigator', {
-                screen : 'NoticePostTopTabNavigator',
-                params : {
-                  screen : '학교 공지사항'
-                }
+                screen: 'NoticePostTopTabNavigator',
+                params: { screen: '학교 공지사항' }
               });
             }}
-              style={{ flexDirection: 'row' }}>
-              <Text style={{ marginLeft: 130, marginTop: 25, fontSize: 17, }}>더보기</Text>
-              <Text style={{ marginTop: 26, }}><IconB name={"caretright"} size={17} /></Text>
+              style={styles.postDetailArea}>
+              <Text style={styles.postDetailText}>더보기</Text>
+              <IconB style={styles.postDetailIcon} name={"caretright"} size={17} />
             </TouchableOpacity>
           </View>
-          <View style={styles.noticetextcontainer}>
-            <View style={styles.textborder}>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(schoolpostdata[0].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : schoolpostdata[0], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{schoolpostdata[0]?.title}</Text>
-                  <Text style={{ marginLeft: 8, color: 'red' }}><IconH name="burst-new" size={40} /></Text>
+          <View style={styles.postBoxArea}>
+            <View style={styles.postBox}>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(schoolpostdata[0].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[0], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{schoolpostdata[0]?.title}</Text>
+                  <IconH style={styles.postLabelIcon} name="burst-new" size={40} />
                 </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{schoolpostdata[0]?.view}</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(schoolpostdata[1].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : schoolpostdata[1], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{schoolpostdata[1]?.title}</Text>
-                </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{schoolpostdata[1]?.view}</Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{schoolpostdata[0]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(schoolpostdata[2].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : schoolpostdata[2], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{schoolpostdata[2]?.title}</Text>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(schoolpostdata[1].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[1], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{schoolpostdata[1]?.title}</Text>
                 </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{schoolpostdata[2]?.view}</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(schoolpostdata[3].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : schoolpostdata[3], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{schoolpostdata[3]?.title}</Text>
-                </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{schoolpostdata[3]?.view}</Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{schoolpostdata[1]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(schoolpostdata[4].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : schoolpostdata[4], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{schoolpostdata[4]?.title}</Text>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(schoolpostdata[2].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[2], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{schoolpostdata[2]?.title}</Text>
                 </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{schoolpostdata[4]?.view}</Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{schoolpostdata[2]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(schoolpostdata[3].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[3], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{schoolpostdata[3]?.title}</Text>
+                </View>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{schoolpostdata[3]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(schoolpostdata[4].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[4], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{schoolpostdata[4]?.title}</Text>
+                </View>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{schoolpostdata[4]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        <View style={styles.noticecontainer}>
-          <View style={styles.noticeheader}>
-            <Text style={styles.noticeheadertext}>학사 공지사항</Text>
-            <Text style={{ marginTop: 15, marginLeft: 5, color: "#FFC700" }}><IconG name="file-document-multiple" size={28} /></Text>
+
+        <View style={styles.postArea}>
+          <View style={styles.postHeadArea}>
+            <View style={styles.postHeadTextIconArea}>
+              <Text style={styles.postHeadText}>학사 공지사항</Text>
+              <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28}/>
+            </View>
             <TouchableOpacity onPress={() => {
               navigation.navigate('NoticeScreenStackNavigator', {
-                screen : 'NoticePostTopTabNavigator',
-                params : {
-                  screen : '학과 공지사항'
-                }
+                screen: 'NoticePostTopTabNavigator',
+                params: { screen: '학과 공지사항' }
               });
             }}
-              style={{ flexDirection: 'row' }}>
-              <Text style={{ marginLeft: 130, marginTop: 25, fontSize: 17, }}>더보기</Text>
-              <Text style={{ marginTop: 26 }}><IconB name={"caretright"} size={17} /></Text>
+              style={styles.postDetailArea}>
+              <Text style={styles.postDetailText}>더보기</Text>
+              <IconB style={styles.postDetailIcon} name={"caretright"} size={17} />
             </TouchableOpacity>
           </View>
-          <View style={styles.noticetextcontainer}>
-            <View style={styles.textborder}>
-              <TouchableOpacity 
-                style={styles.onebox}
-                onPress={async () => {
-                  await view_count_up(departmentpostdata[0].post_id);
-                  navigation.navigate("NoticePostDetailScreen", { item : departmentpostdata[0], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{departmentpostdata[0]?.title}</Text>
-                  <Text style={{ marginLeft: 8, color: 'red' }}><IconH name="burst-new" size={40} /></Text>
+          <View style={styles.postBoxArea}>
+            <View style={styles.postBox}>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(departmentpostdata[0].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[0], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{departmentpostdata[0]?.title}</Text>
+                  <IconH style={styles.postLabelIcon} name="burst-new" size={40} />
                 </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{departmentpostdata[0]?.view}</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(departmentpostdata[1].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : departmentpostdata[1], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{departmentpostdata[1]?.title}</Text>
-                </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{departmentpostdata[1]?.view}</Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{schoolpostdata[0]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(departmentpostdata[2].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : departmentpostdata[2], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{departmentpostdata[2]?.title}</Text>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(departmentpostdata[1].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[1], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{departmentpostdata[1]?.title}</Text>
                 </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{departmentpostdata[2]?.view}</Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(departmentpostdata[3].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : departmentpostdata[3], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{departmentpostdata[3]?.title}</Text>
-                </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{departmentpostdata[3]?.view}</Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{departmentpostdata[1]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                        await view_count_up(departmentpostdata[4].post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item : departmentpostdata[4], userData })}}>
-                <View style={styles.oneboxtext}>
-                  <Text style={styles.M}>{departmentpostdata[4]?.title}</Text>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(departmentpostdata[2].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[2], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{departmentpostdata[2]?.title}</Text>
                 </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -12 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{departmentpostdata[4]?.view}</Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{departmentpostdata[2]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(departmentpostdata[3].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[3], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{departmentpostdata[3]?.title}</Text>
+                </View>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{departmentpostdata[3]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(departmentpostdata[4].post_id);
+                navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[4], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{departmentpostdata[4]?.title}</Text>
+                </View>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{departmentpostdata[4]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        <View style={styles.noticecontainer}>
-          <View style={styles.noticeheader}>
-            <Text style={styles.noticeheadertext}>인기글</Text>
-            <Text style={{ marginTop: 15, marginLeft: 5, color: "red" }}><IconF name="fire" size={27} /></Text>
-            <TouchableOpacity  onPress={() => {
+
+        <View style={styles.postArea}>
+          <View style={styles.postHeadArea}>
+            <View style={styles.postHeadTextIconArea}>
+              <Text style={styles.postHeadText}>인기글</Text>
+              <IconF style={styles.postHeadIcon} name="fire" size={27}/>
+            </View>
+            <TouchableOpacity onPress={() => {
               navigation.navigate('CommunityScreenStackNavigator', {
-                screen : 'PostTopTabNavigator',
-                params : {
-                  screen : '전체 게시판',
-                  params : {
-                    screen : 'HOT'
-                  }
-                }
+                screen: 'PostTopTabNavigator',
+                params: { screen: '전체 게시판', params: { screen: 'HOT' } }
               });
             }}
-              style={{ flexDirection: 'row' }}>
-              <Text style={{ marginLeft: 205, marginTop: 25, fontSize: 17, }}>더보기</Text>
-              <Text style={{ marginTop: 26 }}><IconB name={"caretright"} size={17} /></Text>
+              style={styles.postDetailArea}>
+              <Text style={styles.postDetailText}>더보기</Text>
+              <IconB style={styles.postDetailIcon} name={"caretright"} size={17} />
             </TouchableOpacity>
           </View>
-          <View style={styles.noticetextcontainer}>
-            <View style={styles.textborder}>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                  await view_count_up(hotpostdata[0].post_id);
-                  navigation.navigate("PostDetailScreen", { item : hotpostdata[0], userData })}}>
-                <View style={styles.fireoneboxtext}>
-                  <Text style={styles.M}>{hotpostdata[0]?.title}</Text>
-                  <Text style={{ marginLeft: 8, color: 'red' }}><IconH name="burst-new" size={40} /></Text>
+          <View style={styles.postBoxArea}>
+            <View style={styles.postBox}>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(hotpostdata[0].post_id);
+                navigation.navigate("PostDetailScreen", { item: hotpostdata[0], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{hotpostdata[0]?.title}</Text>
+                  <IconH style={styles.postLabelIcon} name="burst-new" size={40} />
                 </View>
-                <View style={styles.fireoneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -13 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[0]?.view} /</Text>
-                  <Text style={{ color: '#F29F05' }}> <IconB name="like1" size={25} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[0]?.like} </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                  await view_count_up(hotpostdata[1].post_id);
-                  navigation.navigate("PostDetailScreen", { item : hotpostdata[1], userData })}}>
-                <View style={styles.fireoneboxtext}>
-                  <Text style={styles.M}>{hotpostdata[1]?.title}</Text>
-                </View>
-                <View style={styles.fireoneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -13 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[1]?.view} /</Text>
-                  <Text style={{ color: '#F29F05' }}> <IconB name="like1" size={25} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[1]?.like} </Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{hotpostdata[0]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                  await view_count_up(hotpostdata[2].post_id);
-                  navigation.navigate("PostDetailScreen", { item : hotpostdata[2], userData })}}>
-                <View style={styles.fireoneboxtext}>
-                  <Text style={styles.M}>{hotpostdata[2]?.title}</Text>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(hotpostdata[1].post_id);
+                navigation.navigate("PostDetailScreen", { item: hotpostdata[1], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{hotpostdata[1]?.title}</Text>
                 </View>
-                <View style={styles.fireoneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -13 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[2]?.view} /</Text>
-                  <Text style={{ color: '#F29F05' }}> <IconB name="like1" size={25} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[2]?.like} </Text>
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                  await view_count_up(hotpostdata[3].post_id);
-                  navigation.navigate("PostDetailScreen", { item : hotpostdata[3], userData })}}>
-                <View style={styles.fireoneboxtext}>
-                  <Text style={styles.M}>{hotpostdata[3]?.title}</Text>
-                </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -13 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[3]?.view} /</Text>
-                  <Text style={{ color: '#F29F05' }}> <IconB name="like1" size={25} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[3]?.like} </Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{hotpostdata[1]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.onebox} onPress={async () => {
-                  await view_count_up(hotpostdata[4].post_id);
-                  navigation.navigate("PostDetailScreen", { item : hotpostdata[4], userData })}}>
-                <View style={styles.fireoneboxtext}>
-                  <Text style={styles.M}>{hotpostdata[4]?.title}</Text>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(hotpostdata[2].post_id);
+                navigation.navigate("PostDetailScreen", { item: hotpostdata[2], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{hotpostdata[2]?.title}</Text>
                 </View>
-                <View style={styles.oneboxeye}>
-                  <Text style={{ color: '#F29F05', marginLeft: -13 }}> <IconB name="eyeo" size={30} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black' }}>{hotpostdata[4]?.view} /</Text>
-                  <Text style={{ color: '#F29F05', fontSize: 17 }}> <IconB name="like1" size={25} /></Text>
-                  <Text style={{ marginLeft: 2, color: 'black', fontSize: 17 }}>{hotpostdata[4]?.like} </Text>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{hotpostdata[2]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(hotpostdata[3].post_id);
+                navigation.navigate("PostDetailScreen", { item: hotpostdata[3], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{hotpostdata[3]?.title}</Text>
+                </View>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{hotpostdata[3]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.postLabelArea} onPress={async () => {
+                await view_count_up(hotpostdata[4].post_id);
+                navigation.navigate("PostDetailScreen", { item: hotpostdata[4], userData })
+              }}>
+                <View style={styles.postLabelTextArea}>
+                  <Text style={styles.postLabelText}>{hotpostdata[4]?.title}</Text>
+                </View>
+                <View style={styles.postViewArea}>
+                  <Text style={styles.postViewText}>{hotpostdata[4]?.view}</Text>
+                  <IconB style={styles.postViewIcon} name="eyeo" size={30} />
                 </View>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        <View style={{ height: 50, backgroundColor: 'white', }}></View>
+        <View style={{ height: 100, backgroundColor: 'white', }}></View>
       </ScrollView>
     </View>
   );
@@ -597,233 +568,235 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9F9',
   },
-
-  cardView: {
-    height: 230,
-    //backgroundColor : '#EDA332',
+  profileArea: {
+    alignSelf: 'center',
+    width: width * 0.9,
+    height: 190, // 상단 프로필 박스 영역
+    marginVertical: 20
   },
-
-  card: {
+  profileBox: {
     flex: 1,
-    marginTop: 20,
-    marginBottom: 20,
-    marginLeft: 30,
-    marginRight: 30,
     borderRadius: 20,
-    //borderWidth: 2,
-    borderColor: 'black',
-    //backgroundColor : 'blue',
     elevation: 5,
-
   },
-
-  cardtop: {
-    flex: 0.6,
-    flexDirection: "row",
-    //backgroundColor : '#FF9C63',
+  profileBoxTop: {
     backgroundColor: '#FFFADD',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderBottomWidth: 0.5,
-    borderColor: 'F0EEEE',
-  },
-
-  cardbottom: {
-    flex: 0.4,
-    flexDirection: 'row',
-    //backgroundColor : '#FFDECF',
-    backgroundColor: 'white',
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-
-  },
-  profile: {
-    flex: 0.35,
-    //backgroundColor : '#FF9C63',
-    backgroundColor: '#FFFADD',
-    borderTopLeftRadius: 20,
-    justifyContent: 'center',
+    width: '100%',
+    height: '65%', // 상단 영역
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
+    borderBottomWidth: 1,
+    borderColor: 'gray',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-
+    flexDirection: 'row',
   },
-
-  profilePicture: {
+  profileImageArea: {
     width: 85,
     height: 85,
-    backgroundColor: 'white',
     borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
     borderWidth: 1,
     borderColor: 'lightgray',
-
-  },
-
-  info: {
-    flex: 0.65,
-    borderTopRightRadius: 20,
-  },
-
-  name: {
-    flex: 0.4,
-    justifyContent: 'center',
-  },
-
-  department: {
-    flex: 0.2,
-    justifyContent: 'center',
-  },
-
-  point: {
-    flexDirection: 'row',
-    flex: 0.4,
+    marginLeft: 35,
+    backgroundColor: 'white',
     alignItems: 'center',
-    //backgroundColor : 'red'
-  },
-
-  cardchoice: {
-    margin: 5,
-    flex: 0.2, borderBottomLeftRadius: 10,
     justifyContent: 'center',
+  },
+  profileImage: {
+    width: 85,
+    height: 85,
+    borderRadius: 50,
+  },
+  userInfoNPointArea: {
+    flexDirection: 'column',
+    marginLeft: 40
+  },
+  userInfoArea: {
+    flexDirection: 'column',
+    maxWidth: width * 0.5
+  },
+  userName: {
+    color: 'black',
+    fontSize: 25,
+    fontWeight: 'bold'
+  },
+  userInfo: {
+    color: 'black',
+    fontSize: 15,
+  },
+  pointArea: {
+    flexDirection: 'row',
     alignItems: 'center'
   },
-
-
-  noticecontainer: {
-    height: windowHeight - 500,
-    marginTop: -50,
-    //marginBottom : 15,
-    //backgroundColor : 'green',
-    marginLeft: 15,
-    marginRight: 15,
-  },
-
-  noticeheader: {
-    flex: 0.15,
-    flexDirection: 'row',
-    //backgroundColor : 'yellow',
-    alignItems: 'center',
-  },
-  noticeheadertext: {
-    fontSize: 20,
-    marginTop: 15,
-    marginLeft: 15,
+  pointIcon: {
     color: 'black',
-    fontWeight: 'bold'
   },
-
-  noticetextcontainer: {
-    //justifyContent : 'center',
-    //alignItems : 'center',
-    flex: 0.75,
-    //backgroundColor : "blue"
+  userPoint: {
+    color: 'black',
+    fontSize: 24,
+    marginHorizontal: 5
   },
-
-  textborder: {
-    flex: 1,
-    marginTop: 1,
-    marginBottom: 10,
-    marginLeft: 10,
-    marginRight: 10,
+  pointNavigationIcon: {
+    color: 'black'
+  },
+  profileBoxBottom: {
     backgroundColor: 'white',
-    borderRadius: 15,
-    elevation: 5,
-    //borderWidth : 2,
-
-
-  },
-
-  onebox: {
-    //backgroundColor : 'yellow',
-    flex: 0.2,
+    height: '35%', // 하단 영역
+    borderBottomStartRadius: 20,
+    borderBottomEndRadius: 20,
     flexDirection: 'row',
-    alignItems: 'center',
-
   },
-
-  oneboxtext: {
-    flex: 0.86,
-    //backgroundColor : 'blue',
-    flexDirection: 'row',
+  tabButton: { // 버튼
+    width: '20%',
+    height: '100%',
     alignItems: 'center',
+    justifyContent: 'center'
   },
-
-  oneboxeye: {
-    flex: 0.14,
-    //backgroundColor : 'green',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  fireoneboxtext: {
-    flex: 0.73,
-    //backgroundColor : 'blue',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  fireoneboxeye: {
-    flex: 0.27,
-    //backgroundColor : 'green',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  M: {
-    marginLeft: 15,
-    fontSize: 19,
+  tabIcon: {
     color: 'black',
+    marginVertical: 2
   },
-
-  eventcontainer: {
-    height: 420,
-    //backgroundColor : 'green',
-    marginBottom: 35,
-
+  tabText: {
+    color: 'black',
+    fontSize: 15
   },
-
-  eventheadertext: {
+  eventArea: {
+    width: width,
+    alignSelf: 'center',
+  },
+  eventHead: {
+    width: width*0.85,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
+    marginVertical: 5
+  },
+  eventHeadText: {
+    color: 'black',
     fontSize: 20,
-    marginLeft: 23,
-    color: 'black',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-
-  eventbox: {
-    flex: 1,
-    //backgroundColor : 'red',
-    margin: 20,
-    marginTop: 4,
+  eventHeadIcon: {
+    color: '#FFC700',
+    marginHorizontal: 5
+  },
+  eventSwipeArea: {
+    width: '100%',
+    height: 320, // 이벤트 스와이프 영역
+  },
+  eventBox: {
+    backgroundColor: 'white',
+    width: width*0.9,
+    height: '85%', // 이벤트 박스 영역
+    alignSelf: 'center',
     borderRadius: 20,
-    //borderWidth : 2,
     elevation: 5,
   },
-
-  eventpicture: {
-    flex: 0.75,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    //borderBottomWidth : 2,
-    backgroundColor: 'white',
-    justifyContent: 'center',
+  eventImageArea: {
+    width: '100%',
+    height: '70%', // 이벤트 사진 영역
+  },
+  eventImage: {
+    flex: 1,
+    width: '100%',
+    resizeMode: 'contain',
+  },
+  eventTextArea: {
+    width: '100%',
+    height: '30%', // 이벤트 텍스트 영역
+    padding:  15
+  },
+  eventLabelText: {
+    color: 'black',
+    fontSize: 20, 
+    fontWeight: 'bold',
+  },
+  eventInfoText: {
+    color: 'black',
+    fontSize: 14,
+    marginVertical: 5
+  },
+  postArea: {
+    width: width,
     alignItems: 'center',
-    //elevation: 5, 
+    marginVertical: 10
   },
-
-  eventtext: {
-    backgroundColor: 'white',
-    flex: 0.25,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-
-  },
-
-  eventhearder: {
-    flex: 0.08,
-    //backgroundColor : 'red',
+  postHeadArea: {
+    width: width * 0.85,
     flexDirection: 'row',
-  }
-
+    justifyContent: 'space-between',
+    marginVertical: 5
+  },
+  postHeadTextIconArea: {
+    flexDirection: 'row'
+  },
+  postHeadText: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  postHeadIcon: {
+    color: "#FFC700",
+    marginHorizontal: 10
+  },
+  postDetailArea:{
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  postDetailText: {
+    color: 'black',
+    fontSize: 17,
+    marginHorizontal: 5
+  },
+  postDetailIcon: {
+    color: 'black'
+  },
+  postBoxArea: {
+    width: width * 0.9,
+    height: 300 // 계시물 박스 영역
+  },
+  postBox: {
+    backgroundColor: 'white',
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+    elevation: 5
+  },
+  postLabelArea: {
+    width: '100%',
+    height: '20%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  postLabelTextArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    maxWidth: '80%'
+  },
+  postLabelText: {
+    color: 'black',
+    fontSize: 19,
+    marginHorizontal: 15
+  },
+  postLabelIcon: {
+    color: 'red',
+    marginLeft: -5
+  },
+  postViewArea: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    maxWidth: '20%'
+  },
+  postViewIcon: {
+    color: '#F29F05',
+  },
+  postViewText: {
+    color: 'black',
+    fontSize: 17,
+    marginHorizontal: 5
+  },
 });
 
 export default MainPage;
