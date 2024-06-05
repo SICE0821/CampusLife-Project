@@ -1417,6 +1417,86 @@ async function getUserHaveCoupon(user_id) {
     }
 }
 
+//학교 pk값을 통해 캠퍼스이름 스터디룸이름 가져오기
+async function getCampus(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT study_room.study_room_id, study_room.study_room_name, study_room.campus_place
+            FROM study_room
+            JOIN campus ON study_room.campus_id = campus.campus_id
+            WHERE study_room.campus_id = ?
+        `;
+        const rows = await conn.query(query, [campus_id]);
+        console.log(rows);
+        return rows;
+    } catch (err) {
+        console.error('Error fetching data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function insert_student_study_room(student , study_room, study_room_date, study_room_time) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO study_room_have_object (student, study_room, study_room_date, study_room_time)
+        VALUES (?, ?, ?, ?);`
+        await conn.query(query, [student, study_room, study_room_date, study_room_time]);
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function get_student_study_room(student) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `SELECT 
+        study_room_have_object.student,
+        study_room.study_room_name,
+        study_room_have_object.study_room_date,
+        study_room_have_object.study_room_time
+    FROM
+        study_room_have_object
+            INNER JOIN
+        study_room ON study_room_have_object.study_room = study_room.study_room_id
+    WHERE
+        study_room_have_object.student = ?;
+        `
+        const rows = await conn.query(query, [student]);
+        return rows;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function get_studyroom_date() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `SELECT study_room.study_room_name, study_room_have_object.study_room_date, study_room_have_object.study_room_time
+        FROM study_room_have_object
+        JOIN study_room ON study_room_have_object.study_room = study_room.study_room_id;`
+        const rows = await conn.query(query);
+        return rows;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -1474,4 +1554,8 @@ module.exports = {
     getyourpoint,
     update_user_point,
     Updatelecture,
+    getCampus,
+    insert_student_study_room,
+    get_student_study_room,
+    get_studyroom_date
 };

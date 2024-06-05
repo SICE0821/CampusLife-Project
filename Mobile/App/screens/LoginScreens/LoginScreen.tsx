@@ -166,7 +166,7 @@ function LoginScreen({ navigation }: any) {
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
+      <TouchableOpacity onPress={() => navigation.navigate("SearchScreen")}>
         <Text style={styles.loginlinkText}>아이디, 비밀번호 찾기</Text>
       </TouchableOpacity>
 
