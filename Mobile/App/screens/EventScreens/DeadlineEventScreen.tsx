@@ -7,15 +7,15 @@ import Icon from 'react-native-vector-icons/AntDesign';
 
 const width = Dimensions.get("window").width;
 
+const eventLabel = '이벤트 제목';
+const eventInfo = '이벤트 정보 이벤트 정보 이벤트 정보 이벤트 정보 이벤트 정보';
+
 const eventImages = [
   require('../../assets/event1.jpg'),
   require('../../assets/event2.png'),
   require('../../assets/friend3.png'),
   // Add more images here up to a maximum of 10
 ];
-
-const eventLabel = '이벤트 제목';
-const eventInfo = '이벤트 정보 이벤트 정보 이벤트 정보 이벤트 정보 이벤트 정보';
 
 const DeadlineEventScreen = () => {
   const [maintext, setMainText] = useState('');
