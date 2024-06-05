@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import ModalBox from 'react-native-modalbox';
-import IconA from 'react-native-vector-icons/MaterialIcons';
-import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
-import IconD from 'react-native-vector-icons/FontAwesome6';
 import { useFocusEffect } from '@react-navigation/native';
 import IconB from 'react-native-vector-icons/Entypo';
 import config from '../../config';
@@ -373,17 +369,18 @@ const styles = StyleSheet.create({
   },
   itemrowcontainer: {
     height: 270,
-    //backgroundColor : 'green',
+    backgroundColor : 'green',
     //marginTop: ,
     //marginBottom : 2,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   itemonebox: {
     height: 260,
     width: 220,
-    //backgroundColor : 'red',
+    backgroundColor : 'red',
     margin: 10,
-    marginTop: -5,
   },
   square: {
     width: 200,
