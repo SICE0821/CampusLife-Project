@@ -70,11 +70,11 @@ const AttendanceCheckEventScreen = ({route} : any) => {
         },
         body: JSON.stringify({
           user_id : userData.user_pk,
-          point : 100
+          point : 10
         })
       })
       console.log("포인트 올리기 성공")
-      userData.point = userData.point + 100
+      userData.point = userData.point + 10
     } catch (error) {
       console.error('포인트 올리기 실패', error);
     }
@@ -96,7 +96,13 @@ const AttendanceCheckEventScreen = ({route} : any) => {
       setAttendanceChecked(true);
       addAppAttendanceDate(today);
       user_update_point();
-      Alert.alert('출석체크가 완료되었습니다.');
+      Alert.alert(
+        "앱 출석체크 성공!!",
+        "앱 출석체크 성공!! 10포인트가 적립되었습니다.",
+        [
+          { text: "확인" }
+        ]
+      );
     }
   };
 

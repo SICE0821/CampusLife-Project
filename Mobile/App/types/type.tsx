@@ -147,3 +147,19 @@ export type aramData = {
   friend_code_my_name : string,
 }
 
+export type EventData = {
+  event_id : number,
+  campus_id : number,
+  user_id : number,
+  name : string,
+  get_point : number,
+  info : string,
+  simple_info : string,
+  event_photo : string,
+  start_date : string,
+  close_date : string,
+  is_event_close : boolean
+  photo_list: {
+    photo_data : string
+  }[];
+}
