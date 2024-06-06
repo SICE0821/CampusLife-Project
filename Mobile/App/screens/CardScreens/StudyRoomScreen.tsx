@@ -22,7 +22,7 @@ const images = [studyroom1Image, studyroom2Image];
 
 const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
 
-const StudyRoomScreen = ({ route }: any) => {
+const StudyRoomScreen = ({ route, navigation}: any) => {
   const { userdata } = route.params;
   const [campus, setCampus] = useState<string[]>(['전체']);
   const [selectedDate, setSelectedDate]: any = useState(new Date());
@@ -303,6 +303,7 @@ const StudyRoomScreen = ({ route }: any) => {
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
           <Text style={styles.selectedDateText}>{format(selectedDate, "yyyy년 M월 d일")}</Text>
         </TouchableOpacity>
+        <TouchableOpacity style = {{height : 30, width : 60, backgroundColor : 'blue'}} onPress={() => navigation.navigate("StudyRoomDetailScreen")}></TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
             value={selectedDate}

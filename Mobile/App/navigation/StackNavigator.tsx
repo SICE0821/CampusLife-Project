@@ -34,6 +34,7 @@ import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator, NoticeTopbTabNavigator } from './TopTabNavigator'
 import ItemRegistration from '../admin_screen/ItemRegistration.tsx/ItemRegistration'
 import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPostsScreen'
+import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen';
 
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -51,6 +52,7 @@ const TimetableStack = createStackNavigator();
 const EventShopStack = createStackNavigator();
 const ReqularEventScreenStack = createStackNavigator();
 const AdminStack = createStackNavigator();
+const StudyRoomStack = createStackNavigator();
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = (route: any) => {
@@ -231,21 +233,11 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                 }}
             />
             <MainStack.Screen
-                name="StudyRoomScreen"
-                component={StudyRoomScreen}
+                name="StudyRoomStackNavigator"
+                component={StudyRoomStackNavigator}
                 initialParams={{ userdata }}
                 options={{
-                    headerStyle: {
-                        backgroundColor: '#F27405',
-                    },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
-                    headerTintColor: 'white',
-                    headerTitleAlign: 'center',
-                    title: '스터디룸',
+                    headerShown : false
                 }}
             />
             <MainStack.Screen
@@ -511,5 +503,47 @@ export const EventShopScreenStackNavigator = ({ navigation, route }: any) => {
                 headerShown: false
             }} />
         </EventShopStack.Navigator>
+    )
+}
+
+export const StudyRoomStackNavigator = ({navigation, route} : any) => {
+    const { userdata } = route.params;
+    return (
+        <StudyRoomStack.Navigator>
+            <StudyRoomStack.Screen 
+            name="StudyRoomScreen" 
+            component={StudyRoomScreen}
+            initialParams={{ userdata }}
+            options={{
+                headerStyle: {
+                    backgroundColor: '#F27405',
+                },
+                headerRight: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                    </TouchableOpacity>
+                ),
+                headerTintColor: 'white',
+                headerTitleAlign: 'center',
+                title: '스터디룸',
+            }} />
+            <StudyRoomStack.Screen 
+            name="StudyRoomDetailScreen" 
+            component={StudyRoomDetailScreen}
+            initialParams={{ userdata }}
+            options={{
+                headerStyle: {
+                    backgroundColor: '#F27405',
+                },
+                headerRight: () => (
+                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                    </TouchableOpacity>
+                ),
+                headerTintColor: 'white',
+                headerTitleAlign: 'center',
+                title: '스터디룸',
+            }} />
+        </StudyRoomStack.Navigator>
     )
 }

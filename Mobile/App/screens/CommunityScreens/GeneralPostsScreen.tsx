@@ -202,13 +202,23 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         }
     }
 
+
     const getDepartmentposts = async () => {
         try {
-            const response = await fetch(`${config.serverUrl}/departmentpost`);
+            const response = await fetch(`${config.serverUrl}/departmentpost`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    department_id : userData.department_pk
+                }),
+            })
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {
-            //console.error(error)
+            console.error(error);
+        } finally {
         }
     }
 
