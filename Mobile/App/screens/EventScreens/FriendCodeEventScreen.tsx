@@ -5,7 +5,6 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, UserHaveCouponData } from '../../types/type'
 import Clipboard from '@react-native-clipboard/clipboard';
 import config from '../../config';
-import Clipboard from '@react-native-clipboard/clipboard'; 
 
 const width = Dimensions.get("window").width;
 const friendsinvitepng = require('../../assets/friend3.png');
