@@ -3,6 +3,7 @@ import { Dimensions, View, Text, StyleSheet, TextInput, TouchableOpacity, ToastA
 import Icon from 'react-native-vector-icons/Octicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, UserHaveCouponData } from '../../types/type'
+import Clipboard from '@react-native-clipboard/clipboard';
 import config from '../../config';
 import Clipboard from '@react-native-clipboard/clipboard'; 
 
