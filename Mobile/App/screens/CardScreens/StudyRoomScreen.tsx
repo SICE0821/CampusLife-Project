@@ -3,8 +3,7 @@ import { Dimensions, ScrollView, View, Text, StyleSheet, Image, TouchableOpacity
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import config from '../../config';
-import { UserData } from '../../types/type';
-import { useFocusEffect } from '@react-navigation/native';
+import { endOfMonth } from 'date-fns';
 
 export type BuildingData = {
   [x: string]: any;
@@ -33,7 +32,7 @@ const StudyRoomScreen = ({ route }: any) => {
   const [studyroomInfo, setStudyroomInfo] = useState<{ place: string, name: string, maxHeadCount: number, minHeadCount: number, image: any }[]>([]);
   const [reservedTimes, setReservedTimes] = useState<{ [key: string]: { [key: string]: string[] } }>({});
 
-  const fetchStudyRoomData = async () => {
+  /*const fetchStudyRoomData = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/get_study_room`, {
         method: 'POST',
@@ -49,7 +48,7 @@ const StudyRoomScreen = ({ route }: any) => {
     } catch (error) {
       console.error('과목 가져오기 실패:', error);
     }
-  };
+  };*/
   
 
   const get_campus_place = async () => {
@@ -291,7 +290,6 @@ const StudyRoomScreen = ({ route }: any) => {
   console.log(reservedTimes)
   useEffect(() => {
     get_campus_place();
-    fetchStudyRoomData();
     fetchData();
   }, []);
 
@@ -307,7 +305,9 @@ const StudyRoomScreen = ({ route }: any) => {
           <DateTimePicker
             value={selectedDate}
             mode="date"
-            display="default"
+            display="compact"
+            minimumDate={new Date()}
+            maximumDate={endOfMonth(new Date())}
             onChange={onDateChange}
           />
         )}
@@ -328,15 +328,19 @@ const StudyRoomScreen = ({ route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f9f9f9',
   },
-  header: {
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-    alignItems: 'center',
-  },
+    header: {
+      padding: 20,
+      backgroundColor: '#F5B959',
+      alignItems: 'center',
+      borderBottomLeftRadius: 20,
+      borderBottomRightRadius: 20,
+    },
   selectedDateText: {
-    fontSize: 18,
-    color: '#333',
+    fontSize: 20,
+    color: '#fff',
+    fontWeight: 'bold',
   },
   body: {
     padding: 20,
@@ -351,26 +355,41 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 5,
     backgroundColor: '#e0e0e0',
-    borderRadius: 5,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
   selectedCampus: {
     backgroundColor: '#007BFF',
   },
   campusText: {
     color: '#333',
+    fontWeight: 'bold',
   },
   selectedCampusText: {
     color: '#fff',
   },
   studyroomArea: {
     marginBottom: 20,
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
   infoText: {
     marginBottom: 10,
   },
   studyroomName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
+    color: '#333',
     marginBottom: 5,
   },
   studyroomHeadcount: {
@@ -378,11 +397,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   labelText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#333',
   },
   numText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   selectArea: {
@@ -392,8 +411,8 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 120,
+    height: 120,
     borderRadius: 10,
   },
   timeArea: {
@@ -402,12 +421,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   timeBox: {
-    width: 50,
+    width: 60,
     padding: 10,
-    margin: 5,
+    margin: 3,
     alignItems: 'center',
     backgroundColor: '#e0e0e0',
-    borderRadius: 5,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
   reservedTimeBox: {
     backgroundColor: '#d9534f',
@@ -417,6 +441,8 @@ const styles = StyleSheet.create({
   },
   timeText: {
     color: '#333',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   reservedTimeText: {
     color: '#fff',
@@ -427,6 +453,14 @@ const styles = StyleSheet.create({
   footer: {
     padding: 20,
     alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
   reserveButton: {
     padding: 15,
@@ -434,12 +468,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '80%',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    elevation: 3,
   },
   reserveButtonText: {
     color: '#fff',
     fontSize: 18,
+    fontWeight: 'bold',
   },
-
 });
 
 export default StudyRoomScreen;
