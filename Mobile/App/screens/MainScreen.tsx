@@ -354,7 +354,7 @@ return (
               onPress={() => navigation.navigate("DeadlineEventScreen", {userdata : userData, eventdata : eventData})}
               style={styles.eventBox}>
               <View style={styles.eventImageArea}>
-                <Image source={{ uri: `http://10.0.2.2:3000/${eventData?.event_photo}.png` }} style={styles.eventImage} />
+                <Image source={{ uri: `${config.photoUrl}/${eventData?.event_photo}.png` }} style={styles.eventImage} />
               </View>
               <View style={styles.eventTextArea}>
                 <Text style={styles.eventLabelText}>{eventData?.name}</Text>

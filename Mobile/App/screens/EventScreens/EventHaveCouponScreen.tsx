@@ -65,7 +65,7 @@ const EventHaveCouponScreen = ({ route }: any) => {
       }}>
         <View style={{ width: 140, height: 150, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 110, height: 110, }}>
-            <Image style={{ width: 110, height: 110, }} source={{ uri: `http://10.0.2.2:3000/${item.image_num}.png` }} />
+            <Image style={{ width: 110, height: 110, }} source={{ uri: `${config.photoUrl}/${item.image_num}.png` }} />
           </View>
         </View>
         <View style={{ height: 150, width: 200, }}>

@@ -146,7 +146,7 @@ const DeadlineEventScreen = ({ route }: any) => {
           <Swiper showsPagination={true} loop={true} removeClippedSubviews={false}>
             {eventData.photo_list.map((image, index) => (
               <TouchableOpacity key={index} style={styles.eventImageBox} onPress={() => handleImagePress(image.photo_data)}>
-                <Image style={{ width: width, height: width }} source={{ uri: `http://175.212.187.92:3000/${image.photo_data}.png` }} />
+                <Image style={{ width: width, height: width }} source={{ uri: `${config.photoUrl}/${image.photo_data}.png` }} />
               </TouchableOpacity>
             ))}
           </Swiper>
@@ -200,7 +200,7 @@ const DeadlineEventScreen = ({ route }: any) => {
         >
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <Image style={{ width: width, height: width }} source={{ uri: `http://10.0.2.2:3000/${selectedImage}.png` }} />
+              <Image style={{ width: width, height: width }} source={{ uri: `${config.photoUrl}/${selectedImage}.png` }} />
               <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                 <Text style={styles.closeButtonText}>닫기</Text>
               </TouchableOpacity>
