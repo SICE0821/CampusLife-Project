@@ -387,7 +387,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                 <Text style={{ fontSize: 17, color: 'black', fontWeight: 'bold', marginTop: 13, }}>{postDetailInfo?.post_writer}({postDetailInfo?.writer_department})</Text>
                             </View>
                             <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 9, }}>
-                                <Text style={{ fontSize: 17, }}>{postDetailInfo?.write_date}</Text>
+                                <Text style={{ fontSize: 17, color: 'black', }}>{postDetailInfo?.write_date}</Text>
                             </View>
                         </View>
                         <View style={styles.listcontainer}>
