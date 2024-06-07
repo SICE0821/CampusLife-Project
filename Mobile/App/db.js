@@ -40,11 +40,11 @@ async function getNoticePosts() {
 }
 
 //학교 공지사항에서 학과 게시글 가져오는 쿼리
-async function getNoticeDepartmentPosts() {
+async function getNoticeDepartmentPosts(department_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
+        const query = (
             "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
             + "FROM "
             + "post "
@@ -55,9 +55,10 @@ async function getNoticeDepartmentPosts() {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 1 AND post.inform_check = 1 "
+            + "post.department_check = 1 AND post.inform_check = 1 AND student.department_id = ? "
             + "ORDER BY post.date DESC"
         );
+        const rows = await conn.query(query, [department_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -94,12 +95,12 @@ async function getNoticeHotPosts() {
 }
 
 //학교 게시판에서 핫 게시물을 가져오는 쿼리
-async function getNoticeDepartmentHotPosts() {
+async function getNoticeDepartmentHotPosts(department_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+        const query = (
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.department_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -109,9 +110,10 @@ async function getNoticeDepartmentHotPosts() {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 1 AND post.inform_check = 1 AND post.`like` >= 30 "
+            + "post.department_check = 1 AND post.inform_check = 1 AND post.`like` >= 30 AND student.department_id = ? "
             + "ORDER BY post.date DESC"
         );
+        const rows = await conn.query(query, [department_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -162,7 +164,7 @@ async function getNoticeBookmarkPosts(user_id) {
 }
 
 //학과 공지사항에서 책갈피 가져오기
-async function getNoticeDepartmentBookmarkPosts(user_id) {
+async function getNoticeDepartmentBookmarkPosts(user_id, department_id) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -188,12 +190,13 @@ async function getNoticeDepartmentBookmarkPosts(user_id) {
             post.department_check = 1 
             AND post.inform_check = 1 
             AND user_have_post.user_id = ?
+            AND student.department_id = ?
         GROUP BY 
             post.post_id
         ORDER BY 
             COUNT(user_have_post.post_id) DESC;`
         );
-        const rows = await conn.query(query, [user_id]);
+        const rows = await conn.query(query, [user_id, department_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -298,12 +301,12 @@ async function getBookmarkPosts(user_id) {
 }
 
 //학과 게시판에서 전체 게시글을 가져오는 쿼리
-async function getDepartmentPosts() {
+async function getDepartmentPosts(department_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+        const query = (
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.department_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -313,9 +316,10 @@ async function getDepartmentPosts() {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 1 AND post.inform_check =0 "
+            + "post.department_check = 1 AND post.inform_check =0 AND student.department_id = ? "
             + "ORDER BY post.date DESC"
         );
+        const rows = await conn.query(query, [department_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -325,11 +329,11 @@ async function getDepartmentPosts() {
 }
 
 //학과 게시판에서 핫 게시물을 가져오는 쿼리
-async function getdepartmentHotPosts() {
+async function getdepartmentHotPosts(department_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(
+        const query = (
             "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
             + "FROM "
             + "post "
@@ -340,9 +344,10 @@ async function getdepartmentHotPosts() {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 1 AND post.inform_check = 0 AND post.`like` >= 30 "
+            + "post.department_check = 1 AND post.inform_check = 0 AND post.`like` >= 30 AND student.department_id = ? "
             + "ORDER BY post.date DESC"
         );
+        const rows = await conn.query(query, [department_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -352,7 +357,7 @@ async function getdepartmentHotPosts() {
 }
 
 // 게시판에서 책갈피한 게시물을 가져오는 쿼리
-async function getdepartmentBookmarkPosts(user_id) {
+async function getdepartmentBookmarkPosts(user_id, department_id) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -378,12 +383,13 @@ async function getdepartmentBookmarkPosts(user_id) {
             post.department_check = 1 
             AND post.inform_check = 0 
             AND user_have_post.user_id = ?
+            AND student.department_id = ?
         GROUP BY 
             post.post_id
         ORDER BY 
             COUNT(user_have_post.post_id) DESC;`
         );
-        const rows = await conn.query(query, [user_id]);
+        const rows = await conn.query(query, [user_id, department_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -413,17 +419,25 @@ async function gethotpostdata() {
 }
 
 //메인 화면에서 학과 게시글을 가져오는 쿼리
-async function getdeparmentpostdata() {
+async function getdeparmentpostdata(department_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(`
-            SELECT post_id, title, view 
-            FROM post 
-            WHERE department_check = 1 AND inform_check = 1 
-            ORDER BY post_id DESC 
-            LIMIT 5
-        `);
+        const query = ("SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+        + "FROM "
+        + "post "
+        + "LEFT JOIN "
+        + "user "
+        + "ON post.user_id = user.user_id "
+        + "LEFT JOIN "
+        + "student "
+        + "ON user.student_id = student.student_id "
+        + "WHERE "
+        + "post.department_check = 1 AND post.inform_check = 1 AND student.department_id = ? "
+        + "ORDER BY post.date DESC "
+        + "LIMIT 5")
+        const rows = await conn.query(query, [department_id])
+        ;
         return rows;
     } catch (err) {
         throw err;
@@ -1810,6 +1824,23 @@ async function user_update_point_3(user_id, point) {
     }
 }
 
+//메인화면에서 이벤트 데이터 전부 불러와
+async function Get_Event_Data(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+           `SELECT * FROM event WHERE EVENT.campus_id = ?`
+        );
+        const row = await conn.query(query, [campus_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -1887,6 +1918,7 @@ module.exports = {
     Friend_code_User_id,
     last_friendCode_Info,
     addFriendCodeAram,
-    user_update_point_3
+    user_update_point_3,
+    Get_Event_Data
 
 };

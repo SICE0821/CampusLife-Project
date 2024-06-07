@@ -200,14 +200,23 @@ const HotPostsScreen = ({ route, navigation }: any) => {
             clearTimeout(timeoutId); // 요청이 완료되면 setTimeout을 취소
         }
     }
-    
+
     const getDepartmenHotposts = async () => {
         try {
-            const response = await fetch(`${config.serverUrl}/departmentHotpost`);
+            const response = await fetch(`${config.serverUrl}/departmentHotpost`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    department_id : userData.department_pk
+                }),
+            })
             const postsdata = await response.json();
             setCommunityData(postsdata);
         } catch (error) {
-            //console.error(error)
+            console.error(error);
+        } finally {
         }
     }
 

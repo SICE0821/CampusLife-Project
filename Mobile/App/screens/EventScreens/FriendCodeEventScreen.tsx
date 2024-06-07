@@ -48,7 +48,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
   const success = () => {
     Alert.alert(
       "친구코드 입력 성공",
-      "성공적으로 친구코드를 등록 하셨습니다!",
+      "성공적으로 친구코드를 등록 하셨습니다!                  100포인트 적립!!",
       [
         {
           text: "확인",
@@ -94,7 +94,8 @@ const FriendCodeEventScreen = ({ route }: any) => {
   const last_friendCode_Info = async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후에 요청 중단
+  
       const response = await fetch(`${config.serverUrl}/last_friendCode_Info`, {
         method: 'POST',
         headers: {
@@ -103,19 +104,29 @@ const FriendCodeEventScreen = ({ route }: any) => {
         body: JSON.stringify({
           user_pk: userData.user_pk
         }),
-      })
+        signal: controller.signal, // signal 옵션 추가
+      });
+  
+      clearTimeout(timeoutId); // 요청이 완료되면 타임아웃 클리어
+  
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
+  
       const aram_data = await response.json();
-      //console.log(aram_data);
       console.log(aram_data.friend_code);
       console.log(aram_data.friend_code_id);
       console.log(aram_data.my_name);
-      clearTimeout(timeoutId);
+      
       await addFriendCodeAram(aram_data.friend_code, aram_data.friend_code_id, aram_data.my_name);
-    } catch (error) {
-      console.error(error);
-    } finally {
+    } catch (error : any) {
+      if (error.name === 'AbortError') {
+        //console.error('요청이 타임아웃되었습니다');
+      } else {
+        console.error(error);
+      }
     }
-  }
+  };
 
   const user_update_point = async () => {
 
@@ -139,10 +150,11 @@ const FriendCodeEventScreen = ({ route }: any) => {
     }
   }
 
-  const addFriendCodeAram = async (friend_code: any, friend_code_id: any, my_name: any) => {
+  const addFriendCodeAram = async (friend_code : any, friend_code_id : any, my_name : any) => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2초 후에 요청 중단
+  
       const response = await fetch(`${config.serverUrl}/addFriendCodeAram`, {
         method: 'POST',
         headers: {
@@ -152,14 +164,23 @@ const FriendCodeEventScreen = ({ route }: any) => {
           friend_code: friend_code,
           friend_code_id: friend_code_id,
           my_name: my_name,
-        })
+        }),
+        signal: controller.signal, // signal 옵션 추가
       });
+  
+      clearTimeout(timeoutId); // 요청이 완료되면 타임아웃 클리어
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
       console.log("알림전송!");
-      clearTimeout(timeoutId);
-    } catch (error) {
-      console.error('알람 전송 실패', error);
+    } catch (error : any) {
+      if (error.name === 'AbortError') {
+        //console.error('요청이 타임아웃되었습니다');
+      } else {
+        console.error('알람 전송 실패', error);
+      }
     }
-  }
+  };
 
   const check_end_send = async () => {
     let result = ""

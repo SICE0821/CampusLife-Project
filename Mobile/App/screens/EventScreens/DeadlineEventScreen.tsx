@@ -4,24 +4,38 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Swiper from 'react-native-swiper';
 import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
-
+import { UserData, EventData } from '../../types/type'
 const width = Dimensions.get("window").width;
-
-const eventLabel = '이벤트 제목';
-const eventInfo = '이벤트 정보 이벤트 정보 이벤트 정보 이벤트 정보 이벤트 정보';
+import { useFocusEffect } from '@react-navigation/native';
 
 const eventImages = [
-  require('../../assets/event1.jpg'),
-  require('../../assets/event2.png'),
-  require('../../assets/friend3.png'),
+  require('../../assets/001.png'),
+  require('../../assets/002.png'),
+  require('../../assets/부천대.png'),
   // Add more images here up to a maximum of 10
 ];
 
-const DeadlineEventScreen = () => {
+const DeadlineEventScreen = ({ route }: any) => {
+  const { userdata, eventdata } = route.params;
+  console.log(eventdata);
+  console.log(userdata);
   const [maintext, setMainText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<null | number>(null);
   const [selectedFiles, setSelectedFiles] = useState<DocumentPickerResponse[]>([]);
+  const [userData, setUserData] = useState<UserData>(userdata);
+  const [eventData, setEventData] = useState<EventData>();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      settingDate();
+    }, []
+    )
+  )
+  const settingDate = () => {
+    setUserData(userData);
+    setEventData(eventdata)
+  }
 
   const handleMainTextChange = (inputText: string) => {
     setMainText(inputText);
@@ -57,17 +71,21 @@ const DeadlineEventScreen = () => {
   };
 
   function sendEvent() {
-    
+
   }
 
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.eventLabelArea}>
-          <Text style={styles.eventLabel}>{eventLabel}</Text>
+          <Text style={styles.eventLabel}>{eventData?.name}</Text>
         </View>
         <View style={styles.eventInfoArea}>
-          <Text style={styles.eventInfo}>{eventInfo}</Text>
+          <Text style={styles.explaintext}>{eventData?.simple_info}</Text>
+          <Text style={styles.eventInfo}>{eventData?.info}</Text>
+          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
+            <Text style={styles.endInfo}>종료날짜 : {eventData?.close_date}</Text>
+          </View>
         </View>
         <View style={styles.eventImageArea}>
           <Swiper showsPagination={true} loop={true} removeClippedSubviews={false}>
@@ -101,11 +119,14 @@ const DeadlineEventScreen = () => {
             placeholderTextColor={'gray'}
           />
         </View>
-        <TouchableOpacity onPress={sendEvent}>
-          <View style={styles.sendArea}>
-            <Text style={styles.sendText}>전송</Text>
-          </View>
-        </TouchableOpacity>
+        <View style = {{justifyContent : 'center', alignItems : 'center'}}>
+          <TouchableOpacity onPress={sendEvent}>
+            <View style={styles.sendArea}>
+              <Text style={styles.sendText}>전송</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{ height: 20 }}></View>
       </ScrollView>
 
       {selectedImage !== null && (
@@ -135,9 +156,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   eventLabelArea: {
-    alignItems: 'center',
+    //alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFECF',
+    backgroundColor: 'white',
     width: width,
     minHeight: 70,
     padding: 10,
@@ -146,23 +167,28 @@ const styles = StyleSheet.create({
   },
   eventLabel: {
     color: 'black',
-    fontSize: 32,
+    fontSize: 20,
     fontWeight: 'bold',
+    //textAlign : 'center'
   },
   eventInfoArea: {
-    alignItems: 'center',
+    //alignItems: 'center',
     padding: 10,
-    backgroundColor: '#FFDECF',
+    backgroundColor: 'white',
     width: width,
     minHeight: 150,
   },
   eventInfo: {
-    fontSize: 16,
+    fontSize: 17,
     color: 'black',
+  },
+  endInfo: {
+    fontSize: 16,
+    color: 'grey',
   },
   eventImageArea: {
     width: width,
-    height: 400,
+    height: width,
     alignSelf: 'center',
     borderTopWidth: 1,
     borderBottomWidth: 1,
@@ -173,8 +199,8 @@ const styles = StyleSheet.create({
   },
   eventImage: {
     flex: 1,
-    maxWidth: width * 0.9,
-    resizeMode: 'contain',
+    maxWidth: width * 1,
+    //resizeMode: 'contain',
   },
   fileInputArea: {
     alignItems: 'center',
@@ -182,8 +208,8 @@ const styles = StyleSheet.create({
   },
   fileButton: {
     padding: 10,
-    backgroundColor: '#FFDECF',
-    borderRadius: 5,
+    backgroundColor: '#FFC700',
+    borderRadius: 10,
     elevation: 2
   },
   fileButtonText: {
@@ -207,19 +233,23 @@ const styles = StyleSheet.create({
   },
   writeSpace: {
     padding: 10,
-    backgroundColor: '#C1FFBF',
+    backgroundColor: 'white',
     minHeight: 250,
+    margin : 20,
+    borderWidth : 1,
+    borderRadius : 5,
   },
   textInput: {
     fontSize: 20,
     color: 'black',
   },
   sendArea: {
-    width: width,
+    width: width - 40,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'green'
+    backgroundColor: '#FFC700',
+    borderRadius: 10
   },
   sendText: {
     color: 'white',
@@ -233,9 +263,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    width: '90%',
+    width: '100%',
     backgroundColor: '#fff',
-    padding: 20,
+    //padding: 20,
     borderRadius: 10,
     alignItems: 'center',
   },
@@ -254,6 +284,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  explaintext: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 5,
+  }
 });
 
 export default DeadlineEventScreen;

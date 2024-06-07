@@ -208,7 +208,8 @@ const NoticeBookmarkScreen = ({ route, navigation }: any) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    user_id: userData.user_pk
+                    user_id: userData.user_pk,
+                    department_id : userData.department_pk
                 }),
             })
             const postsdata = await response.json();

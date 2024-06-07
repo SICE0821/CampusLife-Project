@@ -76,6 +76,7 @@ const { getGeneralPosts,
   last_friendCode_Info,
   addFriendCodeAram,
   user_update_point_3,
+  Get_Event_Data,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -147,9 +148,10 @@ app.get('/MainPagehotPost', async (req, res) => {
 
 
 //메인페이지에 학과 게시글 데이터를 가져온다.
-app.get('/MainPagedepartmentPost', async (req, res) => {
+app.post('/MainPagedepartmentPost', async (req, res) => {
+  const {department_id} = req.body;
   try {
-    const rows = await getdeparmentpostdata();
+    const rows = await getdeparmentpostdata(department_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -300,9 +302,10 @@ app.get('/noticeschoolpost', async (req, res) => {
 });
 
 //학교 학과 공지사항
-app.get('/noticedepartmentpost', async (req, res) => {
+app.post('/noticedepartmentpost', async (req, res) => {
+  const { department_id } = req.body;
   try {
-    const rows = await getNoticeDepartmentPosts();
+    const rows = await getNoticeDepartmentPosts(department_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -345,9 +348,10 @@ app.get('/NoticeHotpost', async (req, res) => {
 
 
 //학과 핫 공지사항
-app.get('/NoticeDepartmentHotpost', async (req, res) => {
+app.post('/NoticeDepartmentHotpost', async (req, res) => {
+  const { department_id } = req.body;
   try {
-    const rows = await getNoticeDepartmentHotPosts();
+    const rows = await getNoticeDepartmentHotPosts(department_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -393,10 +397,10 @@ app.post('/Noticebookmark', async (req, res) => {
 
 //공지사항에서 학과 북마크 게시글 가져오기
 app.post('/NoticeDepartmentbookmark', async (req, res) => {
-  const { user_id } = req.body;
+  const { user_id, department_id } = req.body;
   console.log(user_id);
   try {
-    const rows = await getNoticeDepartmentBookmarkPosts(user_id);
+    const rows = await getNoticeDepartmentBookmarkPosts(user_id, department_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -487,9 +491,11 @@ app.post('/bookmark', async (req, res) => {
 
 
 //게시글화면에서 학과 전체 게시글을 가져온다
-app.get('/departmentpost', async (req, res) => {
+app.post('/departmentpost', async (req, res) => {
+  const {department_id} = req.body;
+  console.log(department_id);
   try {
-    const rows = await getDepartmentPosts();
+    const rows = await getDepartmentPosts(department_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -508,10 +514,11 @@ app.get('/departmentpost', async (req, res) => {
   }
 });
 
-//게시글화면에서 학과 핫 게시글을 가져온다
-app.get('/departmentHotpost', async (req, res) => {
+app.post('/departmentHotpost', async (req, res) => {
+  const {department_id} = req.body;
+  console.log(department_id);
   try {
-    const rows = await getdepartmentHotPosts();
+    const rows = await getdepartmentHotPosts(department_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -532,10 +539,10 @@ app.get('/departmentHotpost', async (req, res) => {
 
 //게시글화면에서 학과 책갈피 게시글을 가져온다
 app.post('/departmentbookmark', async (req, res) => {
-  const { user_id } = req.body;
+  const { user_id, department_id } = req.body;
   console.log(user_id);
   try {
-    const rows = await getdepartmentBookmarkPosts(user_id);
+    const rows = await getdepartmentBookmarkPosts(user_id, department_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -1538,6 +1545,33 @@ app.post('/get_study_date_time', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 })
+
+//메인페이지 이벤트 데이터 전부 가져와
+app.post('/Get_Event_Data', async (req, res) => {
+  const {campus_id} = req.body;
+  try {
+    const rows = await Get_Event_Data(campus_id);
+    const processedData = {
+      event_id : rows[0].event_id,
+      campus_id : rows[0].campus_id,
+      user_id : rows[0].user_id,
+      name : rows[0].name,
+      get_point : rows[0].get_point,
+      info : rows[0].info,
+      simple_info : rows[0].simple_info,
+      event_photo : rows[0].event_photo,
+      start_date : formatDate(rows[0].start_date),
+      close_date : formatDate(rows[0].close_date),
+      is_event_close : rows[0].is_event_close,
+    }
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 //서버 시작
 app.listen(PORT, () => {
