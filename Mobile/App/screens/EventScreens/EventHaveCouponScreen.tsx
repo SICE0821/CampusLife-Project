@@ -60,28 +60,28 @@ const EventHaveCouponScreen = ({ route }: any) => {
       style={styles.itemcontainer}
       onPress={() => {openmodal(item)}}>
       <View style={{
-        height: 150, width: 460, borderWidth: 2, borderColor: "#F27405", flexDirection: 'row',
+        height: 150, width: '95%', borderWidth: 2, borderColor: "#F27405", flexDirection: 'row',
         alignItems: 'center'
       }}>
-        <View style={{ width: 140, height: 150, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ width: 110, height: 110, }}>
-            <Image style={{ width: 110, height: 110, }} source={{ uri: `http://10.0.2.2:3000/${item.image_num}.png` }} />
+        <View style={{ width: '30%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: '100%', height: '100%'}}>
+            <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `http://10.0.2.2:3000/${item.image_num}.png` }} />
           </View>
         </View>
-        <View style={{ height: 150, width: 200, }}>
+        <View style={{ height: '100%', width: '50%', padding: 5 }}>
           <View style={{ flexDirection: 'row' }}>
-            <View style={{ width: 120 }}>
+            <View style={{ width: '50%' }}>
               <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginTop: 20 }}>[ {item.name} ]</Text>
             </View>
             <View>
               <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ED9E2B', marginTop: 20 }}>[ {item.price}P ]</Text>
             </View>
           </View>
-          <Text style={{ marginTop: 5, fontSize: 16 }}>{item.explain}</Text>
-          <Text style={{ marginTop: 5, fontSize: 16 }}>{item.using_time}</Text>
+          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.explain}</Text>
+          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.using_time}</Text>
         </View>
-        <View style={{ width: 120, height: 150, justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ width: 90, height: 130, backgroundColor: '#F7B02E', marginLeft: 20, justifyContent: 'center', alignItems: 'center', margin: 10 }}>
+        <View style={{ width: '20%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ width: '90%', height: '95%', backgroundColor: '#F7B02E', justifyContent: 'center', alignItems: 'center' }}>
             <Text style={{ color: 'white' }}> <IconC name="mail-forward" size={40} /></Text>
             <Text style={{ fontSize: 18, color: 'white' }}>사용하기</Text>
           </View>
@@ -108,22 +108,23 @@ const EventHaveCouponScreen = ({ route }: any) => {
         position='center'
         swipeToClose={false}
         onClosed={closemodal}>
-          <View style = {{height : 120, justifyContent : 'center', alignItems : 'center', borderBottomWidth : 1}}>
-            <Text style ={{fontSize : 20, fontWeight : 'bold',color : 'black'}}>상품명 : {SelectItem?.name}</Text>
-            <Text style ={{fontSize : 18, }}>구매 날짜 : {SelectItem?.buy_date}</Text>
-            <Text style ={{fontSize : 18, }}>사용 기한 : {SelectItem?.using_time}</Text>
+          <View style = {{ height : '35%', justifyContent : 'center', alignItems : 'center', borderBottomWidth : 1 }}>
+            <Text style ={{ fontSize : 20, fontWeight : 'bold', color : 'black'}}>상품명 : {SelectItem?.name}</Text>
+            <Text style ={{ fontSize : 18, color : 'black' }}>구매 날짜 : {SelectItem?.buy_date}</Text>
+            <Text style ={{ fontSize : 18, color : 'black' }}>사용 기한 : {SelectItem?.using_time}</Text>
           </View>
-          <View style = {{height : 230, justifyContent : 'center', alignItems : 'center'}}>
+          <View style = {{height : '65%', justifyContent : 'center', alignItems : 'center'}}>
             <Barcode
-                style = {{marginBottom : 20}}
+                style = {{marginBottom : 20,}}
                 value = {
                   (SelectItem ? SelectItem.code_num : 0).toString().replace(/(.{4})/g, '$1 ').toString()
                 }
                 text= {
                   (SelectItem ? SelectItem.code_num : 0).toString().replace(/(.{4})/g, '$1 ').toString()
                 }
+                textStyle={{color: 'black'}}
               />
-            <Text style ={{fontSize : 20, marginBottom : 30,}}>사용기한이 넘으시면 쿠폰은 자동으로 폐기 됩니다!</Text>
+            <Text style ={{fontSize : 18, marginBottom : 30, color : 'black'}}>사용기한이 넘으시면 쿠폰은 자동으로 폐기 됩니다!</Text>
           </View>
       </ModalBox>
     </View>
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   toptitlebox: {
-    height: 45,
+    padding: 15,
     //backgroundColor : 'red',
     flexDirection: 'row',
     alignItems : 'center'
@@ -144,7 +145,6 @@ const styles = StyleSheet.create({
   toptitletext: {
     fontSize: 20,
     color: 'black',
-    marginLeft: 20,
   },
   dividingline: {
     flex: 0.93,
@@ -154,6 +154,7 @@ const styles = StyleSheet.create({
     //backgroundColor : 'blue',
   },
   itemcontainer: {
+    width: '100%',
     height: 150,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -219,8 +220,8 @@ const styles = StyleSheet.create({
 
 const modalstyles = StyleSheet.create({
   modalcontainer: {
-    height: 350,
-    width : 450,
+    height: '45%',
+    width : '95%',
     borderRadius : 10,
   },
   modalbox: {

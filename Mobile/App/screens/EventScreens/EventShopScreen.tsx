@@ -206,21 +206,21 @@ const EventShopScreen = ({ navigation, route }: any) => {
       }}>
         <View style={styles.square}>
           <View style={styles.picturebox}>
-            <Image style={{ width: 130, height: 130, marginTop: 12 }} source={{ uri: `http://10.0.2.2:3000/${item.firstImage_Num}.png` }} />
+            <Image style={{ width: '100%', resizeMode: 'contain' }} source={{ uri: `http://10.0.2.2:3000/${item.firstImage_Num}.png` }} />
           </View>
           <View style={styles.iteminfo}>
-            <Text style={{ fontSize: 20, color: 'black', marginLeft: 10 }}>{item.firstName}</Text>
-            <Text style={{ fontSize: 16, color: 'grey', marginLeft: 10 }} numberOfLines={1} ellipsizeMode='tail'>
+            <Text style={{ fontSize: 20, color: 'black', }}>{item.firstName}</Text>
+            <Text style={{ fontSize: 16, color: 'grey', }} numberOfLines={1} ellipsizeMode='tail'>
               {item.firstExplain}
             </Text>
             <View style={{ flexDirection: 'row', backgroundColor: 'white', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
-              <View style={{ width: 140 }}>
-                <Text style={{ fontSize: 27, color: '#ED9E2B', marginLeft: 10, fontWeight: 'bold', marginTop: 4 }}>
+              <View style={{ width: '70%' }}>
+                <Text style={{ fontSize: 27, color: '#ED9E2B', fontWeight: 'bold', }}>
                   {item.firstprice}p
                 </Text>
               </View>
-              <View style={{ width: 60 }}>
-                <Text style={{ color: '#EB8A90', marginTop: 6, marginLeft: 4 }}> <IconB name="circle-with-plus" size={40} style={{ elevation: 5 }} /></Text>
+              <View style={{ width: '30%' }}>
+                <Text style={{ color: '#EB8A90', }}> <IconB name="circle-with-plus" size={40} style={{ elevation: 5 }} /></Text>
               </View>
             </View>
           </View>
@@ -233,7 +233,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
         }}>
           <View style={styles.square}>
             <View style={styles.picturebox}>
-              <Image style={{ width: 130, height: 130, marginTop: 12 }} source={{ uri: `http://10.0.2.2:3000/${item.secondImage_Num}.png` }} />
+              <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `http://10.0.2.2:3000/${item.secondImage_Num}.png` }} />
             </View>
             <View style={styles.iteminfo}>
               <Text style={{ fontSize: 20, color: 'black', marginLeft: 10 }}>{item.secondName}</Text>
@@ -280,48 +280,46 @@ const EventShopScreen = ({ navigation, route }: any) => {
       >
         <View style={styles.modalContent}>
           <View style={styles.itemDetailPictureBox}>
-            <Image style={{ width: 400, height: 400, marginTop: 12 }} source={{ uri: `http://10.0.2.2:3000/${SelectItem?.image_num}.png` }} />
+            <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `http://10.0.2.2:3000/${SelectItem?.image_num}.png` }} />
           </View>
           <View style={styles.itemInfo}>
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15 }}>
               <View style={{
-                width: 280,
               }}>
                 <Text style={{
                   fontSize: 30,
                   color: 'black',
                   fontWeight: 'bold',
-                  marginLeft: 15,
                 }}>{SelectItem?.name}</Text>
               </View>
-              <View>
+              <View style={{
+                justifyContent: 'center'
+              }}>
                 <Text style={{
                   fontSize: 16,
-                  color: 'grey',
-                  marginTop: 10,
-
+                  color: 'gray',
                 }}>{SelectItem?.using_time}</Text>
               </View>
             </View>
             <Text style={{
               fontSize: 20,
               color: 'black',
-              marginLeft: 17,
+              marginLeft: 15,
             }}>{SelectItem?.explain}</Text>
             <Text style={{
               fontSize: 35,
               color: '#ED9E2B',
-              marginLeft: 17,
+              marginLeft: 15,
               fontWeight: 'bold'
             }}>
               {SelectItem?.price}P
             </Text>
           </View>
-          <View style={{ height: 100, marginTop: 10, }}>
-            <Text style={{ fontSize: 20, marginLeft: 10 }}>현재 보유 포인트 : {userData.point}P</Text>
-            <Text style={{ fontSize: 20, marginLeft: 10 }}>상품 포인트 : {SelectItem?.price}P</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Text style={{ fontSize: 20, marginLeft: 10 }}>잔액 : {userData.point} - {SelectItem?.price} :</Text>
+          <View style={{ height: '15%', padding: 15 }}>
+            <Text style={{ color: 'black', fontSize: 20, }}>현재 보유 포인트 : {userData.point}P</Text>
+            <Text style={{ color: 'black', fontSize: 20, }}>상품 포인트 : {SelectItem?.price}P</Text>
+            <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
+              <Text style={{ color: 'black', fontSize: 20,}}>잔액 : {userData.point} - {SelectItem?.price} :</Text>
               <Text style={{ fontSize: 20, color: 'black', marginLeft: 6, fontWeight: 'bold' }}>{userData.point - (SelectItem ? SelectItem.price : 0)}P</Text>
             </View>
           </View>
@@ -335,10 +333,9 @@ const EventShopScreen = ({ navigation, route }: any) => {
               }
             }}>
             <View style={{
-              width: 230,
+              width: '60%',
               height: 50,
               backgroundColor: '#EB8A90',
-              marginBottom: 30,
               borderRadius: 5,
               justifyContent: 'center',
               alignItems: 'center',
@@ -368,8 +365,8 @@ const styles = StyleSheet.create({
 
   },
   itemrowcontainer: {
-    height: 270,
-    backgroundColor : 'green',
+    height: 300,
+    //backgroundColor : 'green',
     //marginTop: ,
     //marginBottom : 2,
     flexDirection: 'row',
@@ -377,32 +374,32 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   itemonebox: {
-    height: 260,
-    width: 220,
-    backgroundColor : 'red',
-    margin: 10,
+    height: '100%',
+    width: '45%',
+    //backgroundColor : 'red',
+    padding: 10,
   },
   square: {
-    width: 200,
-    height: 250,
+    width: '100%',
+    height: '90%',
     borderRadius: 20,
-    margin: 10,
+    //margin: 10,
     elevation: 5,
     backgroundColor: 'white',
-
   },
 
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: 800,
+    height: '90%',
   },
 
   modalContent: {
     flex: 1,
-    //backgroundColor: 'red',
+    backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    padding: 15
   },
 
   textbox: {
@@ -412,40 +409,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   picturebox: {
-    height: 150,
-    //backgroundColor : 'red',
+    height: '60%',
+    backgroundColor : 'gray',
     justifyContent: 'center',
     alignItems: 'center',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
   iteminfo: {
-    height: 100,
+    height: '40%',
     //backgroundColor : 'green',
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    padding: 10
   },
 
   itemDetailPictureBox: {
-    height: 480,
-    width: 480,
-    //backgroundColor: 'red',
+    height: '55%',
+    width: '100%',
+    //backgroundColor: 'gray',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: 'lightgrey'
+    borderColor: 'lightgrey',
   },
   itemInfo: {
-    height: 110,
+    height: '20%',
     //backgroundColor: 'green',
-    marginTop: 10,
   },
   buyButtonBox: {
-    height: 100,
+    height: '10%',
     //backgroundColor : 'blue',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center'
   }
 });
