@@ -233,7 +233,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
         }}>
           <View style={styles.square}>
             <View style={styles.picturebox}>
-              <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `http://10.0.2.2:3000/${item.secondImage_Num}.png` }} />
+              <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.secondImage_Num}.png` }} />
             </View>
             <View style={styles.iteminfo}>
               <Text style={{ fontSize: 20, color: 'black', marginLeft: 10 }}>{item.secondName}</Text>
@@ -280,7 +280,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       >
         <View style={styles.modalContent}>
           <View style={styles.itemDetailPictureBox}>
-            <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `http://10.0.2.2:3000/${SelectItem?.image_num}.png` }} />
+            <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${SelectItem?.image_num}.png` }} />
           </View>
           <View style={styles.itemInfo}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15 }}>

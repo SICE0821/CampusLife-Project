@@ -77,6 +77,9 @@ const { getGeneralPosts,
   addFriendCodeAram,
   user_update_point_3,
   Get_Event_Data,
+  Get_Event_Photos,
+  send_user_event_info,
+  user_send_photo,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -149,7 +152,7 @@ app.get('/MainPagehotPost', async (req, res) => {
 
 //메인페이지에 학과 게시글 데이터를 가져온다.
 app.post('/MainPagedepartmentPost', async (req, res) => {
-  const {department_id} = req.body;
+  const { department_id } = req.body;
   try {
     const rows = await getdeparmentpostdata(department_id);
     const processedData = rows.map(item => ({
@@ -216,17 +219,17 @@ app.post('/post', async (req, res) => {
 });
 
 //아이디와 비밀번호를 받고 유저 pk값을 가져온다.
-app.post('/get_user_data', async(req, res) => {
-  const {user_id, user_pass} = req.body;
+app.post('/get_user_data', async (req, res) => {
+  const { user_id, user_pass } = req.body;
   const rows = await getuserpk(user_id, user_pass);
-  
+
   const userData = {
     user_pk: rows[0].user_id,
     student_pk: rows[0].student_id,
     friend_code: rows[0].friend_code,
     admin_check: rows[0].admin_check,
-    profile_photo : rows[0].profilePhoto,
-    id : rows[0].id,
+    profile_photo: rows[0].profilePhoto,
+    id: rows[0].id,
     name: rows[0].name,
     campus_pk: rows[0].campus_id,
     department_pk: rows[0].department_id,
@@ -492,7 +495,7 @@ app.post('/bookmark', async (req, res) => {
 
 //게시글화면에서 학과 전체 게시글을 가져온다
 app.post('/departmentpost', async (req, res) => {
-  const {department_id} = req.body;
+  const { department_id } = req.body;
   console.log(department_id);
   try {
     const rows = await getDepartmentPosts(department_id);
@@ -515,7 +518,7 @@ app.post('/departmentpost', async (req, res) => {
 });
 
 app.post('/departmentHotpost', async (req, res) => {
-  const {department_id} = req.body;
+  const { department_id } = req.body;
   console.log(department_id);
   try {
     const rows = await getdepartmentHotPosts(department_id);
@@ -601,7 +604,7 @@ app.post('/login', async (req, res) => {
 app.post('/getlecture', async (req, res) => {
   const studentId = req.body.student_pk; // POST 요청에서 student_id를 가져옴
   if (!studentId) {
-      return res.status(400).json({ error: 'student_id is required' });
+    return res.status(400).json({ error: 'student_id is required' });
   }
 
   try {
@@ -629,8 +632,8 @@ app.post('/getlecture', async (req, res) => {
     console.log(processedData)
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
-      console.error(error); 
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1179,9 +1182,9 @@ app.post('/get_campus_place', async (req, res) => {
   try {
     const rows = await getCampus(campus_id);
     const processedData = rows.map(item => ({
-      study_room_id : item.study_room_id,
-      campus_place : item.campus_place,
-      study_room_name : item.study_room_name
+      study_room_id: item.study_room_id,
+      campus_place: item.campus_place,
+      study_room_name: item.study_room_name
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1192,7 +1195,7 @@ app.post('/get_campus_place', async (req, res) => {
 })
 
 app.post('/studyroomReservation', async (req, res) => {
-  const { student , study_room, study_room_date, study_room_time } = req.body;
+  const { student, study_room, study_room_date, study_room_time } = req.body;
   const result = await insert_student_study_room(student, study_room, study_room_date, study_room_time);
   if (result) {
     res.json({ message: 'Data received successfully', receivedData: { student, study_room, study_room_date, study_room_time } });
@@ -1206,9 +1209,9 @@ app.post('/get_study_room', async (req, res) => {
   try {
     const rows = await get_student_study_room(student);
     const processedData = rows.map(item => ({
-      study_room_name : item.study_room_name,
-      study_room_date : item.study_room_date,
-      study_room_time : item.study_room_time
+      study_room_name: item.study_room_name,
+      study_room_date: item.study_room_date,
+      study_room_time: item.study_room_time
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1222,9 +1225,9 @@ app.post('/get_study_date_time', async (req, res) => {
   try {
     const rows = await get_studyroom_date();
     const processedData = rows.map(item => ({
-      study_room_name : item.study_room_name,
-      study_room_date : item.study_room_date,
-      study_room_time : item.study_room_time
+      study_room_name: item.study_room_name,
+      study_room_date: item.study_room_date,
+      study_room_time: item.study_room_time
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1258,8 +1261,8 @@ app.post('/get_aram_data', async (req, res) => {
       my_post_like_title: item.my_post_like_title,
       new_event_id: item.new_event_id,
       new_event_name: item.new_event_name,
-      friend_code_id : item.friend_code_id,
-      friend_code_my_name : item.friend_code_my_name,
+      friend_code_id: item.friend_code_id,
+      friend_code_my_name: item.friend_code_my_name,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1388,10 +1391,10 @@ app.post('/get_invite_num', async (req, res) => {
   try {
     const rows = await get_invite_num(friend_code);
     const processedData = rows.map(item => ({
-      friend_code_ID : item.friend_code_id,
+      friend_code_ID: item.friend_code_id,
       user_id: item.user_id,
       friend_code: item.friend_code,
-      my_name : item.my_name
+      my_name: item.my_name
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1420,7 +1423,7 @@ app.post('/check_end_send', async (req, res) => {
           res.json({ success: "성공" });
         }
       }
-    }else {
+    } else {
       res.json({ success: "코드없음" });
     }
   } catch (error) {
@@ -1432,7 +1435,7 @@ app.post('/Friend_code_User_id', async (req, res) => {
   const { friend_code } = req.body;
   try {
     const rows = await Friend_code_User_id(friend_code);
-    const user_pk = { user_pk : rows[0].user_id }
+    const user_pk = { user_pk: rows[0].user_id }
     res.json(user_pk);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
@@ -1446,10 +1449,10 @@ app.post('/last_friendCode_Info', async (req, res) => {
   try {
     const rows = await last_friendCode_Info(user_pk);
     const processedData = {
-      friend_code_id : rows.friend_code_id,
+      friend_code_id: rows.friend_code_id,
       user_id: rows.user_id,
       friend_code: rows.friend_code,
-      my_name : rows.my_name
+      my_name: rows.my_name
     };
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1462,13 +1465,13 @@ app.post('/last_friendCode_Info', async (req, res) => {
 //친구코드 알람이 쇽쇽쇽!
 app.post('/addFriendCodeAram', async (req, res) => {
   try {
-    const { friend_code, friend_code_id, my_name} = req.body;
+    const { friend_code, friend_code_id, my_name } = req.body;
     const rows = await Friend_code_User_id(friend_code);
     const user_pk = rows[0].user_id
     const user_id = user_pk
     await addFriendCodeAram(user_pk, friend_code_id, my_name);
     await user_update_point_3(user_id, 100);
-    
+
   } catch (error) {
     console.error("알람 보내기 실패:", error);
   }
@@ -1491,9 +1494,9 @@ app.post('/get_campus_place', async (req, res) => {
   try {
     const rows = await getCampus(campus_id);
     const processedData = rows.map(item => ({
-      study_room_id : item.study_room_id,
-      campus_place : item.campus_place,
-      study_room_name : item.study_room_name
+      study_room_id: item.study_room_id,
+      campus_place: item.campus_place,
+      study_room_name: item.study_room_name
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1504,7 +1507,7 @@ app.post('/get_campus_place', async (req, res) => {
 })
 
 app.post('/studyroomReservation', async (req, res) => {
-  const { student , study_room, study_room_date, study_room_time } = req.body;
+  const { student, study_room, study_room_date, study_room_time } = req.body;
   const result = await insert_student_study_room(student, study_room, study_room_date, study_room_time);
   if (result) {
     res.json({ message: 'Data received successfully', receivedData: { student, study_room, study_room_date, study_room_time } });
@@ -1518,9 +1521,9 @@ app.post('/get_study_room', async (req, res) => {
   try {
     const rows = await get_student_study_room(student);
     const processedData = rows.map(item => ({
-      study_room_name : item.study_room_name,
-      study_room_date : item.study_room_date,
-      study_room_time : item.study_room_time
+      study_room_name: item.study_room_name,
+      study_room_date: item.study_room_date,
+      study_room_time: item.study_room_time
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1534,9 +1537,9 @@ app.post('/get_study_date_time', async (req, res) => {
   try {
     const rows = await get_studyroom_date();
     const processedData = rows.map(item => ({
-      study_room_name : item.study_room_name,
-      study_room_date : item.study_room_date,
-      study_room_time : item.study_room_time
+      study_room_name: item.study_room_name,
+      study_room_date: item.study_room_date,
+      study_room_time: item.study_room_time
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1548,21 +1551,21 @@ app.post('/get_study_date_time', async (req, res) => {
 
 //메인페이지 이벤트 데이터 전부 가져와
 app.post('/Get_Event_Data', async (req, res) => {
-  const {campus_id} = req.body;
+  const { campus_id } = req.body;
   try {
     const rows = await Get_Event_Data(campus_id);
     const processedData = {
-      event_id : rows[0].event_id,
-      campus_id : rows[0].campus_id,
-      user_id : rows[0].user_id,
-      name : rows[0].name,
-      get_point : rows[0].get_point,
-      info : rows[0].info,
-      simple_info : rows[0].simple_info,
-      event_photo : rows[0].event_photo,
-      start_date : formatDate(rows[0].start_date),
-      close_date : formatDate(rows[0].close_date),
-      is_event_close : rows[0].is_event_close,
+      event_id: rows[0].event_id,
+      campus_id: rows[0].campus_id,
+      user_id: rows[0].user_id,
+      name: rows[0].name,
+      get_point: rows[0].get_point,
+      info: rows[0].info,
+      simple_info: rows[0].simple_info,
+      event_photo: rows[0].event_photo,
+      start_date: formatDate(rows[0].start_date),
+      close_date: formatDate(rows[0].close_date),
+      is_event_close: rows[0].is_event_close,
     }
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1572,6 +1575,94 @@ app.post('/Get_Event_Data', async (req, res) => {
   }
 });
 
+//메인페이지 이벤트 데이터 전부 가져와
+app.post('/Get_Event_Data', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await Get_Event_Data(campus_id);
+    const processedData = {
+      event_id: rows[0].event_id,
+      campus_id: rows[0].campus_id,
+      user_id: rows[0].user_id,
+      name: rows[0].name,
+      get_point: rows[0].get_point,
+      info: rows[0].info,
+      simple_info: rows[0].simple_info,
+      event_photo: rows[0].event_photo,
+      start_date: formatDate(rows[0].start_date),
+      close_date: formatDate(rows[0].close_date),
+      is_event_close: rows[0].is_event_close,
+    }
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//메인페이지 이벤트 사진 데이터 가져오기
+app.post('/Get_Event_Photos', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    const rows = await Get_Event_Photos(event_id);
+    const processedData = rows.map(item => ({
+      photo_data: item.event_photo
+    }));
+    console.log(processedData);
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/send_user_event_info', async (req, res) => {
+  const { user_id, event_id, content } = req.body;
+  try {
+    await send_user_event_info(user_id, event_id, content);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이미지 업로드 및 DB저장
+app.post('/send_user_event_photo', upload.array('images'), (req, res) => {
+  console.log("일단 서버에는 잘 들어와");
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).send('No files uploaded');
+  }
+
+  const fileNames = req.files.map(file => file.filename); // 파일 이름 추출
+  try {
+    for (const fileName of fileNames) {
+      const regex = /_(\d+)_(\d+)\.png$/;
+      const match = fileName.match(regex);
+
+      if (match) {
+        const fileNameWithoutExtension = fileName.replace('.png', '');
+        const user_id = parseInt(match[1], 10);
+        const event_id = parseInt(match[2], 10);
+
+        console.log(fileNameWithoutExtension);
+        console.log(user_id);
+        console.log(event_id);
+
+        user_send_photo(user_id, event_id, fileNameWithoutExtension);
+      } else {
+        console.error('The filename format is incorrect.');
+      }
+    }
+    res.send('Files processed and saved successfully to the database');
+  } catch (error) {
+    console.error('Error saving files to the database:', error);
+    res.status(500).send('Internal Server Error');
+  }
+  });
 
 //서버 시작
 app.listen(PORT, () => {
