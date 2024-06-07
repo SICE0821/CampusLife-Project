@@ -90,11 +90,6 @@ export const MainTabNavigator = ({ route }: any) => {
         options={{
           headerShown: false,
           title: '출석',
-          headerStyle: {
-            backgroundColor: '#F27405',
-          },
-
-
           tabBarIcon: ({ color, size }) => (
             <IconA name="check" size={37} color={color} />
           ),
@@ -110,6 +105,10 @@ export const MainTabNavigator = ({ route }: any) => {
         component={TimetableScreenStackNavigator}
         options={{
           title: '시간표',
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: '#F27405',
+          },
           tabBarIcon: ({ color, size }) => (
             <IconC name="calendar-days" size={30} color={color} />
           ),

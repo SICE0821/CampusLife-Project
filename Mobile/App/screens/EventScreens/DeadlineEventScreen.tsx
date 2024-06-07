@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import { UserData, EventData } from '../../types/type'
 const width = Dimensions.get("window").width;
 import { useFocusEffect } from '@react-navigation/native';
+import config from '../../config';
 
 const eventImages = [
   require('../../assets/001.png'),
@@ -17,14 +18,13 @@ const eventImages = [
 
 const DeadlineEventScreen = ({ route }: any) => {
   const { userdata, eventdata } = route.params;
-  console.log(eventdata);
-  console.log(userdata);
+  //console.log(eventdata);
   const [maintext, setMainText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<null | number>(null);
+  const [selectedImage, setSelectedImage] = useState<null | string>(null);
   const [selectedFiles, setSelectedFiles] = useState<DocumentPickerResponse[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
-  const [eventData, setEventData] = useState<EventData>();
+  const [eventData, setEventData] = useState<EventData>(eventdata);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -41,7 +41,7 @@ const DeadlineEventScreen = ({ route }: any) => {
     setMainText(inputText);
   };
 
-  const handleImagePress = (image: number) => {
+  const handleImagePress = (image: string) => {
     setSelectedImage(image);
     setModalVisible(true);
   };
@@ -65,14 +65,69 @@ const DeadlineEventScreen = ({ route }: any) => {
     }
   };
 
+  const uploadAllFiles = async () => {
+    const formData = new FormData();
+    selectedFiles.forEach((file) => {
+      formData.append('images', {
+        uri: file.uri,
+        type: file.type,
+        name: `${Date.now()}_${userData.user_pk}_${eventData.event_id}.png`
+      });
+    });
+    console.log(formData);
+    await uploadImages(formData);
+  };
+
+  const uploadImages = async (formData: FormData) => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const response = await fetch(`${config.serverUrl}/send_user_event_photo`, {
+        method: 'POST',
+        body: formData,
+      });
+      clearTimeout(timeoutId);
+      const imageName = await response.text();
+      console.log(imageName);
+      if (response.ok) {
+        console.log('Images uploaded successfully');
+      } else {
+        console.error('Error uploading images');
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error);
+    }
+  };
+
+  const send_user_event_info = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/send_user_event_info`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userData.user_pk,
+          event_id: eventData.event_id,
+          content: maintext,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const sendEvent = () => {
+
+  }
+
   const handleFileRemove = (index: number) => {
     const updatedFiles = selectedFiles.filter((_, i) => i !== index);
     setSelectedFiles(updatedFiles);
   };
-
-  function sendEvent() {
-
-  }
 
   return (
     <View style={styles.container}>
@@ -89,20 +144,23 @@ const DeadlineEventScreen = ({ route }: any) => {
         </View>
         <View style={styles.eventImageArea}>
           <Swiper showsPagination={true} loop={true} removeClippedSubviews={false}>
-            {eventImages.map((image, index) => (
-              <TouchableOpacity key={index} style={styles.eventImageBox} onPress={() => handleImagePress(image)}>
-                <Image source={image} style={styles.eventImage} />
+            {eventData.photo_list.map((image, index) => (
+              <TouchableOpacity key={index} style={styles.eventImageBox} onPress={() => handleImagePress(image.photo_data)}>
+                <Image style={{ width: width, height: width }} source={{ uri: `http://175.212.187.92:3000/${image.photo_data}.png` }} />
               </TouchableOpacity>
             ))}
           </Swiper>
         </View>
         <View style={styles.fileInputArea}>
-          <TouchableOpacity style={styles.fileButton} onPress={handleFilePick}>
+          <TouchableOpacity style={styles.fileButton} onPress={() => {
+            handleFilePick();
+            console.log(selectedFiles)
+          }}>
             <Text style={styles.fileButtonText}>파일 첨부</Text>
           </TouchableOpacity>
           {selectedFiles.map((file, index) => (
             <View key={index} style={styles.fileInfo}>
-              <Text style={styles.fileName}>{file.name}</Text>
+              <Text style={styles.fileName}>{file.type}</Text>
               <TouchableOpacity onPress={() => handleFileRemove(index)} style={styles.cancelButton}>
                 <Icon name="closecircleo" size={18} />
               </TouchableOpacity>
@@ -119,8 +177,12 @@ const DeadlineEventScreen = ({ route }: any) => {
             placeholderTextColor={'gray'}
           />
         </View>
-        <View style = {{justifyContent : 'center', alignItems : 'center'}}>
-          <TouchableOpacity onPress={sendEvent}>
+        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <TouchableOpacity onPress={async () => {
+            sendEvent();
+            send_user_event_info();
+            uploadAllFiles()
+          }}>
             <View style={styles.sendArea}>
               <Text style={styles.sendText}>전송</Text>
             </View>
@@ -138,7 +200,7 @@ const DeadlineEventScreen = ({ route }: any) => {
         >
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              <Image source={selectedImage} style={styles.modalImage} />
+              <Image style={{ width: width, height: width }} source={{ uri: `http://10.0.2.2:3000/${selectedImage}.png` }} />
               <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                 <Text style={styles.closeButtonText}>닫기</Text>
               </TouchableOpacity>
@@ -235,9 +297,9 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'white',
     minHeight: 250,
-    margin : 20,
-    borderWidth : 1,
-    borderRadius : 5,
+    margin: 20,
+    borderWidth: 1,
+    borderRadius: 5,
   },
   textInput: {
     fontSize: 20,

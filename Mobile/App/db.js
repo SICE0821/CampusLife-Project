@@ -1175,22 +1175,7 @@ async function view_count_up(post_id) {
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
-} async function updateUserImg(user_pk, photopath) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        // 데이터 삽입 쿼리 작성
-        const query = `UPDATE user
-        SET profilePhoto = ?
-        WHERE user_id = ?;`
-        await conn.query(query, [photopath, user_pk]);
-        console.log("업데이트 성공");
-    } catch (err) {
-        console.error('Error inserting data:', err);
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
+} 
 
 async function post_comment(post_id, user_id, contents) {
     let conn;
@@ -1841,6 +1826,53 @@ async function Get_Event_Data(campus_id) {
     }
 }
 
+//메인화면에서 이벤트 사진
+async function Get_Event_Photos(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+           `SELECT event_photo.event_photo FROM event_photo WHERE event_photo.event_id = ?`
+        );
+        const row = await conn.query(query, [event_id]);
+        console.log(row);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function send_user_event_info(user_id, event_id, content) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO user_send_event (user_id, event_id, time, content) VALUES (?, ?, DEFAULT, ?);`
+        await conn.query(query, [user_id, event_id, content]);
+        console.log("입력 성공");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function user_send_photo(user_id, event_id, fileNameWithoutExtension) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO user_send_event_photo (event_id, user_id, event_photo) VALUES (?, ?, ?);`
+        await conn.query(query, [event_id, user_id, fileNameWithoutExtension]);
+        console.log("사진 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -1919,6 +1951,8 @@ module.exports = {
     last_friendCode_Info,
     addFriendCodeAram,
     user_update_point_3,
-    Get_Event_Data
-
+    Get_Event_Data,
+    Get_Event_Photos,
+    send_user_event_info,
+    user_send_photo
 };
