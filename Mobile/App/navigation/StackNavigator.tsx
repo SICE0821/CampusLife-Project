@@ -62,7 +62,7 @@ export const RootStackNavigator = (route: any) => {
 
     return (
         <RootStack.Navigator initialRouteName="LoginScreenStackNavigator">
-            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator} />
+            <RootStack.Screen name="LoginScreenStackNavigator" component={LoginScreenStackNavigator} options={{ headerShown: false }}/>
             <RootStack.Screen name="AdminTabNavigator" component={AdminTabNavigator} options={{ headerShown: false }} />
             <RootStack.Screen name="MainTabNavigator" component={MainTabNavigator} options={{ headerShown: false }} />
             <RootStack.Screen
@@ -164,7 +164,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
 
     return (
         <MainStack.Navigator>
-            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata,LectureData }} />
+            <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata,LectureData }} options={{headerShown : false}}/>
             <MainStack.Screen
                 name="StudentInfoNavigator"
                 component={StudentInfoScreen}
@@ -482,11 +482,29 @@ export const AttendanceScreenStackNavigator = ({ navigation, route }: any) => {
 };
 
 //시간표 페이지 관련 스택 네비게이터
-export const TimetableScreenStackNavigator = ({route} : any) => {
+export const TimetableScreenStackNavigator = ({route, navigation} : any) => {
     const { userdata, LectureData } = route.params;
     return (
         <TimetableStack.Navigator>
-            <TimetableStack.Screen name="TimetableScreen" component={TimetableScreen} initialParams={{ userdata, LectureData }}/>
+            <TimetableStack.Screen name="TimetableScreen" 
+            component={TimetableScreen} 
+            initialParams={{ userdata, LectureData }}
+            options={{
+                headerStyle: {
+                    backgroundColor: '#F27405',
+                },
+
+
+                headerLeft: () => (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate("MainPage")}>
+                        <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                    </TouchableOpacity>
+                ),
+                headerTintColor: 'white',
+                headerTitleAlign: 'center',
+                title: '시간표',
+            }}/>
         </TimetableStack.Navigator>
     );
 };

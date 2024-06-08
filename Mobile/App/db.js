@@ -1825,30 +1825,6 @@ async function Get_Event_Data(campus_id) {
     } finally {
         if (conn) conn.end();
     }
-} 
-
-//스터디룸 삭제
-async function delete_studyroom(student, study_room_name, study_room_date, study_room_time) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const query = `
-            DELETE FROM study_room_have_object 
-            WHERE student = ? 
-            AND study_room = (
-                SELECT study_room_id FROM study_room WHERE study_room_name = ?
-            )
-            AND study_room_date = ? 
-            AND study_room_time = ?;
-        `;
-        const result = await conn.query(query, [student, study_room_name, study_room_date, study_room_time]);
-        return true;
-    } catch (err) {
-        console.error('Error deleting data:', err);
-        return false;
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
 }
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
@@ -1930,5 +1906,8 @@ module.exports = {
     addFriendCodeAram,
     user_update_point_3,
     Get_Event_Data,
+    Get_Event_Photos,
+    send_user_event_info,
+    user_send_photo,
     delete_studyroom,
 };

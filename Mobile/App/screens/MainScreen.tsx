@@ -49,7 +49,7 @@ const MainPage = ({ navigation, route }: any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const [eventData, setEventData] = useState<EventData>();
   const [Userdepartment, setUserDepartment] = useState();
-  const fileUri = `http://10.0.2.2:3000/${userData.profile_photo}`;
+  const fileUri = `http://175.212.187.92:3000/${userData.profile_photo}`;
 
   const view_count_up = async (post_id: any) => {
     try {
@@ -84,7 +84,8 @@ const MainPage = ({ navigation, route }: any) => {
           name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
         });
       });
-      uploadImages(formData);
+      console.log(formData);
+      //uploadImages(formData);
     });
   };
 
@@ -191,27 +192,6 @@ const MainPage = ({ navigation, route }: any) => {
     }
   }
 
-  /*
-  const Get_Event_Data = async () => {
-    try {
-      const response = await fetch(`${config.serverUrl}/Get_Event_Data`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          campus_id: userData.campus_pk,
-        })
-      })
-      const Event_Data = await response.json();
-      console.log(Event_Data);
-      setEventData(Event_Data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  */
-
   const Get_Event_Data = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/Get_Event_Data`, {
@@ -231,7 +211,7 @@ const MainPage = ({ navigation, route }: any) => {
       const eventData: EventData = await response.json();
   
       // photo_list 데이터를 가져오기 위한 추가 작업
-      const photoResponse = await fetch(`${config.serverUrl}/Get_Photos`, {
+      const photoResponse = await fetch(`${config.serverUrl}/Get_Event_Photos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -246,7 +226,8 @@ const MainPage = ({ navigation, route }: any) => {
       }
   
       const photoList = await photoResponse.json();
-  
+      console.log(photoList);
+      
       const eventDataWithPhotos = {
         ...eventData,
         photo_list: photoList
@@ -373,7 +354,7 @@ return (
               onPress={() => navigation.navigate("DeadlineEventScreen", {userdata : userData, eventdata : eventData})}
               style={styles.eventBox}>
               <View style={styles.eventImageArea}>
-                <Image source={{ uri: `http://10.0.2.2:3000/${eventData?.event_photo}.png` }} style={styles.eventImage} />
+                <Image source={{ uri: `${config.photoUrl}/${eventData?.event_photo}.png` }} style={styles.eventImage} />
               </View>
               <View style={styles.eventTextArea}>
                 <Text style={styles.eventLabelText}>{eventData?.name}</Text>

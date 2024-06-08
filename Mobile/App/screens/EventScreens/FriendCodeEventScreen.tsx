@@ -5,6 +5,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, UserHaveCouponData } from '../../types/type'
 import Clipboard from '@react-native-clipboard/clipboard';
 import config from '../../config';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const width = Dimensions.get("window").width;
 const friendsinvitepng = require('../../assets/friend3.png');
@@ -245,6 +246,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
 
   return (
     <View style={styles.container}>
+      <ScrollView>
       <View style={styles.topArea}>
         <View style={styles.circleArea}>
           <View style={styles.imageArea}>
@@ -273,11 +275,12 @@ const FriendCodeEventScreen = ({ route }: any) => {
           <Icon name="paste" size={36} color={'black'} />
         </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={registerFriendCode}>
+      <TouchableOpacity onPress={registerFriendCode} style = {{marginTop : 10,justifyContent : 'center', alignItems : 'center'}}>
         <View style={styles.register}>
           <Text style={styles.registerText}>등록하기</Text>
         </View>
       </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 };
@@ -372,11 +375,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     borderRadius: 10,
-    backgroundColor: 'lightblue'
+    backgroundColor: 'lightblue',
+    justifyContent : 'center',
+    alignItems : 'center',
+    width : width - 300
   },
   registerText: {
     color: 'black',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold'
   }
 });

@@ -20,7 +20,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
     const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
     const [selectedstatus, setSelectedstatus] = useState<string | null>(null);  // 선택된 학년을 추적하는 state
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-    const [imageUrl, setImageUrl] = useState(`http://10.0.2.2:3000/${userData.profile_photo}`);
+    const [imageUrl, setImageUrl] = useState(`${config.photoUrl}/${userData.profile_photo}`);
 
     const get_user_university = async () => {
         try {
