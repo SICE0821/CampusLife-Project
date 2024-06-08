@@ -236,18 +236,18 @@ const EventShopScreen = ({ navigation, route }: any) => {
               <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.secondImage_Num}.png` }} />
             </View>
             <View style={styles.iteminfo}>
-              <Text style={{ fontSize: 20, color: 'black', marginLeft: 10 }}>{item.secondName}</Text>
-              <Text style={{ fontSize: 16, color: 'grey', marginLeft: 10 }} numberOfLines={1} ellipsizeMode='tail'>
+              <Text style={{ fontSize: 20, color: 'black', }}>{item.secondName}</Text>
+              <Text style={{ fontSize: 16, color: 'grey', }} numberOfLines={1} ellipsizeMode='tail'>
                 {item.secondExplain}
               </Text>
               <View style={{ flexDirection: 'row', backgroundColor: 'white', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}>
-                <View style={{ width: 140 }}>
-                  <Text style={{ fontSize: 27, color: '#ED9E2B', marginLeft: 10, fontWeight: 'bold', marginTop: 4 }}>
+                <View style={{ width: '70%' }}>
+                  <Text style={{ fontSize: 27, color: '#ED9E2B', fontWeight: 'bold', }}>
                     {item.secondprice}p
                   </Text>
                 </View>
-                <View style={{ width: 60 }}>
-                  <Text style={{ color: '#EB8A90', marginTop: 6, marginLeft: 4 }}> <IconB name="circle-with-plus" size={40} style={{ elevation: 5 }} /></Text>
+                <View style={{ width: '30%' }}>
+                  <Text style={{ color: '#EB8A90' }}> <IconB name="circle-with-plus" size={40} style={{ elevation: 5 }} /></Text>
                 </View>
               </View>
             </View>
