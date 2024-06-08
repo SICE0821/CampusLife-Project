@@ -163,3 +163,11 @@ export type EventData = {
     photo_data : string
   }[];
 }
+
+export type BuildingData = {
+  [x: string]: any;
+  study_room_id: number,
+  campus_place: string,
+  study_room_name: string,
+  image : any
+};

@@ -77,6 +77,7 @@ const { getGeneralPosts,
   addFriendCodeAram,
   user_update_point_3,
   Get_Event_Data,
+  delete_studyroom
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -626,7 +627,6 @@ app.post('/getlecture', async (req, res) => {
       lecture_grades: item.lecture_grades
     }));
     res.json({ data: processedData });
-    console.log(processedData)
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
       console.error(error); 
@@ -1174,22 +1174,6 @@ app.post('/user_buy_action', async (req, res) => {
   }
 });
 
-app.post('/get_campus_place', async (req, res) => {
-  const { campus_id } = req.body;
-  try {
-    const rows = await getCampus(campus_id);
-    const processedData = rows.map(item => ({
-      study_room_id : item.study_room_id,
-      campus_place : item.campus_place,
-      study_room_name : item.study_room_name
-    }));
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
 
 app.post('/studyroomReservation', async (req, res) => {
   const { student , study_room, study_room_date, study_room_time } = req.body;
@@ -1201,22 +1185,6 @@ app.post('/studyroomReservation', async (req, res) => {
   }
 });
 
-app.post('/get_study_room', async (req, res) => {
-  const { student } = req.body;
-  try {
-    const rows = await get_student_study_room(student);
-    const processedData = rows.map(item => ({
-      study_room_name : item.study_room_name,
-      study_room_date : item.study_room_date,
-      study_room_time : item.study_room_time
-    }));
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
 
 app.post('/get_study_date_time', async (req, res) => {
   try {
@@ -1493,7 +1461,8 @@ app.post('/get_campus_place', async (req, res) => {
     const processedData = rows.map(item => ({
       study_room_id : item.study_room_id,
       campus_place : item.campus_place,
-      study_room_name : item.study_room_name
+      study_room_name : item.study_room_name,
+      image : item.image
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1517,34 +1486,22 @@ app.post('/get_study_room', async (req, res) => {
   const { student } = req.body;
   try {
     const rows = await get_student_study_room(student);
+    console.log(rows);
     const processedData = rows.map(item => ({
-      study_room_name : item.study_room_name,
-      study_room_date : item.study_room_date,
-      study_room_time : item.study_room_time
+      student : item.student,
+      study_room_name: item.study_room_name,
+      study_room_date: item.study_room_date,
+      study_room_time: item.study_room_time,
+      image: item.image,
     }));
+    console.log(processedData);
     res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
-})
+});
 
-app.post('/get_study_date_time', async (req, res) => {
-  try {
-    const rows = await get_studyroom_date();
-    const processedData = rows.map(item => ({
-      study_room_name : item.study_room_name,
-      study_room_date : item.study_room_date,
-      study_room_time : item.study_room_time
-    }));
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
 
 //메인페이지 이벤트 데이터 전부 가져와
 app.post('/Get_Event_Data', async (req, res) => {
@@ -1569,6 +1526,17 @@ app.post('/Get_Event_Data', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//스터디룸 삭제하기
+app.post('/deletestudyroom', async (req, res) => {
+  const { student, study_room_name, study_room_date, study_room_time } = req.body;
+  const success = await delete_studyroom(student, study_room_name, study_room_date, study_room_time);
+  if (success) {
+      res.json({ message: "성공적으로 값 삭제" });
+  } else {
+      res.status(500).json({ error: "삭제 실패" });
   }
 });
 

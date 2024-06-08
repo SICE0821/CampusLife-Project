@@ -4,22 +4,20 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import config from '../../config';
 import { endOfMonth } from 'date-fns';
+import ImageCropPicker from 'react-native-image-crop-picker';
+
+const width = Dimensions.get("window").width;
+
+const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
+
 
 export type BuildingData = {
   [x: string]: any;
   study_room_id: number,
   campus_place: string,
   study_room_name: string,
+  image : any
 };
-
-const width = Dimensions.get("window").width;
-
-const studyroom1Image = require('../../assets/studyroom1.png');
-const studyroom2Image = require('../../assets/studyroom2.png');
-
-const images = [studyroom1Image, studyroom2Image];
-
-const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20'];
 
 const StudyRoomScreen = ({ route, navigation}: any) => {
   const { userdata } = route.params;
@@ -31,25 +29,6 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
   const [schoolBuildingData, setSchoolBuildingData] = useState<BuildingData[]>();
   const [studyroomInfo, setStudyroomInfo] = useState<{ place: string, name: string, maxHeadCount: number, minHeadCount: number, image: any }[]>([]);
   const [reservedTimes, setReservedTimes] = useState<{ [key: string]: { [key: string]: string[] } }>({});
-
-  /*const fetchStudyRoomData = async () => {
-    try {
-      const response = await fetch(`${config.serverUrl}/get_study_room`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          student: userdata.student_pk
-        })
-      });
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('과목 가져오기 실패:', error);
-    }
-  };*/
-  
 
   const get_campus_place = async () => {
     try {
@@ -65,7 +44,7 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
       const campusplace = await response.json();
       const campusPlace = campusplace;
       setSchoolBuildingData(campusPlace);
-
+      console.log(campusPlace)
       const campusPlaces = ['전체', ...new Set(campusPlace.map((data: BuildingData) => data.campus_place))] as string[];
       setCampus(campusPlaces);
 
@@ -97,7 +76,7 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
       });
   
       setReservedTimes(reservedTimesData); // 예약 정보를 reservedTimes 상태로 업데이트
-      console.log(data); 
+      //console.log(data); 
     } catch (error) {
       console.error('데이터를 불러오는 중 오류 발생:', error);
     }
@@ -143,7 +122,7 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
         name: room.study_room_name,
         maxHeadCount: 12,
         minHeadCount: 4,
-        image: images[0]
+        image: room.image 
       }));
       setStudyroomInfo(buildingData);
     }
@@ -215,7 +194,6 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
             const studyRoomTime = detail.times.join(',');
   
             message += `스터디룸: ${selectedRoomInfo.place} ${selectedRoomInfo.name}\n시간대: ${detail.times.join(', ')}시\n`;
-            console.log(studyRoomDate)
             insert_user_study_room(studyRoomId, studyRoomDate, studyRoomTime);
             updateReservedTimes(studyRoomDate, detail.room, detail.times);  // 배열로 전달
           }
@@ -243,7 +221,6 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
 
   const reservedTimesForSelectedDate = reservedTimes[format(selectedDate, "yyyy-MM-dd")] || {};
 
-
   const renderStudyRooms = () => (
     studyroomInfo.map((room, index) => (
       (room.place === selectedCampus || selectedCampus === '전체') && (
@@ -259,7 +236,7 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
           </View>
           <View style={styles.selectArea}>
             <View style={styles.imageArea}>
-              <Image style={styles.image} source={room.image} />
+              <Image style={styles.image} source={{uri: `http://10.0.2.2:3000/${room.image}.png` }} />
             </View>
             <View style={styles.timeArea}>
               {time.map((hour, index) => (
@@ -287,21 +264,17 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
       )
     ))
   );
-  console.log(reservedTimes)
+  
   useEffect(() => {
     get_campus_place();
     fetchData();
   }, []);
-
-  
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
           <Text style={styles.selectedDateText}>{format(selectedDate, "yyyy년 M월 d일")}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style = {{height : 30, width : 60, backgroundColor : 'blue'}} onPress={() => navigation.navigate("StudyRoomDetailScreen")}></TouchableOpacity>
         {showDatePicker && (
           <DateTimePicker
             value={selectedDate}
@@ -325,6 +298,7 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
