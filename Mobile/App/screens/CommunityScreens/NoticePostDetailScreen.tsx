@@ -310,7 +310,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                         <View style={styles.profilepicturecontainer}>
                             <View style={styles.profilepicturebox}>
                                 <Image
-                                    source={{ uri: `http://10.0.2.2:3000/${postDetailInfo?.writer_propile}` }}
+                                    source={{ uri: `${config.photoUrl}/${postDetailInfo?.writer_propile}` }}
                                     style={{ width: 60, height: 60, borderRadius: 12, justifyContent: 'center', alignItems: 'center' }}
                                 />
                             </View>
@@ -320,7 +320,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                 <Text style={{ fontSize: 17, color: 'black', fontWeight: 'bold', marginTop: 13, }}>{postDetailInfo?.post_writer}({postDetailInfo?.writer_department})</Text>
                             </View>
                             <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 9, }}>
-                                <Text style={{ fontSize: 17, }}>{postDetailInfo?.write_date}</Text>
+                                <Text style={{ fontSize: 17, color: 'black' }}>{postDetailInfo?.write_date}</Text>
                             </View>
                         </View>
                         <View style={styles.listcontainer}>

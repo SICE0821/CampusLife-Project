@@ -49,7 +49,7 @@ const MainPage = ({ navigation, route }: any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const [eventData, setEventData] = useState<EventData>();
   const [Userdepartment, setUserDepartment] = useState();
-  const fileUri = `http://175.212.187.92:3000/${userData.profile_photo}`;
+  const fileUri = `http://192.168.219.106:3000/${userData.profile_photo}`;
 
   const view_count_up = async (post_id: any) => {
     try {
