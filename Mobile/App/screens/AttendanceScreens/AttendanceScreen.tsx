@@ -386,6 +386,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginLeft: 25,
     marginTop : 5,
+    
   },
   modal: { // 모달 창 css
     borderTopLeftRadius : 20,

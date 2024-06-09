@@ -138,10 +138,16 @@ const SchoolInfoScreen = () => {
             </NaverMapMarkerOverlay>
           ))}
         </NaverMapView>
-        <View style={{ marginTop: 5, position: 'absolute', alignSelf: 'flex-end', borderWidth: 1, elevation: 5, borderColor: 'gray'}}>
+        <View style={{ marginTop: 5, 
+          position: 'absolute', 
+          alignSelf: 'flex-end',
+          borderWidth: 1, 
+          elevation: 5, 
+          right: 5,
+          borderColor: 'gray'}}>
           <Picker
           selectedValue={selectedCampus}
-          style={{ height: 50, width: 150, color: 'black', backgroundColor: '#ffffff', }}
+          style={{ height: 50, width: 150, color: 'black', backgroundColor: '#ffffff' }}
           onValueChange={handleCampusChange}
           dropdownIconColor={'black'}
         >

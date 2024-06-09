@@ -457,11 +457,11 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                 {item.content}
                             </Text>
                             <View style={styles.dataandlike}>
-                                <Text style={{ marginTop: 3, marginLeft: 24, fontSize: 15 }}>
+                                <Text style={{ marginTop: 3, marginLeft: 24, fontSize: 15, color: 'black' }}>
                                     {item.date}
                                 </Text>
-                                <Text style={{ marginTop: 2 }}><IconD size={27} color="black" name={"like"} /></Text>
-                                <Text style={{ fontSize: 15, marginTop: 2, }}>
+                                <Text style={{ marginTop: 2, }}><IconD size={27} color="black" name={"like"} /></Text>
+                                <Text style={{ fontSize: 15, marginTop: 2, color: 'black' }}>
                                     {item.like}
                                 </Text>
                             </View>
@@ -522,14 +522,13 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 <View style={[styles.inputtext, { height: inputheight }]}>
                     <TextInput
                         ref={inputRef}
-                        style={{ paddingLeft: 20, fontSize: 20, }}
+                        style={{ paddingLeft: 20, fontSize: 20, color: 'gray' }}
                         onChangeText={handleInputChange}
                         onBlur={() => setIsCommentorRecomment(0)}
                         onContentSizeChange={handleContentSizeChange}
                         value={commenttext}
                         multiline={true}
                         placeholder="텍스트를 입력하세요"
-                        placeholderTextColor={'gray'}
                     />
                 </View>
                 <TouchableOpacity
@@ -554,14 +553,14 @@ const styles = StyleSheet.create({
         //backgroundColor: 'blue'
     },
     headercontainer: {
-        flex: 1,
+        width: '90%',
+        alignSelf: 'center',
         //backgroundColor : 'red',
         flexDirection: 'row',
-
     },
     profilepicturecontainer: {
         height: 75,
-        width: 100,
+        width: '20%',
         //backgroundColor : 'yellow',
         justifyContent: 'center',
         alignItems: 'center',
@@ -570,7 +569,7 @@ const styles = StyleSheet.create({
     profileinfocontainer: {
         height: 75,
         //backgroundColor : 'red',
-        width: 330,
+        width: '70%',
 
     },
     listcontainer: {
@@ -578,7 +577,6 @@ const styles = StyleSheet.create({
         //backgroundColor : 'blue',
         justifyContent: 'center',
         alignItems: 'center',
-
     },
     profilepicturebox: {
         width: 60,

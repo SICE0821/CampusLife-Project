@@ -145,7 +145,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         </View>
         <View style={styles.writespace}>
           <TextInput
-            style={{ fontSize: 20, }}
+            style={{ fontSize: 20, color: 'black' }}
             onChangeText={handlemainTextChange}
             value={maintext}
             multiline={true}

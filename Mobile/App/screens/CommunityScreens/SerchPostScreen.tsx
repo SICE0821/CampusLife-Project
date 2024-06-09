@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
         //backgroundColor: 'blue',
     },
     headercontainer: {
-        height: 40,
+        height: 50,
         //backgroundColor: 'red',
         flexDirection: 'row',
         justifyContent: 'center',

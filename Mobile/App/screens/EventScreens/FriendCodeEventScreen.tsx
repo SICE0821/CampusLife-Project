@@ -289,7 +289,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: 'white'
   },
   topArea: {
     borderBottomWidth: 1,
@@ -342,15 +341,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: 'pink',
     marginHorizontal: 20,
-    marginVertical: 20
+    marginVertical: 20,
+    backgroundColor: 'white',
+    elevation: 5
   },
   mycodeText: {
     color: 'black',
     fontSize: 22,
+    fontWeight: 'bold'
   },
   mycode: {
-    color: 'pink',
+    color: 'blue',
     fontSize: 22,
+    fontWeight: 'bold'
   },
   inputcode: {
     flexDirection: 'row',
@@ -368,7 +371,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     padding: -5,
     marginHorizontal: 10,
-    fontSize: 18
+    fontSize: 18,
+    backgroundColor: 'white'
   },
   register: {
     padding: 5,
