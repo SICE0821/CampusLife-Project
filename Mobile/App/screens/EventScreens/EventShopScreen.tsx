@@ -206,7 +206,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       }}>
         <View style={styles.square}>
           <View style={styles.picturebox}>
-            <Image style={{ width: 130, height: 130, marginTop: 12 }} source={{ uri: `http://10.0.2.2:3000/${item.firstImage_Num}.png` }} />
+            <Image style={{ width: 130, height: 130, marginTop: 12 }} source={{ uri: `${config.photoUrl}/${item.firstImage_Num}.png` }} />
           </View>
           <View style={styles.iteminfo}>
             <Text style={{ fontSize: 20, color: 'black', marginLeft: 10 }}>{item.firstName}</Text>

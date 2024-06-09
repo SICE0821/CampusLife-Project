@@ -127,9 +127,11 @@ const upload = multer({ storage });
 
 
 //메인페이지에 핫 게시글 데이터를 가져온다.
-app.get('/MainPagehotPost', async (req, res) => {
+app.post('/MainPagehotPost', async (req, res) => {
+  const { campus_id } = req.body;
+  
   try {
-    const rows = await gethotpostdata();
+    const rows = await gethotpostdata(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -176,9 +178,10 @@ app.post('/MainPagedepartmentPost', async (req, res) => {
 
 
 //메인페이지에 전체 게시글 데이터를 가져온다.
-app.get('/MainPageSchoolPost', async (req, res) => {
+app.post('/MainPageSchoolPost', async (req, res) => {
+  const { campus_id } = req.body;
   try {
-    const rows = await getschoolpostdata();
+    const rows = await getschoolpostdata(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -283,9 +286,10 @@ app.post('/get_items', async (req, res) => {
 });
 
 //학교 전체 공지사항
-app.get('/noticeschoolpost', async (req, res) => {
+app.post('/noticeschoolpost', async (req, res) => {
+  const { campus_id } = req.body;
   try {
-    const rows = await getNoticePosts();
+    const rows = await getNoticePosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -328,9 +332,10 @@ app.post('/noticedepartmentpost', async (req, res) => {
 });
 
 //학교 핫 공지사항
-app.get('/NoticeHotpost', async (req, res) => {
+app.post('/NoticeHotpost', async (req, res) => {
+  const { campus_id } = req.body;
   try {
-    const rows = await getNoticeHotPosts();
+    const rows = await getNoticeHotPosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -425,9 +430,10 @@ app.post('/NoticeDepartmentbookmark', async (req, res) => {
 
 
 //게시글화면에서 전체 전체 게시글을 가져온다.
-app.get('/generalpost', async (req, res) => {
+app.post('/generalpost', async (req, res) => {
   try {
-    const rows = await getGeneralPosts();
+    const { campus_id } = req.body;
+    const rows = await getGeneralPosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -447,9 +453,10 @@ app.get('/generalpost', async (req, res) => {
 });
 
 //게시글화면에서 전체 핫 게시글을 가져온다.
-app.get('/Hotpost', async (req, res) => {
+app.post('/Hotpost', async (req, res) => {
   try {
-    const rows = await getHotPosts();
+    const { campus_id } = req.body;
+    const rows = await getHotPosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
