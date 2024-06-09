@@ -1420,7 +1420,7 @@ async function getCampus(campus_id) {
     try {
         conn = await pool.getConnection();
         const query = `
-            SELECT study_room.study_room_id, study_room.study_room_name, study_room.campus_place
+            SELECT study_room.study_room_id, study_room.study_room_name, study_room.campus_place, study_room.image
             FROM study_room
             JOIN campus ON study_room.campus_id = campus.campus_id
             WHERE study_room.campus_id = ?
@@ -1455,18 +1455,19 @@ async function get_student_study_room(student) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `SELECT 
-        study_room_have_object.student,
-        study_room.study_room_name,
-        study_room_have_object.study_room_date,
-        study_room_have_object.study_room_time
-    FROM
-        study_room_have_object
-            INNER JOIN
-        study_room ON study_room_have_object.study_room = study_room.study_room_id
-    WHERE
-        study_room_have_object.student = ?;
-        `
+        const query = `
+        SELECT
+            study_room_have_object.student,
+            study_room.study_room_name,
+            study_room.image,
+            study_room_have_object.study_room_date,
+            study_room_have_object.study_room_time
+        FROM
+            study_room_have_object
+            INNER JOIN study_room ON study_room_have_object.study_room = study_room.study_room_id
+        WHERE
+            study_room_have_object.student = ?;
+        `;
         const rows = await conn.query(query, [student]);
         return rows;
     } catch (err) {
@@ -1824,6 +1825,30 @@ async function Get_Event_Data(campus_id) {
     } finally {
         if (conn) conn.end();
     }
+} 
+
+//스터디룸 삭제
+async function delete_studyroom(student, study_room_name, study_room_date, study_room_time) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            DELETE FROM study_room_have_object 
+            WHERE student = ? 
+            AND study_room = (
+                SELECT study_room_id FROM study_room WHERE study_room_name = ?
+            )
+            AND study_room_date = ? 
+            AND study_room_time = ?;
+        `;
+        const result = await conn.query(query, [student, study_room_name, study_room_date, study_room_time]);
+        return true;
+    } catch (err) {
+        console.error('Error deleting data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
 }
 
 //메인화면에서 이벤트 사진
@@ -1878,7 +1903,7 @@ module.exports = {
     getGeneralPosts,
     getDepartmentPosts,
     gethotpostdata,
-    getdeparmentpostdata,
+    getdeparmentpostdata, 
     getschoolpostdata,
     insertDataIntoDB,
     getuserpk,
@@ -1954,5 +1979,6 @@ module.exports = {
     Get_Event_Data,
     Get_Event_Photos,
     send_user_event_info,
-    user_send_photo
+    user_send_photo,
+    delete_studyroom,
 };

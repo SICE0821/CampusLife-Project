@@ -77,9 +77,7 @@ const { getGeneralPosts,
   addFriendCodeAram,
   user_update_point_3,
   Get_Event_Data,
-  Get_Event_Photos,
-  send_user_event_info,
-  user_send_photo,
+  delete_studyroom
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -629,7 +627,6 @@ app.post('/getlecture', async (req, res) => {
       lecture_grades: item.lecture_grades
     }));
     res.json({ data: processedData });
-    console.log(processedData)
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
@@ -1177,22 +1174,6 @@ app.post('/user_buy_action', async (req, res) => {
   }
 });
 
-app.post('/get_campus_place', async (req, res) => {
-  const { campus_id } = req.body;
-  try {
-    const rows = await getCampus(campus_id);
-    const processedData = rows.map(item => ({
-      study_room_id: item.study_room_id,
-      campus_place: item.campus_place,
-      study_room_name: item.study_room_name
-    }));
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
 
 app.post('/studyroomReservation', async (req, res) => {
   const { student, study_room, study_room_date, study_room_time } = req.body;
@@ -1204,22 +1185,6 @@ app.post('/studyroomReservation', async (req, res) => {
   }
 });
 
-app.post('/get_study_room', async (req, res) => {
-  const { student } = req.body;
-  try {
-    const rows = await get_student_study_room(student);
-    const processedData = rows.map(item => ({
-      study_room_name: item.study_room_name,
-      study_room_date: item.study_room_date,
-      study_room_time: item.study_room_time
-    }));
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
 
 app.post('/get_study_date_time', async (req, res) => {
   try {
@@ -1494,9 +1459,10 @@ app.post('/get_campus_place', async (req, res) => {
   try {
     const rows = await getCampus(campus_id);
     const processedData = rows.map(item => ({
-      study_room_id: item.study_room_id,
-      campus_place: item.campus_place,
-      study_room_name: item.study_room_name
+      study_room_id : item.study_room_id,
+      campus_place : item.campus_place,
+      study_room_name : item.study_room_name,
+      image : item.image
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1505,113 +1471,21 @@ app.post('/get_campus_place', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 })
-
-app.post('/studyroomReservation', async (req, res) => {
-  const { student, study_room, study_room_date, study_room_time } = req.body;
-  const result = await insert_student_study_room(student, study_room, study_room_date, study_room_time);
-  if (result) {
-    res.json({ message: 'Data received successfully', receivedData: { student, study_room, study_room_date, study_room_time } });
-  } else {
-    res.status(500).json({ message: 'Failed to insert data' });
-  }
-});
 
 app.post('/get_study_room', async (req, res) => {
   const { student } = req.body;
   try {
     const rows = await get_student_study_room(student);
+    console.log(rows);
     const processedData = rows.map(item => ({
+      student : item.student,
       study_room_name: item.study_room_name,
       study_room_date: item.study_room_date,
-      study_room_time: item.study_room_time
-    }));
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
-
-app.post('/get_study_date_time', async (req, res) => {
-  try {
-    const rows = await get_studyroom_date();
-    const processedData = rows.map(item => ({
-      study_room_name: item.study_room_name,
-      study_room_date: item.study_room_date,
-      study_room_time: item.study_room_time
-    }));
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
-
-//메인페이지 이벤트 데이터 전부 가져와
-app.post('/Get_Event_Data', async (req, res) => {
-  const { campus_id } = req.body;
-  try {
-    const rows = await Get_Event_Data(campus_id);
-    const processedData = {
-      event_id: rows[0].event_id,
-      campus_id: rows[0].campus_id,
-      user_id: rows[0].user_id,
-      name: rows[0].name,
-      get_point: rows[0].get_point,
-      info: rows[0].info,
-      simple_info: rows[0].simple_info,
-      event_photo: rows[0].event_photo,
-      start_date: formatDate(rows[0].start_date),
-      close_date: formatDate(rows[0].close_date),
-      is_event_close: rows[0].is_event_close,
-    }
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-//메인페이지 이벤트 데이터 전부 가져와
-app.post('/Get_Event_Data', async (req, res) => {
-  const { campus_id } = req.body;
-  try {
-    const rows = await Get_Event_Data(campus_id);
-    const processedData = {
-      event_id: rows[0].event_id,
-      campus_id: rows[0].campus_id,
-      user_id: rows[0].user_id,
-      name: rows[0].name,
-      get_point: rows[0].get_point,
-      info: rows[0].info,
-      simple_info: rows[0].simple_info,
-      event_photo: rows[0].event_photo,
-      start_date: formatDate(rows[0].start_date),
-      close_date: formatDate(rows[0].close_date),
-      is_event_close: rows[0].is_event_close,
-    }
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-//메인페이지 이벤트 사진 데이터 가져오기
-app.post('/Get_Event_Photos', async (req, res) => {
-  const { event_id } = req.body;
-  try {
-    const rows = await Get_Event_Photos(event_id);
-    const processedData = rows.map(item => ({
-      photo_data: item.event_photo
+      study_room_time: item.study_room_time,
+      image: item.image,
     }));
     console.log(processedData);
     res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -1619,50 +1493,43 @@ app.post('/Get_Event_Photos', async (req, res) => {
 });
 
 
-app.post('/send_user_event_info', async (req, res) => {
-  const { user_id, event_id, content } = req.body;
+//메인페이지 이벤트 데이터 전부 가져와
+app.post('/Get_Event_Data', async (req, res) => {
+  const { campus_id } = req.body;
   try {
-    await send_user_event_info(user_id, event_id, content);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-//이미지 업로드 및 DB저장
-app.post('/send_user_event_photo', upload.array('images'), (req, res) => {
-  console.log("일단 서버에는 잘 들어와");
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).send('No files uploaded');
-  }
-
-  const fileNames = req.files.map(file => file.filename); // 파일 이름 추출
-  try {
-    for (const fileName of fileNames) {
-      const regex = /_(\d+)_(\d+)\.png$/;
-      const match = fileName.match(regex);
-
-      if (match) {
-        const fileNameWithoutExtension = fileName.replace('.png', '');
-        const user_id = parseInt(match[1], 10);
-        const event_id = parseInt(match[2], 10);
-
-        console.log(fileNameWithoutExtension);
-        console.log(user_id);
-        console.log(event_id);
-
-        user_send_photo(user_id, event_id, fileNameWithoutExtension);
-      } else {
-        console.error('The filename format is incorrect.');
-      }
+    const rows = await Get_Event_Data(campus_id);
+    const processedData = {
+      event_id: rows[0].event_id,
+      campus_id: rows[0].campus_id,
+      user_id: rows[0].user_id,
+      name: rows[0].name,
+      get_point: rows[0].get_point,
+      info: rows[0].info,
+      simple_info: rows[0].simple_info,
+      event_photo: rows[0].event_photo,
+      start_date: formatDate(rows[0].start_date),
+      close_date: formatDate(rows[0].close_date),
+      is_event_close: rows[0].is_event_close,
     }
-    res.send('Files processed and saved successfully to the database');
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
   } catch (error) {
-    console.error('Error saving files to the database:', error);
-    res.status(500).send('Internal Server Error');
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-  });
+});
+
+//스터디룸 삭제하기
+app.post('/deletestudyroom', async (req, res) => {
+  const { student, study_room_name, study_room_date, study_room_time } = req.body;
+  const success = await delete_studyroom(student, study_room_name, study_room_date, study_room_time);
+  if (success) {
+      res.json({ message: "성공적으로 값 삭제" });
+  } else {
+      res.status(500).json({ error: "삭제 실패" });
+  }
+});
+
 
 //서버 시작
 app.listen(PORT, () => {

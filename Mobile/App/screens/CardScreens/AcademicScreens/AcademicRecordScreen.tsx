@@ -80,8 +80,8 @@ const AcademicRecord = ({route} : any) => {
                                             <Row
                                                 data={["과목명", "구분", "담당교수", "학점", "수업시간", "강의실"]}
                                                 style={{ height: 30, backgroundColor: "#dddddd" }}
-                                                textStyle={{ textAlign: "center", fontWeight: "bold" }}
-                                                widthArr={[200, 60, 70, 60, 80, 70]}
+                                                textStyle={{ textAlign: "center", fontWeight: "bold", color: 'black' }}
+                                                widthArr={[180, 60, 80, 60, 120, 70]}
                                             />
                                             <Rows
                                                 data={semesterData[semester].map(lecture => [
@@ -93,8 +93,8 @@ const AcademicRecord = ({route} : any) => {
                                                     lecture.lecture_room
                                                 ])}
                                                 style={styles.tableRows}
-                                                textStyle={{ textAlign: "center", fontWeight: 'bold' }}
-                                                widthArr={[200, 60, 70, 60, 80, 70]}
+                                                textStyle={{ textAlign: "center", fontWeight: 'bold', color: 'black' }}
+                                                widthArr={[180, 60, 80, 60, 120, 70]}
                                             />
                                         </Table>
                                     </View>
@@ -117,23 +117,25 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     detail_credit_box: {
-        backgroundColor: '#999999',
+        backgroundColor: '#FFEFD5',
         width: '100%',
         height: 70,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderWidth: 1,
-        marginTop: 20,
+        marginTop: 10,
     },
     semester_text: {
         fontSize: 32,
         marginLeft: 15,
         fontWeight: 'bold',
+        color: 'black'
     },
     semester_button: {
         fontSize: 50,
         marginRight: 15,
+        color: 'black'
     },
     detail_credit_area: {},
     table: {

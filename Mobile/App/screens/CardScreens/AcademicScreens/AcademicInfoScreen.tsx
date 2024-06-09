@@ -13,6 +13,8 @@ import {
 } from "react-native-chart-kit";
 import { UserData, Lecture } from '../../../types/type';
 
+const width = Dimensions.get("window").width;
+
 const AcademicInfoScreen = ({route} : any) => {
     const { userdata, LectureData } = route.params;
     const [userData, setUserData] = useState<UserData>(userdata);
@@ -89,9 +91,11 @@ const AcademicInfoScreen = ({route} : any) => {
         setCircle6Data(cultureCredits2);
     }, [userLecture]);
 
-    const circleRadius = 60;
-    const circleBorderWidth = 8;
-    const circleColor = "#000000";
+    // "#00BFFF"  
+
+    const circleRadius = 50;
+    const circleBorderWidth = 10;
+    const circleColor = "#FFC81E";
     const circlShadowColor = "#EEEEEE";
 
     const creditMax = 120; // 최대 학점 데이터
@@ -158,7 +162,7 @@ const AcademicInfoScreen = ({route} : any) => {
     };
 
     const tableHead = ["과목명", "구분", "학점", "성적"];
-    const widthArrs = [240,70,70,70]; // 테이블 간격
+    const widthArrs = [ width*0.65, width*0.1, width*0.1, width*0.1,]; // 테이블 간격
     const tableBorderWidth = 3; // 테이블 border 크기
     const tableBorderColor = 'gray'; // 테이블 bordder 색
 
@@ -289,7 +293,7 @@ const AcademicInfoScreen = ({route} : any) => {
                                 }
                             ]
                         }}
-                        width={Dimensions.get("window").width} // from react-native
+                        width={Dimensions.get("window").width*1.18} // from react-native
                         height={220}
                         yAxisLabel=""
                         yAxisSuffix=""
@@ -297,10 +301,9 @@ const AcademicInfoScreen = ({route} : any) => {
                         showValuesOnTopOfBars={true}
                         withHorizontalLabels={true}
                         chartConfig={{
-                            
-                            backgroundColor: "#D3D3D3",
-                            backgroundGradientFrom: "#D3D3D3",
-                            backgroundGradientTo: "#D3D3D3",
+                            backgroundColor: "#fff",
+                            backgroundGradientFrom: "#fff",
+                            backgroundGradientTo: "#fff",
                             decimalPlaces: 0, // optional, defaults to 2dp
                             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                             style: {
@@ -309,7 +312,9 @@ const AcademicInfoScreen = ({route} : any) => {
                             propsForDots: {},
                         }}
                         style={{
-                            
+                            left: -35,
+                            borderWidth: 1,
+                            borderColor: 'black'
                         }}
                     />
                 </View>
@@ -335,7 +340,7 @@ const AcademicInfoScreen = ({route} : any) => {
                                             <Row
                                                 data={tableHead}
                                                 style={{ height: 30, backgroundColor: "#dddddd" }}
-                                                textStyle={{ textAlign: "center", fontWeight: "bold" }}
+                                                textStyle={{ textAlign: "center", fontWeight: "bold", color: 'gray' }}
                                                 widthArr={widthArrs}
                                             />
                                             {lectures.map((lecture, index) => (
@@ -343,7 +348,7 @@ const AcademicInfoScreen = ({route} : any) => {
                                                     key={index}
                                                     data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]}  
                                                     style={styles.tableRows} 
-                                                    textStyle={{ textAlign: "center", fontWeight: 'bold' }}
+                                                    textStyle={{ textAlign: "center", fontWeight: 'bold', color: 'black' }}
                                                     widthArr={widthArrs}
                                                 />
                                             ))}
@@ -354,10 +359,6 @@ const AcademicInfoScreen = ({route} : any) => {
                         </View>
                     );
                 })}
-
-                <View style={styles.bottom_area}>
-                    {/* 바텀 탭 때문에 공간 만들려고 만들었다. */}
-                </View>
             </ScrollView>
         </View>
     );
@@ -371,23 +372,21 @@ const styles = StyleSheet.create({
     circleArea: { // 학점 정보 circle 영역
         marginTop: 10,
         width: '90%',
-        height: 300,
-        borderTopWidth: 2,
-        borderBottomWidth: 2,
         alignSelf: 'center',
     },
     circleRow: { // 학점 정보 열 영역
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: 18
+        marginVertical: 10
     },
     circle: { // 학점 정보 Circle
         marginHorizontal: 18
     },
     circleText: { // Circle 텍스트
         textAlign: 'center',
-        fontSize: 18,
+        fontSize: 16,
         fontWeight: 'bold',
+        color: 'black'
     },
     area: { // 직선 그래프 영역
         marginTop: 15,
@@ -396,7 +395,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     detail_credit_box: { // 학기별 상세 성적 박스 영역
-        backgroundColor: '#999999',
+        backgroundColor: '#FFEFD5',
         width: '100%',
         height: 70,
         flexDirection: 'row',
@@ -405,13 +404,15 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     semester_text: { // 박스 내 텍스트
-        fontSize: 32,
+        fontSize: 28,
         marginLeft: 15,
         fontWeight: 'bold',
+        color: 'black'
     },
     semester_button: { // 박스 내 버튼
         fontSize: 50,
-        marginRight: 15
+        marginRight: 15,
+        color: 'black'
     },
     detail_credit_area: { // 상세 성적 테이블 영역
         //backgroundColor: 'red',

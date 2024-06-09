@@ -40,6 +40,7 @@ import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen'
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
 import IconF from 'react-native-vector-icons/FontAwesome';
+import IconH from 'react-native-vector-icons/FontAwesome5';
 
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
@@ -537,8 +538,8 @@ export const StudyRoomStackNavigator = ({navigation, route} : any) => {
                     backgroundColor: '#F27405',
                 },
                 headerRight: () => (
-                    <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                        <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                    <TouchableOpacity onPress={() => navigation.navigate("StudyRoomDetailScreen")}>
+                        <IconH style={{ marginRight: 10 }} name="calendar-check" size={30} color="white" />
                     </TouchableOpacity>
                 ),
                 headerTintColor: 'white',
