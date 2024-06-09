@@ -16,7 +16,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
     const [inputheight, setinputheight] = useState(40);
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>(); //포스터에 대한 정보.
-    const [commentData, setCommentData] = useState<PostCommentData[]>([]);
     const [userdata, setUserData] = useState<UserData>(userData);
     const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
@@ -368,6 +367,15 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         Keyboard.dismiss(); // 키보드 숨기기
     };
 
+    const writeDate = postDetailInfo?.write_date;
+    let formattedDate = "";
+    if (writeDate) {
+        const parts = writeDate.split("-");
+        const datePart = parts.slice(0, 3).join("-");
+        const timePart = parts.slice(3).join(":");
+        formattedDate = `${datePart} ${timePart}`;
+    }
+
     return (
         <View style={styles.container}>
             <ScrollView>
@@ -387,7 +395,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                 <Text style={{ fontSize: 17, color: 'black', fontWeight: 'bold', marginTop: 13, }}>{postDetailInfo?.post_writer}({postDetailInfo?.writer_department})</Text>
                             </View>
                             <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 9, }}>
-                                <Text style={{ fontSize: 17, color: 'black', }}>{postDetailInfo?.write_date}</Text>
+                                <Text style={{ fontSize: 17, color: 'black' }}>{formattedDate}</Text>
                             </View>
                         </View>
                         <View style={styles.listcontainer}>

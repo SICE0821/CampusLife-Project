@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Dimensions, Image, Modal, TouchableOpacity, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Swiper from 'react-native-swiper';
@@ -8,6 +8,11 @@ import { UserData, EventData } from '../../types/type'
 const width = Dimensions.get("window").width;
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
+
+type userEvent = {
+  user_id : number,
+  event_id : number
+}
 
 const eventImages = [
   require('../../assets/001.png'),
@@ -25,6 +30,7 @@ const DeadlineEventScreen = ({ route }: any) => {
   const [selectedFiles, setSelectedFiles] = useState<DocumentPickerResponse[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
   const [eventData, setEventData] = useState<EventData>(eventdata);
+  const [usereventData, setUserEventData] = useState<userEvent[]>([])
 
   useFocusEffect(
     React.useCallback(() => {
@@ -32,6 +38,11 @@ const DeadlineEventScreen = ({ route }: any) => {
     }, []
     )
   )
+
+  useEffect(() => {
+    fetchEventData();
+  }, []);
+
   const settingDate = () => {
     setUserData(userData);
     setEventData(eventdata)
@@ -112,27 +123,70 @@ const DeadlineEventScreen = ({ route }: any) => {
           content: maintext,
         }),
       });
+  
       if (!response.ok) {
         throw new Error('서버 응답 오류');
       }
+  
     } catch (error) {
       console.error(error);
     }
   }
 
-  const send_event_alert = () => {
-    Alert.alert(
-      "이벤트 작성완료",
-      `이벤트를 성공적으로 작성하셨습니다. 
-당첨되시면 알람이 자동으로 가게됩니다.
-종료 일자 : ${eventData.close_date}`,
-      [
-        { text: "확인", onPress: () => sendEvent() }
-      ]
-    );
+  const fetchEventData = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/select_user_event_info`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_pk : userData.student_pk
+        })
+      })
+      const data = await response.json();
+      setUserEventData(data);
+    } catch (error) {
+      console.error('과목 가져오기 실패:', error);
+    }
+  }
+
+  const send_event_alert = async () => {
+    // 사용자가 이미 해당 이벤트를 등록한 경우
+    let hasRegistered = false;
+    usereventData.forEach(data => {
+      if (data.user_id === userData.user_pk && data.event_id === eventData.event_id) {
+        hasRegistered = true;
+      }
+    });
+  
+    if (hasRegistered) {
+      // 이미 등록한 사용자인 경우
+      Alert.alert("이미 이벤트를 등록하셨습니다.");
+    } else {
+      // 등록되지 않은 사용자인 경우
+      Alert.alert(
+        "이벤트 작성완료",
+        `이벤트를 성공적으로 작성하셨습니다. 
+        당첨되시면 알람이 자동으로 가게됩니다.
+        종료 일자 : ${eventData.close_date}`,
+        [
+          {
+            text: "확인", onPress: () => {
+              send_user_event_info();
+              uploadAllFiles();
+              // 여기서 이벤트 등록 상태를 업데이트합니다.
+              setUserEventData([...usereventData, { user_id: userData.user_pk, event_id: eventData.event_id }]);
+            }
+          }
+        ]
+      );
+    }
   };
 
   const sendEvent = () => {
+    
+    // 사용자가 이벤트를 등록하지 않은 경우, 초기화 코드 실행
     setSelectedFiles([]);
     setMainText("이곳에 글을 입력해 주세요");
   }
@@ -193,8 +247,6 @@ const DeadlineEventScreen = ({ route }: any) => {
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity onPress={async () => {
             sendEvent();
-            send_user_event_info();
-            uploadAllFiles();
             send_event_alert();
           }}>
             <View style={styles.sendArea}>

@@ -147,7 +147,7 @@ const SchoolInfoScreen = () => {
           borderColor: 'gray'}}>
           <Picker
           selectedValue={selectedCampus}
-          style={{ height: 50, width: 150, color: 'black', backgroundColor: '#ffffff' }}
+          style={{ height: 50, width: 170, color: 'black', backgroundColor: '#ffffff' }}
           onValueChange={handleCampusChange}
           dropdownIconColor={'black'}
         >

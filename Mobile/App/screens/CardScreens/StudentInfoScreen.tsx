@@ -310,12 +310,9 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                         {userdata.currentstatus !== "졸업" && (
                             <View style={styles.schoolInfoLabel}>
                                 <Text style={styles.schoolInfoText}>학년</Text>
-                                <TouchableOpacity onPress={opengradeModal}>
                                     <View style={styles.listBoxArea}>
                                         <Text style={styles.listBoxText}>{userdata.grade}학년</Text>
-                                        <IconB style={styles.listBoxIcon} name="down" size={30} />
                                     </View>
-                                </TouchableOpacity>
                             </View>
                         )}
                         {userdata.currentstatus !== "졸업" ? (

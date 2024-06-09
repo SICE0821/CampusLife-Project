@@ -80,7 +80,8 @@ const { getGeneralPosts,
   Get_Event_Photos,
   send_user_event_info,
   user_send_photo,
-  delete_studyroom
+  delete_studyroom,
+  select_user_event_info,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -107,7 +108,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -795,27 +796,6 @@ app.post('/delete_book_mark', async (req, res) => {
     res.status(500).send({ message: "서버 오류" });
   }
 })
-
-//포스트 디테일 페이지 정보 불러오기
-app.post('/get_post_detail', async (req, res) => {
-  const { post_id } = req.body; //데이터 가져올때 무조건 awit
-  const row = await get_post_detail(post_id);
-
-  const userData = {
-    post_writer: row[0].student_name,
-    writer_department: row[0].department_name,
-    write_date: formatDate2(row[0].date),
-    title: row[0].title,
-    contents: row[0].contents,
-    like: row[0].like,
-    view: row[0].view,
-    writer_propile: row[0].profilePhoto,
-    post_id: row[0].post_id,
-    user_id: row[0].user_id,
-  };
-  res.json(userData);
-
-});
 
 //포스트 댓글 리스트 불러오기
 app.post('/get_comment', async (req, res) => {
@@ -1602,6 +1582,25 @@ app.post('/send_user_event_photo', upload.array('images'), (req, res) => {
     res.status(500).send('Internal Server Error');
   }
   });
+
+// 이벤트 정보 선택
+app.post('/select_user_event_info', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    const rows = await select_user_event_info(user_id);
+    const processedData = rows.map(item => ({
+        user_id : item.user_id,
+        user_send_event : item.user_send_event,
+        event_id : item.event_id
+    }));
+    console.log(processedData);
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //서버 시작
 app.listen(PORT, () => {

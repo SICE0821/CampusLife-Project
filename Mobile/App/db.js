@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -1881,6 +1881,23 @@ async function send_user_event_info(user_id, event_id, content) {
     }
 }
 
+async function select_user_event_info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT user_send_event.user_id, user_send_event.event_id, user_send_event.user_send_event FROM user_send_event
+        `;
+        const row = await conn.query(query);
+        console.log(row);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 async function user_send_photo(user_id, event_id, fileNameWithoutExtension) {
     let conn;
     try {
@@ -2001,4 +2018,5 @@ module.exports = {
     send_user_event_info,
     user_send_photo,
     delete_studyroom,
+    select_user_event_info,
 };
