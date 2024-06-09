@@ -529,6 +529,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                         value={commenttext}
                         multiline={true}
                         placeholder="텍스트를 입력하세요"
+                        placeholderTextColor={'gray'}
                     />
                 </View>
                 <TouchableOpacity
@@ -618,7 +619,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     inputtext: {
-        width: 410,
+        width: '88%',
         //backgroundColor: 'red',
         borderTopLeftRadius: 10,
         borderBottomLeftRadius: 10,

@@ -120,14 +120,6 @@ const SchoolInfoScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Picker
-        selectedValue={selectedCampus}
-        style={{ height: 50, width: 150, color: 'black', backgroundColor: 'gray' }}
-        onValueChange={handleCampusChange}
-      >
-        <Picker.Item label="본캠퍼스" value="본캠퍼스" />
-        <Picker.Item label="소사캠퍼스" value="소사캠퍼스" />
-      </Picker>
       <ScrollView ref={scrollViewRef}>
         <NaverMapView style={styles.map} camera={camera}>
           {filteredBuildings.map((building, index) => (
@@ -146,6 +138,18 @@ const SchoolInfoScreen = () => {
             </NaverMapMarkerOverlay>
           ))}
         </NaverMapView>
+        <View style={{ marginTop: 5, position: 'absolute', alignSelf: 'flex-end', borderWidth: 1, elevation: 5, borderColor: 'gray'}}>
+          <Picker
+          selectedValue={selectedCampus}
+          style={{ height: 50, width: 150, color: 'black', backgroundColor: '#ffffff', }}
+          onValueChange={handleCampusChange}
+          dropdownIconColor={'black'}
+        >
+          <Picker.Item label="본캠퍼스" value="본캠퍼스" />
+          <Picker.Item label="소사캠퍼스" value="소사캠퍼스" />
+        </Picker>
+        </View>
+        
         {filteredBuildings.map((building, index) => (
           <View
             key={index}
@@ -177,12 +181,11 @@ const SchoolInfoScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: width,
     backgroundColor: 'white',
   },
   map: {
     width: '100%',
-    height: 500,
+    height: 600,
     justifyContent: 'center',
     alignItems: 'center',
   },
