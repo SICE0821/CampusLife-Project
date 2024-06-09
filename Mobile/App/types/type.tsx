@@ -122,6 +122,7 @@ export type Lecture = {
   lecture_semester : number;
   lecture_credit : number;
   lecture_grades : string;
+  session_duration: number;
 }
 
 export type aramData = {
@@ -163,11 +164,3 @@ export type EventData = {
     photo_data : string
   }[];
 }
-
-export type BuildingData = {
-  [x: string]: any;
-  study_room_id: number,
-  campus_place: string,
-  study_room_name: string,
-  image : any
-};

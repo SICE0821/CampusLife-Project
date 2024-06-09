@@ -77,6 +77,9 @@ const { getGeneralPosts,
   addFriendCodeAram,
   user_update_point_3,
   Get_Event_Data,
+  Get_Event_Photos,
+  send_user_event_info,
+  user_send_photo,
   delete_studyroom
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -106,8 +109,8 @@ function formatDate2(dateString) {
 const pool = mariadb.createPool({
   host: '127.0.0.1',
   port: 3306,
-  user: 'root',
-  password: '1214',
+  user: 'dohyun',
+  password: '0000',
   connectionLimit: 10,
   database: 'campuslife',
 });
@@ -125,9 +128,11 @@ const upload = multer({ storage });
 
 
 //메인페이지에 핫 게시글 데이터를 가져온다.
-app.get('/MainPagehotPost', async (req, res) => {
+app.post('/MainPagehotPost', async (req, res) => {
+  const { campus_id } = req.body;
+  
   try {
-    const rows = await gethotpostdata();
+    const rows = await gethotpostdata(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -174,9 +179,10 @@ app.post('/MainPagedepartmentPost', async (req, res) => {
 
 
 //메인페이지에 전체 게시글 데이터를 가져온다.
-app.get('/MainPageSchoolPost', async (req, res) => {
+app.post('/MainPageSchoolPost', async (req, res) => {
+  const { campus_id } = req.body;
   try {
-    const rows = await getschoolpostdata();
+    const rows = await getschoolpostdata(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -281,9 +287,10 @@ app.post('/get_items', async (req, res) => {
 });
 
 //학교 전체 공지사항
-app.get('/noticeschoolpost', async (req, res) => {
+app.post('/noticeschoolpost', async (req, res) => {
+  const { campus_id } = req.body;
   try {
-    const rows = await getNoticePosts();
+    const rows = await getNoticePosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -326,9 +333,10 @@ app.post('/noticedepartmentpost', async (req, res) => {
 });
 
 //학교 핫 공지사항
-app.get('/NoticeHotpost', async (req, res) => {
+app.post('/NoticeHotpost', async (req, res) => {
+  const { campus_id } = req.body;
   try {
-    const rows = await getNoticeHotPosts();
+    const rows = await getNoticeHotPosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -423,9 +431,10 @@ app.post('/NoticeDepartmentbookmark', async (req, res) => {
 
 
 //게시글화면에서 전체 전체 게시글을 가져온다.
-app.get('/generalpost', async (req, res) => {
+app.post('/generalpost', async (req, res) => {
   try {
-    const rows = await getGeneralPosts();
+    const { campus_id } = req.body;
+    const rows = await getGeneralPosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -445,9 +454,10 @@ app.get('/generalpost', async (req, res) => {
 });
 
 //게시글화면에서 전체 핫 게시글을 가져온다.
-app.get('/Hotpost', async (req, res) => {
+app.post('/Hotpost', async (req, res) => {
   try {
-    const rows = await getHotPosts();
+    const { campus_id } = req.body;
+    const rows = await getHotPosts(campus_id);
     const processedData = rows.map(item => ({
       post_id: item.post_id,
       title: item.title,
@@ -1530,6 +1540,68 @@ app.post('/deletestudyroom', async (req, res) => {
   }
 });
 
+//메인페이지 이벤트 사진 데이터 가져오기
+app.post('/Get_Event_Photos', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    const rows = await Get_Event_Photos(event_id);
+    const processedData = rows.map(item => ({
+      photo_data: item.event_photo
+    }));
+    console.log(processedData);
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/send_user_event_info', async (req, res) => {
+  const { user_id, event_id, content } = req.body;
+  try {
+    await send_user_event_info(user_id, event_id, content);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이미지 업로드 및 DB저장
+app.post('/send_user_event_photo', upload.array('images'), (req, res) => {
+  console.log("일단 서버에는 잘 들어와");
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).send('No files uploaded');
+  }
+
+  const fileNames = req.files.map(file => file.filename); // 파일 이름 추출
+  try {
+    for (const fileName of fileNames) {
+      const regex = /_(\d+)_(\d+)\.png$/;
+      const match = fileName.match(regex);
+
+      if (match) {
+        const fileNameWithoutExtension = fileName.replace('.png', '');
+        const user_id = parseInt(match[1], 10);
+        const event_id = parseInt(match[2], 10);
+
+        console.log(fileNameWithoutExtension);
+        console.log(user_id);
+        console.log(event_id);
+
+        user_send_photo(user_id, event_id, fileNameWithoutExtension);
+      } else {
+        console.error('The filename format is incorrect.');
+      }
+    }
+    res.send('Files processed and saved successfully to the database');
+  } catch (error) {
+    console.error('Error saving files to the database:', error);
+    res.status(500).send('Internal Server Error');
+  }
+  });
 
 //서버 시작
 app.listen(PORT, () => {

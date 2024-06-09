@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Dimensions, Image, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Dimensions, Image, Modal, TouchableOpacity, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Swiper from 'react-native-swiper';
 import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
@@ -120,8 +120,21 @@ const DeadlineEventScreen = ({ route }: any) => {
     }
   }
 
-  const sendEvent = () => {
+  const send_event_alert = () => {
+    Alert.alert(
+      "이벤트 작성완료",
+      `이벤트를 성공적으로 작성하셨습니다. 
+당첨되시면 알람이 자동으로 가게됩니다.
+종료 일자 : ${eventData.close_date}`,
+      [
+        { text: "확인", onPress: () => sendEvent() }
+      ]
+    );
+  };
 
+  const sendEvent = () => {
+    setSelectedFiles([]);
+    setMainText("이곳에 글을 입력해 주세요");
   }
 
   const handleFileRemove = (index: number) => {
@@ -160,7 +173,7 @@ const DeadlineEventScreen = ({ route }: any) => {
           </TouchableOpacity>
           {selectedFiles.map((file, index) => (
             <View key={index} style={styles.fileInfo}>
-              <Text style={styles.fileName}>{file.type}</Text>
+              <Text style={styles.fileName}>{file.name}</Text>
               <TouchableOpacity onPress={() => handleFileRemove(index)} style={styles.cancelButton}>
                 <Icon name="closecircleo" size={18} />
               </TouchableOpacity>
@@ -181,7 +194,8 @@ const DeadlineEventScreen = ({ route }: any) => {
           <TouchableOpacity onPress={async () => {
             sendEvent();
             send_user_event_info();
-            uploadAllFiles()
+            uploadAllFiles();
+            send_event_alert();
           }}>
             <View style={styles.sendArea}>
               <Text style={styles.sendText}>전송</Text>

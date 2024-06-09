@@ -149,63 +149,86 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
   };
 
   const handleTimeSelect = (selectedRoom: string, selectedHour: string) => {
+    const reservedTimesForSelectedDate = reservedTimes[format(selectedDate, "yyyy-MM-dd")] || {};
+    
+    for (const roomName in selectedTimes) {
+      const roomTimes = selectedTimes[roomName];
+      if (roomName !== selectedRoom && roomTimes.includes(selectedHour)) {
+        Alert.alert("예약 실패", "이미 해당 시간에 다른 스터디룸이 예약되어 있습니다.");
+        return; 
+      }
+    }    
     const roomTimes = selectedTimes[selectedRoom] || [];
     const newTimes = roomTimes.includes(selectedHour)
       ? roomTimes.filter((time: any) => time !== selectedHour)
       : [...roomTimes, selectedHour].slice(-3);
   
+    // 최대 예약 가능한 시간을 초과하는지 확인합니다.
     if (newTimes.length > 3) {
       Alert.alert("예약 실패", "최대 3시간까지 연속된 시간대만 선택할 수 있습니다.");
       return;
-    } 
+    }
   
+    // 연속된 시간을 선택했는지 확인합니다.
     if (!isConsecutive(newTimes)) {
       Alert.alert("예약 실패", "연속된 시간대만 선택할 수 있습니다.");
       return;
     }
   
-  
+    // 선택한 시간을 상태에 업데이트합니다.
     setSelectedTimes({
       ...selectedTimes,
       [selectedRoom]: newTimes,
     });
   };
-  const handleReservation = () => {
-    const reservationDetails = Object.entries(selectedTimes).map(([room, times]: any) => ({
-      room,
-      times: times.sort(),
-    })).filter(detail => detail.times.length > 0);
   
-    if (reservationDetails.length === 0) {
-      Alert.alert("예약 실패", "시간대를 선택해주세요.");
+  const handleReservation = () => {
+    // 선택한 날짜에 대한 이미 예약된 시간 정보를 가져옵니다.
+    const reservedTimesForSelectedDate = reservedTimes[format(selectedDate, "yyyy-MM-dd")] || {};
+  
+    // 선택한 날짜에 이미 스터디룸 예약이 있는 경우, 예약을 실패하고 함수를 종료합니다.
+    if (Object.keys(reservedTimesForSelectedDate).length > 0) {
+      Alert.alert("예약 실패", "이미 해당 날짜에 스터디룸을 예약하셨습니다.");
       return;
     }
-  
-    let message = `예약된 날짜: ${format(selectedDate, "yyyy년 M월 d일")}\n`;
-  
-    if (schoolBuildingData) {
-      reservationDetails.forEach(detail => {
-        const selectedRoomInfo = studyroomInfo.find(room => room.name === detail.room);
-        if (selectedRoomInfo) {
-          const selectedBuilding = schoolBuildingData.find((building: BuildingData) => building.study_room_name === detail.room);
-          if (selectedBuilding) {
-            const studyRoomId = selectedBuilding.study_room_id;
-            const studyRoomDate = format(selectedDate, "yyyy-MM-dd");
-            const studyRoomTime = detail.times.join(',');
-  
-            message += `스터디룸: ${selectedRoomInfo.place} ${selectedRoomInfo.name}\n시간대: ${detail.times.join(', ')}시\n`;
-            insert_user_study_room(studyRoomId, studyRoomDate, studyRoomTime);
-            updateReservedTimes(studyRoomDate, detail.room, detail.times);  // 배열로 전달
-          }
+  // 예약 가능한 경우에만 예약 처리를 진행합니다.
+  const reservationDetails = Object.entries(selectedTimes).map(([room, times]: any) => ({
+    room,
+    times: times.sort(),
+  })).filter(detail => detail.times.length > 0);
+
+  if (reservationDetails.length === 0) {
+    Alert.alert("예약 실패", "시간대를 선택해주세요.");
+    return;
+  }
+
+  let message = `예약된 날짜: ${format(selectedDate, "yyyy년 M월 d일")}\n`;
+
+  if (schoolBuildingData) {
+    reservationDetails.forEach(detail => {
+      const selectedRoomInfo = studyroomInfo.find(room => room.name === detail.room);
+      if (selectedRoomInfo) {
+        const selectedBuilding = schoolBuildingData.find((building: BuildingData) => building.study_room_name === detail.room);
+        if (selectedBuilding) {
+          const studyRoomId = selectedBuilding.study_room_id;
+          const studyRoomDate = format(selectedDate, "yyyy-MM-dd");
+          const studyRoomTime = detail.times.join(',');
+
+          message += `스터디룸: ${selectedRoomInfo.place} ${selectedRoomInfo.name}\n시간대: ${detail.times.join(', ')}시\n`;
+          insert_user_study_room(studyRoomId, studyRoomDate, studyRoomTime);
+          updateReservedTimes(studyRoomDate, detail.room, detail.times);  // 배열로 전달
         }
-      });
-    } else {
-      console.error('학교 건물 데이터가 없습니다.');
-    }
+      }
+    });
+  } else {
+    console.error('학교 건물 데이터가 없습니다.');
+  }
+
+  Alert.alert("예약 성공", message);
+  setSelectedTimes({});
+};
+
   
-    Alert.alert("예약 성공", message);
-    setSelectedTimes({});
-  };
 
   const renderCampusSelect = () => (
     <View style={styles.campusSelectArea}>
