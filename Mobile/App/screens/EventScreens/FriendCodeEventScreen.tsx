@@ -49,7 +49,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
   const success = () => {
     Alert.alert(
       "친구코드 입력 성공",
-      "성공적으로 친구코드를 등록 하셨습니다!                  100포인트 적립!!",
+      "성공적으로 친구코드를 등록 하셨습니다!                  \n100포인트 적립!!",
       [
         {
           text: "확인",
