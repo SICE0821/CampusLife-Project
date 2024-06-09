@@ -108,7 +108,6 @@ const StudyRoomDetailScreen = ({ route }: any) => {
       return acc;
     }, {});
 
-    // 날짜를 내림차순으로 정렬
     const sortedGroupedData = Object.keys(groupedData)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
       .reduce((acc: GroupedStudyRoomInfo, key: string) => {
