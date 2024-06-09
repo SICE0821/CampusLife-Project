@@ -503,11 +503,11 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                             {subitem.content}
                                         </Text>
                                         <View style={styles.dataandlike}>
-                                            <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 15 }}>
+                                            <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 15, color: 'black' }}>
                                                 {subitem.date}
                                             </Text>
                                             <Text style={{ marginTop: 2 }}><IconD size={30} color="black" name={"like"} /></Text>
-                                            <Text style={{ fontSize: 15, marginTop: 2, }}>
+                                            <Text style={{ fontSize: 15, marginTop: 2, color: 'black' }}>
                                                 {subitem.like}
                                             </Text>
                                         </View>

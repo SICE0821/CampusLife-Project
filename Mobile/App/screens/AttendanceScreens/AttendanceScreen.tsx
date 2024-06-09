@@ -13,6 +13,8 @@ import { Camera,
 import { UserData, Lecture } from '../../types/type'
 import config from '../../config';
 
+const width = Dimensions.get("window").width;
+
 const AttendanceScreen = ({navigation, route}: any) => {
   const { userdata, LectureData } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
@@ -308,10 +310,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white'
   },
   textContainer: { // 오늘의 출석, 날짜 텍스트 컨테이너
+    alignSelf: 'flex-start',
     justifyContent: 'center',
-    top: 40,
-    marginRight : 200,
-    marginBottom : 60,
+    width: width*0.9,
+    marginVertical: 40,
+    padding: 5,
   },
   textContainer2:{ // 출석 현황 텍스트 컨테이너
     alignItems: 'center',
@@ -324,7 +327,6 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 10,
-    marginLeft : 5,
     color : 'black',
   },
   title2: { // 출석 현황 텍스트 css
@@ -336,7 +338,7 @@ const styles = StyleSheet.create({
   date: { // 날짜 텍스트 css
     fontWeight: 'bold',
     fontSize: 20,
-    marginLeft : 6,
+    color: 'gray'
   },
   buttonContainer: { // 오늘의 출석 버튼 컨테이너
     justifyContent: 'flex-start',
@@ -371,7 +373,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginLeft: 5,
     marginBottom: 5,
-    
+    color: 'black'
   },
   ListInfo2: { // 버튼 누른 후 과목마다의 출석 텍스트
     fontSize: 15,

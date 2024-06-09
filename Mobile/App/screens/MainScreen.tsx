@@ -498,7 +498,7 @@ return (
                 <IconH style={styles.postLabelIcon} name="burst-new" size={40} />
               </View>
               <View style={styles.postViewArea}>
-                <Text style={styles.postViewText}>{schoolpostdata[0]?.view}</Text>
+                <Text style={styles.postViewText}>{departmentpostdata[0]?.view}</Text>
                 <IconB style={styles.postViewIcon} name="eyeo" size={30} />
               </View>
             </TouchableOpacity>
