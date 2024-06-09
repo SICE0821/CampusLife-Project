@@ -181,24 +181,24 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
             </TouchableOpacity>
         )
     };
-    const getGeneralposts = async () => {
-        const controller = new AbortController(); // AbortController 인스턴스 생성
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후 요청을 중단하기 위한 setTimeout 설정
 
+    const getGeneralposts = async () => {
         try {
             const response = await fetch(`${config.serverUrl}/generalpost`, {
-                signal: controller.signal // fetch 요청에 signal 옵션 추가
-            });
-            if (!response.ok) { // 응답 상태 확인
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    campus_id : userData.campus_pk,
+                    department_id : userData.department_pk
+                }),
+            })
             const postsdata = await response.json();
-            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error);
         } finally {
-            clearTimeout(timeoutId); // 요청이 완료되면 setTimeout을 취소
         }
     }
 

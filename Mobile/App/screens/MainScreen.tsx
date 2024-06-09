@@ -124,20 +124,24 @@ const MainPage = ({ navigation, route }: any) => {
     }
   }
 
+
   const fetchschoolpostData = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/MainPageSchoolPost`);
-      if (!response.ok) {
-        throw new Error('서버 응답 실패');
-      }
+      const response = await fetch(`${config.serverUrl}/MainPageSchoolPost`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userData.campus_pk,
+        })
+      })
       const data = await response.json();
       setschollpostdata(data);
-      //console.log("데이터 받음:", data);
     } catch (error) {
-      console.error('데이터를 가져오는 중 오류 발생:', error);
+      console.error('유저 학과 이름 가져오기 실패:', error);
     }
-  };
-
+  }
 
   const fetchdepartmentpostData = async () => {
     try {
@@ -157,22 +161,27 @@ const MainPage = ({ navigation, route }: any) => {
     } finally {
     }
   }
-
-  const fetchhotpostData = async () => {
-    try {
-      const response = await fetch(`${config.serverUrl}/MainPagehotPost`);
-      if (!response.ok) {
-        throw new Error('서버 응답 실패');
-      }
-      const data = await response.json();
-      sethotpostdata(data);
-      //console.log("데이터 받음:", data);
-    } catch (error) {
-      console.error('데이터를 가져오는 중 오류 발생:', error);
-    }
-  };
   const settingUserData = () => {
     setUserData(userdata);
+  }
+
+  
+  const fetchhotpostData = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/MainPagehotPost`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userData.campus_pk,
+        })
+      })
+      const data = await response.json();
+      sethotpostdata(data);
+    } catch (error) {
+      console.error('유저 학과 이름 가져오기 실패:', error);
+    }
   }
 
   const get_user_point = async () => {
@@ -389,7 +398,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[0], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{schoolpostdata[0]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{schoolpostdata[0]?.title}</Text>
                 <IconH style={styles.postLabelIcon} name="burst-new" size={40} />
               </View>
               <View style={styles.postViewArea}>
@@ -402,7 +413,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[1], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{schoolpostdata[1]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{schoolpostdata[1]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{schoolpostdata[1]?.view}</Text>
@@ -414,7 +427,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[2], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{schoolpostdata[2]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{schoolpostdata[2]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{schoolpostdata[2]?.view}</Text>
@@ -426,7 +441,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[3], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{schoolpostdata[3]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{schoolpostdata[3]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{schoolpostdata[3]?.view}</Text>
@@ -438,7 +455,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: schoolpostdata[4], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{schoolpostdata[4]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{schoolpostdata[4]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{schoolpostdata[4]?.view}</Text>
@@ -473,7 +492,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[0], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{departmentpostdata[0]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{departmentpostdata[0]?.title}</Text>
                 <IconH style={styles.postLabelIcon} name="burst-new" size={40} />
               </View>
               <View style={styles.postViewArea}>
@@ -486,7 +507,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[1], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{departmentpostdata[1]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{departmentpostdata[1]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{departmentpostdata[1]?.view}</Text>
@@ -498,7 +521,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[2], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{departmentpostdata[2]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{departmentpostdata[2]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{departmentpostdata[2]?.view}</Text>
@@ -510,7 +535,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[3], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{departmentpostdata[3]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{departmentpostdata[3]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{departmentpostdata[3]?.view}</Text>
@@ -522,7 +549,9 @@ return (
               navigation.navigate("NoticePostDetailScreen", { item: departmentpostdata[4], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{departmentpostdata[4]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{departmentpostdata[4]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{departmentpostdata[4]?.view}</Text>
@@ -557,7 +586,9 @@ return (
               navigation.navigate("PostDetailScreen", { item: hotpostdata[0], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{hotpostdata[0]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{hotpostdata[0]?.title}</Text>
                 <IconH style={styles.postLabelIcon} name="burst-new" size={40} />
               </View>
               <View style={styles.postViewArea}>
@@ -570,7 +601,9 @@ return (
               navigation.navigate("PostDetailScreen", { item: hotpostdata[1], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{hotpostdata[1]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{hotpostdata[1]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{hotpostdata[1]?.view}</Text>
@@ -582,7 +615,9 @@ return (
               navigation.navigate("PostDetailScreen", { item: hotpostdata[2], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{hotpostdata[2]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{hotpostdata[2]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{hotpostdata[2]?.view}</Text>
@@ -594,7 +629,9 @@ return (
               navigation.navigate("PostDetailScreen", { item: hotpostdata[3], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{hotpostdata[3]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{hotpostdata[3]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{hotpostdata[3]?.view}</Text>
@@ -606,7 +643,9 @@ return (
               navigation.navigate("PostDetailScreen", { item: hotpostdata[4], userData })
             }}>
               <View style={styles.postLabelTextArea}>
-                <Text style={styles.postLabelText}>{hotpostdata[4]?.title}</Text>
+                <Text style={styles.postLabelText}
+                numberOfLines={1}
+                ellipsizeMode="tail">{hotpostdata[4]?.title}</Text>
               </View>
               <View style={styles.postViewArea}>
                 <Text style={styles.postViewText}>{hotpostdata[4]?.view}</Text>
