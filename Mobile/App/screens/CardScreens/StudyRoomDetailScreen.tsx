@@ -103,10 +103,20 @@ const StudyRoomDetailScreen = ({ route }: any) => {
   }, []);
 
   const groupByDate = (data: StudyRoomInfo[]): GroupedStudyRoomInfo => {
-    return data.reduce((acc: GroupedStudyRoomInfo, item: StudyRoomInfo) => {
+    const groupedData = data.reduce((acc: GroupedStudyRoomInfo, item: StudyRoomInfo) => {
       (acc[item.study_room_date] = acc[item.study_room_date] || []).push(item);
       return acc;
     }, {});
+
+    // 날짜를 내림차순으로 정렬
+    const sortedGroupedData = Object.keys(groupedData)
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+      .reduce((acc: GroupedStudyRoomInfo, key: string) => {
+        acc[key] = groupedData[key];
+        return acc;
+      }, {});
+
+    return sortedGroupedData;
   };
 
   const currentDate = new Date();
@@ -124,7 +134,7 @@ const StudyRoomDetailScreen = ({ route }: any) => {
           {expanded[date] && groupedStudyRoomInfo[date].map((room, idx) => (
             <View key={idx}>
               <View style={styles.additionalInfo}>
-                <Image style={styles.image} source={{ uri: `http://10.0.2.2:3000/${room.image}.png` }} />
+                <Image style={styles.image} source={{ uri: `${config.photoUrl}/${room.image}.png` }} />
                 <View style={styles.info}>
                   <Text style={styles.label}>시간: {room.study_room_time.split(',').map(time => `${time.trim()}시`).join(', ')}</Text>
                   <Text style={styles.label}>예약자: {userdata.name}</Text>
@@ -139,7 +149,7 @@ const StudyRoomDetailScreen = ({ route }: any) => {
                   <Text style={{ fontSize: 18, color: 'black' }}>취소하기</Text>
                 </TouchableOpacity>
               )}
-              <View style={{borderWidth : 0.5, borderColor:"grey", marginTop : 10,}}></View>
+              <View style={{ borderWidth: 0.5, borderColor: "grey", marginTop: 10, }}></View>
             </View>
           ))}
         </View>

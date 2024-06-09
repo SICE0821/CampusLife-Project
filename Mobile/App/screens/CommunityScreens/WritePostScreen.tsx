@@ -239,25 +239,31 @@ const styles = StyleSheet.create({
 
   allposter: {
     flex: 0.2,
-    //backgroundColor : 'red',
+    justifyContent: 'center', // 수직 정렬
+    alignItems: 'center', // 수평 정렬
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
     margin: 20,
-    borderBottomWidth: 2,
   },
 
   noallposterfont: {
     color: '#CCCCCC',
+    borderBottomWidth: 2,
+    borderBottomColor: '#CCCCCC',
+    width: '100%', // 가로 길이 조정
+    textAlign: 'center', // 텍스트 가운데 정렬
+    paddingBottom: 10,
     fontSize: 25,
     marginTop: 15,
   },
-
+  
   yesallposterfont: {
     fontSize: 25,
     marginTop: 15,
-    color: 'black'
+    borderBottomColor: 'black',
+    color: 'black',
+    width: '100%', // 가로 길이 조정
+    textAlign: 'center', // 텍스트 가운데 정렬
   },
 
   departmentposter: {

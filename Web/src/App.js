@@ -4,13 +4,12 @@ import QRCode from 'react-qr-code';
 function App() {
   const [qrData, setQrData] = useState(""); // QR 코드 데이터 상태 추가
   const [remainingTime, setRemainingTime] = useState(20); // 남은 시간 상태 추가
-  const qrCodeDataArray = useMemo(() => ["QR 데이터 1", "QR 데이터 2", "QR 데이터 3"], []); // useMemo를 사용하여 초기화
 
   useEffect(() => {
     const timer = setInterval(() => {
-      // 20초마다 QR 데이터를 변경
-      const randomIndex = Math.floor(Math.random() * qrCodeDataArray.length);
-      setQrData(qrCodeDataArray[randomIndex]);
+      // 랜덤한 QR 데이터 생성
+      const randomData = generateRandomQRData();
+      setQrData(randomData);
 
       // 남은 시간 업데이트
       setRemainingTime(20);
@@ -26,7 +25,13 @@ function App() {
       clearInterval(timer);
       clearInterval(countdown);
     };
-  }, [qrCodeDataArray]); // 처음 한 번만 실행되어야 함
+  }, []);
+
+  const generateRandomQRData = () => {
+    // 랜덤한 문자열 생성
+    const randomString = Math.random().toString(36).substring(2, 15);
+    return randomString;
+  };
 
   return (
     <div className="App">

@@ -10,10 +10,16 @@ const FullScreenCamera = ({navigation}: any) => {
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
     onCodeScanned: (codes) => {
-      if (!hasScanned) { 
+      if (!hasScanned) {
         setHasScanned(true);
-        console.log("QR code scanned");
-        navigation.navigate('AttendanceScreen', { scannedCode: codes });
+        console.log("인식된 QR 코드 목록:", codes);
+        const webQRCode = codes.find(code => code.value && code.value.length === 11);
+        if (webQRCode) {
+          console.log("QR이 인식되었습니다 : ", webQRCode.value);
+          navigation.navigate('AttendanceScreen', { scannedCode: webQRCode.value });
+        } else {
+          Alert.alert("악용하면 큰일나요^^");
+        }
       }
     },
   });

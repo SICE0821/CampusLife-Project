@@ -109,8 +109,8 @@ function formatDate2(dateString) {
 const pool = mariadb.createPool({
   host: '14.6.152.64',
   port: 3306,
-  user: 'root',
-  password: '1214',
+  user: 'dohyun',
+  password: '0000',
   connectionLimit: 10,
   database: 'campuslife',
 });
@@ -1540,32 +1540,6 @@ app.post('/deletestudyroom', async (req, res) => {
       res.json({ message: "성공적으로 값 삭제" });
   } else {
       res.status(500).json({ error: "삭제 실패" });
-  }
-});
-
-//메인페이지 이벤트 데이터 전부 가져와
-app.post('/Get_Event_Data', async (req, res) => {
-  const { campus_id } = req.body;
-  try {
-    const rows = await Get_Event_Data(campus_id);
-    const processedData = {
-      event_id: rows[0].event_id,
-      campus_id: rows[0].campus_id,
-      user_id: rows[0].user_id,
-      name: rows[0].name,
-      get_point: rows[0].get_point,
-      info: rows[0].info,
-      simple_info: rows[0].simple_info,
-      event_photo: rows[0].event_photo,
-      start_date: formatDate(rows[0].start_date),
-      close_date: formatDate(rows[0].close_date),
-      is_event_close: rows[0].is_event_close,
-    }
-    res.json(processedData);
-    console.log("성공적으로 데이터 보냄");
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

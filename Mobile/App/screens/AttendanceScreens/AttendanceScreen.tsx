@@ -16,7 +16,7 @@ import config from '../../config';
 const AttendanceScreen = ({navigation, route}: any) => {
   const { userdata, LectureData } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
-  const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관
   const { hasPermission, requestPermission } = useCameraPermission()
   const [isCameraButton, setIsCameraButton] = useState(false);
   const [scannedCode, setScannedCode] = useState<string | null>(null);
@@ -24,6 +24,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const [selectedLecture, setSelectedLecture] = useState<Lecture | null>(null);
   const [lastScannedTime, setLastScannedTime] = useState<null | Date>(null);
   const [isScanned, setIsScanned] = useState(false); // QR 코드가 스캔되었는지 추적
+  
 
   const filterLectures = (lectures: Lecture[]) => {
     return lectures.filter(
@@ -44,12 +45,15 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
     return `${year}년 ${month}월 ${date}일 ${day}요일`;
   };
+  
 
   const getCurrentDay = () => {
-    const days = ['월요일', '화요일', '수요일', '목요일', '금요일'];
+    const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
     const now = new Date();
-    return days[now.getDay() - 1]; // 현재 요일 반환
+    return days[now.getDay()]; // 현재 요일 반환
   };
+
+  const nowday = getCurrentDay();
 
   const formatTimeRange = (lectureTime: string) => {
     return lectureTime.split(' ~ ');
@@ -63,25 +67,21 @@ const AttendanceScreen = ({navigation, route}: any) => {
     const [endHour, endMinute] = end.split(':').map(Number);
   
     while (!(currentHour === endHour && currentMinute === endMinute)) {
-      // 시작 시간을 10분 단위로 반올림
       if (currentMinute % 10 !== 0) {
         currentMinute = Math.ceil(currentMinute / 10) * 10;
       }
   
-      // 시간 형식 맞추기
       const startHourStr = currentHour < 10 ? `0${currentHour}` : `${currentHour}`;
       const startMinuteStr = currentMinute < 10 ? `0${currentMinute}` : `${currentMinute}`;
   
       let nextHour = currentHour;
-      let nextMinute = currentMinute + 50; // 50분 간격
+      let nextMinute = currentMinute + 50;
   
-      // 시간을 60분 단위로 조정
       if (nextMinute >= 60) {
         nextHour++;
         nextMinute -= 60;
       }
   
-      // 종료 시간에 도달하면 반복 종료
       if (nextHour > endHour || (nextHour === endHour && nextMinute > endMinute)) {
         break;
       }
@@ -92,11 +92,9 @@ const AttendanceScreen = ({navigation, route}: any) => {
       const nextTime = `${startHourStr}:${startMinuteStr} ~ ${nextHourStr}:${nextMinuteStr}`;
       timeRanges.push(nextTime);
   
-      // 다음 시간대의 시작 시간 설정
       currentHour = nextHour;
       currentMinute = nextMinute;
   
-      // 이전 시간대의 종료 시간에 10분을 추가하여 다음 시간대의 시작 시간 설정
       currentMinute += 10;
       if (currentMinute >= 60) {
         currentHour++;
@@ -104,8 +102,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
       }
     }
   
-    return timeRanges;
-
+    return [...timeRanges]; 
   };
 
   const updateAttendanceStatus = async (lecture: Lecture) => {
@@ -122,7 +119,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
       return lec;
     });
     setLectureList(updatedLectureList);
-    Updatelecture(updatedLectureList);
+    await Updatelecture(updatedLectureList); 
   };
   
 
@@ -145,7 +142,9 @@ const AttendanceScreen = ({navigation, route}: any) => {
           }),
         });
         const data = await response.json();
+
         console.log("출석 정보 업데이트 성공:", data);
+        
       });
   
       await Promise.all(promises);
@@ -157,7 +156,6 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const openModal = (lecture: Lecture) => {
     setSelectedLecture(lecture);
     setIsModalOpen(true);
-    
   };
 
   const closeModal = () => {
@@ -165,9 +163,9 @@ const AttendanceScreen = ({navigation, route}: any) => {
     setIsCameraButton(false); // 모달을 닫을 때 카메라 버튼 상태도 false로 변경합니다.
   };
 
-  const openCamera = () => {
+  const openCamera = (lecture: Lecture) => {
     const currentTime = new Date().getTime();
-    if (isScanned && lastScannedTime && (currentTime - new Date(lastScannedTime).getTime()) < 10000) {
+    if (isScanned && lastScannedTime && (currentTime - new Date(lastScannedTime).getTime()) < (24 * 60 * 60 * 1000) ) {
       Alert.alert(
         '출석 처리됨',
         '이미 출석 처리가 완료되었습니다. 하루에 한 번만 출석할 수 있습니다.',
@@ -196,27 +194,20 @@ const AttendanceScreen = ({navigation, route}: any) => {
   }, [route.params?.scannedCode]);
 
   useEffect(() => {
+    const filteredLectures = filterLectures(LectureData);
+    setLectureList(filteredLectures);
     if (scannedCode && selectedLecture) {
-    updateAttendanceStatus(selectedLecture);
     setLastScannedTime(new Date());
     setIsScanned(true);
     Alert.alert(
       'QR 코드 스캔됨',
       `스캔된 코드: ${scannedCode}`,
-      [{ text: '확인', onPress: () => console.log("asd") }],
+      [{ text: '확인', onPress: () => updateAttendanceStatus(selectedLecture) }],
       { cancelable: false }
     );
   }
-}, [scannedCode]);
+}, [scannedCode, LectureData]);
 
-
-useEffect(() => {
-  // 학년과 학기에 맞는 과목만 필터링하여 설정
-  const filteredLectures = filterLectures(LectureData);
-  setLectureList(filteredLectures);
-}, [LectureData]);
-
-  const nowday = getCurrentDay();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -264,8 +255,8 @@ useEffect(() => {
                 <Text style={styles.ListText2}>{selectedLecture?.lecture_name}</Text>
                 </View>
                   <View style={styles.Icon}>
-                  <TouchableOpacity onPress={openCamera}>
-                    <IconA name="camera" size={32} color="black" />
+                  <TouchableOpacity onPress={() => openCamera(selectedLecture)} disabled={nowday !== selectedLecture?.week}>
+                    <IconA name="camera" size={32} color={nowday === selectedLecture?.week ? "black" : "gray"} />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -289,7 +280,7 @@ useEffect(() => {
                             <Text style={styles.timeText}>{index + 1}차시            {timeRange}</Text>
                           </View>
                           <View style={styles.Box}>
-                            <View style={[styles.realBox, { backgroundColor: weekIndex < selectedLecture.weeknum ? "#00FF00" : "#909090" }]}>
+                            <View style={[styles.realBox, { backgroundColor: weekIndex < selectedLecture.weeknum ? "#228B22" : "#909090" }]}>
                             </View>
                           </View>
                         </View>
@@ -387,10 +378,19 @@ const styles = StyleSheet.create({
     marginLeft: 25,
     marginTop : 5,
   },
-  modal: { // 모달 창 css
-    borderTopLeftRadius : 20,
-    borderTopRightRadius : 20,
+  modal: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     height: 600,
+    backgroundColor: 'white', // 모달 배경색
+    shadowColor: '#000', // 그림자 색상
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   modalContainer:{
     flex : 1,
@@ -398,23 +398,23 @@ const styles = StyleSheet.create({
     borderTopRightRadius : 20,
     //backgroundColor : 'black',
   },
-  header :{
-    flex : 0.2,
-    borderTopLeftRadius : 20,
-    borderTopRightRadius : 20,
-    borderBottomWidth: 2  ,
-    justifyContent : "center",
-    alignContent : "center",
+  header: {
+    flex: 0.2,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomWidth: 2,
+    justifyContent: 'center',
+    alignContent: 'center',
   },
-  Week:{
-    flex : 0.09,
-    fontSize : 20,
-    fontWeight : 'bold',
-    color: 'black', 
-    backgroundColor : '#AFEEEE',
-    borderBottomWidth: 2  ,
-    height : 45,
-    paddingLeft : 25,
+  Week: {
+    flex: 0.09,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'black',
+    backgroundColor: '#FCC3A2', // 헤더 배경색
+    borderBottomWidth: 2,
+    height: 45,
+    paddingLeft: 25,
   },
   WeekContainer:{
     flex : 0.8,
@@ -431,13 +431,15 @@ const styles = StyleSheet.create({
   },
   Box:{
     flex : 0.1,
+    paddingRight : 12,
     justifyContent : "center",
     alignItems : "center",
   },
-  Include:{
-    flexDirection : 'row',
-    borderBottomWidth : 2,
-    flex : 0.13,
+  Include: {
+    flexDirection: 'row',
+    borderBottomWidth: 2,
+    flex: 0.13,
+    backgroundColor: 'white', // 각 시간표 항목 배경색
   },
   Include2:{
     flexDirection : 'row',

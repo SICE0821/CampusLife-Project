@@ -5,7 +5,7 @@ const PORT = 3000;
 const pool = mariadb.createPool({
     host: '14.6.152.64',
     port: 3306,
-    user: 'yuhwan',
+    user: 'dohyun',
     password: '0000',
     connectionLimit: 5,
     database: 'campuslife',
@@ -575,7 +575,7 @@ async function Updatelecture(student_id, lecture_id, nonattendance, attendance, 
                 attendance = ?, 
                 tardy = ?, 
                 absent = ?,
-                weeknum = ? 
+                weeknum = ?
             WHERE student_id = ? AND lecture_id = ?
         `;
         const result = await conn.query(query, [nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id]);
@@ -1827,6 +1827,78 @@ async function Get_Event_Data(campus_id) {
     }
 }
 
+//메인화면에서 이벤트 사진
+async function Get_Event_Photos(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+           `SELECT event_photo.event_photo FROM event_photo WHERE event_photo.event_id = ?`
+        );
+        const row = await conn.query(query, [event_id]);
+        console.log(row);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function send_user_event_info(user_id, event_id, content) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO user_send_event (user_id, event_id, time, content) VALUES (?, ?, DEFAULT, ?);`
+        await conn.query(query, [user_id, event_id, content]);
+        console.log("입력 성공");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function user_send_photo(user_id, event_id, fileNameWithoutExtension) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO user_send_event_photo (event_id, user_id, event_photo) VALUES (?, ?, ?);`
+        await conn.query(query, [event_id, user_id, fileNameWithoutExtension]);
+        console.log("사진 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//스터디룸 삭제
+async function delete_studyroom(student, study_room_name, study_room_date, study_room_time) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            DELETE FROM study_room_have_object 
+            WHERE student = ? 
+            AND study_room = (
+                SELECT study_room_id FROM study_room WHERE study_room_name = ? LIMIT 1
+            )
+            AND study_room_date = ? 
+            AND study_room_time = ?;
+        `;
+        const result = await conn.query(query, [student, study_room_name, study_room_date, study_room_time]);
+        return true;
+    } catch (err) {
+        console.error('Error deleting data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -1875,7 +1947,6 @@ module.exports = {
     getNoticeDepartmentHotPosts,
     getNoticeBookmarkPosts,
     getNoticeDepartmentBookmarkPosts,
-    getyourpoint,
     update_user_point,
     Get_One_Event_Item,
     update_object,
