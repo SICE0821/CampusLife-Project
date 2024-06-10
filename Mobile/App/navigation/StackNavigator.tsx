@@ -3,7 +3,7 @@ import { Text, Touchable, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
-import ManagementUserScreen from '../admin_screen/managementUserScreen';
+import ManagementUserScreen from "../admin_screen/ManagementUserScreen"
 import MainScreen from '../screens/MainScreen';
 import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
@@ -37,6 +37,7 @@ import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPos
 import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen';
 import MyPostScreen from '../screens/CommunityScreens/MyPostScreen';
 import { RegisterItemStackNavigator } from '../admin_screen/Admin_navigation/AdminStackNavigator';
+
 
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
