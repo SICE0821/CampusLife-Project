@@ -340,15 +340,15 @@ const AcademicInfoScreen = ({route} : any) => {
                                             <Row
                                                 data={tableHead}
                                                 style={{ height: 30, backgroundColor: "#dddddd" }}
-                                                textStyle={{ textAlign: "center", fontWeight: "bold", color: 'gray' }}
+                                                textStyle={{ ...styles.tableHeader }} // 변경된 부분
                                                 widthArr={widthArrs}
                                             />
                                             {lectures.map((lecture, index) => (
-                                                <Row 
+                                                <Row
                                                     key={index}
-                                                    data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]}  
-                                                    style={styles.tableRows} 
-                                                    textStyle={{ textAlign: "center", fontWeight: 'bold', color: 'black' }}
+                                                    data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]}
+                                                    style={styles.tableRows}
+                                                    textStyle={{ ...styles.tableText }} // Use object style
                                                     widthArr={widthArrs}
                                                 />
                                             ))}
@@ -365,9 +365,19 @@ const AcademicInfoScreen = ({route} : any) => {
 };
 
 const styles = StyleSheet.create({
-    container: { // 전체 뷰
+    container: {
         flex: 1,
         backgroundColor: 'white',
+    },
+    tableHeader: {
+        textAlign: "center",
+        fontWeight: "bold",
+        color: 'gray'
+    },
+    tableText: {
+        textAlign: "center",
+        fontWeight: 'bold',
+        color: 'black'
     },
     circleArea: { // 학점 정보 circle 영역
         marginTop: 10,
