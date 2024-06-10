@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -227,6 +227,34 @@ async function getGeneralPosts(campus_id) {
             + "ORDER BY post.date DESC"
         );
         const rows = await conn.query(query, [campus_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//전체 게시판에서 전체 게시글을 가져오는 쿼리
+async function getMyPostData(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.campus_id "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "user.user_id = ? "
+            + "ORDER BY post.date DESC"
+        );
+        const rows = await conn.query(query, [user_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -1919,6 +1947,69 @@ async function delete_studyroom(student, study_room_name, study_room_date, study
     }
 }
 
+async function deleteMyPostData(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM post WHERE post_id = ?"
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function deleteMyaram(aram_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM aram WHERE aram_id = ?"
+        const result = await conn.query(query, [aram_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//메인화면에서 이벤트 사진
+async function is_user_post_like(user_id, post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+           `SELECT * FROM is_user_post_like WHERE post_id = ? AND user_id = ?`
+        );
+        const row = await conn.query(query, [post_id, user_id]);
+        console.log(row);
+        return row.length === 0; // row가 비어 있으면 true, 비어 있지 않으면 false
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+
+async function put_user_post_like(user_id, post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO is_user_post_like (user_id, post_id) VALUES (?, ?);`
+        await conn.query(query, [user_id, post_id]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2001,4 +2092,9 @@ module.exports = {
     send_user_event_info,
     user_send_photo,
     delete_studyroom,
+    getMyPostData,
+    deleteMyPostData,
+    deleteMyaram,
+    is_user_post_like,
+    put_user_post_like
 };

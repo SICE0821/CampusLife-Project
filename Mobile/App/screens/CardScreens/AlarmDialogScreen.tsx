@@ -92,6 +92,56 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     }
   }
 
+  const delete_aram_data = (aram_id: number) => {
+    Alert.alert(
+      "알람 삭제",
+      "알람을 정말로 삭제하시겠습니까??",
+      [
+        {
+          text: "취소",
+          onPress: () => console.log("취소 클릭"),
+          style: "cancel"
+        },
+        {
+          text: "확인", onPress: async () => {
+            console.log(aram_id);
+            deleteMyaram(aram_id);
+            delete_aram()
+          }
+        }
+      ]
+    );
+  };
+
+  const deleteMyaram = async (aram_id : number) => {
+    try {
+        const response = await fetch(`${config.serverUrl}/deleteMyaram`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              aram_id: aram_id
+            }),
+        })
+        const postsdata = await response.json();
+        await get_aram_data();
+    } catch (error) {
+        console.error(error);
+    } finally {
+    }
+}
+
+  const delete_aram = () => {
+    Alert.alert(
+      "알람 삭제 성공!",
+      "알람 성공적으로 삭제 하였습니다!",
+      [
+        { text: "확인" }
+      ]
+    );
+  };
+
   /*
     const handleLongPress = (index : any) => {
       Alert.alert(
@@ -222,7 +272,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
             <TouchableHighlight style={{ width: '90%' }}
               underlayColor="#BBBBBB"
               onPress={() => NavigationPage(item)}
-              onLongPress={() => /*handleLongPress(index)*/console.log("삭제 하다")}>
+              onLongPress={() => delete_aram_data(item.aram_id)}>
               <View style={styles.box}>
                 <View style={styles.imagearea}>
                   {renderTargetIcon(item)}

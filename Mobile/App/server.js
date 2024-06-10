@@ -80,7 +80,12 @@ const { getGeneralPosts,
   Get_Event_Photos,
   send_user_event_info,
   user_send_photo,
-  delete_studyroom
+  delete_studyroom,
+  getMyPostData,
+  deleteMyPostData,
+  deleteMyaram,
+  is_user_post_like,
+  put_user_post_like
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -107,7 +112,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -428,6 +433,28 @@ app.post('/NoticeDepartmentbookmark', async (req, res) => {
   }
 });
 
+//내가 쓴 게시글 보기
+app.post('/getMyPostData', async (req, res) => {
+  try {
+    const { user_id } = req.body;
+    const rows = await getMyPostData(user_id);
+    const processedData = rows.map(item => ({
+      post_id: item.post_id,
+      title: item.title,
+      contents: item.contents,
+      date: formatDate(item.date),
+      view: item.view,
+      like: item.like,
+      name: item.name,
+      admin_check: item.admin_check,
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 //게시글화면에서 전체 전체 게시글을 가져온다.
@@ -1602,6 +1629,61 @@ app.post('/send_user_event_photo', upload.array('images'), (req, res) => {
     res.status(500).send('Internal Server Error');
   }
   });
+
+
+app.post('/deleteMyPostData', async (req, res) => {
+  try {
+    const { post_id } = req.body; //1번 body에서 값 추출
+
+    const deleteResult = await deleteMyPostData(post_id);
+    if (deleteResult === true) {
+      console.log("삭제완료");
+      res.status(200).send({ message: "게시글 삭제 완료" });
+    }
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
+  }
+})
+
+app.post('/deleteMyaram', async (req, res) => {
+  try {
+    const { aram_id } = req.body; //1번 body에서 값 추출
+
+    const deleteResult = await deleteMyaram(aram_id);
+    if (deleteResult === true) {
+      console.log("삭제완료");
+      res.status(200).send({ message: "게시글 삭제 완료" });
+    }
+  } catch (error) {
+    console.error("서버 오류:", error);
+    res.status(500).send({ message: "서버 오류" });
+  }
+})
+
+
+//일단 유저가 좋아요를 눌렀는지확인
+app.post('/is_user_post_like', async (req, res) => {
+  try {
+    const { user_id, post_id } = req.body;
+    //console.log(post_id);
+    const result = await is_user_post_like(user_id, post_id);
+    res.json({ isLiked: result });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+app.post('/put_user_post_like', async (req, res) => {
+  const { user_id, post_id} = req.body;
+  try {
+    await put_user_post_like(user_id, post_id);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //서버 시작
 app.listen(PORT, () => {
