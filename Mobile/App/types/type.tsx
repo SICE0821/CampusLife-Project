@@ -27,6 +27,7 @@ export type UserData = {
   id: string,
   student_semester : number, 
   college : number,
+  title : string
 }
 
 export type PostDeatilData = {

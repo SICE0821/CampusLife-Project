@@ -3,6 +3,7 @@ import { Text, Touchable, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
+import ManagementUserScreen from '../admin_screen/managementUserScreen';
 import MainScreen from '../screens/MainScreen';
 import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
@@ -25,18 +26,17 @@ import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicI
 import SchoolInfoScreen from '../screens/CardScreens/SchoolInfoScreen';
 import StudyRoomScreen from '../screens/CardScreens/StudyRoomScreen'
 import AlarmDialogScreen from '../screens/CardScreens/AlarmDialogScreen';
-import AdminMainScreen from '../admin_screen/AdminMainScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
 import { UserData } from "../types/type";
 import { PostTopTabNavigator } from './TopTabNavigator';
 import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator, NoticeTopbTabNavigator } from './TopTabNavigator'
-import ItemRegistration from '../admin_screen/ItemRegistration.tsx/ItemRegistration'
+import AdminMainScreen from '../admin_screen/AdminMainScreen';
 import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPostsScreen'
 import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen';
 import MyPostScreen from '../screens/CommunityScreens/MyPostScreen';
-
+import { RegisterItemStackNavigator } from '../admin_screen/Admin_navigation/AdminStackNavigator';
 
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
@@ -144,25 +144,6 @@ export const LoginScreenStackNavigator = () => {
 export const MainScreenStackNavigator = ({ route }: any) => {
     const navigation: any = useNavigation();
     const { userdata, LectureData } = route.params;
-    React.useLayoutEffect(() => {
-        const routeName = getFocusedRouteNameFromRoute(route);
-        if (routeName === "MainScreen" || routeName === undefined) {
-            navigation.setOptions({
-                tabBarStyle: {
-                    height: 65,
-                    position: 'absolute',
-                    bottom: 16,
-                    right: 10,
-                    left: 10,
-                    borderRadius: 20,
-                    backgroundColor: 'white',
-                }
-            });
-        } else {
-            navigation.setOptions({ tabBarStyle: { display: 'none' } });
-        }
-    }, [navigation, route])
-
     return (
         <MainStack.Navigator>
             <MainStack.Screen name="MainScreen" component={MainScreen} initialParams={{ userdata, LectureData }} options={{ headerShown: false }} />
@@ -305,26 +286,141 @@ export const MainScreenStackNavigator = ({ route }: any) => {
     );
 };
 
-export const AdminMainScreenStackNavigator = ({ route, navigation }: any) => {
-    const { userdata } = route.params;
+export const AdminMainScreenStackNavigator = ({ route }: any) => {
+    const navigation: any = useNavigation();
+    const { userdata, LectureData } = route.params;
     return (
-        <AdminStack.Navigator>
-            <AdminStack.Screen name="AdminScreen" component={AdminMainScreen} initialParams={{ userdata }} />
-            <AdminStack.Screen name="ItemRegistration" component={ItemRegistration} initialParams={{ userdata }} options={{
-                headerStyle: {
-                    backgroundColor: '#F27405',
-                },
-                headerLeft: () => (
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate("AdminScreen")}>
-                        <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
-                    </TouchableOpacity>
-                ),
-                headerTintColor: 'white',
-                headerTitleAlign: 'center',
-                title: '물품 등록 현황',
-            }} />
-        </AdminStack.Navigator>
+        <MainStack.Navigator>
+            <MainStack.Screen name="AdminScreen" component={AdminMainScreen} initialParams={{ userdata, LectureData }} options={{ headerShown: false }} />
+            <MainStack.Screen
+                name="StudentInfoNavigator"
+                component={StudentInfoScreen}
+                options={{
+
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '정보변경',
+                }}
+            />
+            <MainStack.Screen
+                name="AcademicInfoNavigator"
+                component={AcademicTopTabNavigator}
+                initialParams={{ userdata, LectureData }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학적확인',
+                }}
+            />
+            <MainStack.Screen
+                name="AlarmDialogScreen"
+                initialParams={{ userdata }}
+                component={AlarmDialogScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '알람 확인',
+                }}
+            />
+
+            <MainStack.Screen
+                name="SchoolInfoScreen"
+                component={SchoolInfoScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학교 정보',
+                }}
+            />
+            <MainStack.Screen
+                name="RegisterItemStackNavigator"
+                initialParams={{ userdata }}
+                component={RegisterItemStackNavigator}
+                options={{
+                    headerShown: false
+                }}
+            />
+            <MainStack.Screen
+                name="ManagementUserScreen"
+                component={ManagementUserScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이벤트',
+                }} />
+
+            <MainStack.Screen
+                name="FriendCodeEventScreen"
+                component={FriendCodeEventScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이벤트',
+                }} />
+            <MainStack.Screen
+                name="DeadlineEventScreen"
+                component={DeadlineEventScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이벤트',
+                }} />
+        </MainStack.Navigator>
     );
 };
 
@@ -342,13 +438,13 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
-                        <View style = {{flexDirection : 'row'}}>
+                        <View style={{ flexDirection: 'row' }}>
                             <TouchableOpacity
                                 onPress={() => navigation.goBack()}>
                                 <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                             </TouchableOpacity>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate("MyPostScreen", {userdata})}>
+                                onPress={() => navigation.navigate("MyPostScreen", { userdata })}>
                                 <IconF style={{ marginLeft: 10, }} name="user" size={30} color="white" />
                             </TouchableOpacity>
                         </View>
@@ -377,7 +473,7 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
-                        <View style = {{flexDirection : 'row'}}>
+                        <View style={{ flexDirection: 'row' }}>
                             <TouchableOpacity
                                 onPress={() => navigation.navigate(PostTopTabNavigator)}>
                                 <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />

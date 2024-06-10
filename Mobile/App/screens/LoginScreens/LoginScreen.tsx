@@ -22,15 +22,7 @@ function LoginScreen({ navigation }: any) {
   const [lectureList, setLectureList] = useState<Lecture>();
  
 
-  const IsUser = () => {
-    if(userData?.admin_check == true) {
-      console.log(userData);
-      navigation.navigate('AdminTabNavigator', { userdata : userData});
-    }else {
-      console.log(userData);
-      navigation.navigate('MainTabNavigator', {userdata : userData});
-    }
-  }
+
 
   const get_user_data = async () => {
     try {
@@ -67,7 +59,12 @@ function LoginScreen({ navigation }: any) {
       });
       const data = await response.text();
       if (data === 'success') {
-        navigation.navigate('MainTabNavigator', {userdata : userdata, LectureData : LectureData});
+        if(userdata.admin_check === true ) {
+          navigation.navigate('AdminTabNavigator', { userdata : userdata, LectureData : LectureData });
+        }else if(userdata.admin_check === false) {
+          navigation.navigate('MainTabNavigator', {userdata : userdata, LectureData : LectureData});
+        }
+
       } else {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
       }
