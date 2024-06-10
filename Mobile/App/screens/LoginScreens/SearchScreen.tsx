@@ -36,7 +36,7 @@ const Search = ({navigation}: any) => {
   };
 
   const returnApp = () => {
-    navigation.navigate('로그인')
+    navigation.navigate('LoginScreen')
   }
 
   return(

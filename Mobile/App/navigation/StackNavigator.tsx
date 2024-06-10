@@ -219,6 +219,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
             <MainStack.Screen
                 name="SchoolInfoScreen"
                 component={SchoolInfoScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
