@@ -292,7 +292,7 @@ const BookmarkScreen = ({ route, navigation }: any) => {
                         <View style={styles.wirterandtime}>
                             <View style={styles.writerbox}>
                                 <Text style={{ fontSize: 13, marginLeft: 10, color: item.admin_check === true ? 'red' : 'black' }}>{item.name}</Text>
-                                <Text> | {item.date}</Text>
+                                <Text style={{color:'black'}}> | {item.date}</Text>
                             </View>
                             <View style={styles.likenum}>
                                 <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
@@ -358,17 +358,20 @@ const styles = StyleSheet.create({
         borderBottomColor: '#CCCCCC',
         //backgroundColor: 'red',
         height: 70,
+        paddingHorizontal: 10
     },
 
     writetitle: {
-        flex: 0.6,
+        width: '100%',
+        height: '60%',
         flexDirection: 'row',
         marginTop: 5,
         //backgroundColor : 'yellow'
     },
 
     wirterandtime: {
-        flex: 0.4,
+        width: '100%',
+        height: '40%',
         flexDirection: 'row'
         //backgroundColor : 'yellow'
     },
