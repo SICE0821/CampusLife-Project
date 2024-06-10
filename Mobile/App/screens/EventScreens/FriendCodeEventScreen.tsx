@@ -263,6 +263,9 @@ const FriendCodeEventScreen = ({ route }: any) => {
           </View>
         </TouchableOpacity>
       </View>
+      <View style={styles.infoTextArea}>
+        <Text style={styles.infoText}>친구를 초대하여 100P 지급!</Text>
+      </View>
       <View style={styles.inputcode}>
         <TextInput
           style={styles.input}
@@ -292,7 +295,8 @@ const styles = StyleSheet.create({
   },
   topArea: {
     borderBottomWidth: 1,
-    marginVertical: 60
+    marginTop: 60,
+    marginBottom: 30
   },
   circleArea: {
     alignItems: 'center',
@@ -354,6 +358,15 @@ const styles = StyleSheet.create({
     color: 'blue',
     fontSize: 22,
     fontWeight: 'bold'
+  },
+  infoTextArea: {
+    width: '90%',
+    alignSelf: 'center',
+    alignItems: 'center'
+  },
+  infoText:{
+    color: 'gray',
+    fontSize: 16
   },
   inputcode: {
     flexDirection: 'row',

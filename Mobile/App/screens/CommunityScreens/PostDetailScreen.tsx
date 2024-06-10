@@ -13,7 +13,7 @@ import config from '../../config';
 
 const PostDetailScreen: React.FC = ({ route }: any) => {
     const { item, userData } = route.params;
-    const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
+    const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>(); //포스터에 대한 정보.
     const [userdata, setUserData] = useState<UserData>(userData);
@@ -579,13 +579,14 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 <View style={[styles.inputtext, { height: inputheight }]}>
                     <TextInput
                         ref={inputRef}
-                        style={{ paddingLeft: 20, fontSize: 20, color: 'gray' }}
+                        style={{ paddingLeft: 20, fontSize: 20, color: 'black' }}
                         onChangeText={handleInputChange}
                         onBlur={() => setIsCommentorRecomment(0)}
                         onContentSizeChange={handleContentSizeChange}
                         value={commenttext}
                         multiline={true}
-                        placeholder="텍스트를 입력하세요"
+                        placeholder="댓글을 입력하세요."
+                        placeholderTextColor={'gray'}
                     />
                 </View>
                 <TouchableOpacity
