@@ -20,6 +20,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
     const [commentspk, setCommentspk]: any = useState();
+    const [ispushlike, Setispushlike]: any = useState();
     const inputRef = useRef<TextInput>(null);
 
     const onFocusName = useCallback(() => {
@@ -34,6 +35,46 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             setUserData(userdata);
         }, [])
     );
+
+    //좋아요 중복 제거
+    const is_user_post_like = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/is_user_post_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,
+                    post_id: postDetailInfo?.post_id
+                })
+            })
+            const result = await response.json();
+            return result.isLiked;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+        //좋아요 테이블에 유저 번호 넣음
+        const put_user_post_like = async () => {
+            try {
+                const response = await fetch(`${config.serverUrl}/put_user_post_like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userdata.user_pk,
+                        post_id: postDetailInfo?.post_id
+                    })
+                })
+                const result = await response.json();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
 
     //포스터에 대한 정보
     const DeatilPost = async () => {
@@ -107,63 +148,63 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             console.error('댓글 쓰기 실패!', error);
         }
     }
-    
 
-        //댓글 작성 알람 추가
-        const addCommentAram = async () => {
-            try {
-                const response = await fetch(`${config.serverUrl}/addCommentAram`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_id: postDetailInfo?.user_id,
-                        target_id: postDetailInfo?.post_id,
-                    })
-                });
-                console.log("알람전송!");
-            } catch (error) {
-                console.error('알람 전송 실패', error);
-            }
-        }
 
-        //좋아요 30개가 넘으면 핫포스터로 등록되면서 모든 user에게 알람 보내기
-        const addHotAram = async () => {
-            try {
-                const response = await fetch(`${config.serverUrl}/addHotAram`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        target_id: postDetailInfo?.post_id,
-                    })
-                });
-                console.log("알람전송!");
-            } catch (error) {
-                console.error('알람 전송 실패', error);
-            }
+    //댓글 작성 알람 추가
+    const addCommentAram = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/addCommentAram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: postDetailInfo?.user_id,
+                    target_id: postDetailInfo?.post_id,
+                })
+            });
+            console.log("알람전송!");
+        } catch (error) {
+            console.error('알람 전송 실패', error);
         }
+    }
 
-        //좋아요 눌러주면 해당 당사자에게 알람이 쑝숑쑝~
-        const addLikeAram = async () => {
-            try {
-                const response = await fetch(`${config.serverUrl}/addLikeAram`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        user_id: postDetailInfo?.user_id,
-                        target_id: postDetailInfo?.post_id,
-                    })
-                });
-                console.log("알람전송!");
-            } catch (error) {
-                console.error('알람 전송 실패', error);
-            }
+    //좋아요 30개가 넘으면 핫포스터로 등록되면서 모든 user에게 알람 보내기
+    const addHotAram = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/addHotAram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    target_id: postDetailInfo?.post_id,
+                })
+            });
+            console.log("알람전송!");
+        } catch (error) {
+            console.error('알람 전송 실패', error);
         }
+    }
+
+    //좋아요 눌러주면 해당 당사자에게 알람이 쑝숑쑝~
+    const addLikeAram = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/addLikeAram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: postDetailInfo?.user_id,
+                    target_id: postDetailInfo?.post_id,
+                })
+            });
+            console.log("알람전송!");
+        } catch (error) {
+            console.error('알람 전송 실패', error);
+        }
+    }
 
     //대댓글 달기
     const writerecomment = async () => {
@@ -219,7 +260,8 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    post_id: post_id
+                    post_id: post_id,
+                    user_id: userdata.user_pk
                 })
             })
             const result = await response.json();
@@ -250,27 +292,25 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         }
     }
 
-        //댓글 좋아요 누르기
-        const recomment_like_num_up = async (recomment_id: any) => {
-            try {
-                const response = await fetch(`${config.serverUrl}/recomment_like_up`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        recomment_id: recomment_id
-                    })
+    //댓글 좋아요 누르기
+    const recomment_like_num_up = async (recomment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/recomment_like_up`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    recomment_id: recomment_id
                 })
-                const result = await response.json();
-                await CommentList();
-                console.log("대댓글 좋아요 누르기 성공!")
-            } catch (error) {
-                console.error('대댓글 좋아요 누르기 실패', error);
-            }
+            })
+            const result = await response.json();
+            await CommentList();
+            console.log("대댓글 좋아요 누르기 성공!")
+        } catch (error) {
+            console.error('대댓글 좋아요 누르기 실패', error);
         }
-
-
+    }
 
     const Post_Like_alert = (post_id: any) => {
         Alert.alert(
@@ -279,15 +319,23 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             [
                 {
                     text: "취소",
-                    onPress: () => console.log("취소 클릭"),
+                    onPress: async () => console.log("취소 클릭"),
                     style: "cancel"
                 },
-                { text: "확인", onPress: async () => {
-                    await like_num_up(post_id);
-                    addLikeAram();
-                    if(postDetailInfo?.like == 29) {
-                        addHotAram();
-                    } }}
+                {
+                    text: "확인", onPress: async () => {
+
+                        const is_post_like: boolean = await is_user_post_like();
+                        if (is_post_like) {
+                            await like_num_up(post_id);
+                            put_user_post_like();
+                            addLikeAram();
+                            if (postDetailInfo?.like == 29) {
+                                addHotAram();
+                            }
+                        }
+                    }
+                }
             ]
         );
     };
@@ -413,7 +461,8 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     {postDetailInfo?.contents}
                 </Text>
                 <View style={styles.postslikeandlook}>
-                    <TouchableOpacity onPress={() => Post_Like_alert(postDetailInfo?.post_id)}>
+                    <TouchableOpacity onPress={() =>
+                        Post_Like_alert(postDetailInfo?.post_id)}>
                         <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
                     </TouchableOpacity>
                     <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> {postDetailInfo?.like}</Text>
@@ -450,7 +499,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                             }}>
                                             <Text><IconD size={27} color="black" name={"comment"} /></Text>
                                         </TouchableOpacity>
-                                        <TouchableOpacity 
+                                        <TouchableOpacity
                                             style={styles.likebox}
                                             onPress={() => comment_Like_alert(item.comment_id)}>
                                             <Text><IconD size={29} color="black" name={"like"} /></Text>
@@ -496,7 +545,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                             </View>
                                             <View style={styles.listbox2}>
                                                 <View style={styles.LikeListBox2}>
-                                                    <TouchableOpacity 
+                                                    <TouchableOpacity
                                                         style={styles.likebox2}
                                                         onPress={() => recomment_Like_alert(subitem.recomment_id)}>
                                                         <Text><IconD size={29} color="black" name={"like"} /></Text>
@@ -745,20 +794,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#CED4DA',
     },
     likebox2: {
-        width : 37,
+        width: 37,
         //backgroundColor : 'yellow',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop : 2,
+        marginTop: 2,
     },
     reallistbox2: {
-        width : 37,
+        width: 37,
         //backgroundColor : 'blue'
         justifyContent: 'center',
         alignItems: 'center',
         borderLeftWidth: 0.5,
         borderColor: '#333',
-        marginTop : 4,
+        marginTop: 4,
     },
     listbox2: {
         flex: 0.25,
