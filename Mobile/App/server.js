@@ -113,7 +113,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -250,6 +250,7 @@ app.post('/get_user_data', async (req, res) => {
     currentstatus: rows[0].currentstatus,
     student_semester: rows[0].student_semester,
     college: rows[0].college,
+    title : rows[0].title
   };
   res.json(userData);
 })
