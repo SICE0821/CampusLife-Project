@@ -137,7 +137,7 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '물품 등록',
+                    title: '물품 등록 현황',
                 }} />
                 
             <RegisterItemStack.Screen name="RegisterItemScreen"

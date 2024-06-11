@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, FlatList } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import IconC from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, UserHaveCouponData } from '../../types/type'
 import config from '../../config';
+
+import IconD from 'react-native-vector-icons/AntDesign';
 
 const width = Dimensions.get("window").width;
 
@@ -42,36 +43,26 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
   }
 
   //랜더링 할 아이템들
-  const renderItem = ({ item }: any) => (
+  const renderItem = ({item} : {item :UserHaveCouponData }) => (
     <TouchableOpacity
       style={styles.itemcontainer}
-      onPress={() => console.log("등록된 아이템 선택")}>
-      <View style={{
-        height: 150, width: '95%', borderWidth: 2, borderColor: "#F27405", flexDirection: 'row',
-        alignItems: 'center'
-      }}>
-        <View style={{ width: '30%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ width: '100%', height: '100%' }}>
-            <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.image_num}.png` }} />
-          </View>
+      onPress={() => console.log("등록된 아이템 편집하기")}>
+      <View style = {styles.photobox}>
+        <View style = {styles.photo}>
+          <Image style={{ height : "100%", width : "100%", borderRadius : 15 }} source={{ uri: `${config.photoUrl}/${item.image_num}.png` }} />
         </View>
-        <View style={{ height: '100%', width: '50%', padding: 5 }}>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ width: '50%' }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginTop: 20 }}>[ {item.name} ]</Text>
-            </View>
-            <View>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ED9E2B', marginTop: 20 }}>[ {item.price}P ]</Text>
-            </View>
-          </View>
-          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.explain}</Text>
-          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.using_time}</Text>
+      </View>
+      <View style = {styles.infocontainer}>
+        <View style = {styles.nameANDiconbox}>
+          <Text style = {styles.itemexplainText}> {item.name} </Text>
+          <IconD style={{ marginRight : 20, color : '#ED9E2B' }} name="form" size={30} color="white" />
         </View>
-        <View style={{ width: '20%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ width: '90%', height: '95%', backgroundColor: '#F7B02E', justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ color: 'white' }}> <IconC name="mail-forward" size={40} /></Text>
-            <Text style={{ fontSize: 18, color: 'white' }}>수정하기</Text>
-          </View>
+        <View style = {styles.explainTextBox}>
+          <Text numberOfLines={2} ellipsizeMode="tail" style = {styles.explainText}> {item.explain} </Text>
+        </View>
+        <View style = {styles.athorInfobox}>
+          <Text style = {styles.priceText}>[{item.price}P]</Text>
+          <Text style = {styles.usingTimeText}>[{item.using_time}]</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -79,6 +70,13 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
 
   return (
     <View style={styles.container}>
+      <View style = {styles.topbox}>
+        <Text style = {{fontSize : 20, color : 'black', marginLeft : 10, fontWeight : 'bold'}}>현재 등록한 상품 수 : {AdminRegisterItem.length}</Text>
+        <TouchableOpacity style = {styles.registerButton}
+                          onPress={ () => {navigation.navigate("RegisterItemScreen")}}>
+          <Text style = {{fontSize : 18, color : 'white', fontWeight : 'bold'}}>상품등록</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={AdminRegisterItem}
         renderItem={renderItem}
@@ -90,14 +88,97 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor : 'white',
   },
+  topbox : {
+    width : "100%",
+    height : 60,
+    backgroundColor : '#FFFADD',
+    alignItems : 'center',
+    flexDirection : 'row',
+    justifyContent: 'space-between',
+  },
+  registerButton : {
+    width : "30%",
+    height : 40,
+    borderRadius : 10,
+    marginRight : 6,
+    backgroundColor : '#9A9EFF',
+    justifyContent : 'center',
+    alignItems : 'center',
+  },
+
   itemcontainer: {
     width: '100%',
-    height: 150,
+    height: 180,
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 10,
+    justifyContent : 'center',
+    alignItems : 'center',
+    marginTop: 15,
+    paddingHorizontal : 10,
+    //backgroundColor : 'red'
   },
+  photobox : {
+    width : "40%",
+    height : 180,
+    //backgroundColor : 'blue'
+  },
+  photo : {
+    flex : 1,
+    margin : 4,
+    backgroundColor : '#F5F5F5',
+    borderRadius : 15,
+  },
+  infocontainer : {
+    width : "60%",
+    height : 180,
+    //backgroundColor : 'yellow'
+  },
+  itemexplainText : {
+    fontSize : 18,
+    color : 'grey'
+  },
+  explainTextBox : {
+    width : "100%",
+    height : 80,
+    //backgroundColor : 'red',
+    justifyContent : 'center',
+    //alignItems : 'center'
+  },
+  explainText : {
+    fontSize : 19,
+    color : 'black'
+  },
+  athorInfobox : {
+    width : "100%",
+    height : 55.5,
+    //backgroundColor : 'blue'
+  },
+  priceText : {
+    color : "#ED9E2B",
+    fontSize : 19,
+    fontWeight : 'bold',
+    marginLeft : 5,
+  },
+  usingTimeText : {
+    color : "grey",
+    fontSize : 19,
+    marginLeft : 5,
+  },
+  modifybox : {
+    width : "100%",
+    height : 40,
+    backgroundColor : 'white'
+  },
+  nameANDiconbox : {
+    width : "100%",
+    height : 35,
+    //justifyContent : 'center',
+    alignItems : 'center',
+    //backgroundColor : 'green',
+    flexDirection : 'row',
+    justifyContent: 'space-between',
+  }
 });
 
 export default CheckRegistItemScreen;
