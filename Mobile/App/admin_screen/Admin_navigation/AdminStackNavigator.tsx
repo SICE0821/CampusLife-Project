@@ -11,6 +11,7 @@ import ReportPostsScreen from '../AdminReportPostScreens/ReportPostsScreen';
 import CheckRegistItemScreen from '../AdminRegisterItemScreen/CheckRegistItemScreen';
 import RegisterItemScreen from '../AdminRegisterItemScreen/RegisterItemScreen';
 import IconD from 'react-native-vector-icons/AntDesign';
+import ManagementUserScreen from '../managementUserScreen';
 
 
 const AdminEventStack = createStackNavigator();
@@ -118,10 +119,12 @@ export const ReportStackNavigator = ({ navigation, route }: any) => {
 
 //관리자 아이템 등록 및 수정
 export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
+    const { userdata } = route.params;
     return (
         <RegisterItemStack.Navigator>
             <RegisterItemStack.Screen name="CheckRegistItemScreen"
                 component={CheckRegistItemScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

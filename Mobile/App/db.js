@@ -653,6 +653,22 @@ async function get_event_objcet(campus_id) {
     }
 }
 
+async function admin_get_event_objcet(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM event_object WHERE campus_id = ?`
+            , [campus_id]);
+        return rows;
+
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //바코드 최댓값 가져오기
 async function getBarcordMaxNum() {
     let conn;
@@ -2115,5 +2131,6 @@ module.exports = {
     deleteMyPostData,
     deleteMyaram,
     is_user_post_like,
-    put_user_post_like
+    put_user_post_like,
+    admin_get_event_objcet
 };

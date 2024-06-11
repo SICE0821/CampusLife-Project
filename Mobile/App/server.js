@@ -86,7 +86,8 @@ const { getGeneralPosts,
   deleteMyPostData,
   deleteMyaram,
   is_user_post_like,
-  put_user_post_like
+  put_user_post_like,
+  admin_get_event_objcet
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -265,12 +266,8 @@ app.post('/get_items', async (req, res) => {
 
   const event_object_datas = rows.reduce((accumulator, item) => {
     const itemName = item.name;
-
-    // 이미 해당 아이템의 인덱스를 찾은 경우
     const existingItemIndex = accumulator.findIndex(obj => obj.name === itemName);
-
     if (existingItemIndex !== -1) {
-      // 이미 해당 아이템이 존재하는 경우 카운트 증가
       accumulator[existingItemIndex].count++;
     } else {
       // 해당 아이템이 처음 발견된 경우 새로운 객체로 추가
@@ -286,10 +283,38 @@ app.post('/get_items', async (req, res) => {
         count: 1 // 초기 카운트는 1로 설정
       });
     }
-
     return accumulator;
   }, []);
+  res.json(event_object_datas);
+});
 
+//관리자에서 이벤트 상품 싹 가져오기
+app.post('/admin_get_items', async (req, res) => {
+  const { campus_id } = req.body;
+  const rows = await admin_get_event_objcet(campus_id);
+  console.log("서버 응답 잘 받음");
+
+  const event_object_datas = rows.reduce((accumulator, item) => {
+    const itemName = item.name;
+    const existingItemIndex = accumulator.findIndex(obj => obj.name === itemName);
+    if (existingItemIndex !== -1) {
+      accumulator[existingItemIndex].count++;
+    } else {
+      // 해당 아이템이 처음 발견된 경우 새로운 객체로 추가
+      accumulator.push({
+        objec_id: item.object_id,
+        name: itemName,
+        price: item.price,
+        code_num: item.code_num,
+        using_time: item.using_time,
+        image_num: item.image_num,
+        sell_check: item.sell_check,
+        explain: item.explain,
+        count: 1 // 초기 카운트는 1로 설정
+      });
+    }
+    return accumulator;
+  }, []);
   res.json(event_object_datas);
 });
 
