@@ -10,14 +10,14 @@ const width = Dimensions.get("window").width;
 const CheckEventScreen = ({route, navigation} : any) => {
   return (
     <View style={styles.container}>
-      <Text>현재 진행하고 있는 이벤트를 확인하고, 수정 및 종료 할 수 있는 화면</Text>
+      <Text style={{color: 'black'}}>현재 진행하고 있는 이벤트를 확인하고, 수정 및 종료 할 수 있는 화면</Text>
       <TouchableOpacity style = {{width : 150, height : 100, backgroundColor : 'yellow', justifyContent : 'center', alignItems : 'center'}} 
                                 onPress={() => {navigation.navigate("EventRegistrationScreen")}}>
-        <Text>이벤트 등록하러 가기</Text>
+        <Text style={{color: 'black'}}>이벤트 등록하러 가기</Text>
       </TouchableOpacity>
       <TouchableOpacity style = {{width : 150, height : 100, backgroundColor : 'pink', justifyContent : 'center', alignItems : 'center'}} 
                                 onPress={() => {navigation.navigate("SendUserEventScreen")}}>
-        <Text>유저가 보낸 이벤트 확인하러 가기</Text>
+        <Text style={{color: 'black'}}>유저가 보낸 이벤트 확인하러 가기</Text>
       </TouchableOpacity>
     </View>
   );
