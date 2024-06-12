@@ -213,6 +213,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScrollView style={{width: width}}>
       <View style={styles.textContainer}>
         <Text style={styles.title}>오늘의 출석</Text>
         <Text style={styles.date}>{getCurrentDate()}</Text>
@@ -223,7 +224,10 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(Lecture)}>
               <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}               미출결: {Lecture.nonattendance} 출결: {Lecture.attendance} 지각: {Lecture.tardy} 결석: {Lecture.absent}</Text>
+              <View style={styles.ListArea}>
+                <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}</Text>
+                <Text style={styles.ListInfoSec}>미출결: {Lecture.nonattendance} 출결: {Lecture.attendance} 지각: {Lecture.tardy} 결석: {Lecture.absent}</Text>
+              </View>
             </TouchableOpacity>
           </View>
         )
@@ -237,11 +241,16 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer2}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(Lecture)}>
               <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
-              <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}              미출결: {Lecture.nonattendance} 출결: {Lecture.attendance} 지각: {Lecture.tardy} 결석: {Lecture.absent}</Text>
+              <View style={styles.ListArea}>
+                <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}</Text>
+                <Text style={styles.ListInfo}>미출결: {Lecture.nonattendance} 출결: {Lecture.attendance} 지각: {Lecture.tardy} 결석: {Lecture.absent}</Text>
+              </View>
             </TouchableOpacity>
           </View>
         )
       ))}
+      <View style={{height:100}}></View>
+      </ScrollView>
         <ModalBox
           isOpen={isModalOpen && selectedLecture !== null}
           style={styles.modal}
@@ -294,7 +303,6 @@ const AttendanceScreen = ({navigation, route}: any) => {
                 ))}
               </ScrollView>
             </View>
-            <View style = {{backgroundColor:"white" , height : 100, }}></View>
           </View>
         )}
         </ModalBox>
@@ -305,23 +313,22 @@ const AttendanceScreen = ({navigation, route}: any) => {
 const styles = StyleSheet.create({
   container: { // 컨테이너 전체를 담당
     flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    alignContent: 'center',
   },
   textContainer: { // 오늘의 출석, 날짜 텍스트 컨테이너
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     justifyContent: 'center',
     width: width*0.9,
-    marginVertical: 40,
-    padding: 5,
+    paddingHorizontal: 5,
+    marginVertical: 30,
   },
   textContainer2:{ // 출석 현황 텍스트 컨테이너
-    alignItems: 'center',
+    alignSelf: 'center',
     justifyContent: 'center',
-    marginRight : 250,
-    marginTop : 10,
-    marginBottom : 15,
+    width: width*0.9,
+    paddingHorizontal: 5,
+    marginVertical: 15,
   },
   title: { // 오늘의 출석 텍스트 css
     fontSize: 25,
@@ -332,7 +339,6 @@ const styles = StyleSheet.create({
   title2: { // 출석 현황 텍스트 css
     fontSize: 25,
     fontWeight: 'bold',
-    marginRight : 40,
     color : 'black',
   },
   date: { // 날짜 텍스트 css
@@ -341,45 +347,51 @@ const styles = StyleSheet.create({
     color: 'gray'
   },
   buttonContainer: { // 오늘의 출석 버튼 컨테이너
+    alignSelf: 'center',
     justifyContent: 'flex-start',
+    width: width*0.9
   },
   buttonContainer2: { // 출석 현황 버튼 컨테이너
+    alignSelf: 'center',
     marginTop : 5,
     justifyContent: 'flex-start',
-    
+    width: width*0.9
   },
   AttendanceList: { // 과목마다의 버튼 
     borderBottomWidth: 2,
     marginBottom : 8,
     borderColor: 'black',
-    width: 395,
+    width: '100%',
+    padding: 5
   },
   ListText: { // 과목명 텍스트
     fontSize: 20,
     color: 'black',
-    marginBottom: 3,
     fontWeight: 'bold',
-    marginLeft: 5,
-    
   },
   ListText2: { // 버튼 누른 후 과목명 텍스트
     fontSize: 25,
     marginLeft : 25,
     color:'black',
-    fontWeight: 'bold',
-    
+    fontWeight: 'bold'
+  },
+  ListArea: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   ListInfo: { // 과목마다의 출석 텍스트
     fontSize: 15,
-    marginLeft: 5,
-    marginBottom: 5,
+    color: 'black'
+  },
+  ListInfoSec: {
+    fontSize: 15,
     color: 'black'
   },
   ListInfo2: { // 버튼 누른 후 과목마다의 출석 텍스트
     fontSize: 15,
     marginLeft: 25,
     marginTop : 5,
-    
+    color: 'black'
   },
   modal: {
     borderTopLeftRadius: 20,

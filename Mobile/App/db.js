@@ -18,7 +18,7 @@ async function getNoticePosts(campus_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.campus_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -46,7 +46,7 @@ async function getNoticeDepartmentPosts(department_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -74,7 +74,7 @@ async function getNoticeHotPosts(campus_id) {
     try {
         conn = await pool.getConnection(campus_id);
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.campus_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -102,7 +102,7 @@ async function getNoticeDepartmentHotPosts(department_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.department_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.department_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -138,7 +138,7 @@ async function getNoticeBookmarkPosts(user_id) {
             post.view, 
             post.\`like\`, 
             student.name, 
-            user.admin_check
+            user.title AS user_title
         FROM 
             post
         LEFT JOIN 
@@ -179,7 +179,7 @@ async function getNoticeDepartmentBookmarkPosts(user_id, department_id) {
             post.view, 
             post.\`like\`, 
             student.name, 
-            user.admin_check
+            user.title AS user_title
         FROM 
             post
         LEFT JOIN 
@@ -213,7 +213,7 @@ async function getGeneralPosts(campus_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.campus_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -235,13 +235,41 @@ async function getGeneralPosts(campus_id) {
     }
 }
 
+//전체 게시판에서 전체 게시글을 가져오는 쿼리
+async function getMyPostData(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "user.user_id = ? "
+            + "ORDER BY post.date DESC"
+        );
+        const rows = await conn.query(query, [user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //전체 게시판에서 핫 게시물을 가져오는 쿼리
 async function getHotPosts(campus_id) {
     let conn;
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.campus_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -277,7 +305,7 @@ async function getBookmarkPosts(user_id) {
             post.view, 
             post.\`like\`, 
             student.name, 
-            user.admin_check
+            user.title AS user_title
         FROM 
             post
         LEFT JOIN 
@@ -310,7 +338,7 @@ async function getDepartmentPosts(department_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check, student.department_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.department_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -338,7 +366,7 @@ async function getdepartmentHotPosts(department_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -374,7 +402,7 @@ async function getdepartmentBookmarkPosts(user_id, department_id) {
             post.view, 
             post.\`like\`, 
             student.name, 
-            user.admin_check
+            user.title AS user_title
         FROM 
             post
         LEFT JOIN 
@@ -515,6 +543,7 @@ async function getuserpk(user_id, user_passwd) {
                 user.point, user.admin_check, 
                 user.profilePhoto,
                 user.id,
+                user.title,
                 student.name, student.campus_id, 
                 student.department_id, student.email, 
                 student.grade,
@@ -1303,7 +1332,7 @@ async function searchPost(search_text) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " +
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title " +
             "FROM post " +
             "LEFT JOIN user ON post.user_id = user.user_id " +
             "LEFT JOIN student ON user.student_id = student.student_id " +
@@ -1936,6 +1965,102 @@ async function delete_studyroom(student, study_room_name, study_room_date, study
     }
 }
 
+async function deleteMyPostData(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM post WHERE post_id = ?"
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function deleteMyaram(aram_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM aram WHERE aram_id = ?"
+        const result = await conn.query(query, [aram_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//메인화면에서 이벤트 사진
+async function is_user_post_like(user_id, post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+           `SELECT * FROM is_user_post_like WHERE post_id = ? AND user_id = ?`
+        );
+        const row = await conn.query(query, [post_id, user_id]);
+        console.log(row);
+        return row.length === 0; // row가 비어 있으면 true, 비어 있지 않으면 false
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+
+async function put_user_post_like(user_id, post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO is_user_post_like (user_id, post_id) VALUES (?, ?);`
+        await conn.query(query, [user_id, post_id]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function put_user_report(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO report (post_id) VALUES (?);`
+        await conn.query(query, [post_id]);
+        console.log("신고 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function get_user_report() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `SELECT report.report_id, report.post_id, user.user_id
+                        FROM report
+                        JOIN post ON report.post_id = post.post_id
+                        JOIN user ON post.user_id = user.user_id;`;
+        const rows = await conn.query(query);
+        console.log("신고 조회 성공");
+        return rows; // 쿼리 결과 반환
+    } catch (err) {
+        console.error('Error querying data:', err);
+        throw err; // 에러 처리
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2019,4 +2144,11 @@ module.exports = {
     user_send_photo,
     delete_studyroom,
     select_user_event_info,
+    getMyPostData,
+    deleteMyPostData,
+    deleteMyaram,
+    is_user_post_like,
+    put_user_post_like,
+    put_user_report,
+    get_user_report
 };

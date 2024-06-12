@@ -1,11 +1,13 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity, Pressable, Animated, RefreshControl } from 'react-native';
+import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity, Pressable, Animated, RefreshControl, Alert } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
 import { UserData } from '../../types/type'
 import { Swipeable, GestureHandlerRootView, RectButton } from 'react-native-gesture-handler';
 import config from '../../config';
+
+
 
 type PostData = {
     post_id: number,
@@ -27,27 +29,65 @@ const renderEmptyItem = () => {
     )
 }
 
-const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
+//화면.
+const MyPostScreen = ({ route, navigation }: any) => {
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
-    const { department_check, userdata } = route.params;
+    const { userdata } = route.params;
     const [communityData, setCommunityData] = useState<PostData[]>([]);
     const [userData, setUserData] = useState<UserData>(userdata);
     const [userHavePost, setUserHavePost] = useState<any[]>([]);
     const [isSwipeableOpen, setIsSwipeableOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    ;
-    const onRefresh = async () => {
-        setRefreshing(true);
-        await AreYouHavePost();
-        setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
-    };
-
+    const swipeableRef  = useRef<Swipeable>(null);
+    
     const closebookmark = useCallback((index : any) => {
         //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
         swipeableRefs.current[index]?.close();
     }, []);
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        await AreYouHavePost();
+        setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
+      };
+
+      const Addbookmark = async (user_pk : number, post_pk : number) => {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const response = await fetch(`${config.serverUrl}/add_book_mark`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user_pk,
+                    post_id: post_pk,
+                }),
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+    
+            const result = await response.json();
+
+            if (result.message === "북마크 추가 완료") {
+                console.log('북마크가 성공적으로 추가되었습니다.');
+            }else {
+                console.log('알 수 없는 응답:', result);
+            }
+        } catch (error : any) {
+            if (error.name === 'AbortError') {
+                console.error('요청이 타임아웃되었습니다.');
+            } else {
+                console.error('북마크 추가 요청 실패:', error);
+            }
+        }
+    };
 
     const view_count_up = async (post_id: any) => {
         try {
@@ -67,44 +107,7 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
         }
     }
 
-    const Addbookmark = async (user_pk: number, post_pk: number) => {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch(`${config.serverUrl}/add_book_mark`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_id: user_pk,
-                    post_id: post_pk,
-                }),
-                signal: controller.signal
-            });
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const result = await response.json();
-
-            if (result.message === "북마크 추가 완료") {
-                console.log('북마크가 성공적으로 추가되었습니다.');
-            } else {
-                console.log('알 수 없는 응답:', result);
-            }
-        } catch (error: any) {
-            if (error.name === 'AbortError') {
-                console.error('요청이 타임아웃되었습니다.');
-            } else {
-                console.error('북마크 추가 요청 실패:', error);
-            }
-        }
-    };
-
-    const RemoveBookmark = async (user_pk: number, post_pk: number) => {
+    const RemoveBookmark = async (user_pk : number, post_pk : number) => {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -120,19 +123,19 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
                 signal: controller.signal
             });
             clearTimeout(timeoutId);
-
+    
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+    
             const result = await response.json();
 
             if (result.message === "북마크 추가 완료") {
                 console.log('북마크가 성공적으로 추가되었습니다.');
-            } else {
+            }else {
                 console.log('알 수 없는 응답:', result);
             }
-        } catch (error: any) {
+        } catch (error : any) {
             if (error.name === 'AbortError') {
                 console.error('요청이 타임아웃되었습니다.');
             } else {
@@ -143,58 +146,58 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
 
     const handleBookmark = async (item: PostData, index : number) => {
         try {
-            if (userHavePost.some(posts => item.post_id === posts.post_id)) {
-                // 이미 북마크에 있는 경우, 북마크를 삭제합니다.
-                await RemoveBookmark(userData.user_pk, item.post_id);
-                // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
-                setUserHavePost((prev) => prev.filter(post => post.post_id !== item.post_id));
-                closebookmark(index);
-            } else {
-                // 북마크에 없는 경우, 북마크를 추가합니다.
-                await Addbookmark(userData.user_pk, item.post_id);
-                // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
-                setUserHavePost((prev) => [...prev, item]);
-                closebookmark(index);
-            }
+          if (userHavePost.some(posts => item.post_id === posts.post_id)) {
+            // 이미 북마크에 있는 경우, 북마크를 삭제합니다.
+            await RemoveBookmark(userData.user_pk, item.post_id);
+            await getMyPostData();
+            closebookmark(index);
+            // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
+            setUserHavePost((prev) => prev.filter(post => post.post_id !== item.post_id));
+          } else {
+            // 북마크에 없는 경우, 북마크를 추가합니다.
+            await Addbookmark(userData.user_pk, item.post_id);
+            // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
+            setUserHavePost((prev) => [...prev, item]);
+            closebookmark(index);
+          }
         } catch (error) {
-            // 오류 처리
-            console.error("Bookmark 처리 실패:", error);
+          // 오류 처리
+          console.error("Bookmark 처리 실패:", error);
         }
-    };
+      };
 
     const renderRightActions = (item: PostData, index : number) => {
-        return (
-            // 왼쪽으로 스와이프할 때 나타날 컴포넌트
-            <TouchableOpacity
-                onPress={() => handleBookmark(item, index)}
-                style={{
-                    backgroundColor: '#FFDFC1',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    width: 70,
-                }}>
-                {userHavePost.some(posts => item.post_id === posts.post_id) ? (
-                    <Text style={{ color: '#F29F05' }}> <IconC name="bookmark" size={40} /></Text>
-                ) : (
-                    <Text style={{ color: '#F29F05' }}> <IconC name="bookmark-o" size={40} /></Text>
-                )}
-            </TouchableOpacity>
-        )
-    };
+        return(
+        // 왼쪽으로 스와이프할 때 나타날 컴포넌트
+        <TouchableOpacity
+            onPress={() => handleBookmark(item, index)}
+            style={{
+                backgroundColor: '#FFDFC1',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: 70,
+            }}>
+            {userHavePost.some(posts => item.post_id === posts.post_id) ? (
+                <Text style={{ color: '#F29F05' }}> <IconC name="bookmark" size={40} /></Text>
+            ) : (
+                <Text style={{ color: '#F29F05' }}> <IconC name="bookmark-o" size={40} /></Text>
+            )}
+        </TouchableOpacity>
+    )};
 
-    const getNoiceSchollposts = async () => {
+    const getMyPostData = async () => {
         try {
-            const response = await fetch(`${config.serverUrl}/noticeschoolpost`, {
+            const response = await fetch(`${config.serverUrl}/getMyPostData`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    campus_id : userData.campus_pk
+                    user_id: userData.user_pk
                 }),
             })
             const postsdata = await response.json();
-            console.log(postsdata);
+            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error);
@@ -202,25 +205,24 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
         }
     }
 
-    const getNoiceDepartmentposts = async () => {
+    const deleteMyPostData = async (post_id : number) => {
         try {
-            const response = await fetch(`${config.serverUrl}/noticedepartmentpost`, {
+            const response = await fetch(`${config.serverUrl}/deleteMyPostData`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    department_id : userData.department_pk
+                    post_id: post_id
                 }),
             })
             const postsdata = await response.json();
-            setCommunityData(postsdata);
+            await getMyPostData();
         } catch (error) {
             console.error(error);
         } finally {
         }
     }
-
 
     const AreYouHavePost = async () => {
         try {
@@ -245,31 +247,53 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-        } catch (error: any) {
+        } catch (error : any) {
             console.error('북마크 가져오기 실패:', error);
 
-            if (error.name === 'AbortError') {
-                console.error('요청이 타임아웃되었습니다.');
-            } else {
-                console.error('기타 오류:', error);
-            }
+        if (error.name === 'AbortError') {
+            console.error('요청이 타임아웃되었습니다.');
+        } else {
+            console.error('기타 오류:', error);
+        }
         }
     }
 
     useFocusEffect(
         React.useCallback(() => {
-            if (department_check == 0) {
-                getNoiceSchollposts();
-            } else if (department_check == 1) {
-                getNoiceDepartmentposts();
-            }
+            getMyPostData();
             setUserData(userdata);
             AreYouHavePost();
         }, [])
     );
 
+    const delete_post = (post_id : number) => {
+        Alert.alert(
+            "게시글 삭제",
+            "게시글을 정말로 삭제하시겠습니까??",
+            [
+                {
+                    text: "취소",
+                    onPress: () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                { text: "확인", onPress: async () => {
+                    deleteMyPostData(post_id)
+                    delete_post_aram()} }
+            ]
+        );
+    };
 
+    const delete_post_aram = () => {
+        Alert.alert(
+            "게시글 삭제 성공!",
+            "게시글을 성공적으로 삭제 하였습니다!",
+            [
+                { text: "확인" }
+            ]
+        );
+    };
 
+    
     const renderItem = ({ item, index }: { item: PostData, index: number }) => (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
@@ -279,7 +303,8 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
                 onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
-                        navigation.navigate("NoticePostDetailScreen", { item, userData })}}>
+                        navigation.navigate("PostDetailScreen", { item, userData })}}
+                        onLongPress={() => delete_post(item.post_id)}>
                     <View style={styles.writeboxcontainer}>
                         <View style={styles.writetitle}>
                             <View style={styles.titlebox}>
@@ -292,7 +317,7 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
                         </View>
                         <View style={styles.wirterandtime}>
                             <View style={styles.writerbox}>
-                                <Text
+                            <Text
                                     style={{
                                         fontSize: 13,
                                         marginLeft: 10,
@@ -318,9 +343,10 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
         </GestureHandlerRootView>
     );
 
+
     return (
         <View style={styles.container} ref={ref}>
-            <View style={{ height: 120, backgroundColor: 'white' }}></View>
+            <View style = {{backgroundColor : 'white'}}></View>
             <FlatList
                 style={styles.flatliststyle}
                 data={communityData}
@@ -328,10 +354,10 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
                 ListFooterComponent={renderEmptyItem}
                 refreshControl={
                     <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={onRefresh}
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
                     />
-                }
+                  }
             //keyExtractor={(item) => item.id}
             />
         </View>
@@ -418,4 +444,4 @@ const styles = StyleSheet.create({
 }
 )
 
-export default NoticeSchoolPostsScreen;
+export default MyPostScreen;
