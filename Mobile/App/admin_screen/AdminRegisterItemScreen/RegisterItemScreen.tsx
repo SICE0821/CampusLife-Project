@@ -22,6 +22,7 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
   const [itemCount, setItemCount] = useState("");
   const [selectedImagePath, setSelectedImagePath]: any = useState();
   const [selectedImageFormData, setSelectedImageFormData] = useState<FormData | null>(null);
+  const [ImageNum, setImageNum] = useState();
   const [showStartDatePicker, setShowStartDatePicker]: any = useState(false);
   const [showStartEndPicker, setShowEndDatePicker]: any = useState(false);
   const [selectedStartDate, setSelectedStartDate]: any = useState(new Date());
@@ -51,7 +52,7 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
     const start_day = format(startDate, "yyyy.M.d");
     const end_day = format(endDate, "yyyy.M.d");
     const using_time = `${start_day} ~ ${end_day}`;
-    console.log(using_time);
+    //console.log(using_time);
     setDeadlineDate(using_time);
   }
 
@@ -87,12 +88,22 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
       const newPath = res.path;
       setSelectedImagePath(newPath);
       setSelectedImageFormData(formData);
-      await RegistorItemImage(formData);
-      console.log(newPath)
+      const imageData = await RegistorItemImage(formData);
+      setImageNum(imageData);
     } catch (error) {
       console.error(error);
     }
   };
+
+  const CheckData = () => {
+    console.log("상품 이름: " + itemName);
+    console.log("가격: " + itemPoint);
+    console.log("설명: " + itemExplain);
+    console.log("이미지 코드: " + ImageNum);
+    console.log("사용기간: " + deadlineDate);
+    console.log("캠퍼스 아이디: " + userData.campus_pk);
+    console.log("수량: " + itemCount)
+  }
 
   const RegistorItemImage = async (selectImageFormData : FormData) => {
     try {
@@ -101,12 +112,36 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
         body: selectImageFormData,
       });
       const imageData = await response.json();
-      return imageData
-      console.log(imageData);
+      console.log(imageData.fileName);
+      return imageData.fileName;
     } catch (error) {
       console.error(error);
     }
   };
+
+  const RegistorItem = async () => {
+    try {
+        const response = await fetch(`${config.serverUrl}/RegistorItem`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                campus_id : userData.campus_pk,
+                name : itemName,
+                price : itemPoint,
+                using_time : deadlineDate,
+                image_num : ImageNum,
+                explian : itemExplain,
+            }),
+        })
+        const RegistorItem = await response.json();
+        console.log(RegistorItem);
+    } catch (error) {
+        console.error(error);
+    } finally {
+    }
+}
 
   return (
     <View style={styles.container}>
@@ -114,7 +149,7 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
         <View style={styles.ImageBox}>
           <View style={styles.Image}>
             <Image style={{ height: "100%", width: "100%", borderRadius: 20 }}
-              source={{ uri: selectedImagePath ? selectedImagePath : `${config.photoUrl}/1718111429461-1718111429595_21.png` }} />
+              source={{ uri: selectedImagePath ? selectedImagePath : `${config.photoUrl}/1718130565752-1718130565211_21.png` }} />
           </View>
         </View>
         <View style={styles.imageChangeButtonBox}>
@@ -208,7 +243,10 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
         </View>
         <View style={styles.CompleteButtonBox}>
           <TouchableOpacity
-            onPress={() => {
+            onPress={async () => {
+              for (let i = 0; i < parseInt(itemCount); i++) {
+                 await RegistorItem(); 
+              }
             }}
             style={styles.CompleteButton}>
             <Text style={styles.CompleteText}>작성완료</Text>

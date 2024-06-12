@@ -87,7 +87,8 @@ const { getGeneralPosts,
   deleteMyaram,
   is_user_post_like,
   put_user_post_like,
-  admin_get_event_objcet
+  admin_get_event_objcet,
+  RegistorItem
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1710,10 +1711,24 @@ app.post('/select_user_event_info', async (req, res) => {
   }
 });
 
+//상품시에 사진 저장
 app.post('/RegistorItemImage', upload.single('images'), (req, res) => {
   const fileName = req.file ? req.file.filename : null;
-  console.log(fileName);
-  res.json({ fileName }); // 파일 이름을 JSON 형식으로 클라이언트로 반환
+  const baseName = fileName ? fileName.substring(0, fileName.lastIndexOf('.')) : null; // 파일 이름에서 확장자 제거
+  console.log(baseName);
+  res.json({ fileName: baseName }); // 확장자를 제거한 파일 이름을 JSON 형식으로 클라이언트로 반환
+});
+
+//상품등록
+app.post('/RegistorItem', async (req, res) => {
+  const { campus_id, name, price, using_time, image_num, explian} = req.body;
+  try {
+    const rows = await RegistorItem(campus_id, name, price, using_time, image_num, explian);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 //서버 시작

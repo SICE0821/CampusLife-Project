@@ -2044,6 +2044,21 @@ async function put_user_post_like(user_id, post_id) {
     }
 }
 
+async function RegistorItem(campus_id, name, price, using_time, image_num, explian) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO event_object (campus_id, \`NAME\`, price, code_num, using_time, image_num, sell_check,\`explain\`)
+                       VALUES  (?, ?, ?, '123412341235', ?, ?, 0, ?);`
+        await conn.query(query, [campus_id, name, price, using_time, image_num, explian]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2132,5 +2147,6 @@ module.exports = {
     deleteMyaram,
     is_user_post_like,
     put_user_post_like,
-    admin_get_event_objcet
+    admin_get_event_objcet,
+    RegistorItem
 };
