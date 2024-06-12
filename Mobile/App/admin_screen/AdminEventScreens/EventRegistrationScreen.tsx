@@ -355,8 +355,9 @@ const styles = StyleSheet.create({
   },
   inputBox: {
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: '#eeeeee',
     borderBottomWidth: 1.5,
+    borderRadius: 10,
     borderColor: 'gray', // 입력란 아래 테두리 색
     paddingHorizontal: 5,
   },
