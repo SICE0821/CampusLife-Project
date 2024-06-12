@@ -137,7 +137,7 @@ const upload = multer({ storage });
 //메인페이지에 핫 게시글 데이터를 가져온다.
 app.post('/MainPagehotPost', async (req, res) => {
   const { campus_id } = req.body;
-  
+
   try {
     const rows = await gethotpostdata(campus_id);
     const processedData = rows.map(item => ({
@@ -251,7 +251,7 @@ app.post('/get_user_data', async (req, res) => {
     currentstatus: rows[0].currentstatus,
     student_semester: rows[0].student_semester,
     college: rows[0].college,
-    title : rows[0].title
+    title: rows[0].title
   };
   res.json(userData);
 })
@@ -1502,10 +1502,10 @@ app.post('/get_campus_place', async (req, res) => {
   try {
     const rows = await getCampus(campus_id);
     const processedData = rows.map(item => ({
-      study_room_id : item.study_room_id,
-      campus_place : item.campus_place,
-      study_room_name : item.study_room_name,
-      image : item.image
+      study_room_id: item.study_room_id,
+      campus_place: item.campus_place,
+      study_room_name: item.study_room_name,
+      image: item.image
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1521,7 +1521,7 @@ app.post('/get_study_room', async (req, res) => {
     const rows = await get_student_study_room(student);
     console.log(rows);
     const processedData = rows.map(item => ({
-      student : item.student,
+      student: item.student,
       study_room_name: item.study_room_name,
       study_room_date: item.study_room_date,
       study_room_time: item.study_room_time,
@@ -1567,9 +1567,9 @@ app.post('/deletestudyroom', async (req, res) => {
   const { student, study_room_name, study_room_date, study_room_time } = req.body;
   const success = await delete_studyroom(student, study_room_name, study_room_date, study_room_time);
   if (success) {
-      res.json({ message: "성공적으로 값 삭제" });
+    res.json({ message: "성공적으로 값 삭제" });
   } else {
-      res.status(500).json({ error: "삭제 실패" });
+    res.status(500).json({ error: "삭제 실패" });
   }
 });
 
@@ -1634,7 +1634,7 @@ app.post('/send_user_event_photo', upload.array('images'), (req, res) => {
     console.error('Error saving files to the database:', error);
     res.status(500).send('Internal Server Error');
   }
-  });
+});
 
 
 app.post('/deleteMyPostData', async (req, res) => {
@@ -1681,7 +1681,7 @@ app.post('/is_user_post_like', async (req, res) => {
 });
 
 app.post('/put_user_post_like', async (req, res) => {
-  const { user_id, post_id} = req.body;
+  const { user_id, post_id } = req.body;
   try {
     await put_user_post_like(user_id, post_id);
     console.log("성공적으로 데이터 보냄");
@@ -1697,9 +1697,9 @@ app.post('/select_user_event_info', async (req, res) => {
   try {
     const rows = await select_user_event_info(user_id);
     const processedData = rows.map(item => ({
-        user_id : item.user_id,
-        user_send_event : item.user_send_event,
-        event_id : item.event_id
+      user_id: item.user_id,
+      user_send_event: item.user_send_event,
+      event_id: item.event_id
     }));
     console.log(processedData);
     res.json(processedData);
@@ -1708,6 +1708,12 @@ app.post('/select_user_event_info', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+app.post('/RegistorItemImage', upload.single('images'), (req, res) => {
+  const fileName = req.file ? req.file.filename : null;
+  console.log(fileName);
+  res.json({ fileName }); // 파일 이름을 JSON 형식으로 클라이언트로 반환
 });
 
 //서버 시작

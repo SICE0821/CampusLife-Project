@@ -110,17 +110,17 @@ const styles = StyleSheet.create({
 
   itemcontainer: {
     width: '100%',
-    height: 180,
+    height: 140,
     flexDirection: 'row',
     justifyContent : 'center',
-    alignItems : 'center',
+    //alignItems : 'center',
     marginTop: 15,
     paddingHorizontal : 10,
     //backgroundColor : 'red'
   },
   photobox : {
-    width : "40%",
-    height : 180,
+    width : "30%",
+    height : "100%",
     //backgroundColor : 'blue'
   },
   photo : {
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     borderRadius : 15,
   },
   infocontainer : {
-    width : "60%",
+    width : "70%",
     height : 180,
     //backgroundColor : 'yellow'
   },
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   explainTextBox : {
     width : "100%",
-    height : 80,
+    height : 50,
     //backgroundColor : 'red',
     justifyContent : 'center',
     //alignItems : 'center'
@@ -156,13 +156,13 @@ const styles = StyleSheet.create({
   },
   priceText : {
     color : "#ED9E2B",
-    fontSize : 19,
+    fontSize : 16,
     fontWeight : 'bold',
     marginLeft : 5,
   },
   usingTimeText : {
     color : "grey",
-    fontSize : 19,
+    fontSize : 16,
     marginLeft : 5,
   },
   modifybox : {

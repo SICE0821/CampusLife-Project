@@ -142,6 +142,7 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                 
             <RegisterItemStack.Screen name="RegisterItemScreen"
                 component={RegisterItemScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
