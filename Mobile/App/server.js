@@ -87,6 +87,8 @@ const { getGeneralPosts,
   deleteMyaram,
   is_user_post_like,
   put_user_post_like,
+  put_user_report,
+  get_user_report,
   admin_get_event_objcet,
   RegistorItem,
   ChangeItemInfo,
@@ -120,7 +122,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '127.0.0.1',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -337,7 +339,7 @@ app.post('/noticeschoolpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -360,7 +362,7 @@ app.post('/noticedepartmentpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -383,7 +385,7 @@ app.post('/NoticeHotpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -407,7 +409,7 @@ app.post('/NoticeDepartmentHotpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -432,7 +434,7 @@ app.post('/Noticebookmark', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -456,7 +458,7 @@ app.post('/NoticeDepartmentbookmark', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -479,7 +481,7 @@ app.post('/getMyPostData', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -503,7 +505,7 @@ app.post('/generalpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title 
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -526,7 +528,7 @@ app.post('/Hotpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -550,7 +552,7 @@ app.post('/bookmark', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -575,7 +577,7 @@ app.post('/departmentpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -598,7 +600,7 @@ app.post('/departmentHotpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -622,7 +624,7 @@ app.post('/departmentbookmark', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1071,7 +1073,7 @@ app.post('/search_post', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      admin_check: item.admin_check,
+      user_title: item.user_title
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1137,6 +1139,7 @@ app.post('/get_post_detail', async (req, res) => {
     view: row[0].view,
     writer_propile: row[0].profilePhoto,
     post_id: row[0].post_id,
+    user_id: row[0].user_id,
   };
   res.json(userData);
 
@@ -1715,6 +1718,32 @@ app.post('/select_user_event_info', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//신고 등록하기
+app.post('/putuserreport', async (req, res) => {
+  const { post_id } = req.body;
+  try {
+    const rows = put_user_report(post_id);
+    console.log("DB에 신고 정보를 성공적으로 추가했습니다.");
+    res.status(200).json({ success: true, message: "신고가 성공적으로 제출되었습니다." });
+  } catch (error) {
+    console.error("DB에 값을 추가하는 도중 오류가 발생했습니다:", error);
+    res.status(400).json({ success: false, message: "신고 제출에 실패했습니다." });
+  }
+});
+
+app.get('/getuserreport', async (req, res) => {
+  try {
+      const rows = await get_user_report();
+      console.log(rows);
+      res.json(rows); // 쿼리 결과를 JSON으로 클라이언트로 전송
+      console.log("성공적으로 데이터 전송");
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 //상품시에 사진 저장
 app.post('/RegistorItemImage', upload.single('images'), (req, res) => {

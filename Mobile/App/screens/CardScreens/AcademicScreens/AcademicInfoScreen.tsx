@@ -1,125 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import ProgressCircle from 'react-native-progress-circle';
-import Icon from 'react-native-vector-icons/Entypo';
-import { Table, Row, Rows } from "react-native-table-component";
-import {
-    LineChart,
-    BarChart,
-    PieChart,
-    ProgressChart,
-    ContributionGraph,
-    StackedBarChart
-} from "react-native-chart-kit";
+import { Table, Row } from "react-native-table-component";
+import { BarChart } from "react-native-chart-kit";
 import { UserData, Lecture } from '../../../types/type';
 
-const width = Dimensions.get("window").width;
+const { width } = Dimensions.get("window");
 
-const AcademicInfoScreen = ({route} : any) => {
+const AcademicInfoScreen = ({ route }: any) => {
     const { userdata, LectureData } = route.params;
     const [userData, setUserData] = useState<UserData>(userdata);
     const [userLecture, setUserLecture] = useState<Lecture[]>(LectureData);
-    const [visibleSemesters, setVisibleSemesters] = useState<number[]>([]);
+    const [selectedYear, setSelectedYear] = useState<number>(1);
+    const [selectedSemester, setSelectedSemester] = useState<number>(1);
 
-    const [circle1Data, setCircle1Data] = useState(0);
-    const [circle2Data, setCircle2Data] = useState(0);
-    const [circle3Data, setCircle3Data] = useState(0);
-    const [circle4Data, setCircle4Data] = useState(0);
-    const [circle5Data, setCircle5Data] = useState(0);
-    const [circle6Data, setCircle6Data] = useState(0);
+    const [circleData, setCircleData] = useState({
+        circle1Data: 0,
+        circle2Data: 0,
+        circle3Data: 0,
+        circle4Data: 0,
+        circle5Data: 0,
+        circle6Data: 0,
+    });
 
-    // 성적 데이터 초기화
-    let datas = [0, 0, 0, 0, 0, 0, 0, 0, 0]; // A+부터 F까지의 갯수를 담을 배열
+    const gradesData = Array(9).fill(0); // A+부터 F까지의 갯수를 담을 배열
 
-    // userLecture 배열을 순회하면서 성적을 확인하고 datas 배열 업데이트
     userLecture.forEach(lecture => {
-        // 성적에 따라 datas 배열 업데이트
-        switch (lecture.lecture_grades) {
-            case 'A+':
-                datas[0]++;
-                break;
-            case 'A':
-                datas[1]++;
-                break;
-            case 'B+':
-                datas[2]++;
-                break;
-            case 'B':
-                datas[3]++;
-                break;
-            case 'C+':
-                datas[4]++;
-                break;
-            case 'C':
-                datas[5]++;
-                break;
-            case 'D+':
-                datas[6]++;
-                break;
-            case 'D':
-                datas[7]++;
-                break;
-            case 'F':
-                datas[8]++;
-                break;
-            default:
-                break;
-        }
+        const gradeIndex = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'].indexOf(lecture.lecture_grades);
+        if (gradeIndex !== -1) gradesData[gradeIndex]++;
     });
 
     useEffect(() => {
         const totalCredits = userLecture.reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
         const averageCredits = parseFloat((totalCredits / userLecture.length).toFixed(2));
 
-        const majorCredits = userLecture.filter(lecture => lecture.division === '전공').reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
-        const majorCount = userLecture.filter(lecture => lecture.division === '전공').length;
-        const majorAverageCredits = parseFloat((majorCredits / majorCount).toFixed(2));
+        const majorLectures = userLecture.filter(lecture => lecture.division === '전공');
+        const cultureLectures = userLecture.filter(lecture => lecture.division === '교양');
 
-        const cultureCredits = userLecture.filter(lecture => lecture.division === '교양').reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
-        const cultureCount = userLecture.filter(lecture => lecture.division === '교양').length;
-        const cultureAverageCredits = parseFloat((cultureCredits / cultureCount).toFixed(2));
-        
+        const majorCredits = majorLectures.reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
+        const cultureCredits = cultureLectures.reduce((sum, lecture) => sum + lecture.lecture_credit, 0);
+
+        const majorAverageCredits = parseFloat((majorCredits / majorLectures.length).toFixed(2));
+        const cultureAverageCredits = parseFloat((cultureCredits / cultureLectures.length).toFixed(2));
+
         const totalCredits2 = userLecture.reduce((sum, lecture) => sum + lecture.credit, 0);
-        const majorCredits2 = userLecture.filter(lecture => lecture.division === '전공').reduce((sum, lecture) => sum + lecture.credit, 0);
-        const cultureCredits2 = userLecture.filter(lecture => lecture.division === '교양').reduce((sum, lecture) => sum + lecture.credit, 0);
+        const majorCredits2 = majorLectures.reduce((sum, lecture) => sum + lecture.credit, 0);
+        const cultureCredits2 = cultureLectures.reduce((sum, lecture) => sum + lecture.credit, 0);
 
-        setCircle1Data(averageCredits);
-        setCircle2Data(majorAverageCredits);
-        setCircle3Data(cultureAverageCredits);
-        setCircle4Data(totalCredits2);
-        setCircle5Data(majorCredits2);
-        setCircle6Data(cultureCredits2);
+        setCircleData({
+            circle1Data: averageCredits,
+            circle2Data: majorAverageCredits,
+            circle3Data: cultureAverageCredits,
+            circle4Data: totalCredits2,
+            circle5Data: majorCredits2,
+            circle6Data: cultureCredits2,
+        });
     }, [userLecture]);
-
-    // "#00BFFF"  
-
-    const circleRadius = 50;
-    const circleBorderWidth = 10;
-    const circleColor = "#FFC81E";
-    const circlShadowColor = "#EEEEEE";
-
-    const creditMax = 120; // 최대 학점 데이터
-    const majorCreditMax = 80; // 최대 전공 학점 데이터
-    const cultureCreditMax = 20; // 최대 교양 학점 데이터
-
-    const circle1_percent = (circle1Data / 4.5) * 100;
-    const circle2_percent = (circle2Data / 4.5) * 100;
-    const circle3_percent = (circle3Data / 4.5) * 100;
-    const circle4_percent = (circle4Data / creditMax) * 100;
-    const circle5_percent = (circle5Data / majorCreditMax) * 100;
-    const circle6_percent = (circle6Data / cultureCreditMax) * 100;
-
-    
-    useEffect(() => {
-        const semesters: number[] = [];
-        for (let year = 1; year <= userData.college; year++) {
-            const maxSemester = year === userData.college ? 2 : 2; // 만약 학년이 현재 학년이면 userData.student_semester까지, 아니면 2학기까지만 보이도록 조절
-            for (let semester = 1; semester <= maxSemester; semester++) {
-                semesters.push((year - 1) * 2 + semester); // 학년과 학기를 조합하여 배열에 추가
-            }
-        }
-        setVisibleSemesters(semesters);
-    }, [userData.college, userData.student_semester]);
 
     const semesterLabels: Record<number, string> = {
         1: '1학년 1학기',
@@ -142,223 +79,104 @@ const AcademicInfoScreen = ({route} : any) => {
         7: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 1),
         8: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 2),
     };
-    
-    const [detailCreditAreaVisible, setDetailCreditAreaVisible] = useState<Record<number, boolean>>({
-        1: true,
-        2: true,
-        3: true,
-        4: true,
-        5: true,
-        6: true,
-        7: true,
-        8: true,
-    });
 
-    const toggleDetailCreditAreaVisibility = (semesterKey: number) => {
-        setDetailCreditAreaVisible({
-            ...detailCreditAreaVisible,
-            [semesterKey]: !detailCreditAreaVisible[semesterKey],
-        });
-    };
-
-    const tableHead = ["과목명", "구분", "학점", "성적"];
-    const widthArrs = [ width*0.65, width*0.1, width*0.1, width*0.1,]; // 테이블 간격
-    const tableBorderWidth = 3; // 테이블 border 크기
-    const tableBorderColor = 'gray'; // 테이블 bordder 색
+    const circleConfigs = [
+        { label: '전체 평점', value: circleData.circle1Data, maxValue: 4.5 },
+        { label: '전공 평점', value: circleData.circle2Data, maxValue: 4.5 },
+        { label: '교양 평점', value: circleData.circle3Data, maxValue: 4.5 },
+        { label: '전체 학점', value: circleData.circle4Data, maxValue: 120 },
+        { label: '전공 학점', value: circleData.circle5Data, maxValue: 80 },
+        { label: '교양 학점', value: circleData.circle6Data, maxValue: 20 },
+    ];
 
     return (
         <View style={styles.container}>
-            <View style={{borderBottomWidth: 2, marginTop: 5, borderColor: "black"}}></View>
             <ScrollView>
-                
-                {/* 학점 Circle 데이터 영역 */}
                 <View style={styles.circleArea}>
-                    {/* 학점 Circle 열 영역 */}
-                    <View style={styles.circleRow}>
-                        {/* 전체 평점 Circle */}
-                        <View style={styles.circle}>
-                            {/* Circle 설정 */}
-                            <ProgressCircle
-                                percent={circle1_percent}
-                                radius={circleRadius}
-                                borderWidth={circleBorderWidth}
-                                color={circleColor}
-                                shadowColor={circlShadowColor}
-                                bgColor="#fff">
-                                {/* Circle안의 텍스트 설정 */}
-                                <Text style={styles.circleText}>
-                                    {'전체 평점' + '\n'}
-                                    {circle1Data + '/' + 4.5}
-                                </Text>
-                            </ProgressCircle>
+                    {[...Array(Math.ceil(circleConfigs.length / 3))].map((_, rowIndex) => (
+                        <View style={styles.circleRow} key={rowIndex}>
+                            {circleConfigs.slice(rowIndex * 3, (rowIndex + 1) * 3).map((config, index) => (
+                                <View style={styles.circle} key={index}>
+                                    <ProgressCircle
+                                        percent={(config.value / config.maxValue) * 100}
+                                        radius={50}
+                                        borderWidth={10}
+                                        color="#FFC81E"
+                                        shadowColor="#EEEEEE"
+                                        bgColor="#fff">
+                                        <Text style={styles.circleText}>
+                                            {`${config.label}\n${config.value.toFixed(2)}/${config.maxValue}`}
+                                        </Text>
+                                    </ProgressCircle>
+                                </View>
+                            ))}
                         </View>
-                        {/* 전공 평점 Circle */}
-                        <View style={styles.circle}>
-                            {/* Circle 설정 */}
-                            <ProgressCircle
-                                percent={circle2_percent}
-                                radius={circleRadius}
-                                borderWidth={circleBorderWidth}
-                                color={circleColor}
-                                shadowColor={circlShadowColor}
-                                bgColor="#fff">
-                                {/* Circle안의 텍스트 설정 */}
-                                <Text style={styles.circleText}>
-                                    {'전공 평점' + '\n'}
-                                    {circle2Data + '/' + 4.5}
-                                </Text>
-                            </ProgressCircle>
-                        </View>
-                        {/* 교양 평점 Circle */}
-                        <View style={styles.circle}>
-                            {/* Circle 설정 */}
-                            <ProgressCircle
-                                percent={circle3_percent}
-                                radius={circleRadius}
-                                borderWidth={circleBorderWidth}
-                                color={circleColor}
-                                shadowColor={circlShadowColor}
-                                bgColor="#fff">
-                                {/* Circle안의 텍스트 설정 */}
-                                <Text style={styles.circleText}>
-                                    {'교양 평점' + '\n'}
-                                    {circle3Data + '/' + 4.5}
-                                </Text>
-                            </ProgressCircle>
-                        </View>
-                    </View>
-                    {/* 학점 Circle 열 영역 */}
-                    <View style={styles.circleRow}>
-                        {/* 전체 학점 Circle */}
-                        <View style={styles.circle}>
-                            {/* Circle 설정 */}
-                            <ProgressCircle
-                                percent={circle4_percent}
-                                radius={circleRadius}
-                                borderWidth={circleBorderWidth}
-                                color={circleColor}
-                                shadowColor={circlShadowColor}
-                                bgColor="#fff">
-                                {/* Circle안의 텍스트 설정 */}
-                                <Text style={styles.circleText}>
-                                    {'전체 학점' + '\n'}
-                                    {circle4Data + '/' + creditMax}
-                                </Text>
-                            </ProgressCircle>
-                        </View>
-                        {/* 전공 학점 Circle */}
-                        <View style={styles.circle}>
-                            {/* Circle 설정 */}
-                            <ProgressCircle
-                                percent={circle5_percent}
-                                radius={circleRadius}
-                                borderWidth={circleBorderWidth}
-                                color={circleColor}
-                                shadowColor={circlShadowColor}
-                                bgColor="#fff">
-                                {/* Circle안의 텍스트 설정 */}
-                                <Text style={styles.circleText}>
-                                    {'전공 학점' + '\n'}
-                                    {circle5Data + '/' + majorCreditMax}
-                                </Text>
-                            </ProgressCircle>
-                        </View>
-                        {/* 교양 학점 Circle */}
-                        <View style={styles.circle}>
-                            {/* Circle 설정 */}
-                            <ProgressCircle
-                                percent={circle6_percent}
-                                radius={circleRadius}
-                                borderWidth={circleBorderWidth}
-                                color={circleColor}
-                                shadowColor={circlShadowColor}
-                                bgColor="#fff">
-                                {/* Circle안의 텍스트 설정 */}
-                                <Text style={styles.circleText}>
-                                    {'교양 학점' + '\n'}
-                                    {circle6Data + '/' + cultureCreditMax}
-                                </Text>
-                            </ProgressCircle>
-                        </View>
-                    </View>
+                    ))}
                 </View>
-                {/* Bar Chart */}
-                <View style={styles.area}>
+
+                <ScrollView style={styles.chartArea} horizontal={true}>
                     <BarChart
                         data={{
                             labels: ["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"],
-                            datasets: [
-                                {
-                                    data: datas
-                                }
-                            ]
+                            datasets: [{ data: gradesData }],
                         }}
-                        width={Dimensions.get("window").width*1.18} // from react-native
+                        
+                        width={width*1.2}
                         height={220}
-                        yAxisLabel=""
-                        yAxisSuffix=""
-                        yAxisInterval={1} // optional, defaults to 1
+                        yAxisLabel=''
+                        yAxisSuffix=''
+                        
                         showValuesOnTopOfBars={true}
                         withHorizontalLabels={true}
                         chartConfig={{
                             backgroundColor: "#fff",
-                            backgroundGradientFrom: "#fff",
-                            backgroundGradientTo: "#fff",
-                            decimalPlaces: 0, // optional, defaults to 2dp
+                            backgroundGradientFrom: "#eee",
+                            backgroundGradientTo: "#eee",
+                            decimalPlaces: 0,
                             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                            style: {
-                                
-                            },
-                            propsForDots: {},
+                            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                         }}
-                        style={{
-                            left: -35,
-                            borderWidth: 1,
-                            borderColor: 'black'
-                        }}
+                        style={styles.chart}
                     />
+                </ScrollView>
+                <View style={styles.pickerArea}>
+                    <Picker
+                        selectedValue={selectedYear}
+                        style={styles.picker}
+                        dropdownIconColor={'black'}
+                        onValueChange={(itemValue: React.SetStateAction<number>) => setSelectedYear(itemValue)}
+                    >
+                        {[...Array(userData.college)].map((_, index) => (
+                            <Picker.Item key={index} label={`${index + 1}학년`} value={index + 1} />
+                        ))}
+                    </Picker>
+                    <Picker
+                        selectedValue={selectedSemester}
+                        style={styles.picker}
+                        dropdownIconColor={'black'}
+                        onValueChange={(itemValue: React.SetStateAction<number>) => setSelectedSemester(itemValue)}
+                    >
+                        {[1, 2].map((semester, index) => (
+                            <Picker.Item key={index} label={`${semester}학기`} value={semester - 1} />
+                        ))}
+                    </Picker>
                 </View>
 
 
-                {/* 학기별 상세 성적 확인용 영역 */}
-                {visibleSemesters.map((semesterKey) => {
-                    const semesterLabel = semesterLabels[semesterKey];
-                    const lectures = semesterData[semesterKey];
-                    
-                    return (
-                        <View key={semesterKey}>
-                            <View style={styles.detail_credit_box}>
-                                <Text style={styles.semester_text}>{semesterLabel}</Text>
-                                <TouchableOpacity onPress={() => toggleDetailCreditAreaVisibility(semesterKey)}>
-                                    <Icon name={detailCreditAreaVisible[semesterKey] ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
-                                </TouchableOpacity>
-                            </View>
-                            {!detailCreditAreaVisible[semesterKey] && (
-                                <View style={styles.detail_credit_area}>
-                                    <View style={styles.table}>
-                                        <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
-                                            <Row
-                                                data={tableHead}
-                                                style={{ height: 30, backgroundColor: "#dddddd" }}
-                                                textStyle={{ ...styles.tableHeader }} // 변경된 부분
-                                                widthArr={widthArrs}
-                                            />
-                                            {lectures.map((lecture, index) => (
-                                                <Row
-                                                    key={index}
-                                                    data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]}
-                                                    style={styles.tableRows}
-                                                    textStyle={{ ...styles.tableText }} // Use object style
-                                                    widthArr={widthArrs}
-                                                />
-                                            ))}
-                                        </Table>
-                                    </View>
-                                </View>
-                            )}
-                        </View>
-                    );
-                })}
+
+                {semesterData[selectedYear * 2 - 1 + selectedSemester].length > 0 ? (
+                    <View style={styles.detailCreditArea}>
+                        <Table borderStyle={{ borderWidth: 3, borderColor: 'gray' }}>
+                            <Row data={["과목명", "구분", "학점", "성적"]} style={styles.tableHeader} textStyle={styles.tableHeaderText} widthArr={[width * 0.65, width * 0.1, width * 0.1, width * 0.1]} />
+                            {semesterData[selectedYear * 2 - 1 + selectedSemester].map((lecture, index) => (
+                                <Row key={index} data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]} style={styles.tableRow} textStyle={styles.tableText} widthArr={[width * 0.65, width * 0.1, width * 0.1, width * 0.1]} />
+                            ))}
+                        </Table>
+                    </View>
+                ) : (
+                    <Text style={styles.noDataText}>데이터가 없습니다.</Text>
+                )}
+
             </ScrollView>
         </View>
     );
@@ -369,79 +187,75 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
     },
+    circleArea: {
+        marginVertical: 10,
+        width: '90%',
+        alignSelf: 'center',
+    },
+    circleRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
+    circle: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    circleText: {
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: 'black',
+    },
+    chartArea: {
+        marginBottom: 15,
+        borderWidth: 1,
+    },
+    chart: {
+        overflow: 'visible',
+        borderColor: 'black',
+    },
+    pickerArea:{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 10
+    },
+    picker:{
+        width: width*0.45,
+        backgroundColor: '#dddddd',
+        marginHorizontal: 5,
+        color: 'black',
+        elevation: 5,
+        shadowColor: 'black',
+    },
+    detailCreditArea: {
+        width: '100%',
+        alignItems: 'center',
+        paddingVertical: 15
+    },
     tableHeader: {
+        height: 30,
+        backgroundColor: "#dddddd",
+    },
+    tableHeaderText: {
         textAlign: "center",
         fontWeight: "bold",
-        color: 'gray'
+        color: 'gray',
+    },
+    tableRow: {
+        height: 50,
     },
     tableText: {
         textAlign: "center",
         fontWeight: 'bold',
-        color: 'black'
+        color: 'black',
     },
-    circleArea: { // 학점 정보 circle 영역
-        marginTop: 10,
-        width: '90%',
-        alignSelf: 'center',
-    },
-    circleRow: { // 학점 정보 열 영역
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginVertical: 10
-    },
-    circle: { // 학점 정보 Circle
-        marginHorizontal: 18
-    },
-    circleText: { // Circle 텍스트
+    noDataText: {
         textAlign: 'center',
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: 'black'
+        fontSize: 18,
+        marginTop: 20,
+        color: 'gray',
     },
-    area: { // 직선 그래프 영역
-        marginTop: 15,
-        marginBottom: 15,
-        width: '100%',
-        alignItems: 'center',
-    },
-    detail_credit_box: { // 학기별 상세 성적 박스 영역
-        backgroundColor: '#FFEFD5',
-        width: '100%',
-        height: 70,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderWidth: 1
-    },
-    semester_text: { // 박스 내 텍스트
-        fontSize: 28,
-        marginLeft: 15,
-        fontWeight: 'bold',
-        color: 'black'
-    },
-    semester_button: { // 박스 내 버튼
-        fontSize: 50,
-        marginRight: 15,
-        color: 'black'
-    },
-    detail_credit_area: { // 상세 성적 테이블 영역
-        //backgroundColor: 'red',
-        width: '100%',
-    },
-    table: { // 테이블
-        marginTop: 10,
-        marginBottom: 10,
-        backgroundColor: "#fff",
-        alignSelf: 'center',
-    },
-    tableRows:{ // 테이블 열
-        height: 50
-    },
-
-    bottom_area: { // 바닥 잉여 영역
-        //backgroundColor: 'gray',
-        height:100
-    }
 });
 
 export default AcademicInfoScreen;

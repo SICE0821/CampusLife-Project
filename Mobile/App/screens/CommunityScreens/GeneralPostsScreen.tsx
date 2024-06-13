@@ -15,7 +15,7 @@ type PostData = {
     view: number,
     like: number,
     name: string,
-    admin_check: boolean
+    user_title: string
 }
 
 
@@ -269,7 +269,6 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     );
 
 
-
     const renderItem = ({ item, index }: { item: PostData, index: number }) => (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
@@ -292,7 +291,19 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                         </View>
                         <View style={styles.wirterandtime}>
                             <View style={styles.writerbox}>
-                                <Text style={{ fontSize: 13, marginLeft: 10, color: item.admin_check === true ? 'red' : 'black' }}>{item.name}</Text>
+                            <Text
+                                    style={{
+                                        fontSize: 13,
+                                        marginLeft: 10,
+                                        color:
+                                            item.user_title === "학교" ? 'red' :
+                                            item.user_title === "반장" ? 'green' :
+                                            item.user_title === "학우회장" ? 'blue' :
+                                            'black'
+                                    }}
+                                >
+                                    {item.name}
+                                </Text>
                                 <Text> | {item.date}</Text>
                             </View>
                             <View style={styles.likenum}>
@@ -354,24 +365,26 @@ const styles = StyleSheet.create({
     },
 
     writeboxcontainer: {
-        //padding: 50, 
+        paddingHorizontal: 10, 
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
         //backgroundColor: 'red',
+        width: '100%',
         height: 70,
     },
 
     writetitle: {
-        flex: 0.6,
+        width: '100%',
+        height: '60%',
         flexDirection: 'row',
-        marginTop: 5,
         //backgroundColor : 'yellow'
     },
 
     wirterandtime: {
-        flex: 0.4,
-        flexDirection: 'row'
-        //backgroundColor : 'yellow'
+        width: '100%',
+        height: '40%',
+        flexDirection: 'row',
+        //backgroundColor : 'blue'
     },
 
     titlebox: {
@@ -381,7 +394,7 @@ const styles = StyleSheet.create({
     eyesnum: {
         flex: 0.15,
         flexDirection: 'row',
-        // backgroundColor : 'red',
+        //backgroundColor : 'red',
         alignItems: 'center',
         justifyContent: 'center',
     },

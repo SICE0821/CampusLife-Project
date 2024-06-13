@@ -1,16 +1,336 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { UserData } from '../../types/type'
-import config from '../../config';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Image
+} from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
+import IconPen from 'react-native-vector-icons/FontAwesome6';
+import IconTrash from 'react-native-vector-icons/FontAwesome6';
+import IconCancel from 'react-native-vector-icons/AntDesign';
+import IconPlus from 'react-native-vector-icons/AntDesign';
+import IconVote from 'react-native-vector-icons/FontAwesome5';
+import IconImage from 'react-native-vector-icons/FontAwesome5';
+import IconCalendar from 'react-native-vector-icons/MaterialCommunityIcons';
+import { launchImageLibrary } from 'react-native-image-picker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale'; // date-fns의 한국어 locale 불러오기
+
 
 const width = Dimensions.get("window").width;
 
-const EventRegistrationScreen = ({route} : any) => {
+const EventRegistrationScreen = () => {
+  // 이벤트 정보 관련 상태 변수들
+  const [title, setTitle] = useState(''); // 이벤트 제목
+  const [content, setContent] = useState(''); // 이벤트 내용
+  const [votes, setVotes] = useState<{ id: number, text: string }[]>([]); // 투표 옵션
+  const [showVoteSection, setShowVoteSection] = useState(false); // 투표 섹션 표시 여부
+  const [submittedData, setSubmittedData] = useState<any>(null); // 제출된 데이터
+  const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
+
+  // useState Hook를 사용하여 시작 및 종료 날짜와 모달 유형, 노출 여부를 설정할 변수를 생성
+  const [startDate, onChangeStartDate] = useState(new Date()); // 시작 날짜
+  const [endDate, onChangeEndDate] = useState(new Date()); // 종료 날짜
+  const [startVisible, setStartVisible] = useState(false); // 시작 날짜 모달 노출 여부
+  const [endVisible, setEndVisible] = useState(false); // 종료 날짜 모달 노출 여부
+
+  const onPressStartDate = () => { // 시작 날짜 클릭 시
+    setStartVisible(true); // 시작 날짜 모달 open
+  };
+
+  const onPressEndDate = () => { // 종료 날짜 클릭 시
+    setEndVisible(true); // 종료 날짜 모달 open
+  };
+
+  const onConfirmStartDate = (selectedDate: React.SetStateAction<Date>) => { // 시작 날짜 선택 시
+    setStartVisible(false); // 시작 날짜 모달 close
+    onChangeStartDate(selectedDate); // 선택한 시작 날짜 변경
+  };
+
+  const onConfirmEndDate = (selectedDate: React.SetStateAction<Date>) => { // 종료 날짜 선택 시
+    setEndVisible(false); // 종료 날짜 모달 close
+    onChangeEndDate(selectedDate); // 선택한 종료 날짜 변경
+  };
+
+  const onCancel = () => { // 취소 시
+    setStartVisible(false); // 모달 close
+    setEndVisible(false); // 모달 close
+  };
+
+
+  // 투표 옵션 추가 함수
+  const handleAddVote = () => {
+    if (votes.length < 5) {
+      setVotes(prevVotes => [...prevVotes, { id: prevVotes.length + 1, text: '' }]);
+    }
+  };
+
+  // 투표 옵션 변경 함수
+  const handleVoteChange = (id: number, text: string) => {
+    const newVotes = votes.map(vote =>
+      vote.id === id ? { ...vote, text } : vote
+    );
+    setVotes(newVotes);
+  };
+
+  // 투표 옵션 삭제 함수
+  const handleDeleteVote = (id: number) => {
+    const newVotes = votes.filter(vote => vote.id !== id);
+    setVotes(newVotes);
+    if (newVotes.length < 2) {
+      setShowVoteSection(false);
+    }
+  };
+
+  // 투표 옵션 표시 함수
+  const showVoteOptions = () => {
+    setShowVoteSection(true);
+    if (votes.length <= 1) {
+      setVotes([
+        { id: 1, text: '' },
+        { id: 2, text: '' }
+      ]);
+    }
+  };
+
+  // 투표 옵션 숨기기 함수
+  const hideVoteOptions = () => {
+    setShowVoteSection(false);
+    setVotes([]);
+  };
+
+  // 제출 처리 함수
+  const handleSubmit = () => {
+    if (title.trim() !== '' && content.trim() !== '') {
+      if (!showVoteSection || (showVoteSection && votes.every(vote => vote.text.trim() !== ''))) {
+        // Validate start date and end date
+        if (startDate <= endDate) {
+          const submittedData = {
+            title,
+            content,
+            votes: showVoteSection ? votes.map(vote => vote.text.trim()) : [],
+            images: selectedImages.map(image => image.uri),
+            startDate,
+            endDate
+          };
+          setSubmittedData(submittedData);
+
+          // 폼 필드 초기화
+          setTitle('');
+          setContent('');
+          setVotes([]);
+          setShowVoteSection(false);
+          setSelectedImages([]);
+
+          hideVoteOptions(); // 제출 후 투표 옵션 초기화
+        } else {
+          Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
+        }
+      } else {
+        Alert.alert("투표 옵션을 모두 입력해주세요.");
+      }
+    } else {
+      Alert.alert("이벤트 제목과 내용을 입력해주세요.");
+    }
+  };
+
+  // 이미지 선택 함수
+  const handleImagePick = () => {
+    launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
+      if (response.assets) {
+        setSelectedImages([...selectedImages, ...response.assets]);
+      } else if (response.errorCode) {
+        console.log('Image picker error: ', response.errorMessage);
+      }
+    });
+  };
+
+  // 이미지 삭제 함수
+  const handleImageRemove = (index: number) => {
+    const updatedImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(updatedImages);
+  };
+
   return (
     <View style={styles.container}>
-      <Text>이벤트 등록 화면</Text>
+      <ScrollView>
+        {/* 이벤트 제목 입력란 */}
+        <View style={styles.inputArea}>
+          <Text style={styles.inputText}>이벤트 제목</Text>
+          <View style={[styles.inputBox, { flexDirection: 'row' }]}>
+            <TextInput
+              style={styles.input}
+              placeholder="제목을 입력해주세요. (최대 50자)"
+              placeholderTextColor={'gray'}
+              maxLength={50}
+              value={title}
+              onChangeText={setTitle}
+            />
+            <IconPen name='pen' size={22} color='black' style={styles.iconPen} />
+          </View>
+        </View>
+
+        {/* 이벤트 내용 입력란 */}
+        <View style={styles.inputArea}>
+          <Text style={styles.inputText}>이벤트 내용</Text>
+          <View style={styles.inputBox}>
+            <TextInput
+              style={styles.input}
+              placeholder="내용을 입력해주세요. (최대 800자)"
+              placeholderTextColor={'gray'}
+              maxLength={800}
+              multiline={true}
+              value={content}
+              onChangeText={setContent}
+            />
+            <Text style={[styles.showLength, { color: content.length === 800 ? 'red' : 'gray' }]}>
+              {content.length} / 800
+            </Text>
+          </View>
+        </View>
+
+        {/* 투표 옵션 */}
+        <View style={styles.contentArea}>
+          {!showVoteSection && (
+            <View style={styles.addContentBox}>
+              <View style={styles.contentTextArea}>
+                <IconVote style={styles.voteIcon} name='vote-yea' />
+                <Text style={styles.contentText}>투표</Text>
+              </View>
+
+              <TouchableOpacity style={styles.contentTextArea} onPress={showVoteOptions}>
+                <Text style={styles.contentAddText}>추가</Text>
+                <IconPlus name='pluscircleo' style={styles.addIcon} />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {showVoteSection && (
+            <View style={[styles.inputArea, { marginTop: 0 }]}>
+              <Text style={styles.inputText}>투표 옵션</Text>
+              {votes.map((vote, index) => (
+                <View key={vote.id}
+                  style={[styles.inputBox, styles.voteOptionArea]}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={`옵션 ${index + 1}`}
+                    placeholderTextColor={'gray'}
+                    maxLength={50}
+                    value={vote.text}
+                    onChangeText={(text) => handleVoteChange(vote.id, text)}
+                  />
+                  <TouchableOpacity onPress={() => handleDeleteVote(vote.id)}>
+                    <IconTrash name='trash' size={22} color='red' style={styles.icon} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              {votes.length < 5 && (
+                <TouchableOpacity onPress={handleAddVote} style={{ marginTop: 10 }}>
+                  <IconPlus name='pluscircleo' size={30} color='black' />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
+
+        {/* 이미지 추가 영역 */}
+        <View style={styles.contentArea}>
+          <View style={styles.addContentBox}>
+            <View style={styles.contentTextArea}>
+              <IconImage style={styles.imageIcon} name='images' />
+              <Text style={styles.contentText}>이미지</Text>
+            </View>
+            <TouchableOpacity style={styles.contentTextArea} onPress={handleImagePick}>
+              <Text style={styles.contentAddText}>추가</Text>
+              <IconPlus name='pluscircleo' style={styles.addIcon} />
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+            {selectedImages.map((image, index) => (
+              <View key={index} style={styles.fileInfo}>
+                <Image source={{ uri: image.uri }} style={styles.imagePreview} />
+                <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
+                  <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.contentArea}>
+          <View style={styles.addContentBox}>
+            <View style={styles.contentTextArea}>
+              <IconCalendar style={styles.imageIcon} name='calendar-start' />
+              <Text style={styles.contentText}>시작 날짜</Text>
+            </View>
+            <TouchableOpacity style={styles.contentTextArea} onPress={onPressStartDate}>
+              <Text style={styles.dateText}>{format(new Date(startDate), 'PPP', { locale: ko })} </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.contentArea}>
+          <View style={styles.addContentBox}>
+            <View style={styles.contentTextArea}>
+              <IconCalendar style={styles.imageIcon} name='calendar-end' />
+              <Text style={styles.contentText}>종료 날짜</Text>
+            </View>
+            <TouchableOpacity style={styles.contentTextArea} onPress={onPressEndDate}>
+              <Text style={styles.dateText}>{format(new Date(endDate), 'PPP', { locale: ko })} </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <DateTimePickerModal
+          isVisible={startVisible}
+          mode={'date'}
+          onConfirm={onConfirmStartDate}
+          onCancel={onCancel}
+          date={startDate} />
+
+        <DateTimePickerModal
+          isVisible={endVisible}
+          mode={'date'}
+          onConfirm={onConfirmEndDate}
+          onCancel={onCancel}
+          date={endDate} />
+
+        {/* 등록 버튼 */}
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitButtonText}>등록하기</Text>
+        </TouchableOpacity>
+
+        {/* 제출 후 결과 표시 */}
+        {submittedData && (
+          <View>
+            <Text style={{ color: 'black', marginTop: 20 }}>결과값</Text>
+            <Text style={{ color: 'black' }}>제목: {submittedData.title}</Text>
+            <Text style={{ color: 'black' }}>내용: {submittedData.content}</Text>
+            {submittedData.votes.length > 0 && (
+              <Text style={{ color: 'black' }}>투표 옵션:</Text>
+            )}
+            {submittedData.votes.map((vote: string, index: number) => (
+              <Text key={index} style={{ color: 'black' }}>{index + 1}. {vote}</Text>
+            ))}
+            {submittedData.images.length > 0 && (
+              <Text style={{ color: 'black' }}>첨부된 이미지:</Text>
+            )}
+            {submittedData.images.map((image: string, index: number) => (
+              <Image key={index} source={{ uri: image }} style={styles.imagePreview} />
+            ))}
+            <Text style={{ color: 'black' }}>시작 날짜: {format(new Date(submittedData.startDate), 'PPP',)}</Text>
+            <Text style={{ color: 'black' }}>종료 날짜: {format(new Date(submittedData.endDate), 'PPP',)}</Text>
+          </View>
+        )}
+
+      </ScrollView>
+      <View style={{ height: 100 }} />
     </View>
   );
 };
@@ -19,7 +339,136 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent : 'center'
+    backgroundColor: 'white'
+  },
+  inputArea: {
+    alignItems: 'center',
+    alignSelf: 'center',
+    width: width * 0.9,
+    padding: 10,
+    marginTop: 20
+  },
+  inputText: {
+    alignSelf: 'flex-start',
+    color: 'black', // 입력란 제목 글자색
+    fontSize: 18,
+  },
+  inputBox: {
+    width: '100%',
+    backgroundColor: '#eeeeee',
+    borderBottomWidth: 1.5,
+    borderRadius: 10,
+    borderColor: 'gray', // 입력란 아래 테두리 색
+    paddingHorizontal: 5,
+  },
+  input: {
+    width: '90%',
+    color: 'black', // 입력 텍스트 색상
+    fontSize: 18,
+  },
+  iconPen: {
+    alignSelf: 'center',
+  },
+  showLength: {
+    alignSelf: 'flex-end',
+    fontSize: 16,
+  },
+  contentArea: {
+    //backgroundColor: 'red',
+    width: width * 0.9,
+    padding: 10,
+    alignSelf: 'center',
+    marginVertical: 10
+  },
+  addContentBox: {
+    width: '100%',
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 5,
+    borderBottomWidth: 1.5,
+    borderColor: 'gray'
+  },
+  contentTextArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  voteIcon: {
+    color: 'black',
+    fontSize: 22
+  },
+  imageIcon: {
+    color: 'black',
+    fontSize: 22
+  },
+  contentText: {
+    color: 'black',
+    fontSize: 20,
+    marginHorizontal: 5
+  },
+  contentAddText: {
+    color: '#0080ff',
+    fontSize: 22,
+    marginHorizontal: 5
+  },
+  addIcon: {
+    color: '#0080ff',
+    fontSize: 22,
+    top: 1
+  },
+  voteOptionArea: {
+    flexDirection: 'row',
+    marginVertical: 5,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  fileButton: {
+    padding: 10,
+    backgroundColor: '#FFC700',
+    borderRadius: 10,
+    elevation: 2
+  },
+  fileButtonText: {
+    fontSize: 16,
+    color: 'black',
+  },
+  fileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10
+  },
+  cancelButton: {
+    alignSelf: 'flex-start',
+    right: 15,
+    bottom: 5
+  },
+  icon: {
+    alignSelf: 'center',
+  },
+  imagePreview: {
+    width: 100,
+    height: 100,
+  },
+  submitButton: {
+    backgroundColor: 'orange',
+    width: 100,
+    height: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    borderRadius: 10,
+    alignSelf: 'center'
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold'
+  },
+  dateText: {
+    color: 'black',
+    fontSize: 20,
   },
 });
 
