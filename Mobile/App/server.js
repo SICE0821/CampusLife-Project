@@ -1721,9 +1721,9 @@ app.post('/RegistorItemImage', upload.single('images'), (req, res) => {
 
 //상품등록
 app.post('/RegistorItem', async (req, res) => {
-  const { campus_id, name, price, using_time, image_num, explian} = req.body;
+  const { campus_id, name, price, using_time, image_num, explian, count} = req.body;
   try {
-    const rows = await RegistorItem(campus_id, name, price, using_time, image_num, explian);
+    const rows = await RegistorItem(campus_id, name, price, using_time, image_num, explian, count);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, FlatList } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import ModalBox from 'react-native-modalbox';
 import { UserData, UserHaveCouponData } from '../../types/type'
 import config from '../../config';
 
@@ -11,6 +12,7 @@ const width = Dimensions.get("window").width;
 
 const CheckRegistItemScreen = ({ navigation, route }: any) => {
   const { userdata } = route.params;
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [userData, setUserData] = useState<UserData>(userdata);
   const [AdminRegisterItem, setAdminRegisterItem] = useState<UserHaveCouponData[]>([]);
   //console.log(userdata);
@@ -21,6 +23,11 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
       getItems();
     }, [])
   );
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
 
   //관리자에서 Item 목록 가져오기.
   const getItems = async () => {
@@ -43,26 +50,26 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
   }
 
   //랜더링 할 아이템들
-  const renderItem = ({item} : {item :UserHaveCouponData }) => (
+  const renderItem = ({ item }: { item: UserHaveCouponData }) => (
     <TouchableOpacity
       style={styles.itemcontainer}
-      onPress={() => console.log("등록된 아이템 편집하기")}>
-      <View style = {styles.photobox}>
-        <View style = {styles.photo}>
-          <Image style={{ height : "100%", width : "100%", borderRadius : 15 }} source={{ uri: `${config.photoUrl}/${item.image_num}.png` }} />
+      onPress={() => navigation.navigate("EditItemScreen", userdata)}>
+      <View style={styles.photobox}>
+        <View style={styles.photo}>
+          <Image style={{ height: "100%", width: "100%", borderRadius: 15 }} source={{ uri: `${config.photoUrl}/${item.image_num}.png` }} />
         </View>
       </View>
-      <View style = {styles.infocontainer}>
-        <View style = {styles.nameANDiconbox}>
-          <Text style = {styles.itemexplainText}> {item.name} </Text>
-          <IconD style={{ marginRight : 20, color : '#ED9E2B' }} name="form" size={30} color="white" />
+      <View style={styles.infocontainer}>
+        <View style={styles.nameANDiconbox}>
+          <Text style={styles.itemexplainText}> {item.name} </Text>
+          <IconD style={{ marginRight: 20, color: '#ED9E2B' }} name="form" size={30} color="white" />
         </View>
-        <View style = {styles.explainTextBox}>
-          <Text numberOfLines={2} ellipsizeMode="tail" style = {styles.explainText}> {item.explain} </Text>
+        <View style={styles.explainTextBox}>
+          <Text numberOfLines={2} ellipsizeMode="tail" style={styles.explainText}> {item.explain} </Text>
         </View>
-        <View style = {styles.athorInfobox}>
-          <Text style = {styles.priceText}>[{item.price}P]</Text>
-          <Text style = {styles.usingTimeText}>[{item.using_time}]</Text>
+        <View style={styles.athorInfobox}>
+          <Text style={styles.priceText}>[{item.price}P]</Text>
+          <Text style={styles.usingTimeText}>[{item.using_time}]</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -70,17 +77,25 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
 
   return (
     <View style={styles.container}>
-      <View style = {styles.topbox}>
-        <Text style = {{fontSize : 20, color : 'black', marginLeft : 10, fontWeight : 'bold'}}>현재 등록한 상품 수 : {AdminRegisterItem.length}</Text>
-        <TouchableOpacity style = {styles.registerButton}
-                          onPress={ () => {navigation.navigate("RegisterItemScreen")}}>
-          <Text style = {{fontSize : 18, color : 'white', fontWeight : 'bold'}}>상품등록</Text>
+      <View style={styles.topbox}>
+        <Text style={{ fontSize: 20, color: 'black', marginLeft: 10, fontWeight: 'bold' }}>현재 등록한 상품 수 : {AdminRegisterItem.length}</Text>
+        <TouchableOpacity style={styles.registerButton}
+          onPress={() => { navigation.navigate("RegisterItemScreen") }}>
+          <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold' }}>상품등록</Text>
         </TouchableOpacity>
       </View>
       <FlatList
         data={AdminRegisterItem}
         renderItem={renderItem}
       />
+      <ModalBox
+        isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
+        style={styles.modal}
+        position="bottom"
+        swipeToClose={false}
+        onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
+      >
+      </ModalBox>
     </View>
   );
 };
@@ -88,97 +103,102 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor : 'white',
+    backgroundColor: 'white',
   },
-  topbox : {
-    width : "100%",
-    height : 60,
-    backgroundColor : '#FFFADD',
-    alignItems : 'center',
-    flexDirection : 'row',
+  topbox: {
+    width: "100%",
+    height: 60,
+    backgroundColor: '#FFFADD',
+    alignItems: 'center',
+    flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  registerButton : {
-    width : "30%",
-    height : 40,
-    borderRadius : 10,
-    marginRight : 6,
-    backgroundColor : '#9A9EFF',
-    justifyContent : 'center',
-    alignItems : 'center',
+  registerButton: {
+    width: "30%",
+    height: 40,
+    borderRadius: 10,
+    marginRight: 6,
+    backgroundColor: '#9A9EFF',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   itemcontainer: {
     width: '100%',
     height: 140,
     flexDirection: 'row',
-    justifyContent : 'center',
+    justifyContent: 'center',
     //alignItems : 'center',
     marginTop: 15,
-    paddingHorizontal : 10,
+    paddingHorizontal: 10,
     //backgroundColor : 'red'
   },
-  photobox : {
-    width : "30%",
-    height : "100%",
+  photobox: {
+    width: "30%",
+    height: "100%",
     //backgroundColor : 'blue'
   },
-  photo : {
-    flex : 1,
-    margin : 4,
-    backgroundColor : '#F5F5F5',
-    borderRadius : 15,
+  photo: {
+    flex: 1,
+    margin: 4,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 15,
   },
-  infocontainer : {
-    width : "70%",
-    height : 180,
+  infocontainer: {
+    width: "70%",
+    height: 180,
     //backgroundColor : 'yellow'
   },
-  itemexplainText : {
-    fontSize : 18,
-    color : 'grey'
+  itemexplainText: {
+    fontSize: 18,
+    color: 'grey'
   },
-  explainTextBox : {
-    width : "100%",
-    height : 50,
+  explainTextBox: {
+    width: "100%",
+    height: 50,
     //backgroundColor : 'red',
-    justifyContent : 'center',
+    justifyContent: 'center',
     //alignItems : 'center'
   },
-  explainText : {
-    fontSize : 19,
-    color : 'black'
+  explainText: {
+    fontSize: 19,
+    color: 'black'
   },
-  athorInfobox : {
-    width : "100%",
-    height : 55.5,
+  athorInfobox: {
+    width: "100%",
+    height: 55.5,
     //backgroundColor : 'blue'
   },
-  priceText : {
-    color : "#ED9E2B",
-    fontSize : 16,
-    fontWeight : 'bold',
-    marginLeft : 5,
+  priceText: {
+    color: "#ED9E2B",
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 5,
   },
-  usingTimeText : {
-    color : "grey",
-    fontSize : 16,
-    marginLeft : 5,
+  usingTimeText: {
+    color: "grey",
+    fontSize: 16,
+    marginLeft: 5,
   },
-  modifybox : {
-    width : "100%",
-    height : 40,
-    backgroundColor : 'white'
+  modifybox: {
+    width: "100%",
+    height: 40,
+    backgroundColor: 'white'
   },
-  nameANDiconbox : {
-    width : "100%",
-    height : 35,
+  nameANDiconbox: {
+    width: "100%",
+    height: 35,
     //justifyContent : 'center',
-    alignItems : 'center',
+    alignItems: 'center',
     //backgroundColor : 'green',
-    flexDirection : 'row',
+    flexDirection: 'row',
     justifyContent: 'space-between',
-  }
+  },
+  modal: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: '90%',
+  },
 });
 
 export default CheckRegistItemScreen;
