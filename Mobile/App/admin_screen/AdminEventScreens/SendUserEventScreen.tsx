@@ -108,34 +108,41 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#eeeeee',
     padding: 10,
   },
   pickerArea: {
-    width: width * 0.9,
+    backgroundColor: 'white',
+    width: width * 0.95,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10
+    borderRadius: 15,
+    padding: 10,
+    elevation: 5,
+    marginVertical: 10
   },
   pickerText: {
     color: 'black',
     fontSize: 18,
-    width: '30%'
+    fontWeight: 'bold',
+    width: '40%',
+    textAlign: 'center'
   },
   pickerBox: {
     borderWidth: 1,
     borderRadius: 10,
   },
   picker: {
-    minWidth: '70%',
+    minWidth: '60%',
     color: 'black',
   },
   eventBox: {
-    backgroundColor: '#eeeeee',
+    backgroundColor: 'white',
     width: width * 0.95,
     marginBottom: 10,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 15,
+    elevation: 5
   },
   topInfoArea: {
     width: '100%',
