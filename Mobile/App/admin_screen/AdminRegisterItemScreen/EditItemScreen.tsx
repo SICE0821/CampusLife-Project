@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 
 const width = Dimensions.get("window").width;
 
-const RegisterItemScreen = ({ route, navigation }: any) => {
+const EditItemScreen = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
   const [itemName, setItemName] = useState("");
@@ -422,4 +422,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default RegisterItemScreen;
+export default EditItemScreen;

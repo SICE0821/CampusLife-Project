@@ -2044,13 +2044,12 @@ async function put_user_post_like(user_id, post_id) {
     }
 }
 
-async function RegistorItem(campus_id, name, price, using_time, image_num, explian) {
+async function RegistorItem(campus_id, name, price, using_time, image_num, explian, count) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `INSERT INTO event_object (campus_id, \`NAME\`, price, code_num, using_time, image_num, sell_check,\`explain\`)
-                       VALUES  (?, ?, ?, '123412341235', ?, ?, 0, ?);`
-        await conn.query(query, [campus_id, name, price, using_time, image_num, explian]);
+        const query = `CALL example_while(?, ?, ?, ?, ?, ?, ?);`
+        await conn.query(query, [campus_id, name, price, using_time, image_num, explian, count]);
         console.log("값 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
