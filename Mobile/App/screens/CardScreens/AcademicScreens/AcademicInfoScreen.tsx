@@ -163,32 +163,57 @@ const AcademicInfoScreen = ({ route }: any) => {
                 </View>
 
 
-
-                {semesterData[selectedYear * 2 - 1 + selectedSemester].length > 0 ? (
-                    <View style={styles.detailCreditArea}>
-                        <Table borderStyle={{ borderWidth: 3, borderColor: 'gray' }}>
-                            <Row data={["과목명", "구분", "학점", "성적"]} style={styles.tableHeader} textStyle={styles.tableHeaderText} widthArr={[width * 0.65, width * 0.1, width * 0.1, width * 0.1]} />
-                            {semesterData[selectedYear * 2 - 1 + selectedSemester].map((lecture, index) => (
-                                <Row key={index} data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]} style={styles.tableRow} textStyle={styles.tableText} widthArr={[width * 0.65, width * 0.1, width * 0.1, width * 0.1]} />
-                            ))}
-                        </Table>
-                    </View>
-                ) : (
-                    <Text style={styles.noDataText}>데이터가 없습니다.</Text>
-                )}
-
+                {/* 학기별 상세 성적 확인용 영역 */}
+                {visibleSemesters.map((semesterKey) => {
+                    const semesterLabel = semesterLabels[semesterKey];
+                    const lectures = semesterData[semesterKey];
+                    
+                    return (
+                        <View key={semesterKey}>
+                            <View style={styles.detail_credit_box}>
+                                <Text style={styles.semester_text}>{semesterLabel}</Text>
+                                <TouchableOpacity onPress={() => toggleDetailCreditAreaVisibility(semesterKey)}>
+                                    <Icon name={detailCreditAreaVisible[semesterKey] ? "chevron-down" : "chevron-up"} style={styles.semester_button} />
+                                </TouchableOpacity>
+                            </View>
+                            {!detailCreditAreaVisible[semesterKey] && (
+                                <View style={styles.detail_credit_area}>
+                                    <View style={styles.table}>
+                                        <Table borderStyle={{ borderWidth: tableBorderWidth, borderColor: tableBorderColor }}>
+                                            <Row
+                                                data={tableHead}
+                                                style={{ height: 30, backgroundColor: "#dddddd" }}
+                                                textStyle={{ textAlign: "center", fontWeight: "bold", color: 'gray' }}
+                                                widthArr={widthArrs}
+                                            />
+                                            {lectures.map((lecture, index) => (
+                                                <Row 
+                                                    key={index}
+                                                    data={[lecture.lecture_name, lecture.division, lecture.lecture_credit, lecture.lecture_grades]}  
+                                                    style={styles.tableRows} 
+                                                    textStyle={{ textAlign: "center", fontWeight: 'bold', color: 'black' }}
+                                                    widthArr={widthArrs}
+                                                />
+                                            ))}
+                                        </Table>
+                                    </View>
+                                </View>
+                            )}
+                        </View>
+                    );
+                })}
             </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
+    container: { // 전체 뷰
         flex: 1,
         backgroundColor: 'white',
     },
-    circleArea: {
-        marginVertical: 10,
+    circleArea: { // 학점 정보 circle 영역
+        marginTop: 10,
         width: '90%',
         alignSelf: 'center',
     },

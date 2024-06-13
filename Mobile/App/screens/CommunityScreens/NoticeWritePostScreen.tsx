@@ -172,10 +172,10 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
       >
         <View style={styles.modalContent}>
           <TouchableOpacity style={styles.allposter} onPress={handleAllPosterPress}>
-            <Text style={[styles.noallposterfont, selectallposter == 1 && styles.yesallposterfont]}> 전체 게시판 </Text>
+            <Text style={[styles.noallposterfont, selectallposter == 1 && styles.yesallposterfont]}> 학교 공지사항 </Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.allposter} onPress={handleDepartmentPosterPress}>
-            <Text style={[styles.noallposterfont, selectdepartmentposter === 1 && styles.yesallposterfont]}> 학과 게시판 </Text>
+            <Text style={[styles.noallposterfont, selectdepartmentposter === 1 && styles.yesallposterfont]}> 학과 공지사항 </Text>
           </TouchableOpacity>
           <View style={styles.writeButtom}>
             <View style={{ flex: 0.65, }}>

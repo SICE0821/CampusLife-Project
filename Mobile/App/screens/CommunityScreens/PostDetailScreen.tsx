@@ -10,6 +10,11 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { UserData } from '../../types/type'
 import config from '../../config';
 
+type ReportUser = {
+    post_id : number,
+    user_id : number,
+}
+
 
 const PostDetailScreen: React.FC = ({ route }: any) => {
     const { item, userData } = route.params;
@@ -18,10 +23,16 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>(); //포스터에 대한 정보.
     const [userdata, setUserData] = useState<UserData>(userData);
     const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
+    const [userReport, setUserReport] = useState<ReportUser[]>([]); //포스터에 대한 정보.
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
     const [commentspk, setCommentspk]: any = useState();
     const [ispushlike, Setispushlike]: any = useState();
+    const [showOptions, setShowOptions] = useState(false);
     const inputRef = useRef<TextInput>(null);
+
+    const toggleOptions = () => {
+        setShowOptions(!showOptions);
+    };
 
     const onFocusName = useCallback(() => {
         //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
@@ -76,7 +87,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         }
 
 
-    //포스터에 대한 정보
+    //포스터에 대한 정보.
     const DeatilPost = async () => {
         try {
             const response = await fetch(`${config.serverUrl}/get_post_detail`, {
@@ -90,7 +101,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             })
             const get_post_detail = await response.json();
             setPostDetailInfo(get_post_detail);
-            //console.log(get_post_detail.post_id);
         } catch (error) {
             console.error('유저 학과 이름 가져오기 실패:', error);
         }
@@ -139,8 +149,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 })
             });
             const result = await response.json();
-            console.log(result);
-            console.log("댓글 작성완료!");
             const newCommentList: any = await CommentList();
             //console.log(newCommentList);
             //setComments((prev) => [...prev, newCommentList]);
@@ -163,7 +171,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            console.log("알람전송!");
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -181,7 +188,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            console.log("알람전송!");
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -200,7 +206,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            console.log("알람전송!");
+
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -309,6 +315,63 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             console.log("대댓글 좋아요 누르기 성공!")
         } catch (error) {
             console.error('대댓글 좋아요 누르기 실패', error);
+        }
+    }
+
+    const put_user_report = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/putuserreport`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: postDetailInfo?.post_id
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUserReport(prev => [
+                    ...prev,
+                    { post_id: postDetailInfo?.post_id || 0, user_id: postDetailInfo?.user_id || 0 }
+                ]);
+                Alert.alert("신고 예약 되었습니다."); // 성공 메시지 표시
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('신고 제출에 실패하였습니다.', error);
+            Alert.alert('신고 제출에 실패하였습니다.'); // 실패 메시지 표시
+        }
+    }
+    
+
+      const ReportUserduplicate = () => {
+        console.log(postDetailInfo);
+        console.log(userReport);
+        const isDuplicateReport = userReport.some((report) =>
+            postDetailInfo?.user_id === report.user_id && postDetailInfo?.post_id === report.post_id
+        );
+        if (isDuplicateReport) {
+            Alert.alert("해당 게시물에 대해 신고할 수 없습니다.");
+        } else {
+            put_user_report();
+        }
+    }
+
+      const get_user_report = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/getuserreport`, {
+                method: 'GET', // GET 요청으로 수정
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            setUserReport(data);
+            return data;
+        } catch (error) {
+            console.error('값 가져오기 실패:', error);
         }
     }
 
@@ -424,7 +487,11 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         formattedDate = `${datePart} ${timePart}`;
     }
 
-    return (
+    useEffect(() => {
+        get_user_report();
+      }, []);
+
+    return (    
         <View style={styles.container}>
             <ScrollView>
                 <View style={{ height: 15 }}></View>
@@ -447,11 +514,24 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                             </View>
                         </View>
                         <View style={styles.listcontainer}>
-                            <Text><IconA size={35} color="black" name={"dots-three-vertical"} /></Text>
+                            <TouchableOpacity>
+                                <IconA size={35} color="black" name={"dots-three-vertical"} onPress={toggleOptions} />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
                 <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
+                {showOptions && (
+                                <View style={styles.optionsContainer}>
+                                    <TouchableOpacity>
+                                        <Text style={{fontSize : 15, fontWeight : "bold" , color : "black" , paddingLeft : 10,}}>수정</Text>
+                                    </TouchableOpacity>
+                                    <View style={{ width : 100, height: 0.5, backgroundColor: 'black', marginRight: 20, marginTop: 10 , marginBottom : 10, }}></View>
+                                    <TouchableOpacity onPress={ReportUserduplicate}>
+                                        <Text style={{fontSize : 15, fontWeight : "bold" , color : "black" , paddingLeft : 10}}>신고</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
                 <View style={styles.titlecontainer}>
                     <Text style={{ fontSize: 20, marginLeft: 16, color: 'black', fontWeight: 'bold' }}>
                         {postDetailInfo?.title}
@@ -551,7 +631,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                                         <Text><IconD size={29} color="black" name={"like"} /></Text>
                                                     </TouchableOpacity>
                                                     <TouchableOpacity style={styles.reallistbox2}>
-                                                        <Text><IconA size={19} color="black" name={"dots-three-vertical"} /></Text>
+                                                       <IconA size={19}  color="black" name={"dots-three-vertical"} />
                                                     </TouchableOpacity>
                                                 </View>
                                             </View>
@@ -635,6 +715,8 @@ const styles = StyleSheet.create({
         //backgroundColor : 'blue',
         justifyContent: 'center',
         alignItems: 'center',
+        
+        
     },
     profilepicturebox: {
         width: 60,
@@ -819,6 +901,26 @@ const styles = StyleSheet.create({
         //backgroundColor : "red",
         flexDirection: 'row',
     },
+
+    optionsContainer: {
+        position: 'absolute',
+        top: 80,
+        right: 20,
+        width: 120,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+    },
+      
 })
 
 export default PostDetailScreen;

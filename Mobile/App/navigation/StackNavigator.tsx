@@ -18,6 +18,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
 import NoticePostDetailScreen from '../screens/CommunityScreens/NoticePostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
+import WritePostDetailScreen from '../screens/CommunityScreens/NoticeWritePostScreen';
 import FullScreenCamera from '../screens/AttendanceScreens/FullScreenCamera'
 import AttendanceCheckEventScreen from '../screens/EventScreens/AttendanceCheckEventScreen';
 import FriendCodeEventScreen from '../screens/EventScreens/FriendCodeEventScreen';
@@ -105,6 +106,24 @@ export const RootStackNavigator = (route: any) => {
             <RootStack.Screen
                 name="NoticePostDetailScreen"
                 component={NoticePostDetailScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '공지사항',
+                })}
+            />
+
+            <RootStack.Screen
+                name="WritePostDetailScreen"
+                component={WritePostDetailScreen}
                 options={({ navigation }: any) => ({
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -440,21 +459,23 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                     },
                     headerLeft: () => (
                         <View style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity
-                                onPress={() => navigation.goBack()}>
-                                <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate("MyPostScreen", { userdata })}>
-                                <IconF style={{ marginLeft: 10, }} name="user" size={30} color="white" />
-                            </TouchableOpacity>
+                            {userdata.title !== "학교" && (
+                                <TouchableOpacity onPress={() => navigation.navigate("MyPostScreen", { userdata })}>
+                                    <IconF style={{ marginLeft: 10 }} name="user" size={30} color="white" />
+                                </TouchableOpacity>
+                            )}
                         </View>
                     ),
                     headerRight: () => (
                         <View style={{ flexDirection: 'row' }}>
-                            <TouchableOpacity onPress={() => navigation.navigate("WritePostScreen", { userdata })}>
-                                <IconD style={{ marginRight: 10 }} name="form" size={30} color="white" />
-                            </TouchableOpacity>
+                            {userdata.title !== "학교" && (
+                                <TouchableOpacity onPress={() => navigation.navigate("WritePostScreen", { userdata })}>
+                                    <IconD style={{ marginRight: 10 }} name="form" size={30} color="white" />
+                                </TouchableOpacity>
+                            )}
                             <TouchableOpacity onPress={() => navigation.navigate("SearchPostScreen", { userdata })}>
                                 <IconD style={{ marginRight: 10 }} name="search1" size={30} color="white" />
                             </TouchableOpacity>
@@ -505,13 +526,24 @@ export const NoticeScreenStackNavigator = ({ route, navigation }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.goBack()}>
-                            <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity onPress={() => navigation.goBack()}>
+                                <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                            </TouchableOpacity>
+                            {userdata.title !== "일반학생" && (
+                                <TouchableOpacity onPress={() => navigation.navigate("MyPostScreen", { userdata })}>
+                                    <IconF style={{ marginLeft: 10 }} name="user" size={30} color="white" />
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     ),
                     headerRight: () => (
                         <View style={{ flexDirection: 'row' }}>
+                            {userdata.title !== "일반학생" && (
+                                <TouchableOpacity onPress={() => navigation.navigate("WritePostDetailScreen", { userdata })}>
+                                    <IconD style={{ marginRight: 10 }} name="form" size={30} color="white" />
+                                </TouchableOpacity>
+                            )}
                             <TouchableOpacity onPress={() => navigation.navigate("SearchPostScreen", { userdata })}>
                                 <IconD style={{ marginRight: 10 }} name="search1" size={30} color="white" />
                             </TouchableOpacity>
