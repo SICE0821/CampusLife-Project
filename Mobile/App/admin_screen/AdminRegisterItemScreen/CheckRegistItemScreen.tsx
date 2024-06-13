@@ -53,7 +53,7 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
   const renderItem = ({ item }: { item: UserHaveCouponData }) => (
     <TouchableOpacity
       style={styles.itemcontainer}
-      onPress={() => navigation.navigate("EditItemScreen", userdata)}>
+      onPress={() => navigation.navigate("EditItemScreen", {userdata, ItemInfo : item })}>
       <View style={styles.photobox}>
         <View style={styles.photo}>
           <Image style={{ height: "100%", width: "100%", borderRadius: 15 }} source={{ uri: `${config.photoUrl}/${item.image_num}.png` }} />

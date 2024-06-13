@@ -2058,6 +2058,28 @@ async function RegistorItem(campus_id, name, price, using_time, image_num, expli
     }
 }
 
+//수량은 변화하지 않고 DB의 아이템 정보만 변경한다.
+async function ChangeItemInfo(origin_name, name, price, using_time, image_num, explian) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 
+        `UPDATE event_object
+         SET name = ?, 
+             price = ?,
+             using_time = ?,
+             image_num = ?,
+             \`explain\` = ? 
+         WHERE name = ? `
+        await conn.query(query, [name, price, using_time, image_num, explian, origin_name]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2147,5 +2169,6 @@ module.exports = {
     is_user_post_like,
     put_user_post_like,
     admin_get_event_objcet,
-    RegistorItem
+    RegistorItem,
+    ChangeItemInfo
 };

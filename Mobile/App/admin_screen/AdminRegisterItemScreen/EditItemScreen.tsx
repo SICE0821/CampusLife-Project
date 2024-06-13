@@ -3,51 +3,78 @@ import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, Tex
 import { Calendar } from 'react-native-calendars';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { UserData } from '../../types/type'
+import { UserData, UserHaveCouponData } from '../../types/type'
 import config from '../../config';
 import { endOfMonth } from 'date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ScrollView } from 'react-native-gesture-handler';
 import IconC from 'react-native-vector-icons/Ionicons';
+import IconD from 'react-native-vector-icons/AntDesign';
 import { format } from 'date-fns';
 
 const width = Dimensions.get("window").width;
 
+//처음에 가져온 Date문자열을 Date()객체 타입으로 변환하여 Default값으로 넣어준다.
+const parseDateString = (dateString : string) => {
+  const [start, end] = dateString.split(' ~ ').map(date => {
+    const [year, month, day] = date.split('.').map(Number);
+    return new Date(year, month - 1, day);
+  });
+  return { start, end };
+};
+
 const EditItemScreen = ({ route, navigation }: any) => {
-  const { userdata } = route.params;
-  const [userData, setUserData] = useState<UserData>(userdata);
-  const [itemName, setItemName] = useState("");
-  const [itemExplain, setItemExplain] = useState("");
-  const [itemPoint, setItemPoint] = useState("");
-  const [itemCount, setItemCount] = useState("");
+  const { userdata ,ItemInfo} = route.params;
+  //console.log(ItemInfo);
+  const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
+  const [itemName, setItemName] = useState(ItemInfo.name);  //상품 이름
+  const [itemExplain, setItemExplain] = useState(ItemInfo.explain); //상품 설명
+  const [itemPoint, setItemPoint] = useState(ItemInfo.price.toString()); //상품 포인트
+  const [itemCount, setItemCount] = useState(ItemInfo.count.toString()); //상품 수량
+  const [changeitemCount, setChangeitemCount] = useState<number>(0);
   const [selectedImagePath, setSelectedImagePath]: any = useState();
   const [selectedImageFormData, setSelectedImageFormData] = useState<FormData | null>(null);
-  const [ImageNum, setImageNum] = useState();
+  const [ImageNum, setImageNum] = useState(ItemInfo.image_num);
   const [showStartDatePicker, setShowStartDatePicker]: any = useState(false);
   const [showStartEndPicker, setShowEndDatePicker]: any = useState(false);
-  const [selectedStartDate, setSelectedStartDate]: any = useState(new Date());
-  const [selectedEndDate, setSelectedEndDate]: any = useState(new Date());
-  const [deadlineDate, setDeadlineDate] = useState<string>("");
+  const { start, end } = parseDateString(ItemInfo.using_time);
+  const [selectedStartDate, setSelectedStartDate]: any = useState(start);
+  const [selectedEndDate, setSelectedEndDate]: any = useState(end);
+  const [deadlineDate, setDeadlineDate] = useState<string>(ItemInfo.using_time);
+  const [ItemInformation, setItemInformation] = useState<UserHaveCouponData>(ItemInfo);
 
   useFocusEffect(
     React.useCallback(() => {
       setUserData(userdata);
+      setItemInformation(ItemInfo);
     }, [])
   );
 
+  //상품의 수량 증가와 감소를 계산해서 나중에 수량을 증가시킬건지, 감소시킬건지 확인할때 사용
+  const calculator_ItemCount = (before_count: number, after_count: number) => {
+    const validBeforeCount = isNaN(before_count) ? 0 : before_count;
+    const validAfterCount = isNaN(after_count) ? 0 : after_count;
+    
+    const rest_count = validAfterCount - validBeforeCount;
+    return rest_count
+  }
+
+  //상품 사용 시작 기간설정
   const onStartDateChange = (event: any, date?: Date) => {
     const currentDate = date || new Date();
     setShowStartDatePicker(false);
     setSelectedStartDate(currentDate);
   };
 
+  //상품 사용 종료 기간설정
   const onEndDateChange = (event: any, date?: Date) => {
     const currentDate = date || new Date();
     setShowEndDatePicker(false);
-    setSelectedEndDate(currentDate);
+    setSelectedEndDate(currentDate);0
     Change_Date(selectedStartDate, currentDate);
   };
 
+  //시작과 종료 Date()타입의 객체를 문자열로 저장
   const Change_Date = (startDate: Date, endDate: Date) => {
     const start_day = format(startDate, "yyyy.M.d");
     const end_day = format(endDate, "yyyy.M.d");
@@ -56,18 +83,38 @@ const EditItemScreen = ({ route, navigation }: any) => {
     setDeadlineDate(using_time);
   }
 
+  //상품 이름 변경
   const handleNameTextChange = (inputText: string) => {
     setItemName(inputText);
   };
+  //상품 설명 변경
   const handleExplainTextChange = (inputText: string) => {
     setItemExplain(inputText);
   };
+  //상품 가격 변경
   const handlePointTextChange = (inputText: string) => {
     setItemPoint(inputText);
   };
-  const handleCountTextChange = (inputText: string) => {
-    setItemCount(inputText);
-  };
+
+  //상품 수량 증가
+  const handleCountUpTextChange = () => {
+    const changeText = parseInt(itemCount) + 1
+    const validValue = isNaN(changeText) ? 0 : changeText;
+    const rest_count = calculator_ItemCount(ItemInformation.count, validValue);
+    setChangeitemCount(rest_count);
+    setItemCount(changeText);
+  }
+
+  //상품 수량 감소
+  const handleCountDownTextChange = () => {
+    if(parseInt(itemCount) >= 1) {
+      const changeText = parseInt(itemCount) - 1
+      const validValue = isNaN(changeText) ? 0 : changeText;
+      const rest_count = calculator_ItemCount(ItemInformation.count, validValue);
+      setChangeitemCount(rest_count);
+      setItemCount(changeText);
+    }
+  }
 
   // 사진 선택
   const getPhotos = async () => {
@@ -95,6 +142,7 @@ const EditItemScreen = ({ route, navigation }: any) => {
     }
   };
 
+  /*
   const RegisterItemAlert = () => {
     Alert.alert(
         "상품을 등록 하시겠습니까??",
@@ -126,6 +174,7 @@ const successAlert = () => {
       ]
   );
 };
+*/
 
   const RegistorItemImage = async (selectImageFormData : FormData) => {
     try {
@@ -141,21 +190,21 @@ const successAlert = () => {
     }
   };
 
-  const RegistorItem = async () => {
+  //수량은 변화하지 않고 DB의 아이템 정보만 변경한다.
+  const ChangeItemInfo = async () => {
     try {
-        const response = await fetch(`${config.serverUrl}/RegistorItem`, {
+        const response = await fetch(`${config.serverUrl}/ChangeItemInfo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                campus_id : userData.campus_pk,
+                origin_name : ItemInformation.name,
                 name : itemName,
                 price : itemPoint,
                 using_time : deadlineDate,
                 image_num : ImageNum,
                 explian : itemExplain,
-                count : itemCount,
             }),
         })
     } catch (error) {
@@ -164,13 +213,26 @@ const successAlert = () => {
     }
 }
 
+  // 상품의 증가, 감소, 0에 대한 구분을 해준다.
+const choice_item_action = () => {
+  if (typeof changeitemCount === 'undefined' || changeitemCount === null) {
+    console.log("changeitemCount is undefined or null");
+  } else if (changeitemCount > 0) {
+    console.log("Item count is increasing");
+  } else if (changeitemCount < 0) {
+    console.log("Item count is decreasing");
+  } else if (changeitemCount === 0) {
+    ChangeItemInfo();
+  }
+};
+
   return (
     <View style={styles.container}>
       <View style={styles.ItemImagecontainer}>
         <View style={styles.ImageBox}>
           <View style={styles.Image}>
             <Image style={{ height: "100%", width: "100%", borderRadius: 20 }}
-              source={{ uri: selectedImagePath ? selectedImagePath : `${config.photoUrl}/1718215425110-1718215424055_21.png` }} />
+              source={{ uri: selectedImagePath ? selectedImagePath : `${config.photoUrl}/${ItemInfo.image_num}.png` }} />
           </View>
         </View>
         <View style={styles.imageChangeButtonBox}>
@@ -252,20 +314,30 @@ const successAlert = () => {
             placeholderTextColor={'gray'}
           />
         </View>
-        <View style={styles.PointTextbox}>
-          <Text style={styles.NameText}>수량 :</Text>
-          <TextInput
-            style={styles.TextBoxText}
-            onChangeText={handleCountTextChange}
-            value={itemCount}
-            placeholder="상품의 수량을 입력해주세요(숫자만)"
-            placeholderTextColor={'gray'}
-          />
+        <View style = {styles.ChangePointTextbox}>
+          <Text style={styles.NameText}>현재 수량 :</Text>
+          <Text style ={styles.beforeCountText}>{itemCount}</Text>
+          <View style = {styles.ChangeIconBox}>
+            <TouchableOpacity
+              onPress={() => {
+                handleCountUpTextChange();
+              }}>
+              <IconD style={styles.upIcon} name="upsquare" size={30} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                handleCountDownTextChange();
+                }}>
+              <IconD style={styles.downIcon} name="downsquare" size={30} />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View>
         </View>
         <View style={styles.CompleteButtonBox}>
           <TouchableOpacity
             onPress={async () => {
-              RegisterItemAlert();
+              choice_item_action();
             }}
             style={styles.CompleteButton}>
             <Text style={styles.CompleteText}>작성완료</Text>
@@ -363,6 +435,25 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     width: "70%"
   },
+  beforeCountText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 5,
+    width: "10%",
+    color : 'black'
+    //backgroundColor : 'red'
+  },
+  ChangeIconBox : {
+    width : "70%",
+    //backgroundColor : 'blue',
+    justifyContent : 'center'
+  },
+  changeCountTextBoxText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 5,
+    width: "6%"
+  },
   ExplainTextBoxText: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -390,13 +481,30 @@ const styles = StyleSheet.create({
     color: "#ED9E2B"
   },
 
+  upIcon: {
+    color: "#ED9E2B"
+  },
+
+  downIcon: {
+    color: "#ED9E2B"
+  },
   PointTextbox: {
     width: width,
     minHeight: 70,
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 2,
-    borderColor: 'lightgrey'
+    borderColor: 'lightgrey',
+    //backgroundColor : 'yellow'
+  },
+  ChangePointTextbox: {
+    width: width,
+    minHeight: 70,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderColor: 'lightgrey',
+    //backgroundColor : 'yellow'
   },
   CompleteButtonBox: {
     width: "100%",

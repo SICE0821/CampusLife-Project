@@ -174,7 +174,7 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '물품 수정',
+                    title: '물품 편집',
                 }} />
         </RegisterItemStack.Navigator>
     );
