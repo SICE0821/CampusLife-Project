@@ -90,6 +90,10 @@ const { getGeneralPosts,
   admin_get_event_objcet,
   RegistorItem,
   ChangeItemInfo,
+  ChangeItemInfoANDCountUp,
+  ChangeItemInfoANDCountDown,
+  getRestItemCount,
+  getSellItemCount,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1737,6 +1741,62 @@ app.post('/ChangeItemInfo', async (req, res) => {
   const { origin_name, name, price, using_time, image_num, explian } = req.body;
   try {
     const rows = await ChangeItemInfo(origin_name, name, price, using_time, image_num, explian);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//수량이 증가하고 DB의 아이템 정보를 변경한다.
+app.post('/ChangeItemInfoANDCountUp', async (req, res) => {
+  const { origin_name, campus_id, name, price, using_time, image_num, explian, count} = req.body;
+  try {
+    const rows = await ChangeItemInfoANDCountUp(origin_name, campus_id, name, price, using_time, image_num, explian, count);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//수량이 감소하고 DB의 아이템 정보를 변경한다.
+app.post('/ChangeItemInfoANDCountDown', async (req, res) => {
+  const { origin_name, campus_id, name, price, using_time, image_num, explian, count} = req.body;
+  try {
+    const rows = await ChangeItemInfoANDCountDown(origin_name, campus_id, name, price, using_time, image_num, explian, count);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//현재 남은 제고의 아이템 수를 얻기위함
+app.post('/getRestItemCount', async (req, res) => {
+  const { campus_id, name } = req.body;
+  try {
+    const rows = await getRestItemCount(campus_id, name);
+    const processedData = rows.map(item => ({
+      object_id : item.object_id
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//현재 팔린 제고의 수량을 파악하기 위함
+app.post('/getSellItemCount', async (req, res) => {
+  const { campus_id, name } = req.body;
+  try {
+    const rows = await getSellItemCount(campus_id, name);
+    const processedData = rows.map(item => ({
+      object_id : item.object_id
+    }));
+    res.json(processedData);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);

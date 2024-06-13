@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 const width = Dimensions.get("window").width;
 
 //처음에 가져온 Date문자열을 Date()객체 타입으로 변환하여 Default값으로 넣어준다.
-const parseDateString = (dateString : string) => {
+const parseDateString = (dateString: string) => {
   const [start, end] = dateString.split(' ~ ').map(date => {
     const [year, month, day] = date.split('.').map(Number);
     return new Date(year, month - 1, day);
@@ -24,7 +24,7 @@ const parseDateString = (dateString : string) => {
 };
 
 const EditItemScreen = ({ route, navigation }: any) => {
-  const { userdata ,ItemInfo} = route.params;
+  const { userdata, ItemInfo } = route.params;
   //console.log(ItemInfo);
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   const [itemName, setItemName] = useState(ItemInfo.name);  //상품 이름
@@ -42,11 +42,15 @@ const EditItemScreen = ({ route, navigation }: any) => {
   const [selectedEndDate, setSelectedEndDate]: any = useState(end);
   const [deadlineDate, setDeadlineDate] = useState<string>(ItemInfo.using_time);
   const [ItemInformation, setItemInformation] = useState<UserHaveCouponData>(ItemInfo);
+  const [ItemRestCount, setItemRestCount] : any = useState();
+  const [ItemSellCount, setItemSellCount] : any = useState();
 
   useFocusEffect(
     React.useCallback(() => {
       setUserData(userdata);
       setItemInformation(ItemInfo);
+      getRestItemCount();
+      getSellItemCount();
     }, [])
   );
 
@@ -54,8 +58,8 @@ const EditItemScreen = ({ route, navigation }: any) => {
   const calculator_ItemCount = (before_count: number, after_count: number) => {
     const validBeforeCount = isNaN(before_count) ? 0 : before_count;
     const validAfterCount = isNaN(after_count) ? 0 : after_count;
-    
-    const rest_count = validAfterCount - validBeforeCount;
+    const validRestBeforeCount = validBeforeCount - ItemSellCount;
+    const rest_count = validAfterCount - validRestBeforeCount;
     return rest_count
   }
 
@@ -70,7 +74,7 @@ const EditItemScreen = ({ route, navigation }: any) => {
   const onEndDateChange = (event: any, date?: Date) => {
     const currentDate = date || new Date();
     setShowEndDatePicker(false);
-    setSelectedEndDate(currentDate);0
+    setSelectedEndDate(currentDate); 0
     Change_Date(selectedStartDate, currentDate);
   };
 
@@ -98,21 +102,21 @@ const EditItemScreen = ({ route, navigation }: any) => {
 
   //상품 수량 증가
   const handleCountUpTextChange = () => {
-    const changeText = parseInt(itemCount) + 1
+    const changeText = parseInt(ItemRestCount) + 1
     const validValue = isNaN(changeText) ? 0 : changeText;
     const rest_count = calculator_ItemCount(ItemInformation.count, validValue);
     setChangeitemCount(rest_count);
-    setItemCount(changeText);
+    setItemRestCount(changeText);
   }
 
   //상품 수량 감소
   const handleCountDownTextChange = () => {
-    if(parseInt(itemCount) >= 1) {
-      const changeText = parseInt(itemCount) - 1
+    if (parseInt(ItemRestCount) >= 1) {
+      const changeText = parseInt(ItemRestCount) - 1
       const validValue = isNaN(changeText) ? 0 : changeText;
       const rest_count = calculator_ItemCount(ItemInformation.count, validValue);
       setChangeitemCount(rest_count);
-      setItemCount(changeText);
+      setItemRestCount(changeText);
     }
   }
 
@@ -142,15 +146,15 @@ const EditItemScreen = ({ route, navigation }: any) => {
     }
   };
 
-  /*
-  const RegisterItemAlert = () => {
+  
+  const ADDItemAlert = () => {
     Alert.alert(
-        "상품을 등록 하시겠습니까??",
-        `--상품등록정보--
+        "상품을 이대로 편집 하시겠습니까??",
+        `--상품편집정보--
 등록 상품 이름 : ${itemName}
 상품 사용기간 : ${deadlineDate}
 상품가격 : ${itemPoint}
-수량 : ${itemCount}` ,
+추가수량 : ${changeitemCount}` ,
         [
             {
                 text: "취소",
@@ -158,25 +162,68 @@ const EditItemScreen = ({ route, navigation }: any) => {
                 style: "cancel"
             },
             { text: "확인", onPress: async () => {
-              successAlert();
-              await RegistorItem();
+              successEditItemAlert();
+              await ChangeItemInfoANDCountUp();
             }}
         ]
     );
 };
 
-const successAlert = () => {
+
+const DeleteItemAlert = () => {
   Alert.alert(
-      "상품등록완료",
-      `상품 등록을 성공적으로 완료했습니다!` ,
+      "상품을 이대로 편집 하시겠습니까?",
+      `--상품편집정보--
+등록 상품 이름 : ${itemName}
+상품 사용기간 : ${deadlineDate}
+상품가격 : ${itemPoint}
+삭제수량 : ${changeitemCount}` ,
       [
-          { text: "확인", onPress: () => {navigation.navigate("CheckRegistItemScreen", userData)}}
+          {
+              text: "취소",
+              onPress: () => console.log("취소 클릭"),
+              style: "cancel"
+          },
+          { text: "확인", onPress: async () => {
+            successEditItemAlert();
+            await ChangeItemInfoANDCountDown();
+          }}
       ]
   );
 };
-*/
 
-  const RegistorItemImage = async (selectImageFormData : FormData) => {
+const EditItemAlert = () => {
+  Alert.alert(
+      "상품을 이대로 편집 하시겠습니까?",
+      `--상품편집정보--
+등록 상품 이름 : ${itemName}
+상품 사용기간 : ${deadlineDate}
+상품가격 : ${itemPoint}` ,
+      [
+          {
+              text: "취소",
+              onPress: () => console.log("취소 클릭"),
+              style: "cancel"
+          },
+          { text: "확인", onPress: async () => {
+            successEditItemAlert();
+            await ChangeItemInfo();
+          }}
+      ]
+  );
+};
+
+const successEditItemAlert = () => {
+Alert.alert(
+    "상품이 편집되었습니다.",
+    `상품이 성공적으로 편집되었습니다!!` ,
+    [
+        { text: "확인", onPress: () => {navigation.navigate("CheckRegistItemScreen", userData)}}
+    ]
+);
+};
+
+  const RegistorItemImage = async (selectImageFormData: FormData) => {
     try {
       const response = await fetch(`${config.serverUrl}/RegistorItemImage`, {
         method: 'POST',
@@ -193,38 +240,130 @@ const successAlert = () => {
   //수량은 변화하지 않고 DB의 아이템 정보만 변경한다.
   const ChangeItemInfo = async () => {
     try {
-        const response = await fetch(`${config.serverUrl}/ChangeItemInfo`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                origin_name : ItemInformation.name,
-                name : itemName,
-                price : itemPoint,
-                using_time : deadlineDate,
-                image_num : ImageNum,
-                explian : itemExplain,
-            }),
-        })
+      const response = await fetch(`${config.serverUrl}/ChangeItemInfo`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          origin_name: ItemInformation.name,
+          name: itemName,
+          price: itemPoint,
+          using_time: deadlineDate,
+          image_num: ImageNum,
+          explian: itemExplain,
+        }),
+      })
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
     }
-}
+  }
+
+  //수량이 증가하고 DB의 아이템 정보를 변경한다.
+  const ChangeItemInfoANDCountUp = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/ChangeItemInfoANDCountUp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          origin_name: ItemInformation.name,
+          campus_id: userData.campus_pk,
+          name: itemName,
+          price: itemPoint,
+          using_time: deadlineDate,
+          image_num: ImageNum,
+          explian: itemExplain,
+          count: changeitemCount,
+        }),
+      })
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //수량이 감소하고 DB의 아이템 정보를 변경한다.
+  const ChangeItemInfoANDCountDown = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/ChangeItemInfoANDCountDown`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          origin_name: ItemInformation.name,
+          campus_id: userData.campus_pk,
+          name: itemName,
+          price: itemPoint,
+          using_time: deadlineDate,
+          image_num: ImageNum,
+          explian: itemExplain,
+          count: Math.abs(changeitemCount),
+        }),
+      })
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //현재 남은 제고의 아이템 수를 얻기위함
+  const getRestItemCount = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/getRestItemCount`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userdata.campus_pk,
+          name: ItemInfo.name,
+        }),
+      })
+      const rest_item_pks = await response.json();
+      setItemRestCount(rest_item_pks.length)
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+    //현재 팔린 제고의 수량을 파악하기 위함
+    const getSellItemCount = async () => {
+      try {
+        const response = await fetch(`${config.serverUrl}/getSellItemCount`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            campus_id: userdata.campus_pk,
+            name: ItemInfo.name,
+          }),
+        })
+        const sell_item_pks = await response.json();
+        setItemSellCount(sell_item_pks.length)
+      } catch (error) {
+        console.error(error);
+      } finally {
+      }
+    }
 
   // 상품의 증가, 감소, 0에 대한 구분을 해준다.
-const choice_item_action = () => {
-  if (typeof changeitemCount === 'undefined' || changeitemCount === null) {
-    console.log("changeitemCount is undefined or null");
-  } else if (changeitemCount > 0) {
-    console.log("Item count is increasing");
-  } else if (changeitemCount < 0) {
-    console.log("Item count is decreasing");
-  } else if (changeitemCount === 0) {
-    ChangeItemInfo();
-  }
-};
+  const choice_item_action = () => {
+    if (typeof changeitemCount === 'undefined' || changeitemCount === null) {
+      console.log("changeitemCount is undefined or null");
+    } else if (changeitemCount > 0) {
+      ADDItemAlert();
+    } else if (changeitemCount < 0) {
+      DeleteItemAlert();
+    } else if (changeitemCount === 0) {
+      EditItemAlert();
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -314,10 +453,10 @@ const choice_item_action = () => {
             placeholderTextColor={'gray'}
           />
         </View>
-        <View style = {styles.ChangePointTextbox}>
+        <View style={styles.ChangePointTextbox}>
           <Text style={styles.NameText}>현재 수량 :</Text>
-          <Text style ={styles.beforeCountText}>{itemCount}</Text>
-          <View style = {styles.ChangeIconBox}>
+          <Text style={styles.beforeCountText}>{ItemRestCount}</Text>
+          <View style={styles.ChangeIconBox}>
             <TouchableOpacity
               onPress={() => {
                 handleCountUpTextChange();
@@ -327,10 +466,12 @@ const choice_item_action = () => {
             <TouchableOpacity
               onPress={() => {
                 handleCountDownTextChange();
-                }}>
+              }}>
               <IconD style={styles.downIcon} name="downsquare" size={30} />
             </TouchableOpacity>
           </View>
+          <Text style={{fontSize: 20,fontWeight: 'bold',paddingLeft: 20,color: 'grey'}}>팔린 수량 :</Text>
+          <Text style={{ fontSize: 20,fontWeight: 'bold',marginLeft: 5,width: "10%",color: 'grey'}}>{ItemSellCount}</Text>
         </View>
         <View>
         </View>
@@ -440,13 +581,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 5,
     width: "10%",
-    color : 'black'
+    color: 'black'
     //backgroundColor : 'red'
   },
-  ChangeIconBox : {
-    width : "70%",
+  ChangeIconBox: {
+    width: "10%",
     //backgroundColor : 'blue',
-    justifyContent : 'center'
+    justifyContent: 'center'
   },
   changeCountTextBoxText: {
     fontSize: 20,
