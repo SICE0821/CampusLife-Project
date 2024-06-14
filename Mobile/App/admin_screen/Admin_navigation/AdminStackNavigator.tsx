@@ -21,9 +21,11 @@ const RegisterItemStack = createStackNavigator();
 
 //관리자 이벤트 스택 네비게이터
 export const AdminEventStackNavigator = ({ navigation, route }: any) => {
+    const { userdata } = route.params;
     return (
         <AdminEventStack.Navigator>
             <AdminEventStack.Screen name="CheckEventScreen"
+                initialParams={{ userdata }}
                 component={CheckEventScreen}
                 options={{
                     headerStyle: {
@@ -41,6 +43,7 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                 }} />
 
             <AdminEventStack.Screen name="SendUserEventDetailScreen"
+                initialParams={{ userdata }}
                 component={SendUserEventDetailScreen}
                 options={{
                     headerStyle: {
@@ -58,6 +61,7 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                 }} />
 
             <AdminEventStack.Screen name="SendUserEventScreen"
+                initialParams={{ userdata }}
                 component={SendUserEventScreen}
                 options={{
                     headerStyle: {
@@ -75,6 +79,7 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                 }} />
 
             <AdminEventStack.Screen name="EventRegistrationScreen"
+                initialParams={{ userdata }}
                 component={EventRegistrationScreen}
                 options={{
                     headerStyle: {

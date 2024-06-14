@@ -205,6 +205,7 @@ export const AdminTabNavigator = ({ route }: any) => {
             <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>이벤트</Text>
           )
         }}
+        initialParams={{ userdata }}
       />
 
       <Tab.Screen

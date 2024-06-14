@@ -9,6 +9,7 @@ import {
   Alert,
   Image
 } from 'react-native';
+import config from '../../config';
 import { TextInput } from 'react-native-gesture-handler';
 import IconPen from 'react-native-vector-icons/FontAwesome6';
 import IconTrash from 'react-native-vector-icons/FontAwesome6';
@@ -21,24 +22,42 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale'; // date-fns의 한국어 locale 불러오기
+import { UserData } from '../../types/type'
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 
 const width = Dimensions.get("window").width;
 
-const EventRegistrationScreen = () => {
+const EventRegistrationScreen = ({ route }: any) => {
+  const { userdata } = route.params;
+  const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   // 이벤트 정보 관련 상태 변수들
   const [title, setTitle] = useState(''); // 이벤트 제목
   const [content, setContent] = useState(''); // 이벤트 내용
+  const [simpleInfo, setSimpleInfo] = useState('')//이벤트 간략 설명
+  const [grantPoint, setGrantPoint] = useState('');
   const [votes, setVotes] = useState<{ id: number, text: string }[]>([]); // 투표 옵션
   const [showVoteSection, setShowVoteSection] = useState(false); // 투표 섹션 표시 여부
   const [submittedData, setSubmittedData] = useState<any>(null); // 제출된 데이터
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
+  const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 선택된 이미지를 폼데이터에 저장
 
   // useState Hook를 사용하여 시작 및 종료 날짜와 모달 유형, 노출 여부를 설정할 변수를 생성
   const [startDate, onChangeStartDate] = useState(new Date()); // 시작 날짜
   const [endDate, onChangeEndDate] = useState(new Date()); // 종료 날짜
   const [startVisible, setStartVisible] = useState(false); // 시작 날짜 모달 노출 여부
   const [endVisible, setEndVisible] = useState(false); // 종료 날짜 모달 노출 여부
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setUserData(userdata);
+    }, [])
+  );
+
+  //Date 타입의 문자열을 sql문에 넣을 수 있게 변환하는 함수.
+  const formatDateToSQL = (date: Date) => {
+    return date.toISOString().slice(0, 19).replace('T', ' ');
+  };
 
   const onPressStartDate = () => { // 시작 날짜 클릭 시
     setStartVisible(true); // 시작 날짜 모달 open
@@ -106,7 +125,7 @@ const EventRegistrationScreen = () => {
   };
 
   // 제출 처리 함수
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (title.trim() !== '' && content.trim() !== '') {
       if (!showVoteSection || (showVoteSection && votes.every(vote => vote.text.trim() !== ''))) {
         // Validate start date and end date
@@ -114,6 +133,8 @@ const EventRegistrationScreen = () => {
           const submittedData = {
             title,
             content,
+            simpleInfo,
+            grantPoint,
             votes: showVoteSection ? votes.map(vote => vote.text.trim()) : [],
             images: selectedImages.map(image => image.uri),
             startDate,
@@ -124,11 +145,19 @@ const EventRegistrationScreen = () => {
           // 폼 필드 초기화
           setTitle('');
           setContent('');
+          setSimpleInfo('');
+          setGrantPoint('');
           setVotes([]);
           setShowVoteSection(false);
           setSelectedImages([]);
 
           hideVoteOptions(); // 제출 후 투표 옵션 초기화
+          const event_pk_string = await RegistorEvent();
+          const event_pk = parseInt(event_pk_string);
+          RegistorEventVotes(event_pk)
+          
+          const event_photo = await uploadImages();
+          RegistorEventPhoto(event_pk, event_photo);
         } else {
           Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
         }
@@ -144,18 +173,123 @@ const EventRegistrationScreen = () => {
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
       if (response.assets) {
-        setSelectedImages([...selectedImages, ...response.assets]);
+        const newSelectedImage = [...selectedImages, ...response.assets];
+        setSelectedImages(newSelectedImage);
+        const formDataArray = newSelectedImage.map((image) => {
+          const formData = new FormData();
+          const fileNameWithoutExtension = image.fileName.split('.').slice(0, -1).join('.');
+          const newFileName = `${Date.now()}_${fileNameWithoutExtension}.png`;
+          formData.append('images', {
+            uri: image.uri,
+            type: image.type,
+            name: newFileName ,
+          });
+          return formData;
+        });
+        setSelectedFormImages(formDataArray);
+        console.log(formDataArray);
       } else if (response.errorCode) {
         console.log('Image picker error: ', response.errorMessage);
       }
     });
   };
 
+    // 이미지 업로드 함수
+    const uploadImages = async () => {
+      try {
+        const uploadedImageDatas = [];
+        for (const formData of selectedFormImages) {
+          const response = await fetch(`${config.serverUrl}/uploadImages`, {
+            method: 'POST',
+            body: formData,
+          });
+          const imageData = await response.json();
+          uploadedImageDatas.push(imageData.fileNames[0]);
+          if (response.ok) {
+            //console.log('Image uploaded successfully');
+          } else {
+            //console.error('Image upload failed');
+          }
+        }
+        return uploadedImageDatas;
+      } catch (error) {
+        console.error('Error uploading images: ', error);
+      }
+    };
+
   // 이미지 삭제 함수
   const handleImageRemove = (index: number) => {
     const updatedImages = selectedImages.filter((_, i) => i !== index);
     setSelectedImages(updatedImages);
   };
+
+  //이벤트 정보만 Insert
+  const RegistorEvent = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/RegistorEvent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userData.campus_pk,
+          user_id: userData.user_pk,
+          event_name: title,
+          get_point: grantPoint,
+          info: content,
+          simple_info: simpleInfo,
+          start_date: formatDateToSQL(startDate),
+          close_date: formatDateToSQL(endDate),
+        }),
+      })
+      const data = await response.json();
+      const eventPk = data.eventPk;
+      return eventPk
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
+  const RegistorEventVotes = async (event_id: number) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/RegistorEventVotes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: event_id,
+          votes: votes
+        }),
+      })
+      await response.json();
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+    //이벤트 테이블에 연결되어있는 이미지 테이블에 행삽입
+    const RegistorEventPhoto = async (event_id: number, event_photo : any) => {
+      try {
+        const response = await fetch(`${config.serverUrl}/RegistorEventPhoto`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            event_id: event_id,
+            event_photo : event_photo
+          }),
+        })
+        await response.json();
+      } catch (error) {
+        console.error(error);
+      } finally {
+      }
+    }
 
   return (
     <View style={styles.container}>
@@ -175,7 +309,21 @@ const EventRegistrationScreen = () => {
             <IconPen name='pen' size={22} color='black' style={styles.iconPen} />
           </View>
         </View>
-
+        {/* 이벤트 간략 설명란 */}
+        <View style={styles.inputArea}>
+          <Text style={styles.inputText}>이벤트 간략설명</Text>
+          <View style={[styles.inputBox, { flexDirection: 'row' }]}>
+            <TextInput
+              style={styles.input}
+              placeholder="이벤트 간략 설명을 작성해주세요. (최대 30자)"
+              placeholderTextColor={'gray'}
+              maxLength={30}
+              value={simpleInfo}
+              onChangeText={setSimpleInfo}
+            />
+            <IconPen name='pen' size={22} color='black' style={styles.iconPen} />
+          </View>
+        </View>
         {/* 이벤트 내용 입력란 */}
         <View style={styles.inputArea}>
           <Text style={styles.inputText}>이벤트 내용</Text>
@@ -192,6 +340,23 @@ const EventRegistrationScreen = () => {
             <Text style={[styles.showLength, { color: content.length === 800 ? 'red' : 'gray' }]}>
               {content.length} / 800
             </Text>
+          </View>
+        </View>
+
+        <View style={styles.contentArea}>
+          <View style={styles.addContentBox}>
+            <View style={styles.contentTextArea}>
+              <IconCalendar style={styles.PointIcon} name='cash-plus' />
+              <Text style={styles.contentText}>포인트</Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="부여 포인트를 작성해주세요. (숫자만)"
+              placeholderTextColor={'gray'}
+              maxLength={30}
+              value={grantPoint}
+              onChangeText={setGrantPoint}
+            />
           </View>
         </View>
 
@@ -305,6 +470,10 @@ const EventRegistrationScreen = () => {
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.submitButtonText}>등록하기</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.submitButton} onPress={uploadImages}>
+          <Text style={styles.submitButtonText}>이미지 서버 등록</Text>
+        </TouchableOpacity>
 
         {/* 제출 후 결과 표시 */}
         {submittedData && (
@@ -312,6 +481,8 @@ const EventRegistrationScreen = () => {
             <Text style={{ color: 'black', marginTop: 20 }}>결과값</Text>
             <Text style={{ color: 'black' }}>제목: {submittedData.title}</Text>
             <Text style={{ color: 'black' }}>내용: {submittedData.content}</Text>
+            <Text style={{ color: 'black' }}>간략설명: {submittedData.simpleInfo}</Text>
+            <Text style={{ color: 'black' }}>부여 포인트: {submittedData.grantPoint}P</Text>
             {submittedData.votes.length > 0 && (
               <Text style={{ color: 'black' }}>투표 옵션:</Text>
             )}
@@ -402,6 +573,10 @@ const styles = StyleSheet.create({
   imageIcon: {
     color: 'black',
     fontSize: 22
+  },
+  PointIcon: {
+    color: 'black',
+    fontSize: 30
   },
   contentText: {
     color: 'black',

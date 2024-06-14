@@ -96,6 +96,9 @@ const { getGeneralPosts,
   ChangeItemInfoANDCountDown,
   getRestItemCount,
   getSellItemCount,
+  RegistorEvent,
+  RegistorEventVotes,
+  RegistorEventPhoto,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1832,6 +1835,59 @@ app.post('/getSellItemCount', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//이벤트 정보만 등록
+app.post('/RegistorEvent', async (req, res) => {
+  const { campus_id, user_id, event_name, get_point, info, simple_info, start_date, close_date } = req.body;
+  try {
+    const eventPk = await RegistorEvent(campus_id, user_id, event_name, get_point, info, simple_info, start_date, close_date);
+    res.status(200).json({ eventPk });
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
+app.post('/RegistorEventVotes', async (req, res) => {
+  const { event_id, votes } = req.body;
+  try {
+    await RegistorEventVotes(event_id, votes);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이벤트 테이블에 연결되어있는 이미지 테이블에 행삽입
+app.post('/RegistorEventPhoto', async (req, res) => {
+  const { event_pk, event_photo } = req.body;
+  try {
+    await RegistorEventPhoto(event_pk, event_photo);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/uploadImages', upload.array('images', 10), (req, res) => {
+  try {
+    const fileNames = req.files.map(file => {
+      const fileName = file.filename;
+      const baseName = fileName.substring(0, fileName.lastIndexOf('.')); // 파일 이름에서 확장자 제거
+      return baseName;
+    });
+    console.log(fileNames);
+    res.json({ fileNames: fileNames }); // 확장자를 제거한 파일 이름들을 JSON 형식으로 클라이언트로 반환
+  } catch (error) {
+    console.error('Error uploading images:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 //서버 시작
 app.listen(PORT, () => {
