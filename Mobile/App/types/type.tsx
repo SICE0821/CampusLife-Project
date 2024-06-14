@@ -78,7 +78,8 @@ export type UserHaveCouponData = {
   using_time : string,
   buy_date : string,
   using_check : boolean,
-  using_date : boolean
+  using_date : boolean,
+  count : number,
 }
 
 export type CommentsWithRecomments = {

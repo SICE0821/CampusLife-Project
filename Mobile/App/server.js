@@ -88,7 +88,14 @@ const { getGeneralPosts,
   is_user_post_like,
   put_user_post_like,
   put_user_report,
-  get_user_report
+  get_user_report,
+  admin_get_event_objcet,
+  RegistorItem,
+  ChangeItemInfo,
+  ChangeItemInfoANDCountUp,
+  ChangeItemInfoANDCountDown,
+  getRestItemCount,
+  getSellItemCount,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -115,7 +122,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -138,7 +145,7 @@ const upload = multer({ storage });
 //메인페이지에 핫 게시글 데이터를 가져온다.
 app.post('/MainPagehotPost', async (req, res) => {
   const { campus_id } = req.body;
-  
+
   try {
     const rows = await gethotpostdata(campus_id);
     const processedData = rows.map(item => ({
@@ -252,7 +259,7 @@ app.post('/get_user_data', async (req, res) => {
     currentstatus: rows[0].currentstatus,
     student_semester: rows[0].student_semester,
     college: rows[0].college,
-    title : rows[0].title
+    title: rows[0].title
   };
   res.json(userData);
 })
@@ -267,12 +274,8 @@ app.post('/get_items', async (req, res) => {
 
   const event_object_datas = rows.reduce((accumulator, item) => {
     const itemName = item.name;
-
-    // 이미 해당 아이템의 인덱스를 찾은 경우
     const existingItemIndex = accumulator.findIndex(obj => obj.name === itemName);
-
     if (existingItemIndex !== -1) {
-      // 이미 해당 아이템이 존재하는 경우 카운트 증가
       accumulator[existingItemIndex].count++;
     } else {
       // 해당 아이템이 처음 발견된 경우 새로운 객체로 추가
@@ -288,10 +291,38 @@ app.post('/get_items', async (req, res) => {
         count: 1 // 초기 카운트는 1로 설정
       });
     }
-
     return accumulator;
   }, []);
+  res.json(event_object_datas);
+});
 
+//관리자에서 이벤트 상품 싹 가져오기
+app.post('/admin_get_items', async (req, res) => {
+  const { campus_id } = req.body;
+  const rows = await admin_get_event_objcet(campus_id);
+  console.log("서버 응답 잘 받음");
+
+  const event_object_datas = rows.reduce((accumulator, item) => {
+    const itemName = item.name;
+    const existingItemIndex = accumulator.findIndex(obj => obj.name === itemName);
+    if (existingItemIndex !== -1) {
+      accumulator[existingItemIndex].count++;
+    } else {
+      // 해당 아이템이 처음 발견된 경우 새로운 객체로 추가
+      accumulator.push({
+        objec_id: item.object_id,
+        name: itemName,
+        price: item.price,
+        code_num: item.code_num,
+        using_time: item.using_time,
+        image_num: item.image_num,
+        sell_check: item.sell_check,
+        explain: item.explain,
+        count: 1 // 초기 카운트는 1로 설정
+      });
+    }
+    return accumulator;
+  }, []);
   res.json(event_object_datas);
 });
 
@@ -1480,10 +1511,10 @@ app.post('/get_campus_place', async (req, res) => {
   try {
     const rows = await getCampus(campus_id);
     const processedData = rows.map(item => ({
-      study_room_id : item.study_room_id,
-      campus_place : item.campus_place,
-      study_room_name : item.study_room_name,
-      image : item.image
+      study_room_id: item.study_room_id,
+      campus_place: item.campus_place,
+      study_room_name: item.study_room_name,
+      image: item.image
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1499,7 +1530,7 @@ app.post('/get_study_room', async (req, res) => {
     const rows = await get_student_study_room(student);
     console.log(rows);
     const processedData = rows.map(item => ({
-      student : item.student,
+      student: item.student,
       study_room_name: item.study_room_name,
       study_room_date: item.study_room_date,
       study_room_time: item.study_room_time,
@@ -1545,9 +1576,9 @@ app.post('/deletestudyroom', async (req, res) => {
   const { student, study_room_name, study_room_date, study_room_time } = req.body;
   const success = await delete_studyroom(student, study_room_name, study_room_date, study_room_time);
   if (success) {
-      res.json({ message: "성공적으로 값 삭제" });
+    res.json({ message: "성공적으로 값 삭제" });
   } else {
-      res.status(500).json({ error: "삭제 실패" });
+    res.status(500).json({ error: "삭제 실패" });
   }
 });
 
@@ -1612,7 +1643,7 @@ app.post('/send_user_event_photo', upload.array('images'), (req, res) => {
     console.error('Error saving files to the database:', error);
     res.status(500).send('Internal Server Error');
   }
-  });
+});
 
 
 app.post('/deleteMyPostData', async (req, res) => {
@@ -1659,7 +1690,7 @@ app.post('/is_user_post_like', async (req, res) => {
 });
 
 app.post('/put_user_post_like', async (req, res) => {
-  const { user_id, post_id} = req.body;
+  const { user_id, post_id } = req.body;
   try {
     await put_user_post_like(user_id, post_id);
     console.log("성공적으로 데이터 보냄");
@@ -1675,9 +1706,9 @@ app.post('/select_user_event_info', async (req, res) => {
   try {
     const rows = await select_user_event_info(user_id);
     const processedData = rows.map(item => ({
-        user_id : item.user_id,
-        user_send_event : item.user_send_event,
-        event_id : item.event_id
+      user_id: item.user_id,
+      user_send_event: item.user_send_event,
+      event_id: item.event_id
     }));
     console.log(processedData);
     res.json(processedData);
@@ -1713,6 +1744,94 @@ app.get('/getuserreport', async (req, res) => {
   }
 });
 
+
+//상품시에 사진 저장
+app.post('/RegistorItemImage', upload.single('images'), (req, res) => {
+  const fileName = req.file ? req.file.filename : null;
+  const baseName = fileName ? fileName.substring(0, fileName.lastIndexOf('.')) : null; // 파일 이름에서 확장자 제거
+  console.log(baseName);
+  res.json({ fileName: baseName }); // 확장자를 제거한 파일 이름을 JSON 형식으로 클라이언트로 반환
+});
+
+//상품등록
+app.post('/RegistorItem', async (req, res) => {
+  const { campus_id, name, price, using_time, image_num, explian, count} = req.body;
+  try {
+    const rows = await RegistorItem(campus_id, name, price, using_time, image_num, explian, count);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//수량은 변화하지 않고 DB의 아이템 정보만 변경한다.
+app.post('/ChangeItemInfo', async (req, res) => {
+  const { origin_name, name, price, using_time, image_num, explian } = req.body;
+  try {
+    const rows = await ChangeItemInfo(origin_name, name, price, using_time, image_num, explian);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//수량이 증가하고 DB의 아이템 정보를 변경한다.
+app.post('/ChangeItemInfoANDCountUp', async (req, res) => {
+  const { origin_name, campus_id, name, price, using_time, image_num, explian, count} = req.body;
+  try {
+    const rows = await ChangeItemInfoANDCountUp(origin_name, campus_id, name, price, using_time, image_num, explian, count);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//수량이 감소하고 DB의 아이템 정보를 변경한다.
+app.post('/ChangeItemInfoANDCountDown', async (req, res) => {
+  const { origin_name, campus_id, name, price, using_time, image_num, explian, count} = req.body;
+  try {
+    const rows = await ChangeItemInfoANDCountDown(origin_name, campus_id, name, price, using_time, image_num, explian, count);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//현재 남은 제고의 아이템 수를 얻기위함
+app.post('/getRestItemCount', async (req, res) => {
+  const { campus_id, name } = req.body;
+  try {
+    const rows = await getRestItemCount(campus_id, name);
+    const processedData = rows.map(item => ({
+      object_id : item.object_id
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//현재 팔린 제고의 수량을 파악하기 위함
+app.post('/getSellItemCount', async (req, res) => {
+  const { campus_id, name } = req.body;
+  try {
+    const rows = await getSellItemCount(campus_id, name);
+    const processedData = rows.map(item => ({
+      object_id : item.object_id
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //서버 시작
 app.listen(PORT, () => {

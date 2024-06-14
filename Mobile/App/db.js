@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -643,6 +643,22 @@ async function get_event_objcet(campus_id) {
         conn = await pool.getConnection();
         const rows = await conn.query(
             `SELECT * FROM event_object WHERE campus_id = ? AND sell_check = 0`
+            , [campus_id]);
+        return rows;
+
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+async function admin_get_event_objcet(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM event_object WHERE campus_id = ?`
             , [campus_id]);
         return rows;
 
@@ -2061,6 +2077,105 @@ async function get_user_report() {
     }
 }
 
+async function RegistorItem(campus_id, name, price, using_time, image_num, explian, count) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL example_while(?, ?, ?, ?, ?, ?, ?);`
+        await conn.query(query, [campus_id, name, price, using_time, image_num, explian, count]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//수량은 변화하지 않고 DB의 아이템 정보만 변경한다.
+async function ChangeItemInfo(origin_name, name, price, using_time, image_num, explian) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 
+        `UPDATE event_object
+         SET name = ?, 
+             price = ?,
+             using_time = ?,
+             image_num = ?,
+             \`explain\` = ? 
+         WHERE name = ? `
+        await conn.query(query, [name, price, using_time, image_num, explian, origin_name]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function ChangeItemInfoANDCountUp(origin_name, campus_id, name, price, using_time, image_num, explian, count) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL Change_AND_Insert_Item(?, ?, ?, ?, ?, ?, ?, ?);`
+        await conn.query(query, [origin_name, campus_id, name, price, using_time, image_num, explian, count]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//수량이 감소하고 DB의 아이템 정보를 변경한다.
+async function ChangeItemInfoANDCountDown(origin_name, campus_id, name, price, using_time, image_num, explian, count) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL Change_And_Delete_Items(?, ?, ?, ?, ?, ?, ?, ?);`
+        await conn.query(query, [origin_name, campus_id, name, price, using_time, image_num, explian, count]);
+        console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//현재 남은 제고의 아이템 수를 얻기위함
+async function getRestItemCount(campus_id, name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM event_object WHERE campus_id = ? AND name = ? AND sell_check = 0`
+            , [campus_id, name]);
+        return rows;
+
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//현재 팔린 제고의 수량을 파악하기 위함
+async function getSellItemCount(campus_id, name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM event_object WHERE campus_id = ? AND name = ? AND sell_check = 1`
+            , [campus_id, name]);
+        return rows;
+
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2150,5 +2265,12 @@ module.exports = {
     is_user_post_like,
     put_user_post_like,
     put_user_report,
-    get_user_report
+    get_user_report,
+    admin_get_event_objcet,
+    RegistorItem,
+    ChangeItemInfo,
+    ChangeItemInfoANDCountUp,
+    ChangeItemInfoANDCountDown,
+    getRestItemCount,
+    getSellItemCount
 };

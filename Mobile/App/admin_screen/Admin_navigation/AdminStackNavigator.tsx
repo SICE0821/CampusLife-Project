@@ -10,7 +10,9 @@ import SendUserEventDetailScreen from '../AdminEventScreens/SendUserEventDetailS
 import ReportPostsScreen from '../AdminReportPostScreens/ReportPostsScreen';
 import CheckRegistItemScreen from '../AdminRegisterItemScreen/CheckRegistItemScreen';
 import RegisterItemScreen from '../AdminRegisterItemScreen/RegisterItemScreen';
+import EditItemScreen from '../AdminRegisterItemScreen/EditItemScreen';
 import IconD from 'react-native-vector-icons/AntDesign';
+import ManagementUserScreen from '../managementUserScreen';
 
 
 const AdminEventStack = createStackNavigator();
@@ -118,10 +120,12 @@ export const ReportStackNavigator = ({ navigation, route }: any) => {
 
 //관리자 아이템 등록 및 수정
 export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
+    const { userdata } = route.params;
     return (
         <RegisterItemStack.Navigator>
             <RegisterItemStack.Screen name="CheckRegistItemScreen"
                 component={CheckRegistItemScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -134,11 +138,12 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '물품 등록',
+                    title: '물품 등록 현황',
                 }} />
                 
             <RegisterItemStack.Screen name="RegisterItemScreen"
                 component={RegisterItemScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -152,6 +157,24 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '물품 등록',
+                }} />
+
+            <RegisterItemStack.Screen name="EditItemScreen"
+                component={EditItemScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("CheckRegistItemScreen")}>
+                            <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '물품 편집',
                 }} />
         </RegisterItemStack.Navigator>
     );
