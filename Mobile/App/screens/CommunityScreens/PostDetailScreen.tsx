@@ -16,7 +16,7 @@ type ReportUser = {
 }
 
 
-const PostDetailScreen: React.FC = ({ route }: any) => {
+const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);
@@ -326,7 +326,8 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    post_id: postDetailInfo?.post_id
+                    post_id: postDetailInfo?.post_id,
+                    report_name : userdata.name
                 })
             });
             if (response.ok) {
@@ -344,6 +345,43 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             Alert.alert('신고 제출에 실패하였습니다.'); // 실패 메시지 표시
         }
     }
+
+    const deletePost = async () => {
+        try {
+          const response = await fetch(`${config.serverUrl}/deletepost`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              post_id: postDetailInfo?.post_id,
+            }),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+      
+          const result = await response.json();
+          console.log('게시글 삭제 완료:', result);
+      
+          // 게시글 삭제가 성공하면 알림창을 띄우고 확인 버튼을 눌렀을 때 navigation.goBack()을 호출합니다.
+          Alert.alert(
+            '알림',
+            '게시글이 삭제되었습니다.',
+            [
+              {
+                text: '확인',
+                onPress: () => navigation.goBack(),
+              },
+            ],
+            { cancelable: false }
+          );
+        } catch (error) {
+          console.error('게시글 삭제 실패:', error);
+          Alert.alert('오류', '게시글 삭제에 실패했습니다.');
+        }
+      };
     
 
       const ReportUserduplicate = () => {
@@ -522,16 +560,31 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 </View>
                 <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
                 {showOptions && (
-                                <View style={styles.optionsContainer}>
-                                    <TouchableOpacity>
-                                        <Text style={{fontSize : 15, fontWeight : "bold" , color : "black" , paddingLeft : 10,}}>수정</Text>
-                                    </TouchableOpacity>
-                                    <View style={{ width : 100, height: 0.5, backgroundColor: 'black', marginRight: 20, marginTop: 10 , marginBottom : 10, }}></View>
-                                    <TouchableOpacity onPress={ReportUserduplicate}>
-                                        <Text style={{fontSize : 15, fontWeight : "bold" , color : "black" , paddingLeft : 10}}>신고</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
+                    <View style={styles.optionsContainer}>
+                        <TouchableOpacity>
+                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
+                        </TouchableOpacity>
+                        <View style={{ width: 100, height: 1, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (userdata.user_pk === postDetailInfo?.user_id) {
+                                    Alert.alert("본인은 신고할 수 없습니다.");
+                                } else {
+                                    ReportUserduplicate();
+                                }
+                            }}>
+                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
+                        </TouchableOpacity>
+                        {(userdata?.title === "학교" || postDetailInfo?.post_writer === userdata?.name) && (
+                            <>
+                                <View style={{ width: 100, height: 0.5, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                                <TouchableOpacity onPress={deletePost}>
+                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
+                    </View>
+                )}
                 <View style={styles.titlecontainer}>
                     <Text style={{ fontSize: 20, marginLeft: 16, color: 'black', fontWeight: 'bold' }}>
                         {postDetailInfo?.title}

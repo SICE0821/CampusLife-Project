@@ -94,10 +94,12 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
 
 //관리자 신고관리 스택 네비게이터
 export const ReportStackNavigator = ({ navigation, route }: any) => {
+    const { userdata } = route.params;
     return (
         <ReportPostStack.Navigator>
             <ReportPostStack.Screen name="ReportPostsScreen"
                 component={ReportPostsScreen}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

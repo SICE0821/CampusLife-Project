@@ -95,14 +95,6 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     );
   };
 
-  const adminCheck = () => {
-    if(userData.title === "일반학생"){
-      return 0;
-    }else{
-      return 1;
-    }
-  }
-
   const write_post = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/write_post`, {
@@ -113,7 +105,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         body: JSON.stringify({
           user_id: userData.user_pk,
           department_check: selectdepartmentposter,
-          inform_check: adminCheck(),
+          inform_check: 0,
           title: titletext,
           contents: maintext,
         })

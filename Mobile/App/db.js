@@ -2028,12 +2028,12 @@ async function put_user_post_like(user_id, post_id) {
     }
 }
 
-async function put_user_report(post_id) {
+async function put_user_report(post_id, report_name) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `INSERT INTO report (post_id) VALUES (?);`
-        await conn.query(query, [post_id]);
+        const query = `INSERT INTO report (post_id, report_name) VALUES (?, ?);`
+        await conn.query(query, [post_id, report_name]);
         console.log("신고 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
@@ -2060,6 +2060,73 @@ async function get_user_report() {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
+async function get_user_report_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                r.report_id,
+                r.report_name,
+                p.post_id,
+                p.user_id AS post_user_id,
+                p.title AS post_title,
+                p.contents,
+                p.date,
+                p.view,
+                p.like,
+                u.user_id AS user_user_id,
+                u.student_id AS user_student_id,
+                u.title AS user_title,
+                u.profilePhoto,
+                s.student_id AS student_student_id,
+                s.campus_id AS student_campus_id,
+                s.department_id AS student_department_id,
+                s.name AS student_name,
+                c.campus_id AS campus_campus_id,
+                c.name AS campus_name,
+                d.department_id AS department_department_id,
+                d.name AS department_name
+            FROM 
+                report r
+            JOIN 
+                post p ON r.post_id = p.post_id
+            JOIN 
+                user u ON p.user_id = u.user_id
+            JOIN 
+                student s ON u.student_id = s.student_id
+            JOIN 
+                campus c ON s.campus_id = c.campus_id
+            JOIN 
+                department d ON s.department_id = d.department_id;
+        `;
+        const rows = await conn.query(query);
+        console.log(rows);
+        return rows; // 쿼리 결과 반환
+    } catch (err) {
+        console.error('Error querying data:', err);
+        throw err; // 에러 처리
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function delete_post(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM post WHERE post_id=?;"
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -2150,5 +2217,7 @@ module.exports = {
     is_user_post_like,
     put_user_post_like,
     put_user_report,
-    get_user_report
+    get_user_report,
+    get_user_report_Info,
+    delete_post
 };

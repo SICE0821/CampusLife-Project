@@ -88,7 +88,9 @@ const { getGeneralPosts,
   is_user_post_like,
   put_user_post_like,
   put_user_report,
-  get_user_report
+  get_user_report,
+  get_user_report_Info,
+  delete_post
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1690,9 +1692,9 @@ app.post('/select_user_event_info', async (req, res) => {
 
 //신고 등록하기
 app.post('/putuserreport', async (req, res) => {
-  const { post_id } = req.body;
+  const { post_id, report_name } = req.body;
   try {
-    const rows = put_user_report(post_id);
+    const rows = put_user_report(post_id, report_name);
     console.log("DB에 신고 정보를 성공적으로 추가했습니다.");
     res.status(200).json({ success: true, message: "신고가 성공적으로 제출되었습니다." });
   } catch (error) {
@@ -1710,6 +1712,47 @@ app.get('/getuserreport', async (req, res) => {
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/getUserReportInfo', async (req, res) => {
+  try {
+    const rows = await get_user_report_Info();
+    const processedData = rows.map(item => ({
+      reportId: item.report_id,
+      report_name : item.report_name,
+      post_id: item.post_id,
+      user_id: item.post_user_id,
+      title: item.post_title,
+      contents: item.contents,
+      write_date: formatDate(item.date),
+      view: item.view,
+      like: item.like,
+      userStudentId: item.user_student_id,
+      userTitle: item.user_title,
+      post_writer: item.student_name,
+      campusId: item.student_campus_id,
+      campusName: item.campus_name,
+      departmentId: item.student_department_id,
+      writer_department: item.department_name,
+      writer_profile : item.profilePhoto
+    }));
+    console.log(processedData);
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/deletepost', async (req, res) => {
+  const { post_id } = req.body;
+  const success = await delete_post(post_id);
+  if (success) {
+      res.json({ message: "성공적으로 값 삭제" });
+  } else {
+      res.status(500).json({ error: "삭제 실패" });
   }
 });
 
