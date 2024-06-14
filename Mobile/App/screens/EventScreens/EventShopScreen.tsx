@@ -365,17 +365,17 @@ const styles = StyleSheet.create({
 
   },
   itemrowcontainer: {
+    width: '90%',
     height: 300,
     //backgroundColor : 'green',
     //marginTop: ,
     //marginBottom : 2,
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    alignSelf: 'center',
   },
   itemonebox: {
     height: '100%',
-    width: '45%',
+    width: '50%',
     //backgroundColor : 'red',
     padding: 10,
   },

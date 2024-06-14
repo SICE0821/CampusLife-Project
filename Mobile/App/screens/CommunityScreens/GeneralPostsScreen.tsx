@@ -365,24 +365,26 @@ const styles = StyleSheet.create({
     },
 
     writeboxcontainer: {
-        //padding: 50, 
+        paddingHorizontal: 10, 
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
         //backgroundColor: 'red',
+        width: '100%',
         height: 70,
     },
 
     writetitle: {
-        flex: 0.6,
+        width: '100%',
+        height: '60%',
         flexDirection: 'row',
-        marginTop: 5,
         //backgroundColor : 'yellow'
     },
 
     wirterandtime: {
-        flex: 0.4,
-        flexDirection: 'row'
-        //backgroundColor : 'yellow'
+        width: '100%',
+        height: '40%',
+        flexDirection: 'row',
+        //backgroundColor : 'blue'
     },
 
     titlebox: {
@@ -392,7 +394,7 @@ const styles = StyleSheet.create({
     eyesnum: {
         flex: 0.15,
         flexDirection: 'row',
-        // backgroundColor : 'red',
+        //backgroundColor : 'red',
         alignItems: 'center',
         justifyContent: 'center',
     },

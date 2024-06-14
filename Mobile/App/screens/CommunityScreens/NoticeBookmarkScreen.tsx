@@ -370,17 +370,19 @@ const styles = StyleSheet.create({
         borderBottomColor: '#CCCCCC',
         //backgroundColor: 'red',
         height: 70,
+        paddingHorizontal: 10
     },
 
     writetitle: {
-        flex: 0.6,
+        width: '100%',
+        height: '60%',
         flexDirection: 'row',
-        marginTop: 5,
         //backgroundColor : 'yellow'
     },
 
     wirterandtime: {
-        flex: 0.4,
+        width: '100%',
+        height: '40%',
         flexDirection: 'row'
         //backgroundColor : 'yellow'
     },

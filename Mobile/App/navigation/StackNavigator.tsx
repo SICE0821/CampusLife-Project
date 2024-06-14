@@ -39,6 +39,7 @@ import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen'
 import MyPostScreen from '../screens/CommunityScreens/MyPostScreen';
 import { RegisterItemStackNavigator } from '../admin_screen/Admin_navigation/AdminStackNavigator';
 
+
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
 import IconF from 'react-native-vector-icons/FontAwesome';
@@ -47,6 +48,7 @@ import IconH from 'react-native-vector-icons/FontAwesome5';
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
 const MainStack = createStackNavigator();
+const AdminMainStack = createStackNavigator();
 const CoummunityStack = createStackNavigator();
 const NoticeStack = createStackNavigator();
 const EventStack = createStackNavigator();
@@ -162,6 +164,24 @@ export const LoginScreenStackNavigator = () => {
 //메인 페이지 관련 스택 네비게이터
 export const MainScreenStackNavigator = ({ route }: any) => {
     const navigation: any = useNavigation();
+    React.useLayoutEffect(() => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+        if (routeName === "MainScreen" || routeName === undefined) {
+            navigation.setOptions({
+                tabBarStyle: {
+                    height: 65,
+                    position: 'absolute',
+                    bottom: 16,
+                    right: 10,
+                    left: 10,
+                    borderRadius: 20,
+                    backgroundColor: 'white',
+                }
+            });
+        } else {
+            navigation.setOptions({ tabBarStyle: { display: 'none' } });
+        }
+    }, [navigation, route])
     const { userdata, LectureData } = route.params;
     return (
         <MainStack.Navigator>
@@ -308,24 +328,40 @@ export const MainScreenStackNavigator = ({ route }: any) => {
 export const AdminMainScreenStackNavigator = ({ route }: any) => {
     const navigation: any = useNavigation();
     const { userdata, LectureData } = route.params;
+    React.useLayoutEffect(() => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+        if (routeName === "AdminScreen" || routeName === undefined) {
+            navigation.setOptions({
+                tabBarStyle: {
+                    height: 65,
+                    position: 'absolute',
+                    bottom: 16,
+                    right: 10,
+                    left: 10,
+                    borderRadius: 20,
+                    backgroundColor: 'white',
+                }
+            });
+        } else {
+            navigation.setOptions({ tabBarStyle: { display: 'none' } });
+        }
+    }, [navigation, route])
     return (
-        <MainStack.Navigator>
-            <MainStack.Screen name="AdminScreen" component={AdminMainScreen} initialParams={{ userdata, LectureData }} options={{ headerShown: false }} />
-            <MainStack.Screen
+        <AdminMainStack.Navigator>
+            <AdminMainStack.Screen name="AdminScreen" component={AdminMainScreen} initialParams={{ userdata, LectureData }} options={{ headerShown: false }} />
+            <AdminMainStack.Screen
                 name="StudentInfoNavigator"
                 component={StudentInfoScreen}
                 options={{
-
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '정보변경',
                 }}
             />
-            <MainStack.Screen
+            <AdminMainStack.Screen
                 name="AcademicInfoNavigator"
                 component={AcademicTopTabNavigator}
                 initialParams={{ userdata, LectureData }}
@@ -343,7 +379,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     title: '학적확인',
                 }}
             />
-            <MainStack.Screen
+            <AdminMainStack.Screen
                 name="AlarmDialogScreen"
                 initialParams={{ userdata }}
                 component={AlarmDialogScreen}
@@ -362,7 +398,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                 }}
             />
 
-            <MainStack.Screen
+            <AdminMainStack.Screen
                 name="SchoolInfoScreen"
                 component={SchoolInfoScreen}
                 initialParams={{ userdata }}
@@ -380,7 +416,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     title: '학교 정보',
                 }}
             />
-            <MainStack.Screen
+            <AdminMainStack.Screen
                 name="RegisterItemStackNavigator"
                 initialParams={{ userdata }}
                 component={RegisterItemStackNavigator}
@@ -388,7 +424,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerShown: false
                 }}
             />
-            <MainStack.Screen
+            <AdminMainStack.Screen
                 name="ManagementUserScreen"
                 component={ManagementUserScreen}
                 initialParams={{ userdata }}
@@ -406,7 +442,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     title: '이벤트',
                 }} />
 
-            <MainStack.Screen
+            <AdminMainStack.Screen
                 name="FriendCodeEventScreen"
                 component={FriendCodeEventScreen}
                 initialParams={{ userdata }}
@@ -423,7 +459,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerTitleAlign: 'center',
                     title: '이벤트',
                 }} />
-            <MainStack.Screen
+            <AdminMainStack.Screen
                 name="DeadlineEventScreen"
                 component={DeadlineEventScreen}
                 options={{
@@ -439,7 +475,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerTitleAlign: 'center',
                     title: '이벤트',
                 }} />
-        </MainStack.Navigator>
+        </AdminMainStack.Navigator>
     );
 };
 
