@@ -14,6 +14,18 @@ const userData = [
   { image: require('../assets/event1.jpg'), name: '김철수', id: 'Kim01', department: '기계공학과', report: 4, admin: 0, point: 1500 },
   { image: require('../assets/event1.jpg'), name: '이영희', id: 'Lee01', department: '전자공학과', report: 2, admin: 2, point: 1800 },
   { image: require('../assets/event1.jpg'), name: '박지민', id: 'Park01', department: '컴퓨터소프트웨어학과', report: 3, admin: 3, point: 2200 },
+  { image: require('../assets/event1.jpg'), name: '홍길동', id: 'Hong01', department: '컴퓨터소프트웨어학과', report: 1, admin: 1, point: 2000 },
+  { image: require('../assets/event1.jpg'), name: '김철수', id: 'Kim01', department: '기계공학과', report: 4, admin: 0, point: 1500 },
+  { image: require('../assets/event1.jpg'), name: '이영희', id: 'Lee01', department: '전자공학과', report: 2, admin: 2, point: 1800 },
+  { image: require('../assets/event1.jpg'), name: '박지민', id: 'Park01', department: '컴퓨터소프트웨어학과', report: 3, admin: 3, point: 2200 },
+  { image: require('../assets/event1.jpg'), name: '홍길동', id: 'Hong01', department: '컴퓨터소프트웨어학과', report: 1, admin: 1, point: 2000 },
+  { image: require('../assets/event1.jpg'), name: '김철수', id: 'Kim01', department: '기계공학과', report: 4, admin: 0, point: 1500 },
+  { image: require('../assets/event1.jpg'), name: '이영희', id: 'Lee01', department: '전자공학과', report: 2, admin: 2, point: 1800 },
+  { image: require('../assets/event1.jpg'), name: '박지민', id: 'Park01', department: '컴퓨터소프트웨어학과', report: 3, admin: 3, point: 2200 },
+  { image: require('../assets/event1.jpg'), name: '홍길동', id: 'Hong01', department: '컴퓨터소프트웨어학과', report: 1, admin: 1, point: 2000 },
+  { image: require('../assets/event1.jpg'), name: '김철수', id: 'Kim01', department: '기계공학과', report: 4, admin: 0, point: 1500 },
+  { image: require('../assets/event1.jpg'), name: '이영희', id: 'Lee01', department: '전자공학과', report: 2, admin: 2, point: 1800 },
+  { image: require('../assets/event1.jpg'), name: '박지민', id: 'Park01', department: '컴퓨터소프트웨어학과', report: 3, admin: 3, point: 2200 },
 ];
 
 const getRoleColor = (role: number) => {
