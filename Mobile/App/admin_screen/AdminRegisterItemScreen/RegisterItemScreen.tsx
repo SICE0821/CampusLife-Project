@@ -69,7 +69,7 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
     setItemCount(inputText);
   };
 
-  // 사진 선택
+  // 사진 선택 후 서버에 저장
   const getPhotos = async () => {
     try {
       const res = await ImageCropPicker.openPicker({
@@ -161,7 +161,7 @@ const successAlert = () => {
     } catch (error) {
         console.error(error);
     } finally {
-    }
+  }
 }
 
   return (

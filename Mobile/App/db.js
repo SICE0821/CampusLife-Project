@@ -2176,6 +2176,68 @@ async function getSellItemCount(campus_id, name) {
     }
 }
 
+
+//이벤트 정보만 등록
+async function RegistorEvent(campus_id, user_id, event_name, get_point, info, simple_info, start_date, close_date) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+        INSERT INTO event (
+        campus_id,
+        user_id,
+        \`name\`,
+        get_point,
+        info,
+        simple_info,
+        start_date,
+        close_date,
+        is_event_close) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+        const result = await conn.query(query, [campus_id, user_id, event_name, get_point, info, simple_info, start_date, close_date, 0]);
+        console.log(result);
+        const event_id = result.insertId.toString();
+        return event_id;
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
+//이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
+async function RegistorEventVotes(event_id, votes) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        for(const vote of votes) {
+            const { id, text } = vote;
+            const query = `INSERT INTO event_vote(event_id, vote_name, vote_count) VALUES (?, ?, 0)`
+            const result = await conn.query(query, [event_id, text, 0]);
+        }
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//이벤트 테이블에 연결되어있는 이미지 테이블에 행삽입
+async function RegistorEventPhoto(event_pk, event_photo) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        for(const one_photo of event_photo) {
+            const query = `INSERT INTO event_photo(event_id, event_photo) VALUES (?, ?)`
+            const result = await conn.query(query, [event_pk, one_photo]);
+        }
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2272,5 +2334,8 @@ module.exports = {
     ChangeItemInfoANDCountUp,
     ChangeItemInfoANDCountDown,
     getRestItemCount,
-    getSellItemCount
+    getSellItemCount,
+    RegistorEvent,
+    RegistorEventVotes,
+    RegistorEventPhoto,
 };

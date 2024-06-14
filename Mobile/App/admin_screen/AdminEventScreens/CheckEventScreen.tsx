@@ -11,6 +11,7 @@ const eventData = [
 ];
 
 const CheckEventScreen = ({ route, navigation }: any) => {
+  const { userdata } = route.params;
   const handleEditEvent = (eventId: number) => {
     Alert.alert("Edit Event", `Edit event with ID: ${eventId}`);
   };
@@ -29,11 +30,11 @@ const CheckEventScreen = ({ route, navigation }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.btnArea}>
-        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("EventRegistrationScreen")}>
+        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("EventRegistrationScreen", userdata)}>
           <Icon_event style={styles.eventRegistIcon} name='note-plus-outline' />
           <Text style={styles.eventRegistText}>이벤트 등록</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("SendUserEventScreen")}>
+        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("SendUserEventScreen", userdata)}>
           <Icon_event style={styles.eventRegistIcon} name='note-text-outline' />
           <Text style={styles.eventCheckText}>참여 확인</Text>
         </TouchableOpacity>
