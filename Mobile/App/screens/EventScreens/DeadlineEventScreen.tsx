@@ -4,15 +4,16 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Swiper from 'react-native-swiper';
 import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { UserData, EventData } from '../../types/type'
+import { UserData, EventData } from '../../types/type';
 const width = Dimensions.get("window").width;
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
+import { RadioButton } from 'react-native-paper';
 
 type userEvent = {
-  user_id : number,
-  event_id : number
-}
+  user_id: number,
+  event_id: number
+};
 
 const eventImages = [
   require('../../assets/001.png'),
@@ -20,6 +21,14 @@ const eventImages = [
   require('../../assets/부천대.png'),
   // Add more images here up to a maximum of 10
 ];
+
+const voteInfo = [ // null이면 안보임
+  {vote : 'null'},
+  {vote : 'null'},
+  {vote : 'null'},
+  {vote : 'null'},
+  {vote : 'null'},
+].filter(info => info.vote !== 'null'); // Filter out null values
 
 const DeadlineEventScreen = ({ route }: any) => {
   const { userdata, eventdata } = route.params;
@@ -30,14 +39,16 @@ const DeadlineEventScreen = ({ route }: any) => {
   const [selectedFiles, setSelectedFiles] = useState<DocumentPickerResponse[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
   const [eventData, setEventData] = useState<EventData>(eventdata);
-  const [usereventData, setUserEventData] = useState<userEvent[]>([])
+  const [usereventData, setUserEventData] = useState<userEvent[]>([]);
+  const [checked, setChecked] = useState('');
+  const [voteOptions, setVoteOptions] = useState<string[]>(voteInfo.map(info => info.vote)); // Initial voting options
 
   useFocusEffect(
     React.useCallback(() => {
       settingDate();
     }, []
     )
-  )
+  );
 
   useEffect(() => {
     fetchEventData();
@@ -45,8 +56,8 @@ const DeadlineEventScreen = ({ route }: any) => {
 
   const settingDate = () => {
     setUserData(userData);
-    setEventData(eventdata)
-  }
+    setEventData(eventdata);
+  };
 
   const handleMainTextChange = (inputText: string) => {
     setMainText(inputText);
@@ -65,7 +76,7 @@ const DeadlineEventScreen = ({ route }: any) => {
       if (selectedFiles.length < 5) {
         setSelectedFiles([...selectedFiles, res[0]]);
       } else {
-        alert('You can upload a maximum of 5 files.');
+        Alert.alert('You can upload a maximum of 5 files.');
       }
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
@@ -123,15 +134,15 @@ const DeadlineEventScreen = ({ route }: any) => {
           content: maintext,
         }),
       });
-  
+
       if (!response.ok) {
         throw new Error('서버 응답 오류');
       }
-  
+
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   const fetchEventData = async () => {
     try {
@@ -141,15 +152,15 @@ const DeadlineEventScreen = ({ route }: any) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          student_pk : userData.student_pk
+          student_pk: userData.student_pk
         })
-      })
+      });
       const data = await response.json();
       setUserEventData(data);
     } catch (error) {
       console.error('과목 가져오기 실패:', error);
     }
-  }
+  };
 
   const send_event_alert = async () => {
     // 사용자가 이미 해당 이벤트를 등록한 경우
@@ -159,7 +170,7 @@ const DeadlineEventScreen = ({ route }: any) => {
         hasRegistered = true;
       }
     });
-  
+
     if (hasRegistered) {
       // 이미 등록한 사용자인 경우
       Alert.alert("이미 이벤트를 등록하셨습니다.");
@@ -185,11 +196,11 @@ const DeadlineEventScreen = ({ route }: any) => {
   };
 
   const sendEvent = () => {
-    
+
     // 사용자가 이벤트를 등록하지 않은 경우, 초기화 코드 실행
     setSelectedFiles([]);
     setMainText("이곳에 글을 입력해 주세요");
-  }
+  };
 
   const handleFileRemove = (index: number) => {
     const updatedFiles = selectedFiles.filter((_, i) => i !== index);
@@ -205,10 +216,28 @@ const DeadlineEventScreen = ({ route }: any) => {
         <View style={styles.eventInfoArea}>
           <Text style={styles.explaintext}>{eventData?.simple_info}</Text>
           <Text style={styles.eventInfo}>{eventData?.info}</Text>
+
+          <View style={styles.eventVoteArea}>
+            {voteOptions.map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.eventVoteBox}
+                onPress={() => setChecked(option)}
+              >
+                <Text style={styles.eventVoteText}>{index + 1}. {option}</Text>
+                <RadioButton
+                  value={option}
+                  status={checked === option ? 'checked' : 'unchecked'}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
             <Text style={styles.endInfo}>종료날짜 : {eventData?.close_date}</Text>
           </View>
         </View>
+
         <View style={styles.eventImageArea}>
           <Swiper showsPagination={true} loop={true} removeClippedSubviews={false}>
             {eventData.photo_list.map((image, index) => (
@@ -221,7 +250,7 @@ const DeadlineEventScreen = ({ route }: any) => {
         <View style={styles.fileInputArea}>
           <TouchableOpacity style={styles.fileButton} onPress={() => {
             handleFilePick();
-            console.log(selectedFiles)
+            console.log(selectedFiles);
           }}>
             <Text style={styles.fileButtonText}>파일 첨부</Text>
           </TouchableOpacity>
@@ -309,6 +338,30 @@ const styles = StyleSheet.create({
   eventInfo: {
     fontSize: 17,
     color: 'black',
+  },
+  eventVoteArea: {
+    //backgroundColor: 'red',
+    alignItems: 'center',
+    width: '100%',
+
+  },
+  eventVoteBox: {
+    backgroundColor: '#dddddd',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    marginVertical: 10,
+    borderRadius: 15,
+    width: '80%',
+    height: 50,
+  },
+  eventVoteText: {
+    color: 'black',
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginLeft: 10
+
   },
   endInfo: {
     fontSize: 16,
@@ -421,6 +474,3 @@ const styles = StyleSheet.create({
 });
 
 export default DeadlineEventScreen;
-function alert(arg0: string) {
-  throw new Error('Function not implemented.');
-}

@@ -7,10 +7,19 @@ const width = Dimensions.get("window").width;
 const eventData = [
   { id: 1, image: require('../../assets/friend3.png'), title: 'Event Name 1', content: 'Event Content 1' },
   { id: 2, image: require('../../assets/friend3.png'), title: 'Event Name 2', content: 'Event Content 2' },
-
 ];
 
-const CheckEventScreen = ({ route, navigation }: any) => {
+const voteInfo = [
+  { id: 1, votes: ['투표 항목1', '투표 항목2', '투표 항목3', '투표 항목4', '투표 항목5'] },
+  { id: 2, votes: ['투표 항목1', '투표 항목2'] },
+];
+
+const voteData = [
+  { id: 1, results: [50, 12, 43, 52, 1] },
+  { id: 2, results: [21, 12] },
+];
+
+const CheckEventScreen = ({ route, navigation } : any) => {
   const handleEditEvent = (eventId: number) => {
     Alert.alert("Edit Event", `Edit event with ID: ${eventId}`);
   };
@@ -26,6 +35,15 @@ const CheckEventScreen = ({ route, navigation }: any) => {
     );
   };
 
+  const calculatePercentages = (votes: any[], results: any[]) => {
+    const totalVotes = results.reduce((acc, count) => acc + count, 0);
+    return votes.map((vote, index) => ({
+      vote,
+      count: results[index],
+      percentage: totalVotes === 0 ? 0 : (results[index] / totalVotes) * 100
+    }));
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.btnArea}>
@@ -39,27 +57,46 @@ const CheckEventScreen = ({ route, navigation }: any) => {
         </TouchableOpacity>
       </View>
       <ScrollView>
-        {eventData.map((event) => (
-          <View key={event.id} style={styles.eventBox}>
-            <View style={styles.eventImageArea}>
-              <Image style={styles.image} source={event.image} />
-            </View>
-            <View style={styles.eventInfo}>
-              <View style={styles.eventInfoTextArea}>
-                <Text style={styles.eventTitle}>{event.title}</Text>
-                <Text style={styles.eventContent}>{event.content}</Text>
+        {eventData.map((event) => {
+          const votes = voteInfo.find(vote => vote.id === event.id)?.votes || [];
+          const results = voteData.find(vote => vote.id === event.id)?.results || [];
+          const percentages = calculatePercentages(votes, results);
+
+          return (
+            <View key={event.id} style={styles.eventBox}>
+              <View style={styles.eventImageArea}>
+                <Image style={styles.image} source={event.image} />
               </View>
-              <View style={styles.eventBoxBtnArea}>
-                <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleEditEvent(event.id)}>
-                  <Text style={styles.eventBoxBtnText}>이벤트 수정</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleDeleteEvent(event.id)}>
-                  <Text style={styles.eventBoxBtnText}>이벤트 삭제</Text>
-                </TouchableOpacity>
+              <View style={styles.eventInfo}>
+                <View style={styles.eventInfoTextArea}>
+                  <Text style={styles.eventTitle}>{event.title}</Text>
+                  <Text style={styles.eventContent}>{event.content}</Text>
+                </View>
+                <View>
+                  {percentages.map((vote, index) => (
+                    vote.vote !== 'null' && (
+                      <View key={index} style={styles.voteResult}>
+                        <Text style={styles.voteText}>{vote.vote}</Text>
+                        <View style={styles.voteTextArea}>
+                          <Text style={styles.voteText}>{vote.count} 표</Text>
+                          <Text style={styles.voteText}>({vote.percentage.toFixed(1)}%)</Text>
+                        </View>
+                      </View>
+                    )
+                  ))}
+                </View>
+                <View style={styles.eventBoxBtnArea}>
+                  <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleEditEvent(event.id)}>
+                    <Text style={styles.eventBoxBtnText}>이벤트 수정</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleDeleteEvent(event.id)}>
+                    <Text style={styles.eventBoxBtnText}>이벤트 삭제</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
         <View style={{ height: 100 }}></View>
       </ScrollView>
     </View>
@@ -112,7 +149,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#dddddd',
     width: 150,
     height: 150,
-    alignSelf: 'center',
+    alignSelf: 'flex-start',
     borderRadius: 15
   },
   image: {
@@ -138,10 +175,28 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 14,
   },
+  voteResult: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 2,
+    paddingHorizontal: 5
+  },
+  voteTextArea: {
+    width: '35%',
+    //backgroundColor: 'red',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 5
+  },
+  voteText: {
+    fontSize: 14,
+    color: 'black'
+  },
   eventBoxBtnArea: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: 5
   },
   eventBoxBtn: {
     backgroundColor: 'skyblue',
