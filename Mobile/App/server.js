@@ -99,6 +99,10 @@ const { getGeneralPosts,
   RegistorEvent,
   RegistorEventVotes,
   RegistorEventPhoto,
+  GetEventList,
+  GetEditEventInfo,
+  GetEditEventVote,
+  GetEditEventImage,
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1852,6 +1856,7 @@ app.post('/RegistorEvent', async (req, res) => {
 //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
 app.post('/RegistorEventVotes', async (req, res) => {
   const { event_id, votes } = req.body;
+  //console.log(event_id);
   try {
     await RegistorEventVotes(event_id, votes);
     console.log("성공적으로 데이터 보냄");
@@ -1863,9 +1868,10 @@ app.post('/RegistorEventVotes', async (req, res) => {
 
 //이벤트 테이블에 연결되어있는 이미지 테이블에 행삽입
 app.post('/RegistorEventPhoto', async (req, res) => {
-  const { event_pk, event_photo } = req.body;
+  const { event_id, event_photo } = req.body;
+  console.log(event_photo)
   try {
-    await RegistorEventPhoto(event_pk, event_photo);
+    await RegistorEventPhoto(event_id, event_photo);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
@@ -1873,6 +1879,7 @@ app.post('/RegistorEventPhoto', async (req, res) => {
   }
 });
 
+//이벤트 등록 이미지 함수.
 app.post('/uploadImages', upload.array('images', 10), (req, res) => {
   try {
     const fileNames = req.files.map(file => {
@@ -1888,7 +1895,86 @@ app.post('/uploadImages', upload.array('images', 10), (req, res) => {
   }
 });
 
+//이벤트 리스트 가져오기
+app.post('/GetEventList', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await GetEventList(campus_id);
+    const processedData = rows.map(item => ({
+      event_id : item.event_id,
+      name : item.name,
+      info : item.info,
+      start_date : formatDate(item.start_date),
+      close_date  : formatDate(item.close_date),
+      event_photo : item.event_photo
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
+//편집할 이벤트 정보 가져오기
+app.post('/GetEditEventInfo', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    const rows = await GetEditEventInfo(event_id);
+    const processedData = {
+      event_id : rows[0].event_id,
+      campus_id : rows[0].campus_id,
+      name : rows[0].name,
+      get_point : rows[0].get_point,
+      info  : rows[0].info,
+      simple_info : rows[0].simple_info,
+      start_date : rows[0].start_date,
+      close_date : rows[0].close_date
+    };
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이벤트 편집할 이벤트 투표 가져오기
+app.post('/GetEditEventVote', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    const rows = await GetEditEventVote(event_id);
+    const processedData = rows.map(item => ({
+      event_id : item.event_id,
+      vote_name : item.vote_name,
+      vote_count : item.vote_count,
+      vote_index : item.vote_index,
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+//이벤트 편집할 이벤트 이미지 가져오기
+app.post('/GetEditEventImage', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    const rows = await GetEditEventImage(event_id);
+    const processedData = rows.map(item => ({
+      event_id : item.event_id,
+      event_photo : item.event_photo,
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 //서버 시작
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  Image
+  Image,
 } from 'react-native';
 import config from '../../config';
 import { TextInput } from 'react-native-gesture-handler';
@@ -22,25 +22,26 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale'; // date-fns의 한국어 locale 불러오기
-import { UserData } from '../../types/type'
+import { UserData, EditEventInfo, EditEventVote } from '../../types/type'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 
 const width = Dimensions.get("window").width;
 
-const EventRegistrationScreen = ({ route }: any) => {
-  const { userdata } = route.params;
+const EventEditScreen = ({ route }: any) => {
+  const { userdata, eventId } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   // 이벤트 정보 관련 상태 변수들
   const [title, setTitle] = useState(''); // 이벤트 제목
   const [content, setContent] = useState(''); // 이벤트 내용
   const [simpleInfo, setSimpleInfo] = useState('')//이벤트 간략 설명
   const [grantPoint, setGrantPoint] = useState('');
-  const [votes, setVotes] = useState<{ id: number, text: string }[]>([]); // 투표 옵션
+  const [votes, setVotes] = useState<EditEventVote[]>([]); // 투표 옵션
   const [showVoteSection, setShowVoteSection] = useState(false); // 투표 섹션 표시 여부
   const [submittedData, setSubmittedData] = useState<any>(null); // 제출된 데이터
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
   const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 선택된 이미지를 폼데이터에 저장
+  const [editEventInfo, setEditEventInfo] = useState<EditEventInfo>();
 
   // useState Hook를 사용하여 시작 및 종료 날짜와 모달 유형, 노출 여부를 설정할 변수를 생성
   const [startDate, onChangeStartDate] = useState(new Date()); // 시작 날짜
@@ -51,8 +52,86 @@ const EventRegistrationScreen = ({ route }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       setUserData(userdata);
+      GetEditEventInfo();
+      GetEditEventVote();
+      GetEditEventImage();
     }, [])
   );
+
+  //이벤트 편집할 이벤트 정보 가져오기
+  const GetEditEventInfo = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventInfo`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      setEditEventInfo(data);
+      setTitle(data.name);
+      setContent(data.info);
+      setSimpleInfo(data.simple_info);
+      setGrantPoint(String(data.get_point));
+      onChangeStartDate(new Date(data.start_date));
+      onChangeEndDate(new Date(data.close_date));
+      //console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //이벤트 편집할 이벤트 투표 가져오기
+  const GetEditEventVote = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventVote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      setVotes(data);
+      if (data && data.length > 0) {
+        setVotes(data);
+        setShowVoteSection(true);
+      } else {
+        setShowVoteSection(false);
+      }
+      //console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //이벤트 편집할 이벤트 이미지 가져오기
+  const GetEditEventImage = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      setSelectedImages(data);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
 
   //Date 타입의 문자열을 sql문에 넣을 수 있게 변환하는 함수.
   const formatDateToSQL = (date: Date) => {
@@ -86,21 +165,21 @@ const EventRegistrationScreen = ({ route }: any) => {
   // 투표 옵션 추가 함수
   const handleAddVote = () => {
     if (votes.length < 5) {
-      setVotes(prevVotes => [...prevVotes, { id: prevVotes.length + 1, text: '' }]);
+      setVotes(prevVotes => [...prevVotes, { vote_index: prevVotes.length + 1, vote_name: '' }]);
     }
   };
 
   // 투표 옵션 변경 함수
   const handleVoteChange = (id: number, text: string) => {
     const newVotes = votes.map(vote =>
-      vote.id === id ? { ...vote, text } : vote
+      vote.vote_index === id ? { ...vote, text } : vote
     );
     setVotes(newVotes);
   };
 
   // 투표 옵션 삭제 함수
   const handleDeleteVote = (id: number) => {
-    const newVotes = votes.filter(vote => vote.id !== id);
+    const newVotes = votes.filter(vote => vote.vote_index !== id);
     setVotes(newVotes);
     if (newVotes.length < 2) {
       setShowVoteSection(false);
@@ -112,8 +191,8 @@ const EventRegistrationScreen = ({ route }: any) => {
     setShowVoteSection(true);
     if (votes.length <= 1) {
       setVotes([
-        { id: 1, text: '' },
-        { id: 2, text: '' }
+        { vote_index: 1, vote_name: '' },
+        { vote_index: 2, vote_name: '' }
       ]);
     }
   };
@@ -138,7 +217,7 @@ const EventRegistrationScreen = ({ route }: any) => {
   // 제출 처리 함수
   const handleSubmit = async () => {
     if (title.trim() !== '' && content.trim() !== '') {
-      if (!showVoteSection || (showVoteSection && votes.every(vote => vote.text.trim() !== ''))) {
+      if (!showVoteSection || (showVoteSection && votes.every(vote => vote.vote_name.trim() !== ''))) {
         // Validate start date and end date
         if (startDate <= endDate) {
           const submittedData = {
@@ -146,7 +225,7 @@ const EventRegistrationScreen = ({ route }: any) => {
             content,
             simpleInfo,
             grantPoint,
-            votes: showVoteSection ? votes.map(vote => vote.text.trim()) : [],
+            votes: showVoteSection ? votes.map(vote => vote.vote_name.trim()) : [],
             images: selectedImages.map(image => image.uri),
             startDate,
             endDate
@@ -394,17 +473,17 @@ const EventRegistrationScreen = ({ route }: any) => {
             <View style={[styles.inputArea, { marginTop: 0 }]}>
               <Text style={styles.inputText}>투표 옵션</Text>
               {votes.map((vote, index) => (
-                <View key={vote.id}
+                <View key={vote.vote_index}
                   style={[styles.inputBox, styles.voteOptionArea]}>
                   <TextInput
                     style={styles.input}
                     placeholder={`옵션 ${index + 1}`}
                     placeholderTextColor={'gray'}
                     maxLength={50}
-                    value={vote.text}
-                    onChangeText={(text) => handleVoteChange(vote.id, text)}
+                    value={vote.vote_name}
+                    onChangeText={(text) => handleVoteChange(vote.vote_index, text)}
                   />
-                  <TouchableOpacity onPress={() => handleDeleteVote(vote.id)}>
+                  <TouchableOpacity onPress={() => handleDeleteVote(vote.vote_index)}>
                     <IconTrash name='trash' size={22} color='red' style={styles.icon} />
                   </TouchableOpacity>
                 </View>
@@ -433,7 +512,7 @@ const EventRegistrationScreen = ({ route }: any) => {
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
             {selectedImages.map((image, index) => (
               <View key={index} style={styles.fileInfo}>
-                <Image source={{ uri: image.uri }} style={styles.imagePreview} />
+                <Image source={{ uri : `${config.photoUrl}/${image?.event_photo}.png` }} style={styles.imagePreview} />
                 <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
                   <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
                 </TouchableOpacity>
@@ -509,7 +588,6 @@ const EventRegistrationScreen = ({ route }: any) => {
             <Text style={{ color: 'black' }}>종료 날짜: {format(new Date(submittedData.endDate), 'PPP',)}</Text>
           </View>
         )}
-
       </ScrollView>
       <View style={{ height: 100 }} />
     </View>
@@ -657,4 +735,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventRegistrationScreen;
+export default EventEditScreen;
