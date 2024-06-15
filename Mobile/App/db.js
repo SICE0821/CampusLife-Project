@@ -2211,6 +2211,23 @@ async function RegistorEventVotes(event_id, votes) {
     try {
         conn = await pool.getConnection();
         for (const vote of votes) {
+            const { vote_index, vote_name } = vote;
+            const query = `INSERT INTO event_vote(event_id, vote_name, vote_count, vote_index) VALUES (?, ?, 0, ?)`
+            const result = await conn.query(query, [event_id, vote_name, vote_index]);
+        }
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
+async function RegistorEventVotesAdmin(event_id, votes) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        for (const vote of votes) {
             const { id, text } = vote;
             const query = `INSERT INTO event_vote(event_id, vote_name, vote_count, vote_index) VALUES (?, ?, 0, ?)`
             const result = await conn.query(query, [event_id, text, id]);
@@ -2328,6 +2345,21 @@ async function GetEditEventImage(event_id) {
     }
 }
 
+//해당 이벤트 초기화 후 다시 행삽입
+async function DeleteEvent(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `DELETE FROM event WHERE event_id = ?`
+            , [event_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -2432,5 +2464,7 @@ module.exports = {
     GetEventList,
     GetEditEventInfo,
     GetEditEventVote,
-    GetEditEventImage
+    GetEditEventImage,
+    DeleteEvent,
+    RegistorEventVotesAdmin,
 };

@@ -40,6 +40,7 @@ const EventEditScreen = ({ route }: any) => {
   const [showVoteSection, setShowVoteSection] = useState(false); // 투표 섹션 표시 여부
   const [submittedData, setSubmittedData] = useState<any>(null); // 제출된 데이터
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
+  const [serverImages, setServerImages] = useState<any[]>([]); //서버에서 가져온다 이미지를 담는다.
   const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 선택된 이미지를 폼데이터에 저장
   const [editEventInfo, setEditEventInfo] = useState<EditEventInfo>();
 
@@ -125,12 +126,44 @@ const EventEditScreen = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      setSelectedImages(data);
+      setServerImages(data);
+      //setSelectedImages(data);
       console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
     }
+  }
+
+  //해당 이벤트 초기화 후 다시 행삽입
+  const DeleteEvent= async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/DeleteEvent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //기존의 이미지 배열과 새로운 데이터의 이미지 배열을 합칠거임
+  const chagneImageArray = (addImage : any) => {
+    const ChangeServerImageArray = serverImages.map(photo => photo.event_photo);
+    console.log(ChangeServerImageArray);
+
+    const combinedImageArray = ChangeServerImageArray.concat(addImage);
+    console.log('결합된 이미지 배열:', combinedImageArray);
+
+    return combinedImageArray;
   }
 
   //Date 타입의 문자열을 sql문에 넣을 수 있게 변환하는 함수.
@@ -171,8 +204,9 @@ const EventEditScreen = ({ route }: any) => {
 
   // 투표 옵션 변경 함수
   const handleVoteChange = (id: number, text: string) => {
+    console.log(id);
     const newVotes = votes.map(vote =>
-      vote.vote_index === id ? { ...vote, text } : vote
+      vote.vote_index === id ? { ...vote, vote_name: text } : vote
     );
     setVotes(newVotes);
   };
@@ -205,14 +239,28 @@ const EventEditScreen = ({ route }: any) => {
 
   const EventRegister = () => {
     Alert.alert(
-      "이벤트 등록!",
-      "정말로 이대로 이벤트를 등록 하시겠습니까??",
+      "이벤트 편집!",
+      `정말로 이대로 이벤트를 편집 하시겠습니까??
+주의!!(해당 이벤트를 작성한 유저 정보가 삭제됩니다)`,
       [
         { text: "취소", style: "cancel" },
-        { text: "확인", onPress: () => handleSubmit() }
+        { text: "확인", onPress: () => {
+          good404();
+          handleSubmit(); }}
       ]
     );
   };
+
+  const good404 = () => {
+    Alert.alert(
+      "이벤트 편집 성공!!",
+      `이벤트 편집이 성공적으로 마무리 되었습니다!!`,
+      [
+        { text: "확인" }
+      ]
+    );
+  };
+
 
   // 제출 처리 함수
   const handleSubmit = async () => {
@@ -240,12 +288,15 @@ const EventEditScreen = ({ route }: any) => {
           setVotes([]);
           setShowVoteSection(false);
           setSelectedImages([]);
-
           hideVoteOptions();
+
+
+          DeleteEvent();  
           const event_pk_string = await RegistorEvent(); //우선 이벤트 등록으로 등록된 이벤트의 PK값을 받아옴
           const event_pk = parseInt(event_pk_string);
           const event_photo = await uploadImages();  //사진을 서버에 업로드
-          RegistorEventPhoto(event_pk, event_photo);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
+          const newImageArray = chagneImageArray(event_photo);
+          RegistorEventPhoto(event_pk, newImageArray);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
           RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
         } else {
           Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
@@ -283,13 +334,23 @@ const EventEditScreen = ({ route }: any) => {
       }
     });
   };
-  // 이미지 삭제 함수
-  const handleImageRemove = (index: number) => {
-    const updatedImages = selectedImages.filter((_, i) => i !== index);
-    setSelectedImages(updatedImages);
+
+  // 선택한 이미지 삭제 함수
+  const handleSelectedImageRemove = (index: number) => {
+    const updatedSelectedImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(updatedSelectedImages);
 
     const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
     setSelectedFormImages(updatedFormImages);
+
+    console.log("로컬 이미지 배열 삭제")
+  };
+
+  // 서버에서 가져온 이미지 삭제 함수
+  const handleServerImageRemove = (index: number) => {
+    const updatedServerImages = serverImages.filter((_, i) => i !== index);
+    setServerImages(updatedServerImages);
+    console.log("서버 이미지 배열 삭제")
   };
 
   // 이미지 업로드 함수
@@ -346,8 +407,9 @@ const EventEditScreen = ({ route }: any) => {
 
   //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
   const RegistorEventVotes = async (event_id: number) => {
+    console.log(votes)
     try {
-      const response = await fetch(`${config.serverUrl}/RegistorEventVotes`, {
+      const response = await fetch(`${config.serverUrl}/RegistorEventVotesEdit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -472,12 +534,12 @@ const EventEditScreen = ({ route }: any) => {
           {showVoteSection && (
             <View style={[styles.inputArea, { marginTop: 0 }]}>
               <Text style={styles.inputText}>투표 옵션</Text>
-              {votes.map((vote, index) => (
+              {votes.map((vote) => (
                 <View key={vote.vote_index}
                   style={[styles.inputBox, styles.voteOptionArea]}>
                   <TextInput
                     style={styles.input}
-                    placeholder={`옵션 ${index + 1}`}
+                    placeholder={`옵션 ${vote.vote_index + 1}`}
                     placeholderTextColor={'gray'}
                     maxLength={50}
                     value={vote.vote_name}
@@ -510,10 +572,18 @@ const EventEditScreen = ({ route }: any) => {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+            {serverImages.map((image, index) => (
+              <View key={`server-${index}`} style={styles.fileInfo}>
+                <Image source={{ uri: `${config.photoUrl}/${image.event_photo}.png` }} style={styles.imagePreview} />
+                <TouchableOpacity onPress={() => handleServerImageRemove(index)} style={styles.cancelButton}>
+                  <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+                </TouchableOpacity>
+              </View>
+            ))}
             {selectedImages.map((image, index) => (
               <View key={index} style={styles.fileInfo}>
-                <Image source={{ uri : `${config.photoUrl}/${image?.event_photo}.png` }} style={styles.imagePreview} />
-                <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
+                <Image source={{ uri: image.uri }} style={styles.imagePreview} />
+                <TouchableOpacity onPress={() => handleSelectedImageRemove(index)} style={styles.cancelButton}>
                   <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
                 </TouchableOpacity>
               </View>

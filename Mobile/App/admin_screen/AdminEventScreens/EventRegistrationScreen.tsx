@@ -268,7 +268,7 @@ const EventRegistrationScreen = ({ route }: any) => {
   //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
   const RegistorEventVotes = async (event_id: number) => {
     try {
-      const response = await fetch(`${config.serverUrl}/RegistorEventVotes`, {
+      const response = await fetch(`${config.serverUrl}/RegistorEventVotesRegistor`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

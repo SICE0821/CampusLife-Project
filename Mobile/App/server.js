@@ -103,6 +103,8 @@ const { getGeneralPosts,
   GetEditEventInfo,
   GetEditEventVote,
   GetEditEventImage,
+  DeleteEvent,
+  RegistorEventVotesAdmin
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1854,11 +1856,24 @@ app.post('/RegistorEvent', async (req, res) => {
 });
 
 //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
-app.post('/RegistorEventVotes', async (req, res) => {
+app.post('/RegistorEventVotesEdit', async (req, res) => {
   const { event_id, votes } = req.body;
   //console.log(event_id);
   try {
     await RegistorEventVotes(event_id, votes);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
+app.post('/RegistorEventVotesRegistor', async (req, res) => {
+  const { event_id, votes } = req.body;
+  //console.log(event_id);
+  try {
+    await RegistorEventVotesAdmin(event_id, votes);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
@@ -1975,6 +1990,19 @@ app.post('/GetEditEventImage', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+//해당 이벤트 초기화 후 다시 행삽입
+app.post('/DeleteEvent', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    await DeleteEvent(event_id);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 //서버 시작
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/`);

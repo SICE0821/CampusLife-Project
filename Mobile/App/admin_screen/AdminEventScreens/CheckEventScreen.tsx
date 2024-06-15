@@ -45,17 +45,39 @@ const CheckEventScreen = ({ route, navigation }: any) => {
       }
     }
 
+  
+  //해당 이벤트 초기화 후 다시 행삽입
+  const DeleteEvent= async (eventId : any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/DeleteEvent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      //GetEventList();
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
   const handleEditEvent = (eventId: number) => {
     navigation.navigate("EventEditScreen", {userdata, eventId})
   };
 
   const handleDeleteEvent = (eventId: number) => {
     Alert.alert(
-      "Delete Event",
-      "Are you sure you want to delete this event?",
+      "이벤트 삭제",
+      "해당 이벤트를 정말 삭제 하시겠습니까??",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "OK", onPress: () => console.log(`Event with ID: ${eventId} deleted`) }
+        { text: "OK", onPress: () => {
+          DeleteEvent(eventId)
+          GetEventList()} }
       ]
     );
   };
