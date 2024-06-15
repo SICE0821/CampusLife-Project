@@ -11,6 +11,7 @@ import ReportPostsScreen from '../AdminReportPostScreens/ReportPostsScreen';
 import CheckRegistItemScreen from '../AdminRegisterItemScreen/CheckRegistItemScreen';
 import RegisterItemScreen from '../AdminRegisterItemScreen/RegisterItemScreen';
 import EditItemScreen from '../AdminRegisterItemScreen/EditItemScreen';
+import EventEditScreen from '../AdminEventScreens/EventEditScreen';
 import IconD from 'react-native-vector-icons/AntDesign';
 import ManagementUserScreen from '../managementUserScreen';
 
@@ -94,6 +95,24 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
+                }} />
+            
+            <AdminEventStack.Screen name="EventEditScreen"
+                initialParams={{ userdata }}
+                component={EventEditScreen}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate("CheckEventScreen")}>
+                            <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이벤트 편집',
                 }} />
         </AdminEventStack.Navigator>
     );

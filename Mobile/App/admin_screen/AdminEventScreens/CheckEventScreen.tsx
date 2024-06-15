@@ -1,8 +1,10 @@
-import React from 'react';
 import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import React, { useState } from 'react';
 import Icon_event from 'react-native-vector-icons/MaterialCommunityIcons';
-
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { UserData, AdminEventList } from '../../types/type'
 const width = Dimensions.get("window").width;
+import config from '../../config';
 
 const eventData = [
   { id: 1, image: require('../../assets/friend3.png'), title: 'Event Name 1', content: 'Event Content 1' },
@@ -12,8 +14,39 @@ const eventData = [
 
 const CheckEventScreen = ({ route, navigation }: any) => {
   const { userdata } = route.params;
+  const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
+  const [eventList, setEventList] = useState<AdminEventList[]>([]); //유저 데이터
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setUserData(userdata);
+      GetEventList();
+    }, [])
+  );
+
+    //설정한 이벤트 보여주기
+    const GetEventList = async () => {
+      try {
+        const response = await fetch(`${config.serverUrl}/GetEventList`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            campus_id : userData.campus_pk
+          }),
+        })
+        const data = await response.json();
+        setEventList(data);
+        //console.log(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+      }
+    }
+
   const handleEditEvent = (eventId: number) => {
-    Alert.alert("Edit Event", `Edit event with ID: ${eventId}`);
+    navigation.navigate("EventEditScreen", {userdata, eventId})
   };
 
   const handleDeleteEvent = (eventId: number) => {
@@ -40,21 +73,22 @@ const CheckEventScreen = ({ route, navigation }: any) => {
         </TouchableOpacity>
       </View>
       <ScrollView>
-        {eventData.map((event) => (
-          <View key={event.id} style={styles.eventBox}>
+        {eventList?.map((event) => (
+          <View key={event.event_id} style={styles.eventBox}>
             <View style={styles.eventImageArea}>
-              <Image style={styles.image} source={event.image} />
+              <Image style={styles.image} source={{ uri: `${config.photoUrl}/${event?.event_photo}.png` }} />
             </View>
             <View style={styles.eventInfo}>
               <View style={styles.eventInfoTextArea}>
-                <Text style={styles.eventTitle}>{event.title}</Text>
-                <Text style={styles.eventContent}>{event.content}</Text>
+                <Text style={styles.eventTitle}>{event.name}</Text>
+                <Text style={styles.eventContent}>{event.info}</Text>
+                <Text style={styles.DeadLineDate}>{event.start_date} ~ {event.close_date}</Text>
               </View>
               <View style={styles.eventBoxBtnArea}>
-                <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleEditEvent(event.id)}>
+                <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleEditEvent(event.event_id)}>
                   <Text style={styles.eventBoxBtnText}>이벤트 수정</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleDeleteEvent(event.id)}>
+                <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleDeleteEvent(event.event_id)}>
                   <Text style={styles.eventBoxBtnText}>이벤트 삭제</Text>
                 </TouchableOpacity>
               </View>
@@ -138,6 +172,11 @@ const styles = StyleSheet.create({
   eventContent: {
     color: 'black',
     fontSize: 14,
+  },
+  DeadLineDate: {
+    color: 'grey',
+    marginTop : 10,
+    fontSize: 15,
   },
   eventBoxBtnArea: {
     width: '100%',

@@ -465,20 +465,20 @@ async function getdeparmentpostdata(department_id) {
     try {
         conn = await pool.getConnection();
         const query = ("SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check "
-        + "FROM "
-        + "post "
-        + "LEFT JOIN "
-        + "user "
-        + "ON post.user_id = user.user_id "
-        + "LEFT JOIN "
-        + "student "
-        + "ON user.student_id = student.student_id "
-        + "WHERE "
-        + "post.department_check = 1 AND post.inform_check = 1 AND student.department_id = ? "
-        + "ORDER BY post.date DESC "
-        + "LIMIT 5")
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 1 AND post.inform_check = 1 AND student.department_id = ? "
+            + "ORDER BY post.date DESC "
+            + "LIMIT 5")
         const rows = await conn.query(query, [department_id])
-        ;
+            ;
         return rows;
     } catch (err) {
         throw err;
@@ -1240,7 +1240,7 @@ async function view_count_up(post_id) {
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
-} 
+}
 
 async function post_comment(post_id, user_id, contents) {
     let conn;
@@ -1500,7 +1500,7 @@ async function getCampus(campus_id) {
     }
 }
 
-async function insert_student_study_room(student , study_room, study_room_date, study_room_time) {
+async function insert_student_study_room(student, study_room, study_room_date, study_room_time) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -1679,17 +1679,17 @@ async function addHotAram(user_id, target_id) {
 async function allUser_id() {
     let conn;
     try {
-      conn = await pool.getConnection();
-      const userIds = await conn.query('SELECT user_id FROM user');
-      return userIds
+        conn = await pool.getConnection();
+        const userIds = await conn.query('SELECT user_id FROM user');
+        return userIds
     } catch (err) {
-      console.error(err);
+        console.error(err);
     } finally {
-      if (conn) conn.release();
+        if (conn) conn.release();
     }
-  }
+}
 
-  async function addLikeAram(user_id, target_id) {
+async function addLikeAram(user_id, target_id) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -1771,20 +1771,20 @@ async function get_invite_num(friend_code) {
 async function allUser_friend_code(user_id) {
     let conn;
     try {
-      conn = await pool.getConnection();
-      const query = (
-        'SELECT friend_code FROM user_friend_code WHERE user_id = ?'
+        conn = await pool.getConnection();
+        const query = (
+            'SELECT friend_code FROM user_friend_code WHERE user_id = ?'
         );
-      const user_friend_code = await conn.query(query, [user_id]);
-      return user_friend_code
+        const user_friend_code = await conn.query(query, [user_id]);
+        return user_friend_code
     } catch (err) {
-      console.error(err);
+        console.error(err);
     } finally {
-      if (conn) conn.release();
+        if (conn) conn.release();
     }
-  }
+}
 
-  async function addFriend_Code(user_id, friend_code, user_name) {
+async function addFriend_Code(user_id, friend_code, user_name) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -1819,15 +1819,15 @@ async function Friend_code_User_id(friend_code) {
 async function allUser_Friend_code2() {
     let conn;
     try {
-      conn = await pool.getConnection();
-      const userallfriendcode = await conn.query('SELECT friend_code FROM user');
-      return userallfriendcode
+        conn = await pool.getConnection();
+        const userallfriendcode = await conn.query('SELECT friend_code FROM user');
+        return userallfriendcode
     } catch (err) {
-      console.error(err);
+        console.error(err);
     } finally {
-      if (conn) conn.release();
+        if (conn) conn.release();
     }
-  }
+}
 
 async function last_friendCode_Info(user_pk) {
     let conn;
@@ -1881,7 +1881,7 @@ async function Get_Event_Data(campus_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-           `SELECT * FROM event WHERE EVENT.campus_id = ?`
+            `SELECT * FROM event WHERE EVENT.campus_id = ?`
         );
         const row = await conn.query(query, [campus_id]);
         return row;
@@ -1898,7 +1898,7 @@ async function Get_Event_Photos(event_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-           `SELECT event_photo.event_photo FROM event_photo WHERE event_photo.event_id = ?`
+            `SELECT event_photo.event_photo FROM event_photo WHERE event_photo.event_id = ?`
         );
         const row = await conn.query(query, [event_id]);
         console.log(row);
@@ -2017,7 +2017,7 @@ async function is_user_post_like(user_id, post_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-           `SELECT * FROM is_user_post_like WHERE post_id = ? AND user_id = ?`
+            `SELECT * FROM is_user_post_like WHERE post_id = ? AND user_id = ?`
         );
         const row = await conn.query(query, [post_id, user_id]);
         console.log(row);
@@ -2096,8 +2096,8 @@ async function ChangeItemInfo(origin_name, name, price, using_time, image_num, e
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = 
-        `UPDATE event_object
+        const query =
+            `UPDATE event_object
          SET name = ?, 
              price = ?,
              using_time = ?,
@@ -2210,10 +2210,10 @@ async function RegistorEventVotes(event_id, votes) {
     let conn;
     try {
         conn = await pool.getConnection();
-        for(const vote of votes) {
+        for (const vote of votes) {
             const { id, text } = vote;
-            const query = `INSERT INTO event_vote(event_id, vote_name, vote_count) VALUES (?, ?, 0)`
-            const result = await conn.query(query, [event_id, text, 0]);
+            const query = `INSERT INTO event_vote(event_id, vote_name, vote_count, vote_index) VALUES (?, ?, 0, ?)`
+            const result = await conn.query(query, [event_id, text, id]);
         }
     } catch (err) {
         console.error('Error inserting data:', err);
@@ -2223,13 +2223,13 @@ async function RegistorEventVotes(event_id, votes) {
 }
 
 //이벤트 테이블에 연결되어있는 이미지 테이블에 행삽입
-async function RegistorEventPhoto(event_pk, event_photo) {
+async function RegistorEventPhoto(event_id, event_photo) {
     let conn;
     try {
         conn = await pool.getConnection();
-        for(const one_photo of event_photo) {
+        for (const one_photo of event_photo) {
             const query = `INSERT INTO event_photo(event_id, event_photo) VALUES (?, ?)`
-            const result = await conn.query(query, [event_pk, one_photo]);
+            const result = await conn.query(query, [event_id, one_photo]);
         }
     } catch (err) {
         console.error('Error inserting data:', err);
@@ -2238,12 +2238,103 @@ async function RegistorEventPhoto(event_pk, event_photo) {
     }
 }
 
+//현재 남은 제고의 아이템 수를 얻기위함
+async function GetEventList(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+        `SELECT
+            e.event_id,
+            e.name,
+            e.info,
+            e.campus_id,
+            e.start_date,
+            e.close_date,
+            ep.event_photo
+        FROM
+            event e
+        JOIN
+            (
+                SELECT
+                    ep1.event_id,
+                    MIN(ep1.event_photo) AS min_event_photo -- MIN 함수로 변경
+                FROM
+                    event_photo ep1
+                GROUP BY
+                    ep1.event_id
+            ) ep_min ON e.event_id = ep_min.event_id
+        JOIN
+            event_photo ep ON ep.event_id = ep_min.event_id AND ep.event_photo = ep_min.min_event_photo
+        WHERE
+            e.campus_id = ?
+        ORDER BY
+            e.event_id DESC;`
+            , [campus_id]);
+        return rows;
+
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//편집할 이벤트 정보 가져오기
+async function GetEditEventInfo(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM event WHERE event_id = ?`
+            , [event_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//이벤트 편집할 이벤트 투표 가져오기
+async function GetEditEventVote(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM event_vote WHERE event_id = ?`
+            , [event_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//이벤트 편집할 이벤트 이미지 가져오기
+async function GetEditEventImage(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM event_photo WHERE event_id = ?`
+            , [event_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
     getDepartmentPosts,
     gethotpostdata,
-    getdeparmentpostdata, 
+    getdeparmentpostdata,
     getschoolpostdata,
     insertDataIntoDB,
     getuserpk,
@@ -2338,4 +2429,8 @@ module.exports = {
     RegistorEvent,
     RegistorEventVotes,
     RegistorEventPhoto,
+    GetEventList,
+    GetEditEventInfo,
+    GetEditEventVote,
+    GetEditEventImage
 };

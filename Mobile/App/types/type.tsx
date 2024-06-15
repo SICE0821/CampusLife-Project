@@ -166,3 +166,29 @@ export type EventData = {
     photo_data : string
   }[];
 }
+
+export type AdminEventList = {
+  event_id : number,
+  name : string,
+  info : string,
+  campus_id : number,
+  event_photo : string,
+  start_date : string,
+  close_date  : string
+};
+
+export type EditEventInfo = {
+  event_id : number,
+  campus_id : number,
+  name : string,
+  get_point : number,
+  info : string,
+  simple_info : string,
+  start_date : string,
+  close_date : string,
+}
+
+export type EditEventVote = {
+  vote_index : number,
+  vote_name : string,
+}

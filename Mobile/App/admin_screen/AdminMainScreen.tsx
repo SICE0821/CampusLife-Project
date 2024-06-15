@@ -235,14 +235,14 @@ const AdminMainScreen = ({ navigation, route }: any) => {
       }
   
       const photoList = await photoResponse.json();
-      console.log(photoList);
+      //console.log(photoList);
       
       const eventDataWithPhotos = {
         ...eventData,
         photo_list: photoList
       };
   
-      console.log(eventDataWithPhotos);
+      //console.log(eventDataWithPhotos);
       setEventData(eventDataWithPhotos);
     } catch (error) {
       console.error(error);
