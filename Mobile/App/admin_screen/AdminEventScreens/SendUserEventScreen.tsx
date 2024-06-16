@@ -14,10 +14,24 @@ const eventName = [
   { id: 3, name: '이벤트 3' },
 ];
 
+type EventVoteInfo = {
+  id: number;
+  vote1: string;
+  vote2: string;
+  vote3: string;
+  vote4: string;
+  vote5: string;
+  [key: string]: any;  // Index signature
+}
+
+const eventVoteInfo: EventVoteInfo[] = [
+  { id: 1, vote1: '투표 내용 1', vote2: '투표 내용 2', vote3: '투표 내용 3', vote4: '투표 내용 4', vote5: '투표 내용 5' }
+];
+
 const takePartInfo = [
-  { userName: '홍길동', userId: 'asdasdasdadada', eventId: 1, sendText: '이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1', sendFile: [require('../../assets/event1.jpg'), require('../../assets/event2.png'), require('../../assets/event1.jpg'), require('../../assets/event2.png'), require('../../assets/event1.jpg'), require('../../assets/AttendanceCheckEvent.jpg')] },
-  { userName: '남도현', userId: 'basdasdasdadsbbb', eventId: 2, sendText: '이벤트 참여 내용 2', sendFile: [require('../../assets/event2.png')] },
-  { userName: '정유환', userId: 'aaaa', eventId: 1, sendText: '이벤트 참여 내용 3', sendFile: [require('../../assets/event1.jpg')] },
+  { userName: '홍길동', userId: 'asdasdasdadada', eventId: 1, sendText: '이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1', sendFile: [require('../../assets/event1.jpg'), require('../../assets/event2.png'), require('../../assets/event1.jpg'), require('../../assets/event2.png'), require('../../assets/event1.jpg'), require('../../assets/AttendanceCheckEvent.jpg')], vote: 1 },
+  { userName: '남도현', userId: 'basdasdasdadsbbb', eventId: 2, sendText: '이벤트 참여 내용 2', sendFile: [require('../../assets/event2.png')], vote: 2 },
+  { userName: '정유환', userId: 'aaaa', eventId: 1, sendText: '이벤트 참여 내용 3', sendFile: [require('../../assets/event1.jpg')], vote: 3 },
 ];
 
 const SendUserEventScreen = ({ route }: any) => {
@@ -122,12 +136,16 @@ const SendUserEventScreen = ({ route }: any) => {
     setSelectedEventImages([]);
   };
 
+  const truncateEventName = (name: string) => {
+    return name.length > 20 ? name.substring(0, 20) + '...' : name;
+  };
+
   const filteredEvents = userSendEventData.filter(event => event.event_id === selectedEventId);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.pickerArea}>
-        <Text style={styles.pickerText}>선택한 이벤트 : </Text>
+        <Text style={styles.pickerText}>선택한 이벤트 :</Text>
         <View style={styles.pickerBox}>
           <Picker
             selectedValue={selectedEventId}
@@ -136,8 +154,8 @@ const SendUserEventScreen = ({ route }: any) => {
             dropdownIconColor={'black'}
             dropdownIconRippleColor={'gray'}
           >
-            {eventList.map(event => (
-              <Picker.Item key={event.event_id} label={event.name} value={event.event_id} style={{ color: 'black' }} />
+            {eventName.map(event => (
+              <Picker.Item key={event.id} label={truncateEventName(event.name)} value={event.id} style={{ color: 'black' }} />
             ))}
           </Picker>
         </View>
@@ -145,19 +163,20 @@ const SendUserEventScreen = ({ route }: any) => {
       {filteredEvents.length > 0 ? (
         filteredEvents.map((event, index) => (
           <View key={index} style={styles.eventBox}>
-            <TouchableOpacity style={styles.topInfoArea}
-            onPress={ () => {
-              console.log(event.photodata);
-              console.log(event.content);
-            }}>
+            <View style={styles.topInfoArea}>
               <Text style={styles.eventName}>{eventList.find(item => item.event_id === event.event_id)?.name}</Text>
               <View style={styles.userInfoArea}>
                 <Text style={styles.userInfoText}>이름: {event.user_name}</Text>
                 <Text style={styles.userInfoText}>아이디: {event.user_login_id}</Text>
               </View>
-            </TouchableOpacity>
+            </View>
 
             <Text style={styles.sendText}>{event.content}</Text>
+            {eventVoteInfo.find(vote => vote.id === event.eventId) && (
+              <Text style={styles.voteText}>
+                {`투표 내용: ${eventVoteInfo.find(vote => vote.id === event.eventId)?.[`vote${event.vote}`] ?? '투표 정보 없음'}`}
+              </Text>
+            )}
             <ScrollView horizontal={true} style={styles.imageContainer}>
               {event.photodata && Array.isArray(event.photodata) && event.photodata.map((file, idx) => (
                 <TouchableOpacity key={idx} onPress={() => {
@@ -315,6 +334,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  voteText: {
+    color: 'black',
+    fontSize: 16,
+    marginTop: 10,
+    fontWeight: 'bold',
   },
 });
 

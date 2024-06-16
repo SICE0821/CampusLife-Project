@@ -9,7 +9,16 @@ import config from '../../config';
 const eventData = [
   { id: 1, image: require('../../assets/friend3.png'), title: 'Event Name 1', content: 'Event Content 1' },
   { id: 2, image: require('../../assets/friend3.png'), title: 'Event Name 2', content: 'Event Content 2' },
+];
 
+const voteInfo = [
+  { id: 1, votes: ['투표 항목1', '투표 항목2', '투표 항목3', '투표 항목4', '투표 항목5'] },
+  { id: 2, votes: ['투표 항목1', '투표 항목2'] },
+];
+
+const voteData = [
+  { id: 1, results: [50, 12, 43, 52, 1] },
+  { id: 2, results: [21, 12] },
 ];
 
 const CheckEventScreen = ({ route, navigation }: any) => {
@@ -80,6 +89,15 @@ const CheckEventScreen = ({ route, navigation }: any) => {
           GetEventList()} }
       ]
     );
+  };
+
+  const calculatePercentages = (votes: any[], results: any[]) => {
+    const totalVotes = results.reduce((acc, count) => acc + count, 0);
+    return votes.map((vote, index) => ({
+      vote,
+      count: results[index],
+      percentage: totalVotes === 0 ? 0 : (results[index] / totalVotes) * 100
+    }));
   };
 
   return (
@@ -163,13 +181,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 15,
     marginVertical: 5,
-    elevation: 5
+    elevation: 5,
   },
   eventImageArea: {
     backgroundColor: '#dddddd',
     width: 150,
     height: 150,
-    alignSelf: 'center',
+    alignSelf: 'flex-start',
     borderRadius: 15
   },
   image: {
@@ -203,7 +221,8 @@ const styles = StyleSheet.create({
   eventBoxBtnArea: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginTop: 5
   },
   eventBoxBtn: {
     backgroundColor: 'skyblue',
