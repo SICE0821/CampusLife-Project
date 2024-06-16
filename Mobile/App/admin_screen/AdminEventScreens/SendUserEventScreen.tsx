@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, Text, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { Picker } from '@react-native-picker/picker';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { UserData, AdminEventList, UserSendEventWithPhoto, UserSendEventPhotoData } from '../../types/type'
+import config from '../../config';
 
 const width = Dimensions.get("window").width;
 
@@ -17,12 +20,96 @@ const takePartInfo = [
   { userName: '정유환', userId: 'aaaa', eventId: 1, sendText: '이벤트 참여 내용 3', sendFile: [require('../../assets/event1.jpg')] },
 ];
 
-const SendUserEventScreen = () => {
+const SendUserEventScreen = ({ route }: any) => {
+  const { userdata } = route.params;
+  //console.log(userdata);
+  const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedEventImages, setSelectedEventImages] = useState([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0); //유저 이벤트 사진을 선택했을때 인덱스 저장공간
+  const [selectedEventImages, setSelectedEventImages] = useState<UserSendEventPhotoData[]>([]); //유저 이벤트 사진을 선택했을때 저장공간
   const [selectedEventId, setSelectedEventId] = useState(eventName[0].id);
+  const [userSendEventData, setUserSendEventData] = useState<UserSendEventWithPhoto[]>([]);
+  const [eventList, setEventList] = useState<AdminEventList[]>([]); //이벤트 리스트
 
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setUserData(userdata);
+      GetEventList();
+      GetUserSendEvent();
+    }, [])
+  );
+
+  //유저의 이벤트 목록 가져오기
+  const GetUserSendEvent = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetUserSendEvent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id : userData.campus_pk
+        }),
+      })
+      const data = await response.json();
+      const UserSendEventWithPhoto = await Promise.all(
+        data.map(async (eventData : any) => {
+            const photoData = await GetUserEventPhoto(eventData.event_id, eventData.user_id);
+            return { ...eventData, photodata: photoData };
+        })
+    );
+    console.log(JSON.stringify(UserSendEventWithPhoto, null, 2));
+    //console.log(UserSendEventWithPhoto);
+    setUserSendEventData(UserSendEventWithPhoto);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+    //유저의 이벤트 목록 중 사진 가져오기
+    const GetUserEventPhoto = async (event_id : any, user_id : any) => {
+      try {
+        const response = await fetch(`${config.serverUrl}/GetUserEventPhoto`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            event_id : event_id,
+            user_id : user_id,
+          }),
+        })
+        const data = await response.json();
+        console.log(data);
+        return data
+      } catch (error) {
+        console.error(error);
+      } finally {
+      }
+    }
+
+  //설정한 이벤트 보여주기
+  const GetEventList = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEventList`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userData.campus_pk
+        }),
+      })
+      const data = await response.json();
+      setEventList(data);
+      //console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
   const handleImagePress = (index: any, images: any) => {
     setSelectedImageIndex(index);
     setSelectedEventImages(images);
@@ -35,7 +122,7 @@ const SendUserEventScreen = () => {
     setSelectedEventImages([]);
   };
 
-  const filteredEvents = takePartInfo.filter(event => event.eventId === selectedEventId);
+  const filteredEvents = userSendEventData.filter(event => event.event_id === selectedEventId);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -49,8 +136,8 @@ const SendUserEventScreen = () => {
             dropdownIconColor={'black'}
             dropdownIconRippleColor={'gray'}
           >
-            {eventName.map(event => (
-              <Picker.Item key={event.id} label={event.name} value={event.id} style={{ color: 'black' }} />
+            {eventList.map(event => (
+              <Picker.Item key={event.event_id} label={event.name} value={event.event_id} style={{ color: 'black' }} />
             ))}
           </Picker>
         </View>
@@ -58,19 +145,26 @@ const SendUserEventScreen = () => {
       {filteredEvents.length > 0 ? (
         filteredEvents.map((event, index) => (
           <View key={index} style={styles.eventBox}>
-            <View style={styles.topInfoArea}>
-              <Text style={styles.eventName}>{eventName.find(item => item.id === event.eventId)?.name}</Text>
+            <TouchableOpacity style={styles.topInfoArea}
+            onPress={ () => {
+              console.log(event.photodata);
+              console.log(event.content);
+            }}>
+              <Text style={styles.eventName}>{eventList.find(item => item.event_id === event.event_id)?.name}</Text>
               <View style={styles.userInfoArea}>
-                <Text style={styles.userInfoText}>이름: {event.userName}</Text>
-                <Text style={styles.userInfoText}>아이디: {event.userId}</Text>
+                <Text style={styles.userInfoText}>이름: {event.user_name}</Text>
+                <Text style={styles.userInfoText}>아이디: {event.user_login_id}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
 
-            <Text style={styles.sendText}>{event.sendText}</Text>
+            <Text style={styles.sendText}>{event.content}</Text>
             <ScrollView horizontal={true} style={styles.imageContainer}>
-              {event.sendFile.map((file, idx) => (
-                <TouchableOpacity key={idx} onPress={() => handleImagePress(idx, event.sendFile)}>
-                  <Image source={file} style={styles.image} />
+              {event.photodata && Array.isArray(event.photodata) && event.photodata.map((file, idx) => (
+                <TouchableOpacity key={idx} onPress={() => {
+                  //console.log(event.photodata);
+                  handleImagePress(idx, event.photodata)
+                  }}>
+                  <Image source={{ uri: `${config.photoUrl}/${file.event_photo}.png` }} style={styles.image} />
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -93,7 +187,7 @@ const SendUserEventScreen = () => {
             <Swiper index={selectedImageIndex} loop={false}>
               {selectedEventImages.map((image, idx) => (
                 <View key={idx} style={styles.slide}>
-                  <Image source={image} style={styles.modalImage} />
+                  <Image source={{ uri: `${config.photoUrl}/${image.event_photo}.png` }} style={styles.modalImage} />
                 </View>
               ))}
             </Swiper>

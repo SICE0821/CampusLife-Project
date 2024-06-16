@@ -15,7 +15,7 @@ const eventData = [
 const CheckEventScreen = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
-  const [eventList, setEventList] = useState<AdminEventList[]>([]); //유저 데이터
+  const [eventList, setEventList] = useState<AdminEventList[]>([]); //이벤트 리스트
 
   useFocusEffect(
     React.useCallback(() => {

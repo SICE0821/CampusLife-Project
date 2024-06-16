@@ -192,3 +192,25 @@ export type EditEventVote = {
   vote_index : number,
   vote_name : string,
 }
+
+export type UserSendEventWithPhoto = {
+  user_send_event : number,
+  user_id : number,
+  event_id : number,
+  time : string,
+  content : string,
+  campus_id : number,
+  user_login_id : number,
+  user_name : string,
+  photodata: {
+    event_id : number,
+    user_id : number,
+    event_photo : string,
+  }[];
+}
+
+export type UserSendEventPhotoData = {
+  event_id : number,
+  user_id : number,
+  event_photo : string,
+}

@@ -104,7 +104,9 @@ const { getGeneralPosts,
   GetEditEventVote,
   GetEditEventImage,
   DeleteEvent,
-  RegistorEventVotesAdmin
+  RegistorEventVotesAdmin,
+  GetUserSendEvent,
+  GetUserEventPhoto
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1996,6 +1998,47 @@ app.post('/DeleteEvent', async (req, res) => {
   const { event_id } = req.body;
   try {
     await DeleteEvent(event_id);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//유저의 이벤트 목록 가져오기
+app.post('/GetUserSendEvent', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await GetUserSendEvent(campus_id);
+    const processedData = rows.map(item => ({
+      user_send_event : item.user_send_event,
+      user_id : item.user_id,
+      event_id : item.event_id,
+      time : item.time,
+      content : item.content,
+      campus_id : item.campus_id,
+      user_login_id : item.id,
+      user_name : item.name
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//유저의 이벤트 목록 중 사진 가져오기
+app.post('/GetUserEventPhoto', async (req, res) => {
+  const { event_id, user_id } = req.body;
+  try {
+    const rows = await GetUserEventPhoto(event_id, user_id);
+    const processedData = rows.map(item => ({
+      event_id : item.event_id,
+      user_id : item.user_id,
+      event_photo : item.event_photo,
+    }));
+    res.json(processedData);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);

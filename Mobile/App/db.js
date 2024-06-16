@@ -2361,6 +2361,58 @@ async function DeleteEvent(event_id) {
     }
 }
 
+//유저의 이벤트 목록 가져오기
+async function GetUserSendEvent(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT 
+                us.user_send_event,
+                us.user_id,
+                us.event_id,
+                us.time,  
+                us.content,
+                e.campus_id,
+                userdata.id,
+                st.name
+            FROM
+                user_send_event us
+            JOIN
+                event e ON us.event_id = e.event_id
+            JOIN
+                \`user\` userdata ON userdata.user_id = us.user_id
+            JOIN
+                student st ON st.student_id = userdata.student_id
+            WHERE 
+                e.campus_id = ? `
+            , [campus_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+
+//유저의 이벤트 목록 중 사진 가져오기
+async function GetUserEventPhoto(event_id, user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT * FROM user_send_event_photo
+             WHERE event_id = ? AND user_id = ?`
+            , [event_id, user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2467,4 +2519,6 @@ module.exports = {
     GetEditEventImage,
     DeleteEvent,
     RegistorEventVotesAdmin,
+    GetUserSendEvent,
+    GetUserEventPhoto
 };
