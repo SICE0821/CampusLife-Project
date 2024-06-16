@@ -118,6 +118,7 @@ const SendUserEventScreen = ({ route }: any) => {
       })
       const data = await response.json();
       setEventList(data);
+      setSelectedEventId(data[0].event_id)
       //console.log(data);
     } catch (error) {
       console.error(error);
@@ -154,8 +155,8 @@ const SendUserEventScreen = ({ route }: any) => {
             dropdownIconColor={'black'}
             dropdownIconRippleColor={'gray'}
           >
-            {eventName.map(event => (
-              <Picker.Item key={event.id} label={truncateEventName(event.name)} value={event.id} style={{ color: 'black' }} />
+            {eventList.map(event => (
+              <Picker.Item key={event.event_id} label={truncateEventName(event.name)} value={event.event_id} style={{ color: 'black' }} />
             ))}
           </Picker>
         </View>
@@ -172,11 +173,6 @@ const SendUserEventScreen = ({ route }: any) => {
             </View>
 
             <Text style={styles.sendText}>{event.content}</Text>
-            {eventVoteInfo.find(vote => vote.id === event.eventId) && (
-              <Text style={styles.voteText}>
-                {`투표 내용: ${eventVoteInfo.find(vote => vote.id === event.eventId)?.[`vote${event.vote}`] ?? '투표 정보 없음'}`}
-              </Text>
-            )}
             <ScrollView horizontal={true} style={styles.imageContainer}>
               {event.photodata && Array.isArray(event.photodata) && event.photodata.map((file, idx) => (
                 <TouchableOpacity key={idx} onPress={() => {

@@ -240,9 +240,9 @@ const DeadlineEventScreen = ({ route }: any) => {
 
         <View style={styles.eventImageArea}>
           <Swiper showsPagination={true} loop={true} removeClippedSubviews={false}>
-            {eventData.photo_list.map((image, index) => (
-              <TouchableOpacity key={index} style={styles.eventImageBox} onPress={() => handleImagePress(image.photo_data)}>
-                <Image style={{ width: width, height: width }} source={{ uri: `${config.photoUrl}/${image.photo_data}.png` }} />
+            {eventData.event_photo.map((image, index) => (
+              <TouchableOpacity key={index} style={styles.eventImageBox} onPress={() => handleImagePress(image.event_photo)}>
+                <Image style={{ width: width, height: width }} source={{ uri: `${config.photoUrl}/${image.event_photo}.png` }} />
               </TouchableOpacity>
             ))}
           </Swiper>

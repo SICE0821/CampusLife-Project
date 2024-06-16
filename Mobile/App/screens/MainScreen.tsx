@@ -374,8 +374,8 @@ const MainPage = ({ navigation, route }: any) => {
                 <TouchableOpacity
                   key={index}
                   onPress={() => 
-                    //navigation.navigate(event.screen, event.params)
-                    console.log(event.imageSource)
+                    navigation.navigate(event.screen, event.params)
+                    //console.log(event.imageSource)
                   }
                   style={styles.eventBox}>
                   <View style={styles.eventImageArea}>
