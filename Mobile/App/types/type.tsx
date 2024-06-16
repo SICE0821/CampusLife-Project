@@ -158,12 +158,12 @@ export type EventData = {
   get_point : number,
   info : string,
   simple_info : string,
-  event_photo : string,
   start_date : string,
   close_date : string,
-  is_event_close : boolean
-  photo_list: {
-    photo_data : string
+  is_event_close : boolean,
+  event_photo : {
+    event_id : number,
+    event_photo : string,
   }[];
 }
 

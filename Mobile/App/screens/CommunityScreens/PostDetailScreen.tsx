@@ -613,7 +613,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                                 <View style={styles.picturebox}>
                                                     <View style={styles.picture}>
                                                         <Image
-                                                            source={{ uri: `${config.photoUrl}/${item?.user_profile}` }}
+                                                            source={{ uri: `${config.photoUrl}/${subitem?.user_profile}` }}
                                                             style={{ width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center', borderWidth: 1 }}
                                                         />
                                                     </View>

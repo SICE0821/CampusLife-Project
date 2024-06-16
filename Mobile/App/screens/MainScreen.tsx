@@ -47,7 +47,7 @@ const MainPage = ({ navigation, route }: any) => {
   const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
-  const [eventData, setEventData] = useState<EventData>();
+  const [eventData, setEventData] = useState<EventData[]>([]);
   const [Userdepartment, setUserDepartment] = useState();
   const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
 
@@ -216,64 +216,73 @@ const MainPage = ({ navigation, route }: any) => {
       if (!response.ok) {
         throw new Error('서버 응답 오류');
       }
-
-      const eventData: EventData = await response.json();
-
-      // photo_list 데이터를 가져오기 위한 추가 작업
-      const photoResponse = await fetch(`${config.serverUrl}/Get_Event_Photos`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          event_id: eventData.event_id,
-        }),
-      });
-
-      if (!photoResponse.ok) {
-        throw new Error('사진 데이터 가져오기 실패');
-      }
-
-      const photoList = await photoResponse.json();
-      console.log(photoList);
-
-      const eventDataWithPhotos = {
-        ...eventData,
-        photo_list: photoList
-      };
-
-      console.log(eventDataWithPhotos);
-      setEventData(eventDataWithPhotos);
+      const eventData = await response.json();
+      const eventsWithImages = await Promise.all(eventData.map(async (event : any) => {
+        const eventImage = await GetEditEventImage(event.event_id);
+        return {
+          ...event,
+          event_photo: eventImage
+        };
+      }));
+      setEventData(eventsWithImages);
+      console.log(JSON.stringify(eventsWithImages, null, 2));
     } catch (error) {
       console.error(error);
     }
   };
 
-  const events = [  // 이벤트 추가 재거는 여기서 
+  
+  //이벤트 이미지 가져오기
+  const GetEditEventImage = async (event_id : number) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: event_id
+        }),
+      })
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+
+
+  const initialEvents  = [  // 이벤트 추가 재거는 여기서 
     {
       screen: "AttendanceCheckEventScreen",
-      imageSource: attendancepng,
+      imageSource: "1718551969957-1718551969312_12",
       label: "출석체크 이벤트!",
       info: "앱을 정기적으로 출석할 시에 포인트를 제공해 드립니다!",
       params: {}
     },
     {
       screen: "FriendCodeEventScreen",
-      imageSource: friendsinvitepng,
+      imageSource: "1718551983124-1718551982503_12",
       label: "친구코드 이벤트!",
       info: "친구에게 나의 코드를 보낼시에 포인트를 제공해 드립니다!",
       params: {}
     },
-    {
-      screen: "DeadlineEventScreen",
-      label: eventData?.name,
-      info: eventData?.simple_info,
-      event_photo: eventData?.event_photo,
-      params: { userdata: userData, eventdata: eventData }
-    },
-    // Add more events as needed
   ];
 
+    // eventData 배열을 풀어서 기존 이벤트 배열에 추가
+    const allEvents = [
+      ...initialEvents,
+      ...eventData.map(event => ({
+        screen: "DeadlineEventScreen",
+        label: event.name,
+        info: event.simple_info,
+        imageSource: event.event_photo[0].event_photo, // assuming event_photo is the correct source for the image
+        params: { userdata: userData, eventdata: event }
+      })),
+    ];
 
   const StudentInfo = async () => {
     console.log(userData);
@@ -361,15 +370,18 @@ const MainPage = ({ navigation, route }: any) => {
           </View>
           <View style={styles.eventSwipeArea}>
             <Swiper loop={true} removeClippedSubviews={false}>
-              {events.map((event, index) => (
+              {allEvents.map((event, index) => (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => navigation.navigate(event.screen, event.params)}
+                  onPress={() => 
+                    //navigation.navigate(event.screen, event.params)
+                    console.log(event.imageSource)
+                  }
                   style={styles.eventBox}>
                   <View style={styles.eventImageArea}>
                     <Image
                       style={styles.eventImage}
-                      source={event.imageSource ? event.imageSource : { uri: `${config.photoUrl}/${event.event_photo}.png` }}
+                      source={{ uri: `${config.photoUrl}/${event.imageSource}.png` }}
                     />
                   </View>
                   <View style={styles.eventTextArea}>

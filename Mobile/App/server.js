@@ -1561,19 +1561,19 @@ app.post('/Get_Event_Data', async (req, res) => {
   const { campus_id } = req.body;
   try {
     const rows = await Get_Event_Data(campus_id);
-    const processedData = {
-      event_id: rows[0].event_id,
-      campus_id: rows[0].campus_id,
-      user_id: rows[0].user_id,
-      name: rows[0].name,
-      get_point: rows[0].get_point,
-      info: rows[0].info,
-      simple_info: rows[0].simple_info,
-      event_photo: rows[0].event_photo,
-      start_date: formatDate(rows[0].start_date),
-      close_date: formatDate(rows[0].close_date),
-      is_event_close: rows[0].is_event_close,
-    }
+    const processedData = rows.map(item => ({
+      event_id: item.event_id,
+      campus_id: item.campus_id,
+      user_id: item.user_id,
+      name: item.name,
+      get_point: item.get_point,
+      info: item.info,
+      simple_info: item.simple_info,
+      event_photo: item.event_photo,
+      start_date: formatDate(item.start_date),
+      close_date: formatDate(item.close_date),
+      is_event_close: item.is_event_close,
+    }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
