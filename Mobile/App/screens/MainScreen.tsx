@@ -30,6 +30,8 @@ const volunteerpng = require('../assets/MainPhoto_Event.png');
 
 const width = Dimensions.get('window').width;
 
+console.log(width)
+
 type PostData = {
   post_id: number,
   title: string,
@@ -374,8 +376,7 @@ const MainPage = ({ navigation, route }: any) => {
                 <TouchableOpacity
                   key={index}
                   onPress={() => 
-                    //navigation.navigate(event.screen, event.params)
-                    console.log(event.imageSource)
+                    navigation.navigate(event.screen, event.params)
                   }
                   style={styles.eventBox}>
                   <View style={styles.eventImageArea}>
