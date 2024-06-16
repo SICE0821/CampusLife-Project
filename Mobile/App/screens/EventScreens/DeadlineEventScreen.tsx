@@ -23,8 +23,8 @@ const eventImages = [
 ];
 
 const voteInfo = [ // null이면 안보임
-  {vote : 'null'},
-  {vote : 'null'},
+  {vote : '문주영'},
+  {vote : '김주연'},
   {vote : 'null'},
   {vote : 'null'},
   {vote : 'null'},
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     //backgroundColor: 'red',
     alignItems: 'center',
     width: '100%',
-
+    marginTop: 15
   },
   eventVoteBox: {
     backgroundColor: '#dddddd',
