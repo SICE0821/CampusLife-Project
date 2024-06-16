@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 15,
     marginVertical: 5,
-    elevation: 5
+    elevation: 5,
   },
   eventImageArea: {
     backgroundColor: '#dddddd',
