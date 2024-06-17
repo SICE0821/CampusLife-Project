@@ -652,8 +652,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   imagePreview: {
-    width: 100,
+    width: 200,
     height: 100,
+    resizeMode: 'contain',
+    backgroundColor: '#eeeeee'
   },
   submitButton: {
     backgroundColor: 'orange',

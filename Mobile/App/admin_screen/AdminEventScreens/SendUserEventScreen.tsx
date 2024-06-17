@@ -41,7 +41,7 @@ const SendUserEventScreen = ({ route }: any) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0); //유저 이벤트 사진을 선택했을때 인덱스 저장공간
   const [selectedEventImages, setSelectedEventImages] = useState<UserSendEventPhotoData[]>([]); //유저 이벤트 사진을 선택했을때 저장공간
-  const [selectedEventId, setSelectedEventId] = useState(eventName[0].id);
+  const [selectedEventId, setSelectedEventId] = useState();
   const [userSendEventData, setUserSendEventData] = useState<UserSendEventWithPhoto[]>([]);
   const [eventList, setEventList] = useState<AdminEventList[]>([]); //이벤트 리스트
 
@@ -171,7 +171,7 @@ const SendUserEventScreen = ({ route }: any) => {
       })
       const data = await response.json();
       setEventList(data);
-      setSelectedEventId(data[0].event_id)
+      setSelectedEventId(data[0].event_id);
       //console.log(data);
     } catch (error) {
       console.error(error);
