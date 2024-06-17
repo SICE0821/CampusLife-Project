@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -544,6 +544,7 @@ async function getuserpk(user_id, user_passwd) {
                 user.profilePhoto,
                 user.id,
                 user.title,
+                user.report_confirm,
                 student.name, student.campus_id, 
                 student.department_id, student.email, 
                 student.grade,
