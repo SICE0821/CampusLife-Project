@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, RefreshControl, TouchableHighlight, Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
-import { UserData, aramData } from '../../types/type'
+import { UserData, aramData, EventData } from '../../types/type'
 
 const bellpng = require('../../assets/bell.png'); // 기본 알람 이미지
 const announcementpng = require('../../assets/announcement.png'); // 공지사항 알람 이미지
@@ -36,6 +36,56 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     }, 500);
   }, []);
 
+  const Get_One_Event_Data = async (event_id: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/Get_One_Event_Data`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: event_id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
+      const eventData = await response.json();
+      const eventImage = await GetEditEventImage(eventData.event_id);
+      const eventWithImage = {
+        ...eventData,
+        event_photo: eventImage
+      };
+
+      return(eventWithImage);
+      console.log(JSON.stringify(eventWithImage, null, 2));
+    } catch (error) {
+      return null;
+      console.error(error);
+    }
+  };
+
+  //이벤트 이미지 가져오기
+  const GetEditEventImage = async (event_id: number) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: event_id
+        }),
+      })
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
 
   const get_aram_data = async () => {
     try {
@@ -113,24 +163,24 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     );
   };
 
-  const deleteMyaram = async (aram_id : number) => {
+  const deleteMyaram = async (aram_id: number) => {
     try {
-        const response = await fetch(`${config.serverUrl}/deleteMyaram`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              aram_id: aram_id
-            }),
-        })
-        const postsdata = await response.json();
-        await get_aram_data();
+      const response = await fetch(`${config.serverUrl}/deleteMyaram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          aram_id: aram_id
+        }),
+      })
+      const postsdata = await response.json();
+      await get_aram_data();
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
     }
-}
+  }
 
   const delete_aram = () => {
     Alert.alert(
@@ -211,7 +261,14 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         go_detail_screen5(postList5);
         break;
       case 'new_event':
-        navigation.navigate("DeadlineEventScreen");
+        const eventData: EventData | null = await Get_One_Event_Data(item2.new_event_id);
+    if (eventData) {
+      navigation.navigate("DeadlineEventScreen", { userdata: userData, eventdata: eventData });
+    } else {
+      Alert.alert("이벤트 마감 및 삭제", 
+        `해당 이벤트는 마감되었거나 삭제되었습니다! 
+다음 이벤트를 노려주세요.`);
+    }
         break;
       default:
         console.log("이동 드가자");

@@ -1193,8 +1193,9 @@ async function write_post(user_id, department_check, inform_check, title, conten
         conn = await pool.getConnection();
         const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
         VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
-        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
-        return true;
+        const result = await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        const postId = result.insertId.toString(); // Retrieve the inserted post's ID
+        return postId;
     } catch (err) {
         console.log(err);
         return false;
@@ -1326,21 +1327,6 @@ async function recomment_like_up(recomment_id) {
     }
 }
 
-async function write_post(user_id, department_check, inform_check, title, contents) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
-        VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
-        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
-        return true;
-    } catch (err) {
-        console.log(err);
-        return false;
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
 
 //학과 게시판에서 전체 게시글을 가져오는 쿼리
 async function searchPost(search_text) {
@@ -1665,9 +1651,40 @@ async function addHotAram(target_id) {
     try {
         conn = await pool.getConnection();
         const query = `CALL SendEventNotification(?, '오늘의 HOT 게시물입니다!', 'hot_post');`
-        
         await conn.query(query, [target_id]);
         console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addSchoolNoticeAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL SendEventNotification(?, '학교 공지사항 글이 등록되었습니다!', 'school_notice');`
+        await conn.query(query, [target_id]);
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addDepartmentNoticeAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL SendEventNotification(?, '학과 공지사항 글이 등록되었습니다!', 'department_notice');`
+        await conn.query(query, [target_id]);
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
         console.log(err);
@@ -1900,6 +1917,23 @@ async function Get_Event_Data(campus_id) {
             `SELECT * FROM event WHERE EVENT.campus_id = ?`
         );
         const row = await conn.query(query, [campus_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//메인화면에서 이벤트 데이터 전부 불러와
+async function Get_One_Event_Data(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM event WHERE event_id = ?`
+        );
+        const row = await conn.query(query, [event_id]);
         return row;
     } catch (err) {
         throw err;
@@ -2277,7 +2311,7 @@ async function GetEventList(campus_id) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-        `SELECT
+            `SELECT
             e.event_id,
             e.name,
             e.info,
@@ -2449,7 +2483,7 @@ async function GetoneEventVote(event_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const rows = await conn.query(`SELECT * FROM event_vote WHERE event_id = ?`,[event_id]);
+        const rows = await conn.query(`SELECT * FROM event_vote WHERE event_id = ?`, [event_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -2463,8 +2497,8 @@ async function SendUserEventVote(event_id, vote_name) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = 
-        `UPDATE event_vote
+        const query =
+            `UPDATE event_vote
         SET vote_count = vote_count + 1
         WHERE event_id = ? AND vote_name = ?;`
         const result = await conn.query(query, [event_id, vote_name]);
@@ -2480,8 +2514,8 @@ async function AdminSendPoint(user_id, event_point) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = 
-        `UPDATE user
+        const query =
+            `UPDATE user
         SET point = point + ?
         WHERE user_id = ?;`
         const result = await conn.query(query, [event_point, user_id]);
@@ -2604,5 +2638,8 @@ module.exports = {
     GetoneEventVote,
     SendUserEventVote,
     AdminSendPoint,
-    addNewEventAram
+    addNewEventAram,
+    addSchoolNoticeAram,
+    addDepartmentNoticeAram,
+    Get_One_Event_Data
 };

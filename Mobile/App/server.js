@@ -111,7 +111,10 @@ const { getGeneralPosts,
   GetoneEventVote,
   SendUserEventVote,
   AdminSendPoint,
-  addNewEventAram
+  addNewEventAram,
+  addSchoolNoticeAram,
+  addDepartmentNoticeAram,
+  Get_One_Event_Data
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1061,16 +1064,17 @@ app.post('/recomment_like_up', async (req, res) => {
 app.post('/write_post', async (req, res) => {
   try {
     const { user_id, department_check, inform_check, title, contents } = req.body;
-    const result = await write_post(user_id, department_check, inform_check, title, contents);
-    if (result == true) {
-      console.log("게시물 쓰기 성공");
-      res.json(result);
-    } else if (result == false) {
+    const postId = await write_post(user_id, department_check, inform_check, title, contents);
+    
+    if (postId) {
+      res.status(200).json({ postId });
+    } else {
       console.log("게시물 쓰기 실패");
-      res.json(result);
+      res.json({ success: false });
     }
   } catch (error) {
     console.error("게시물 쓰기 실패:", error);
+    res.json({ success: false, error: error.message });
   }
 });
 
@@ -1357,6 +1361,26 @@ app.post('/addHotAram', async (req, res) => {
   }
 });
 
+app.post('/addSchoolNoticeAram', async (req, res) => {
+  try {
+    const { target_id } = req.body;
+    await addSchoolNoticeAram(target_id);
+    
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
+
+app.post('/addDepartmentNoticeAram', async (req, res) => {
+  try {
+    const { target_id } = req.body;
+    await addDepartmentNoticeAram(target_id);
+    
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
+
 //새로운 이벤트 등록 알람
 app.post('/addNewEventAram', async (req, res) => {
   try {
@@ -1586,6 +1610,32 @@ app.post('/Get_Event_Data', async (req, res) => {
       close_date: formatDate(item.close_date),
       is_event_close: item.is_event_close,
     }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//메인페이지 이벤트 데이터 전부 가져와
+app.post('/Get_One_Event_Data', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    const rows = await Get_One_Event_Data(event_id);
+    const processedData = {
+      event_id: rows[0].event_id,
+      campus_id: rows[0].campus_id,
+      user_id: rows[0].user_id,
+      name: rows[0].name,
+      get_point: rows[0].get_point,
+      info: rows[0].info,
+      simple_info: rows[0].simple_info,
+      event_photo: rows[0].event_photo,
+      start_date: formatDate(rows[0].start_date),
+      close_date: formatDate(rows[0].close_date),
+      is_event_close: rows[0].is_event_close,
+    }
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
