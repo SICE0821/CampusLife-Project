@@ -9,10 +9,17 @@ import { PostDeatilData, PostCommentData, CommentsWithRecomments } from "../../t
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { UserData } from '../../types/type'
 import config from '../../config';
+import { ClipPath } from 'react-native-svg';
 
 type ReportUser = {
     post_id : number,
     user_id : number,
+    report_name : string,
+}
+
+type ReportCommentUser = {
+    comment_id : number,
+    report_comment_name : string,
 }
 
 
@@ -23,15 +30,21 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>(); //포스터에 대한 정보.
     const [userdata, setUserData] = useState<UserData>(userData);
     const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
-    const [userReport, setUserReport] = useState<ReportUser[]>([]); //포스터에 대한 정보.
+    const [userReport, setUserReport] = useState<ReportUser[]>([]); 
+    const [usercommentReport, setUsercommentReport] = useState<ReportCommentUser[]>([]);
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
     const [commentspk, setCommentspk]: any = useState();
     const [ispushlike, Setispushlike]: any = useState();
     const [showOptions, setShowOptions] = useState(false);
+    const [activeCommentId, setActiveCommentId] = useState<number | null>(null);
     const inputRef = useRef<TextInput>(null);
 
     const toggleOptions = () => {
         setShowOptions(!showOptions);
+    };
+
+    const toggleOptions2 = (commentId: number) => {
+        setActiveCommentId(activeCommentId === commentId ? null : commentId);
     };
 
     const onFocusName = useCallback(() => {
@@ -327,14 +340,18 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 },
                 body: JSON.stringify({
                     post_id: postDetailInfo?.post_id,
-                    report_name : userdata.name
+                    report_name: userdata.name
                 })
             });
             if (response.ok) {
                 const data = await response.json();
                 setUserReport(prev => [
                     ...prev,
-                    { post_id: postDetailInfo?.post_id || 0, user_id: postDetailInfo?.user_id || 0 }
+                    {
+                        post_id: postDetailInfo?.post_id || 0,
+                        user_id: postDetailInfo?.user_id || 0,
+                        report_name: typeof userdata.name === 'string' ? userdata.name : '' // Ensure report_name is a string
+                    }
                 ]);
                 Alert.alert("신고 예약 되었습니다."); // 성공 메시지 표시
             } else {
@@ -344,7 +361,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             console.error('신고 제출에 실패하였습니다.', error);
             Alert.alert('신고 제출에 실패하였습니다.'); // 실패 메시지 표시
         }
-    }
+    };
 
     const deletePost = async () => {
         try {
@@ -382,13 +399,117 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
           Alert.alert('오류', '게시글 삭제에 실패했습니다.');
         }
       };
+
+      const put_user_comment_report = async (comment_id : number) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/putusercommentreport`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    comment_id: comment_id,
+                    report_comment_name: userdata.name
+                })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUsercommentReport(prev => [
+                    ...prev,
+                    {
+                        comment_id: comment_id || 0,
+                        report_comment_name: typeof userdata.name === 'string' ? userdata.name : '' // Ensure report_comment_name is a string
+                    }
+                ]);
+                Alert.alert("신고 예약 되었습니다."); // 성공 메시지 표시
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        } catch (error) {
+            console.error('신고 제출에 실패하였습니다.', error);
+            Alert.alert('신고 제출에 실패하였습니다.'); // 실패 메시지 표시
+        }
+    };
+
+
+      const deleteComment = async (comment_id: number) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/deletecomment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    comment_id: comment_id,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const result = await response.json();
+            console.log('댓글 삭제 완료:', result);
+            await CommentList();
+
+            Alert.alert(
+                '알림',
+                '댓글이 삭제되었습니다.',
+                [
+                    {
+                        text: '확인',
+                    },
+                ],
+                { cancelable: false }
+            );
+        } catch (error) {
+            console.error('댓글 삭제 실패:', error);
+            Alert.alert('오류', '댓글 삭제에 실패했습니다.');
+        }
+    };
+
+    const deleterecomment = async (recomment_id: number) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/deleterecomment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    recomment_id: recomment_id,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+    
+            const result = await response.json();
+            console.log('댓글 삭제 완료:', result);
+            await CommentList();
+
+            Alert.alert(
+                '알림',
+                '댓글이 삭제되었습니다.',
+                [
+                    {
+                        text: '확인',
+                    },
+                ],
+                { cancelable: false }
+            );
+        } catch (error) {
+            console.error('댓글 삭제 실패:', error);
+            Alert.alert('오류', '댓글 삭제에 실패했습니다.');
+        }
+    };
     
 
       const ReportUserduplicate = () => {
         console.log(postDetailInfo);
         console.log(userReport);
         const isDuplicateReport = userReport.some((report) =>
-            postDetailInfo?.user_id === report.user_id && postDetailInfo?.post_id === report.post_id
+            userdata.name === report.report_name && postDetailInfo?.post_id === report.post_id
         );
         if (isDuplicateReport) {
             Alert.alert("해당 게시물에 대해 신고할 수 없습니다.");
@@ -396,6 +517,19 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             put_user_report();
         }
     }
+
+    const ReportUserduplicate2= (comment_id : number) => {
+        console.log(postDetailInfo);
+        console.log(userReport);
+        const isDuplicateReport = usercommentReport.some((report) =>
+        userdata.name === report.report_comment_name && comment_id === report.comment_id
+        );
+        if (isDuplicateReport) {
+        Alert.alert("해당 게시물에 대해 신고할 수 없습니다.");
+        } else {
+        put_user_comment_report(comment_id);
+        }
+        }
 
       const get_user_report = async () => {
         try {
@@ -407,6 +541,22 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             });
             const data = await response.json();
             setUserReport(data);
+            return data;
+        } catch (error) {
+            console.error('값 가져오기 실패:', error);
+        }
+    }
+
+    const get_user_comment_report = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/getusercommentreport`, {
+                method: 'GET', // GET 요청으로 수정
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            setUsercommentReport(data);
             return data;
         } catch (error) {
             console.error('값 가져오기 실패:', error);
@@ -527,6 +677,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 
     useEffect(() => {
         get_user_report();
+        get_user_comment_report();
       }, []);
 
     return (    
@@ -564,7 +715,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                         <TouchableOpacity>
                             <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
                         </TouchableOpacity>
-                        <View style={{ width: 100, height: 1, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
                         <TouchableOpacity
                             onPress={() => {
                                 if (userdata.user_pk === postDetailInfo?.user_id) {
@@ -577,7 +728,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                         </TouchableOpacity>
                         {(userdata?.title === "학교" || postDetailInfo?.post_writer === userdata?.name) && (
                             <>
-                                <View style={{ width: 100, height: 0.5, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                                <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
                                 <TouchableOpacity onPress={deletePost}>
                                     <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
                                 </TouchableOpacity>
@@ -603,7 +754,6 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}>{postDetailInfo?.view}</Text>
                 </View>
                 {
-
                     comments.map(item => (
                         <View key={item.comment_id} style={styles.comentcontainer}>
                             <View style={styles.comentTopsection}>
@@ -638,10 +788,36 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                             <Text><IconD size={29} color="black" name={"like"} /></Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={styles.reallistbox}>
-                                            <Text><IconA size={19} color="black" name={"dots-three-vertical"} /></Text>
+                                            <Text><IconA size={19} color="black" name={"dots-three-vertical"} onPress={() => toggleOptions2(item.comment_id)} /></Text>
                                         </TouchableOpacity>
                                     </View>
                                 </View>
+                                {activeCommentId === item.comment_id && (
+                                    <View style={styles.optionsContainer2}>
+                                        <TouchableOpacity>
+                                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
+                                        </TouchableOpacity>
+                                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                                        <TouchableOpacity
+                                            onPress={() => {
+                                                if (userdata.user_pk === item.user_id) {
+                                                    Alert.alert("본인은 신고할 수 없습니다.");
+                                                } else {
+                                                    ReportUserduplicate2(item.comment_id);
+                                                }
+                                            }}>
+                                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
+                                        </TouchableOpacity>
+                                        {(userdata?.title === "학교" || item.student_name === userdata?.name) && (
+                                            <>
+                                                <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                                                <TouchableOpacity onPress={() => deleteComment(item.comment_id)}>
+                                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                                </TouchableOpacity>
+                                            </>
+                                        )}
+                                    </View>
+                                )}
                             </View>
                             <Text style={{ fontSize: 19, color: 'black', marginLeft: 24, marginRight: 20, }}>
                                 {item.content}
@@ -666,7 +842,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                 <View style={styles.picturebox}>
                                                     <View style={styles.picture}>
                                                         <Image
-                                                            source={{ uri: `${config.photoUrl}/${item?.user_profile}` }}
+                                                            source={{ uri: `${config.photoUrl}/${subitem.user_profile}` }}
                                                             style={{ width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center', borderWidth: 1 }}
                                                         />
                                                     </View>
@@ -684,11 +860,37 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                         <Text><IconD size={29} color="black" name={"like"} /></Text>
                                                     </TouchableOpacity>
                                                     <TouchableOpacity style={styles.reallistbox2}>
-                                                       <IconA size={19}  color="black" name={"dots-three-vertical"} />
+                                                       <IconA size={19}  color="black" name={"dots-three-vertical"} onPress={() => toggleOptions2(subitem.recomment_id)}/>
                                                     </TouchableOpacity>
                                                 </View>
                                             </View>
                                         </View>
+                                        {activeCommentId === subitem.recomment_id && (
+                                            <View style={styles.optionsContainer2}>
+                                                <TouchableOpacity>
+                                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
+                                                </TouchableOpacity>
+                                                <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        if (userdata.user_pk === item.user_id) {
+                                                            Alert.alert("본인은 신고할 수 없습니다.");
+                                                        } else {
+                                                            ReportUserduplicate2(item.comment_id);
+                                                        }
+                                                    }}>
+                                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
+                                                </TouchableOpacity>
+                                                {(userdata?.title === "학교" || subitem.student_name === userdata?.name) && (
+                                                    <>
+                                                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                                                        <TouchableOpacity onPress={() => deleterecomment(subitem.recomment_id)}>
+                                                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                                        </TouchableOpacity>
+                                                    </>
+                                                )}
+                                            </View>
+                                        )}
                                         <Text style={{ fontSize: 19, color: 'black', marginLeft: 20, marginRight: 20, }}>
                                             {subitem.content}
                                         </Text>
@@ -972,6 +1174,26 @@ const styles = StyleSheet.create({
         elevation: 5,
         paddingVertical: 10,
         paddingHorizontal: 5,
+    },
+
+    optionsContainer2: {
+        position: 'absolute',
+        top: 45,
+        right: 30,
+        width: 120,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        zIndex : 1000,
     },
       
 })

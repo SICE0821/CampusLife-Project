@@ -758,7 +758,7 @@ async function DeleteUser(user_pk) {
     }
 }
 
-//학과 이름가져오기
+//해당 학생 학과 이름가져오기
 async function get_department_name(department_name) {
     let conn;
     try {
@@ -770,6 +770,29 @@ async function get_department_name(department_name) {
         return result;
     } catch (err) {
         console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//해당 학과 이름가져오기
+async function get_department(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT department.name
+            FROM department_have_object
+            INNER JOIN department ON department_have_object.department_id = department.department_id
+            WHERE department_have_object.campus_id = ?;
+        `;
+        const result = await conn.query(query, [campus_id]);
+        console.log(result);
+        return result;
+
+    } catch (err) {
+        console.error('Error fetching department data:', err);
+        throw err; // 에러를 호출자에게 다시 던짐
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
@@ -950,7 +973,7 @@ async function getComment(post_ida) {
             SELECT 
                 comment.comment_id, comment.contents, comment.date, comment.\`like\`,
                 student.name AS student_name, department.name AS department_name, 
-                user.id, post.post_id, user.profilePhoto
+                user.user_id, post.post_id, user.profilePhoto
             FROM 
                 user
                 LEFT JOIN student ON user.student_id = student.student_id
@@ -2062,10 +2085,43 @@ async function get_user_report() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `SELECT report.report_id, report.post_id, user.user_id
+        const query = `SELECT report.report_id, report.post_id, report.report_name, user.user_id
                         FROM report
                         JOIN post ON report.post_id = post.post_id
                         JOIN user ON post.user_id = user.user_id;`;
+        const rows = await conn.query(query);
+        console.log("신고 조회 성공");
+        return rows; // 쿼리 결과 반환
+
+    } catch (err) {
+        console.error('Error querying data:', err);
+        throw err; // 에러 처리
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function put_user_comment_report(comment_id, report_comment_name) {
+    let conn;   
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO report_comment (comment_id, report_comment_name) VALUES (?, ?);`
+        await conn.query(query, [comment_id, report_comment_name]);
+        console.log("신고 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function get_user_comment_report() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `SELECT report_comment.report_comment_id, report_comment.comment_id, report_comment.report_comment_name
+                        FROM report_comment
+                        JOIN comment ON report_comment.comment_id = comment.comment_id`;
         const rows = await conn.query(query);
         console.log("신고 조회 성공");
         return rows; // 쿼리 결과 반환
@@ -2087,6 +2143,7 @@ async function get_user_report_Info() {
                 r.report_name,
                 p.post_id,
                 p.user_id AS post_user_id,
+                p.department_check,
                 p.title AS post_title,
                 p.contents,
                 p.date,
@@ -2118,7 +2175,6 @@ async function get_user_report_Info() {
                 department d ON s.department_id = d.department_id;
         `;
         const rows = await conn.query(query);
-        console.log(rows);
         return rows; // 쿼리 결과 반환
     } catch (err) {
         console.error('Error querying data:', err);
@@ -2243,6 +2299,78 @@ async function getSellItemCount(campus_id, name) {
     }
 }
 
+async function delete_comment(comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM comment WHERE comment_id=?;"
+        const result = await conn.query(query, [comment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function delete_recomment(recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM recomment WHERE recomment_id=?;"
+        const result = await conn.query(query, [recomment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function get_user_comment_report_Info() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT 
+                rc.report_comment_id,
+                rc.comment_id,
+                rc.report_comment_name,
+                c.contents,
+                c.date AS comment_date,
+                c.like AS comment_like,
+                p.post_id,
+                p.department_check,
+                u.user_id,
+                s.student_id,
+                s.name AS student_name,
+                d.department_id,
+                d.name AS department_name
+            FROM 
+                report_comment rc
+            JOIN 
+                comment c ON rc.comment_id = c.comment_id
+            JOIN 
+                post p ON c.post_id = p.post_id
+            JOIN 
+                user u ON c.user_id = u.user_id
+            JOIN 
+                student s ON u.student_id = s.student_id
+            JOIN
+                department d ON s.department_id = d.department_id;
+        `;
+        const rows = await conn.query(query);
+        return rows; // Return the query result
+    } catch (err) {
+        console.error('Error querying data:', err);
+        throw err; // Handle the error
+    } finally {
+        if (conn) conn.release(); // Release the connection
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2341,5 +2469,11 @@ module.exports = {
     ChangeItemInfoANDCountUp,
     ChangeItemInfoANDCountDown,
     getRestItemCount,
-    getSellItemCount
+    getSellItemCount,
+    get_department,
+    delete_comment,
+    delete_recomment,
+    put_user_comment_report,
+    get_user_comment_report,
+    get_user_comment_report_Info
 };
