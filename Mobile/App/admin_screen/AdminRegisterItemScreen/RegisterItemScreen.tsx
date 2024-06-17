@@ -28,6 +28,7 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
   const [selectedStartDate, setSelectedStartDate]: any = useState(new Date());
   const [selectedEndDate, setSelectedEndDate]: any = useState(new Date());
   const [deadlineDate, setDeadlineDate] = useState<string>("");
+  const [selectedFormImages, setSelectedFormImages] = useState<FormData>(); // 선택된 이미지를 폼데이터에 저장
 
   useFocusEffect(
     React.useCallback(() => {
@@ -88,8 +89,8 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
       const newPath = res.path;
       setSelectedImagePath(newPath);
       setSelectedImageFormData(formData);
-      const imageData = await RegistorItemImage(formData);
-      setImageNum(imageData);
+      //const imageData = await RegistorItemImage(formData);
+      //setImageNum(imageData);
     } catch (error) {
       console.error(error);
     }
@@ -111,7 +112,8 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
             },
             { text: "확인", onPress: async () => {
               successAlert();
-              await RegistorItem();
+              const ImageName = await RegistorItemImage();
+              await RegistorItem(ImageName);
             }}
         ]
     );
@@ -127,11 +129,11 @@ const successAlert = () => {
   );
 };
 
-  const RegistorItemImage = async (selectImageFormData : FormData) => {
+  const RegistorItemImage = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/RegistorItemImage`, {
         method: 'POST',
-        body: selectImageFormData,
+        body: selectedImageFormData,
       });
       const imageData = await response.json();
       console.log(imageData.fileName);
@@ -141,7 +143,7 @@ const successAlert = () => {
     }
   };
 
-  const RegistorItem = async () => {
+  const RegistorItem = async (ImageNum : string) => {
     try {
         const response = await fetch(`${config.serverUrl}/RegistorItem`, {
             method: 'POST',

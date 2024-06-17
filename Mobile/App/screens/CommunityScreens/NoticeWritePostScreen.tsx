@@ -76,6 +76,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
       headerRight: () => (
         <TouchableOpacity onPress={() => {
           write_post();
+          
         }}>
           <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
             <Text style={{ color: 'white', fontSize: 17, fontWeight: "bold" }}>완료</Text>

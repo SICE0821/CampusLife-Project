@@ -202,6 +202,7 @@ export type UserSendEventWithPhoto = {
   campus_id : number,
   user_login_id : number,
   user_name : string,
+  event_point : number,
   photodata: {
     event_id : number,
     user_id : number,
@@ -213,4 +214,21 @@ export type UserSendEventPhotoData = {
   event_id : number,
   user_id : number,
   event_photo : string,
+}
+
+export type VoteEvnetData = {
+  event_id : number,
+  vote_count : number,
+  vote_index : number,
+  vote_name : string,
+}
+
+export type VoteInfoItem = {
+  id: number;
+  votes: string[];
+}
+
+export type VoteDataItem = {
+  id: number;
+  results: number[];
 }

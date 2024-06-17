@@ -4,7 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Swiper from 'react-native-swiper';
 import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { UserData, EventData } from '../../types/type';
+import { UserData, EventData, VoteEvnetData } from '../../types/type';
 const width = Dimensions.get("window").width;
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
@@ -28,7 +28,7 @@ const voteInfo = [ // null이면 안보임
   {vote : 'null'},
   {vote : 'null'},
   {vote : 'null'},
-].filter(info => info.vote !== 'null'); // Filter out null values
+].filter(info => info.vote !== 'null');
 
 const DeadlineEventScreen = ({ route }: any) => {
   const { userdata, eventdata } = route.params;
@@ -41,14 +41,57 @@ const DeadlineEventScreen = ({ route }: any) => {
   const [eventData, setEventData] = useState<EventData>(eventdata);
   const [usereventData, setUserEventData] = useState<userEvent[]>([]);
   const [checked, setChecked] = useState('');
-  const [voteOptions, setVoteOptions] = useState<string[]>(voteInfo.map(info => info.vote)); // Initial voting options
+  const [voteOptions, setVoteOptions] = useState<string[]>(); // Initial voting options
+  const [onevoteInfo, setOneVoteInfo] = useState<VoteEvnetData[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
       settingDate();
+      GetoneEventVote();
     }, []
     )
   );
+
+  const GetoneEventVote = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetoneEventVote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id : eventData.event_id
+        }),
+      })
+      const data : VoteEvnetData[] = await response.json();
+      const voteInfo : VoteEvnetData[]= data.filter(info => info.vote_name !== 'null');
+      setVoteOptions(voteInfo.map(info => info.vote_name));
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  const SendUserEventVote = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/SendUserEventVote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id : eventData.event_id,
+          vote_name : checked,
+        }),
+      })
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
 
   useEffect(() => {
     fetchEventData();
@@ -179,13 +222,16 @@ const DeadlineEventScreen = ({ route }: any) => {
       Alert.alert(
         "이벤트 작성완료",
         `이벤트를 성공적으로 작성하셨습니다. 
-        당첨되시면 알람이 자동으로 가게됩니다.
-        종료 일자 : ${eventData.close_date}`,
+당첨되시면 알람이 자동으로 가게됩니다.
+종료 일자 : ${eventData.close_date}`,
         [
           {
             text: "확인", onPress: () => {
               send_user_event_info();
-              uploadAllFiles();
+              SendUserEventVote();
+              if (selectedFiles.length > 0) {
+                uploadAllFiles();
+              }
               // 여기서 이벤트 등록 상태를 업데이트합니다.
               setUserEventData([...usereventData, { user_id: userData.user_pk, event_id: eventData.event_id }]);
             }
@@ -218,11 +264,14 @@ const DeadlineEventScreen = ({ route }: any) => {
           <Text style={styles.eventInfo}>{eventData?.info}</Text>
 
           <View style={styles.eventVoteArea}>
-            {voteOptions.map((option, index) => (
+            {voteOptions?.map((option, index) => (
               <TouchableOpacity
                 key={index}
                 style={styles.eventVoteBox}
-                onPress={() => setChecked(option)}
+                onPress={() => {
+                  setChecked(option)
+                  console.log(option)
+                }}
               >
                 <Text style={styles.eventVoteText}>{index + 1}. {option}</Text>
                 <RadioButton

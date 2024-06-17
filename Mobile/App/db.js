@@ -658,7 +658,7 @@ async function admin_get_event_objcet(campus_id) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            `SELECT * FROM event_object WHERE campus_id = ?`
+            `SELECT * FROM event_object WHERE campus_id = ? ORDER BY object_id DESC`
             , [campus_id]);
         return rows;
 
@@ -1660,13 +1660,29 @@ async function addCommentAram(user_id, target_id) {
     }
 }
 
-async function addHotAram(user_id, target_id) {
+async function addHotAram(target_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "오늘의 HOT 게시물입니다!", "hot_post");`
-        await conn.query(query, [user_id, target_id]);
+        const query = `CALL SendEventNotification(?, '오늘의 HOT 게시물입니다!', 'hot_post');`
+        
+        await conn.query(query, [target_id]);
         console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addNewEventAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL SendEventNotification(?, '새로운 이벤트가 등록되었습니다!', 'new_event');`
+        await conn.query(query, [target_id]);
         return true;
     } catch (err) {
         console.log(err);
@@ -2375,7 +2391,8 @@ async function GetUserSendEvent(campus_id) {
                 us.content,
                 e.campus_id,
                 userdata.id,
-                st.name
+                st.name,
+                e.get_point
             FROM
                 user_send_event us
             JOIN
@@ -2410,6 +2427,68 @@ async function GetUserEventPhoto(event_id, user_id) {
         throw err;
     } finally {
         if (conn) conn.end();
+    }
+}
+
+//해당 이벤트의 모든 투표 정보 가져오기
+async function GetEventVote(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(`SELECT * FROM event_vote`);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//해당 이벤트의 모든 투표 정보 가져오기
+async function GetoneEventVote(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(`SELECT * FROM event_vote WHERE event_id = ?`,[event_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
+async function SendUserEventVote(event_id, vote_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 
+        `UPDATE event_vote
+        SET vote_count = vote_count + 1
+        WHERE event_id = ? AND vote_name = ?;`
+        const result = await conn.query(query, [event_id, vote_name]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//당첨
+async function AdminSendPoint(user_id, event_point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 
+        `UPDATE user
+        SET point = point + ?
+        WHERE user_id = ?;`
+        const result = await conn.query(query, [event_point, user_id]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
     }
 }
 
@@ -2520,5 +2599,10 @@ module.exports = {
     DeleteEvent,
     RegistorEventVotesAdmin,
     GetUserSendEvent,
-    GetUserEventPhoto
+    GetUserEventPhoto,
+    GetEventVote,
+    GetoneEventVote,
+    SendUserEventVote,
+    AdminSendPoint,
+    addNewEventAram
 };

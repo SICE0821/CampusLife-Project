@@ -106,7 +106,12 @@ const { getGeneralPosts,
   DeleteEvent,
   RegistorEventVotesAdmin,
   GetUserSendEvent,
-  GetUserEventPhoto
+  GetUserEventPhoto,
+  GetEventVote,
+  GetoneEventVote,
+  SendUserEventVote,
+  AdminSendPoint,
+  addNewEventAram
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1345,12 +1350,19 @@ app.post('/addCommentAram', async (req, res) => {
 app.post('/addHotAram', async (req, res) => {
   try {
     const { target_id } = req.body;
-    const userIds = await allUser_id();
-    console.log(userIds);
+    await addHotAram(target_id);
+    
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
 
-    for (const { user_id } of userIds) {
-      await addHotAram(user_id, target_id);
-    }
+//새로운 이벤트 등록 알람
+app.post('/addNewEventAram', async (req, res) => {
+  try {
+    const { target_id } = req.body;
+    await addNewEventAram(target_id);
+    
   } catch (error) {
     console.error("알람 보내기 실패:", error);
   }
@@ -2018,7 +2030,8 @@ app.post('/GetUserSendEvent', async (req, res) => {
       content : item.content,
       campus_id : item.campus_id,
       user_login_id : item.id,
-      user_name : item.name
+      user_name : item.name,
+      event_point : item.get_point
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -2039,6 +2052,70 @@ app.post('/GetUserEventPhoto', async (req, res) => {
       event_photo : item.event_photo,
     }));
     res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//해당 이벤트의 모든 투표 정보 가져오기
+app.post('/GetEventVote', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await GetEventVote(campus_id);
+    const processedData = rows.map(item => ({
+      event_id : item.event_id,
+      vote_name: item.vote_name,
+      vote_count : item.vote_count,
+      vote_index : item.vote_index
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이벤트 하나 표 가져오기
+app.post('/GetoneEventVote', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    const rows = await GetoneEventVote(event_id);
+    const processedData = rows.map(item => ({
+      event_id : item.event_id,
+      vote_name: item.vote_name,
+      vote_count : item.vote_count,
+      vote_index : item.vote_index
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//이벤트 테이블에 연결되어있는 이미지 테이블에 행삽입
+app.post('/SendUserEventVote', async (req, res) => {
+  const { event_id, vote_name } = req.body;
+  console.log(vote_name)
+  try {
+    await SendUserEventVote(event_id, vote_name);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+//이벤트 당첨
+app.post('/AdminSendPoint', async (req, res) => {
+  const { user_id, event_point } = req.body;
+  try {
+    await AdminSendPoint(user_id, event_point);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
