@@ -37,9 +37,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     
     // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
     if (selectallposter === 1) {
-      setpostfontoption("전체 게시판");
+      setpostfontoption("학교 공지사항");
     } else if (selectdepartmentposter === 1) {
-      setpostfontoption("학과 게시판");
+      setpostfontoption("학과 공지사항");
     } else {
       setpostfontoption("게시판을 정해주세요");
     }
@@ -95,13 +95,6 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     );
   };
 
-  const adminCheck = () => {
-    if(userData.title === "일반학생"){
-      return 0;
-    }else{
-      return 1;
-    }
-  }
 
   const write_post = async () => {
     try {
@@ -113,7 +106,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         body: JSON.stringify({
           user_id: userData.user_pk,
           department_check: selectdepartmentposter,
-          inform_check: adminCheck(),
+          inform_check: 1,
           title: titletext,
           contents: maintext,
         })

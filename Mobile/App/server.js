@@ -89,6 +89,8 @@ const { getGeneralPosts,
   put_user_post_like,
   put_user_report,
   get_user_report,
+  get_user_report_Info,
+  delete_post,
   admin_get_event_objcet,
   RegistorItem,
   ChangeItemInfo,
@@ -96,7 +98,12 @@ const { getGeneralPosts,
   ChangeItemInfoANDCountDown,
   getRestItemCount,
   getSellItemCount,
-  RegistorEvent,
+  get_department,
+  delete_comment,
+  delete_recomment,
+  put_user_comment_report,
+  get_user_comment_report,
+  get_user_comment_report_Info,
   RegistorEventVotes,
   RegistorEventPhoto,
   GetEventList,
@@ -133,7 +140,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -270,7 +277,8 @@ app.post('/get_user_data', async (req, res) => {
     currentstatus: rows[0].currentstatus,
     student_semester: rows[0].student_semester,
     college: rows[0].college,
-    title: rows[0].title
+    title: rows[0].title,
+    report_confirm : rows[0].report_confirm,
   };
   res.json(userData);
 })
@@ -769,6 +777,24 @@ app.post('/get_department_name', async (req, res) => {
 
   //console.log("학과 PK성공적으로 넣음");
 });
+
+// 학교 정보 가져오기
+app.post('/get_department', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await get_department(campus_id);
+    const processedData = rows.map(item => ({
+      department_name: item.name 
+    }));
+    res.json(processedData);
+    console.log(processedData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
 
 //학교 이름 가져오기
 app.post('/get_university_name', async (req, res) => {
@@ -1732,9 +1758,9 @@ app.post('/select_user_event_info', async (req, res) => {
 
 //신고 등록하기
 app.post('/putuserreport', async (req, res) => {
-  const { post_id } = req.body;
+  const { post_id, report_name } = req.body;
   try {
-    const rows = put_user_report(post_id);
+    const rows = put_user_report(post_id, report_name);
     console.log("DB에 신고 정보를 성공적으로 추가했습니다.");
     res.status(200).json({ success: true, message: "신고가 성공적으로 제출되었습니다." });
   } catch (error) {
@@ -1752,6 +1778,71 @@ app.get('/getuserreport', async (req, res) => {
   } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/putusercommentreport', async (req, res) => {
+  const { comment_id, report_comment_name } = req.body;
+  try {
+    const rows = put_user_comment_report(comment_id, report_comment_name);
+    console.log("DB에 신고 정보를 성공적으로 추가했습니다.");
+    res.status(200).json({ success: true, message: "신고가 성공적으로 제출되었습니다." });
+  } catch (error) {
+    console.error("DB에 값을 추가하는 도중 오류가 발생했습니다:", error);
+    res.status(400).json({ success: false, message: "신고 제출에 실패했습니다." });
+  }
+});
+
+app.get('/getusercommentreport', async (req, res) => {
+  try {
+      const rows = await get_user_comment_report();
+      console.log(rows);
+      res.json(rows); // 쿼리 결과를 JSON으로 클라이언트로 전송
+      console.log("성공적으로 데이터 전송");
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/getUserReportInfo', async (req, res) => {
+  try {
+    const rows = await get_user_report_Info();
+    const processedData = rows.map(item => ({
+      reportId: item.report_id,
+      report_name : item.report_name,
+      post_id: item.post_id,
+      department_check : item.department_check,
+      user_id: item.post_user_id,
+      title: item.post_title,
+      contents: item.contents,
+      write_date: formatDate(item.date),
+      view: item.view,
+      like: item.like,
+      userStudentId: item.user_student_id,
+      userTitle: item.user_title,
+      post_writer: item.student_name,
+      campusId: item.student_campus_id,
+      campusName: item.campus_name,
+      departmentId: item.student_department_id,
+      writer_department: item.department_name,
+      writer_profile : item.profilePhoto
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/deletepost', async (req, res) => {
+  const { post_id } = req.body;
+  const success = await delete_post(post_id);
+  if (success) {
+      res.json({ message: "성공적으로 값 삭제" });
+  } else {
+      res.status(500).json({ error: "삭제 실패" });
   }
 });
 
@@ -1841,6 +1932,52 @@ app.post('/getSellItemCount', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/deletecomment', async (req, res) => {
+  const { comment_id } = req.body;
+  const success = await delete_comment(comment_id);
+  if (success) {
+      res.json({ message: "성공적으로 값 삭제" });
+  } else {
+      res.status(500).json({ error: "삭제 실패" });
+  }
+});
+
+app.post('/deleterecomment', async (req, res) => {
+  const { recomment_id } = req.body;
+  const success = await delete_recomment(recomment_id);
+  if (success) {
+      res.json({ message: "성공적으로 값 삭제" });
+  } else {
+      res.status(500).json({ error: "삭제 실패" });
+  }
+});
+
+app.post('/getUserCommentReportInfo', async (req, res) => {
+  try {
+    const rows = await get_user_comment_report_Info();
+    const processedData = rows.map(item => ({
+      report_comment_id: item.report_comment_id,
+      comment_id : item.comment_id,
+      report_comment_name: item.report_comment_name,
+      contents : item.contents,
+      comment_date: formatDate(item.comment_date),
+      comment_like: item.comment_like,
+      post_id: item.post_id,
+      department_check : item.department_check,
+      user_id: item.user_id,
+      student_id : item.student_id,
+      student_name: item.student_name,
+      department_id: item.department_id,
+      department_name: item.department_name 
+    }));
+    res.json(processedData);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error('Error fetching comment report info:', error);
+    res.status(500).json({ error: 'Internal Server Error', message: error.message });
   }
 });
 
