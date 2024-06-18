@@ -1,44 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
-import './QrCheck.css'; // Import the CSS file
 
-function QrCheck() {
-  const [qrData, setQrData] = useState(""); 
-  const [remainingTime, setRemainingTime] = useState(20);
-  
-  const qrTime = 2;
+const QrCheck = () => {
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const generateRandomQRData = () => {
-      return Math.random().toString(36).substring(2, 15);
-    };
-
-    setQrData(generateRandomQRData());
-
-    const interval = setInterval(() => {
-      setQrData(generateRandomQRData());
-      setRemainingTime(qrTime); 
-    }, qrTime * 1000);
-
-    const countdown = setInterval(() => {
-      setRemainingTime(prevTime => prevTime > 0 ? prevTime - 1 : qrTime);
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(countdown);
-    };
-  }, []);
+  const handleBackClick = () => {
+    navigate('/Test');
+  };
 
   return (
-    <div className="container">
-      <header className="qr">
-        <h1>출석 체크</h1>
-        <div>
-          <QRCode value={qrData} bgColor={'white'} size={512}/>
-          <p>남은 시간: {remainingTime}초</p>
-        </div>
-      </header>
+    <div>
+      <h1>QrCheck Page</h1>
+      <QRCode value="example-qrcode-value" />
+      <button onClick={handleBackClick}>Back to Test Page</button>
     </div>
   );
 }

@@ -1,33 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import './Main.css'; // Import the CSS file
-import QrCheck from './QrCheck'; // Import the test component
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function Main() {
+const Main = () => {
   const navigate = useNavigate();
 
-  const handleButtonClick = () => {
-    navigate('/QrCheck');
+  const handleNavigateToTest = () => {
+    navigate('/Test');
   };
 
   return (
     <div>
-      <h1>메인 페이지 입니다.</h1>
-      <p>This is the test page.</p>
-      <button onClick={handleButtonClick}>Go test</button>
+      <h1>Main Page</h1>
+      <button onClick={handleNavigateToTest}>Go to Test Page</button>
     </div>
   );
 }
 
-function MainWithRouter() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/QrCheck" element={<QrCheck />} />
-      </Routes>
-    </Router>
-  );
-}
-
-export default MainWithRouter;
+export default Main;

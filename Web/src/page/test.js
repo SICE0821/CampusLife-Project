@@ -1,10 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function Test() {
+const Test = () => {
+  const navigate = useNavigate();
+
+  const handleNavigateToQrCheck = () => {
+    navigate('/QrCheck');
+  };
+
   return (
     <div>
       <h1>Test Page</h1>
-      <p>This is the test page.</p>
+      <button onClick={handleNavigateToQrCheck}>Go to QrCheck Page</button>
     </div>
   );
 }
