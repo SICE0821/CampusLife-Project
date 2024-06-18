@@ -15,11 +15,11 @@ function App() {
 
     const interval = setInterval(() => {
       setQrData(generateRandomQRData());
-      setRemainingTime(20); 
-    }, 20000);
+      setRemainingTime(10); 
+    }, 10000);
 
     const countdown = setInterval(() => {
-      setRemainingTime(prevTime => prevTime > 0 ? prevTime - 1 : 20);
+      setRemainingTime(prevTime => prevTime > 0 ? prevTime - 1 : 10);
     }, 1000);
 
     return () => {
@@ -33,7 +33,7 @@ function App() {
       <header className="App-header">
         <h1>QRCode Check</h1>
         <div>
-          <QRCode value={qrData} bgColor={'#111111'}/>
+          <QRCode value={qrData} bgColor={'white'} size={512}/>
           <p>남은 시간: {remainingTime}초</p>
         </div>
       </header>
