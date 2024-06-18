@@ -113,7 +113,8 @@ const { getGeneralPosts,
   DeleteEvent,
   RegistorEventVotesAdmin,
   GetUserSendEvent,
-  GetUserEventPhoto
+  GetUserEventPhoto,
+  getuserInfo
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -2182,6 +2183,35 @@ app.post('/GetUserEventPhoto', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+app.post('/get_user_Info', async (req, res) => {
+  const { campus_id } = req.body;
+  
+  try {
+    const rows = await getuserInfo(campus_id);
+
+    const userData = rows.map(row => ({
+      user_id: row.user_id,
+      id: row.id,
+      point: row.point,
+      profilePhoto: row.profilePhoto,
+      title: row.title,
+      report_confirm: row.report_confirm,
+      student_name: row.student_name,
+      student_id: row.student_id,
+      department_id: row.department_id,
+      department_name: row.department_name,
+      campus_id: row.campus_id
+    }));
+
+    res.json(userData);
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    res.status(500).json({ error: 'Failed to fetch user info' });
+  }
+});
+
 
 //서버 시작
 app.listen(PORT, () => {

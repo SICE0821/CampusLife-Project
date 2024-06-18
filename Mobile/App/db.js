@@ -2609,6 +2609,44 @@ async function GetUserEventPhoto(event_id, user_id) {
     }
 }
 
+
+async function getuserInfo(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 조회 쿼리 작성
+        const rows = await conn.query(`
+            SELECT 
+                u.user_id, 
+                u.id, 
+                u.point, 
+                u.profilePhoto, 
+                u.title, 
+                u.report_confirm, 
+                s.name AS student_name, 
+                s.student_id, 
+                s.department_id, 
+                s.campus_id,
+                d.name AS department_name
+            FROM 
+                user u
+            JOIN 
+                student s ON u.student_id = s.student_id
+            JOIN 
+                department d ON s.department_id = d.department_id
+            WHERE 
+                s.campus_id = ?
+        `, [campus_id]);
+
+        return rows;
+    } catch (err) {
+        console.error('Error fetching data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2724,5 +2762,6 @@ module.exports = {
     DeleteEvent,
     RegistorEventVotesAdmin,
     GetUserSendEvent,
-    GetUserEventPhoto
+    GetUserEventPhoto,
+    getuserInfo
 };
