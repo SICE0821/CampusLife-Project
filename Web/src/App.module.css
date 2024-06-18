@@ -1,0 +1,12 @@
+.container {
+    background-color: aquamarine;
+}
+
+.title {
+    text-align: center;
+}
+
+.subTitle {
+    text-align: center;
+    font-size: 20pt;
+}

@@ -8,9 +8,10 @@ import { AuthProvider } from './page/AuthContext'; // Adjust path based on your 
 
 ReactDOM.render(
   <React.StrictMode>
-    <AuthProvider>
+    <App />
+    {/* <AuthProvider>
       <Navigater />
-    </AuthProvider>
+    </AuthProvider> */}
   </React.StrictMode>,
   document.getElementById('root')
 );
