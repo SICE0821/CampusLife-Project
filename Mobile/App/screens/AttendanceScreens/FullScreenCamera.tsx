@@ -2,10 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Text, Alert } from 'react-native';
 import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 
-const FullScreenCamera = ({navigation}: any) => {
+const FullScreenCamera = ({ navigation } : any) => {
   const [isCameraActive, setIsCameraActive] = useState(true);
   const [hasScanned, setHasScanned] = useState(false);
-  const device = useCameraDevice('back'); // 후면 카메라를 사용하도록 가정합니다.
+  const device = useCameraDevice('back'); // 후면 카메라를 사용하도록 가정
+
+  const isValidQRCode = (code : string) => {
+    // 현재 날짜와 시간을 포함하는 정규식 패턴 생성
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+    const regex = new RegExp(`^myApp_${timestamp}$`);
+  
+    return regex.test(code);
+  };
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr', 'ean-13'],
@@ -13,17 +22,19 @@ const FullScreenCamera = ({navigation}: any) => {
       if (!hasScanned) {
         setHasScanned(true);
         console.log("인식된 QR 코드 목록:", codes);
-        const webQRCode = codes.find(code => code.value && code.value.length === 11);
-        if (webQRCode) {
-          console.log("QR이 인식되었습니다 : ", webQRCode.value);
-          navigation.navigate('AttendanceScreen', { scannedCode: webQRCode.value });
+        const validQRCode = codes.find(code => code.value && isValidQRCode(code.value));
+        if (validQRCode) {
+          console.log("유효한 QR 코드입니다 : ", validQRCode.value);
+          navigation.navigate('AttendanceScreen', { scannedCode: validQRCode.value });
         } else {
-          Alert.alert("악용하면 큰일나요^^");
+          Alert.alert("허용되지 않은 QR 코드입니다.");
+          navigation.goBack();
         }
+        setIsCameraActive(false); // QR 코드 스캔 후 카메라 비활성화
       }
     },
   });
-
+  
   useEffect(() => {
     setHasScanned(false); // Reset the scan state when the component mounts
   }, []);
@@ -43,13 +54,13 @@ const FullScreenCamera = ({navigation}: any) => {
           // 필요한 경우에 따라 다른 속성을 추가할 수 있습니다.
         />
       )}
-      
+
       {/* 닫기 버튼 */}
       <TouchableOpacity
         style={{ position: 'absolute', top: 20, right: 20 }}
         onPress={() => {
           navigation.navigate('AttendanceScreen');
-          setIsCameraActive(false);
+          setIsCameraActive(false); // 닫기 버튼을 누를 때 카메라 비활성화
         }}
       >
         <Text style={{ color: 'white', fontSize: 18 }}>Close</Text>

@@ -164,10 +164,9 @@ const AttendanceScreen = ({navigation, route}: any) => {
     setIsModalOpen(false);
     setIsCameraButton(false); // 모달을 닫을 때 카메라 버튼 상태도 false로 변경합니다.
   };
-
   const openCamera = (lecture: Lecture) => {
     const currentTime = new Date().getTime();
-    if (isScanned && lastScannedTime && (currentTime - new Date(lastScannedTime).getTime()) < (24 * 60 * 60 * 1000) ) {
+    if (isScanned && lastScannedTime && (currentTime - new Date(lastScannedTime).getTime()) < (24 * 60 * 60 * 1000)) {
       Alert.alert(
         '출석 처리됨',
         '이미 출석 처리가 완료되었습니다. 하루에 한 번만 출석할 수 있습니다.',
@@ -179,7 +178,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
       setIsCameraButton(true);
     }
   };
-
+  
   React.useEffect(() =>{
     requestPermission();
   }, [])
