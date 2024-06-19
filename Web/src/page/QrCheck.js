@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
+import styles from './QrCheck.module.css';
 
-const QrCheck = () => {
+function QrCheck() {
   const navigate = useNavigate();
   const [qrData, setQrData] = useState("");
   const [remainingTime, setRemainingTime] = useState(2);
@@ -10,7 +11,7 @@ const QrCheck = () => {
   const qrTime = 2;
 
   const handleBackClick = () => {
-    navigate('/Test');
+    navigate('/test');
   };
 
   useEffect(() => {
@@ -36,11 +37,11 @@ const QrCheck = () => {
   }, []);
 
   return (
-    <div>
+    <div className={styles.container}>
       <h1>QrCheck Page</h1>
       <QRCode value={qrData} bgColor={'white'} size={256} />
       <p>Remaining Time: {remainingTime} seconds</p>
-      <button onClick={handleBackClick}>Back to Test Page</button>
+      <button onClick={handleBackClick} className={styles.button}>Back to Test Page</button>
     </div>
   );
 }

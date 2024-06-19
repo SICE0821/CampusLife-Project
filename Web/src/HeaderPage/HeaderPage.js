@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../page/AuthContext'; // Adjust path based on your context location
+import styles from './HeaderPage.module.css';
 
 const HeaderPage = () => {
   const { isLoggedIn } = useAuth();
@@ -10,17 +11,17 @@ const HeaderPage = () => {
   }
 
   return (
-    <div>
+    <div className={styles.header}>
       <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
+        <ul className={styles.nav}>
+          <li className={styles.navItem}>
+            <Link to="/" className={styles.navLink}>Home</Link>
           </li>
-          <li>
-            <Link to="/Test">Test Page</Link>
+          <li className={styles.navItem}>
+            <Link to="/Test" className={styles.navLink}>Test Page</Link>
           </li>
-          <li>
-            <Link to="/QrCheck">QrCheck Page</Link>
+          <li className={styles.navItem}>
+            <Link to="/QrCheck" className={styles.navLink}>QrCheck Page</Link>
           </li>
           {/* Add more navigation links as needed */}
         </ul>

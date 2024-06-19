@@ -1,19 +1,15 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  background-color: #f0f2f5;
-}
-
-h1, h2 {
-  color: #333;
-}
-
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 400px;
+  margin: 50px auto;
   padding: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 button {
@@ -31,10 +27,7 @@ button:hover {
 }
 
 form {
-  background-color: white;
   padding: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 input[type="text"],

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Test = () => {
+function Test() {
   const navigate = useNavigate();
 
   const handleNavigateToQrCheck = () => {
-    navigate('/QrCheck');
+    navigate('/qrcheck');
   };
 
   return (

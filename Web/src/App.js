@@ -1,12 +1,20 @@
-import React  from 'react';
+import React from 'react';
 import styles from './App.module.css';
 
-const App = () => {
+function Header() {
+  return <header>
+    <h1><a href='/'>WEB</a></h1>
+  </header>
+}
+
+
+function App() {
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Main Page</h1>
-      <p className={styles.subTitle}>This is the test page.</p>
+    <div>
+      <Header></Header>
+      <h1>Main Page</h1>
+      <p>This is the test page.</p>
     </div>
   );
 }

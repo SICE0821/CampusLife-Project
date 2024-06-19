@@ -1,8 +1,13 @@
 .container {
     background-color: aquamarine;
+    width: 80%;
+    align-items: center;
+    justify-items: center;
 }
 
 .title {
+    background-color: red;
+    width: 200pt;
     text-align: center;
 }
 

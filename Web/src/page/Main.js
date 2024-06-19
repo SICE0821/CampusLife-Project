@@ -1,17 +1,18 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from './Main.module.css';
 
-const Main = () => {
+function Main() {
   const navigate = useNavigate();
 
   const handleNavigateToTest = () => {
-    navigate('/Test');
+    navigate('/test');
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <h1>Main Page</h1>
-      <button onClick={handleNavigateToTest}>Go to Test Page</button>
+      <button onClick={handleNavigateToTest} className={styles.button}>Go to Test Page</button>
     </div>
   );
 }

@@ -7,17 +7,17 @@ import Test from './Test';
 import QrCheck from './QrCheck';
 import HeaderPage from '../HeaderPage/HeaderPage';
 
-const Navigator = () => {
+function Navigator() {
   const { isLoggedIn } = useAuth();
 
   return (
     <Router>
       <HeaderPage />
       <Routes>
-        <Route path="/Login" element={<Login />} />
-        <Route path="/" element={isLoggedIn ? <Main /> : <Navigate to="/Login" />} />
-        <Route path="/Test" element={isLoggedIn ? <Test /> : <Navigate to="/Login" />} />
-        <Route path="/QrCheck" element={isLoggedIn ? <QrCheck /> : <Navigate to="/Login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={isLoggedIn ? <Main /> : <Navigate to="/login" />} />
+        <Route path="/test" element={isLoggedIn ? <Test /> : <Navigate to="/login" />} />
+        <Route path="/qrcheck" element={isLoggedIn ? <QrCheck /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );
