@@ -121,7 +121,10 @@ const { getGeneralPosts,
   addNewEventAram,
   addSchoolNoticeAram,
   addDepartmentNoticeAram,
-  Get_One_Event_Data
+  Get_One_Event_Data,
+  reportPostAram,
+  reportCommentAram,
+  
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -1326,6 +1329,10 @@ app.post('/get_aram_data', async (req, res) => {
       new_event_name: item.new_event_name,
       friend_code_id: item.friend_code_id,
       friend_code_my_name: item.friend_code_my_name,
+      report_post_id : item.report_post_id,
+      report_post_title : item.report_post_title,
+      report_comment_id : item.report_comment_id,
+      report_comment_title : item.report_comment_title
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1381,6 +1388,25 @@ app.post('/addHotAram', async (req, res) => {
   try {
     const { target_id } = req.body;
     await addHotAram(target_id);
+    
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
+app.post('/reportPostAram', async (req, res) => {
+  try {
+    const { target_id } = req.body;
+    await reportPostAram(target_id);
+    
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
+
+app.post('/reportCommentAram', async (req, res) => {
+  try {
+    const { target_id } = req.body;
+    await reportCommentAram(target_id);
     
   } catch (error) {
     console.error("알람 보내기 실패:", error);

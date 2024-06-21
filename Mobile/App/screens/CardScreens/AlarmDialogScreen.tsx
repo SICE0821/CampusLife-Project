@@ -58,7 +58,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         event_photo: eventImage
       };
 
-      return(eventWithImage);
+      return (eventWithImage);
       console.log(JSON.stringify(eventWithImage, null, 2));
     } catch (error) {
       return null;
@@ -232,6 +232,16 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     const item = postList[0];
     navigation.navigate("PostDetailScreen", { item, userData });
   }
+  const go_detail_screen6 = (postList: any) => {
+    const item = postList[0];
+    console.log(item);
+    navigation.navigate("PostDetailScreen", { item, userData });
+  }
+  const go_detail_screen7 = (postList: any) => {
+    const item = postList[0];
+    //console.log(item);
+    navigation.navigate("PostDetailScreen", { item, userData });
+  }
 
   const NavigationPage = async (item2: aramData) => {
     switch (item2.target_type) {
@@ -262,13 +272,24 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         break;
       case 'new_event':
         const eventData: EventData | null = await Get_One_Event_Data(item2.new_event_id);
-    if (eventData) {
-      navigation.navigate("DeadlineEventScreen", { userdata: userData, eventdata: eventData });
-    } else {
-      Alert.alert("이벤트 마감 및 삭제", 
-        `해당 이벤트는 마감되었거나 삭제되었습니다! 
+        if (eventData) {
+          navigation.navigate("DeadlineEventScreen", { userdata: userData, eventdata: eventData });
+        } else {
+          Alert.alert("이벤트 마감 및 삭제",
+            `해당 이벤트는 마감되었거나 삭제되었습니다! 
 다음 이벤트를 노려주세요.`);
-    }
+        }
+        break;
+      case 'report_post':
+        const postList6 = await go_post_detail(item2.report_post_id);
+        //console.log(postList6);
+        console.log(postList6.report_comment_title);
+        go_detail_screen6(postList6);
+        break;
+      case 'report_comment':
+        const postList7 = await go_post_detail(item2.report_comment_id);
+        console.log(postList7.report_comment_title);
+        go_detail_screen7(postList7);
         break;
       default:
         console.log("이동 드가자");
@@ -291,6 +312,10 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={styles.content}>{item.new_event_name}</Text>
       case 'friend_code':
         return <Text style={styles.content}>{item.friend_code_my_name}님이 코드를 입력했습니다</Text>
+      case 'report_post':
+        return <Text style={styles.content}>{item.report_post_title}</Text>
+      case 'report_comment':
+        return <Text style={styles.content}>{item.report_comment_title}</Text>
       default:
         return null;
     }
@@ -312,6 +337,10 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={{ color: '#F29F05' }}><IconD name={"mail"} size={30} /></Text>
       case 'friend_code':
         return <Text style={{ color: '#F29F05' }}><IconE name={"user-friends"} size={30} /></Text>
+      case 'report_post':
+        return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
+      case 'report_comment':
+        return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
       default:
 
         return null;

@@ -1596,7 +1596,11 @@ async function get_aram_data(user_id) {
             new_event.event_id AS new_event_id,
             new_event.name AS new_event_name,
             friend_code.friend_code_id AS friend_code_id,
-            friend_code.my_name AS friend_code_my_name
+            friend_code.my_name AS friend_code_my_name,
+            report_post.post_id AS report_post_id,
+            report_post.title AS report_post_title,
+            report_comment.post_id AS report_comment_id,
+            report_comment.title AS report_comment_title
         FROM
             aram
         LEFT JOIN
@@ -1613,6 +1617,10 @@ async function get_aram_data(user_id) {
             event AS new_event ON aram.target_type = 'new_event' AND aram.target_id = new_event.event_id
         LEFT JOIN
             user_friend_code AS friend_code ON aram.target_type = 'friend_code' AND aram.target_id = friend_code.friend_code_id
+        LEFT JOIN
+        		post AS report_post ON aram.target_type = 'report_post' AND aram.target_id = report_post.post_id
+        LEFT JOIN
+        		post AS report_comment ON aram.target_type = 'report_comment' AND aram.target_id = report_comment.post_id
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -1675,6 +1683,38 @@ async function addHotAram(target_id) {
     try {
         conn = await pool.getConnection();
         const query = `CALL SendEventNotification(?, '오늘의 HOT 게시물입니다!', 'hot_post');`
+        await conn.query(query, [target_id]);
+        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function reportPostAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL InsertIntoAramForAdminUsers(?, '게시물 신고 요청이 들어왔습니다!', 'report_post');`
+        await conn.query(query, [target_id]);
+        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function reportCommentAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL InsertIntoAramForAdminUsers(?, '댓글 신고 요청이 들어왔습니다!', 'report_comment');`
         await conn.query(query, [target_id]);
         console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
@@ -2845,5 +2885,7 @@ module.exports = {
     addNewEventAram,
     addSchoolNoticeAram,
     addDepartmentNoticeAram,
-    Get_One_Event_Data
+    Get_One_Event_Data,
+    reportPostAram,
+    reportCommentAram
 };

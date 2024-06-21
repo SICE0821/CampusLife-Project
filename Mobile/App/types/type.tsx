@@ -126,6 +126,7 @@ export type Lecture = {
   lecture_credit : number;
   lecture_grades : string;
   session_duration: number;
+  today_lecture_state : boolean;
 }
 
 export type aramData = {
@@ -149,6 +150,10 @@ export type aramData = {
   new_event_name : string,
   friend_code_id : number,
   friend_code_my_name : string,
+  report_post_id : number,
+  report_post_title : string,
+  report_comment_id : number,
+  report_comment_title : string,
 }
 
 export type EventData = {

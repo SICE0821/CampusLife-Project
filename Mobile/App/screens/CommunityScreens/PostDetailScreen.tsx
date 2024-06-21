@@ -206,6 +206,39 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     }
 
+    
+    const reportPostAram = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/reportPostAram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    target_id: postDetailInfo?.post_id,
+                })
+            });
+        } catch (error) {
+            console.error('알람 전송 실패', error);
+        }
+    }
+
+    const reportCommentAram = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/reportCommentAram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    target_id: postDetailInfo?.post_id,
+                })
+            });
+        } catch (error) {
+            console.error('알람 전송 실패', error);
+        }
+    }
+
     //좋아요 눌러주면 해당 당사자에게 알람이 쑝숑쑝~
     const addLikeAram = async () => {
         try {
@@ -515,6 +548,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             Alert.alert("해당 게시물에 대해 신고할 수 없습니다.");
         } else {
             put_user_report();
+            reportPostAram();
         }
     }
 
@@ -528,6 +562,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         Alert.alert("해당 게시물에 대해 신고할 수 없습니다.");
         } else {
         put_user_comment_report(comment_id);
+        reportCommentAram();
         }
         }
 
@@ -721,6 +756,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                 if (userdata.user_pk === postDetailInfo?.user_id) {
                                     Alert.alert("본인은 신고할 수 없습니다.");
                                 } else {
+                                    //포스트 신고
                                     ReportUserduplicate();
                                 }
                             }}>
@@ -803,6 +839,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                 if (userdata.user_pk === item.user_id) {
                                                     Alert.alert("본인은 신고할 수 없습니다.");
                                                 } else {
+                                                    //댓글
                                                     ReportUserduplicate2(item.comment_id);
                                                 }
                                             }}>
@@ -876,6 +913,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                         if (userdata.user_pk === item.user_id) {
                                                             Alert.alert("본인은 신고할 수 없습니다.");
                                                         } else {
+                                                            //댓글신고
                                                             ReportUserduplicate2(item.comment_id);
                                                         }
                                                     }}>
