@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (username, password) => {
     // Simulate authentication logic
-    if (username === 'admin' && password === '1111') {
+    if (username === ' ' && password === ' ') {
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);

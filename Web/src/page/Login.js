@@ -2,26 +2,37 @@ import React, { useState } from 'react';
 import { useAuth } from './AuthContext'; // Adjust path based on your context location
 import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
+import logo from '../image/logo.png';
 
 function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    login(username, password);
-    navigate('/');
+    try {
+      await login(username, password);
+      navigate('/');
+    } catch (err) {
+      setError('Login failed. Please check your username and password.');
+    }
   };
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.h2}>로그인</h2>
+      <div className={styles.imageArea}>
+        <img src={logo} alt="Logo" className={styles.image} />
+      </div>
+      <h2 className={styles.h2}>강의 출석체크 홈페이지</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
+        {error && <div className={styles.error}>{error}</div>}
         <div>
-          <label>사용자 이름:</label>
+          <label htmlFor="username">사용자 이름:</label>
           <input
+            id="username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -30,8 +41,9 @@ function Login() {
           />
         </div>
         <div>
-          <label>비밀번호:</label>
+          <label htmlFor="password">비밀번호:</label>
           <input
+            id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

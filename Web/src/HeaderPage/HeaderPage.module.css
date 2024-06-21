@@ -1,6 +1,11 @@
 .header {
-    background-color: #007bff;
+    background-color: #FFDECF;
     padding: 10px 0;
+  }
+
+  .image {
+    width: 250px;
+    padding: 20px;
   }
   
   .nav {

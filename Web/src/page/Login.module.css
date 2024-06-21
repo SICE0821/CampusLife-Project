@@ -1,10 +1,18 @@
 .container {
-  max-width: 400px;
+  max-width: 500px;
   margin: 50px auto;
   padding: 20px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.imageArea {
+  text-align: center;
+}
+
+.image {
+  width: 300px;
 }
 
 h2 {

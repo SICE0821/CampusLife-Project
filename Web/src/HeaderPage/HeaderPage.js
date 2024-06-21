@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../page/AuthContext'; // Adjust path based on your context location
 import styles from './HeaderPage.module.css';
+import logo from '../image/logo.png'
 
 const HeaderPage = () => {
   const { isLoggedIn } = useAuth();
@@ -12,6 +13,7 @@ const HeaderPage = () => {
 
   return (
     <div className={styles.header}>
+      <img src={logo} alt="Logo" className={styles.image} />
       <nav>
         <ul className={styles.nav}>
           <li className={styles.navItem}>
