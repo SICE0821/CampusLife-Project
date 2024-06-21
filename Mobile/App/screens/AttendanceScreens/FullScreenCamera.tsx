@@ -10,10 +10,25 @@ const FullScreenCamera = ({ navigation } : any) => {
   const isValidQRCode = (code : string) => {
     // 현재 날짜와 시간을 포함하는 정규식 패턴 생성
     const now = new Date();
-    const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-    const regex = new RegExp(`^myApp_${timestamp}$`);
-  
-    return regex.test(code);
+    const currentSeconds = now.getSeconds();
+    const tolerance = 1; // 1초의 유예 시간
+
+    for (let i = -tolerance; i <= tolerance; i++) {
+      const seconds = currentSeconds + i;
+      
+      // 초가 60을 넘어갈 경우 분에 반영하고 초를 조정
+      const adjustedSeconds = seconds >= 60 ? seconds - 60 : (seconds < 0 ? seconds + 60 : seconds);
+      const adjustedDate = new Date(now.getTime());
+      adjustedDate.setSeconds(adjustedSeconds);
+      
+      const timestamp = `${adjustedDate.getFullYear()}-${(adjustedDate.getMonth() + 1).toString().padStart(2, '0')}-${adjustedDate.getDate().toString().padStart(2, '0')} ${adjustedDate.getHours().toString().padStart(2, '0')}:${adjustedDate.getMinutes().toString().padStart(2, '0')}:${adjustedDate.getSeconds().toString().padStart(2, '0')}`;
+      const regex = new RegExp(`^myApp_${timestamp}$`);
+      
+      if (regex.test(code)) {
+        return true;
+      }
+    }
+    return false;
   };
 
   const codeScanner = useCodeScanner({
