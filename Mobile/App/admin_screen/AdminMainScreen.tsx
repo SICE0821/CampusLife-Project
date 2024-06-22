@@ -49,7 +49,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const [eventData, setEventData] = useState<EventData[]>([]);
   const [Userdepartment, setUserDepartment] = useState();
-  const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
+  const fileUri = `${config.serverUrl}/${userData.profile_photo}.png`;
 
   const initialEvents = [  // 이벤트 추가 재거는 여기서 
     {
@@ -242,7 +242,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data;
     } catch (error) {
       console.error(error);
@@ -275,7 +275,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
         };
       }));
       setEventData(eventsWithImages);
-      console.log(JSON.stringify(eventsWithImages, null, 2));
+      //console.log(JSON.stringify(eventsWithImages, null, 2));
     } catch (error) {
       console.error(error);
     }
@@ -370,7 +370,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
                   key={index}
                   onPress={() => {
                     navigation.navigate(event.screen, event.params)
-                    console.log(event.params)
+                    //console.log(event.params)
                   }
                   }
                   style={styles.eventBox}>

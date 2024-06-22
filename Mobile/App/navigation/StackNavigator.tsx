@@ -370,7 +370,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),

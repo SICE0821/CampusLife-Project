@@ -310,7 +310,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                         <View style={styles.profilepicturecontainer}>
                             <View style={styles.profilepicturebox}>
                                 <Image
-                                    source={{ uri: `${config.photoUrl}/${postDetailInfo?.writer_propile}` }}
+                                    source={{ uri: `${config.photoUrl}/${postDetailInfo?.writer_propile}.png` }}
                                     style={{ width: 60, height: 60, borderRadius: 12, justifyContent: 'center', alignItems: 'center' }}
                                 />
                             </View>
@@ -354,7 +354,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                     <View style={styles.picturebox}>
                                         <View style={styles.picture}>
                                             <Image
-                                                source={{ uri: `http://10.0.2.2:3000/${item?.user_profile}` }}
+                                                source={{ uri: `http://10.0.2.2:3000/${item?.user_profile}.png` }}
                                                 style={{ width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center' }}
                                             />
                                         </View>
