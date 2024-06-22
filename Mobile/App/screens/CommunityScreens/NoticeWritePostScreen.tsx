@@ -105,6 +105,40 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     }
   }
 
+  const addSchoolNoticeAram = async (value : number) => {
+    try {
+        const response = await fetch(`${config.serverUrl}/addSchoolNoticeAram`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                target_id: value
+            })
+        });
+    } catch (error) {
+        console.error('알람 전송 실패', error);
+    }
+}
+
+
+const addDepartmentNoticeAram = async (value : number) => {
+  try {
+      const response = await fetch(`${config.serverUrl}/addDepartmentNoticeAram`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              target_id: value
+          })
+      });
+  } catch (error) {
+      console.error('알람 전송 실패', error);
+  }
+}
+
+
   const write_post = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/write_post`, {
@@ -123,7 +157,14 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
       console.log("게시글 작성완료!");
       const value = await response.json();
       console.log(value);
+      console.log(selectdepartmentposter);
+      if(selectdepartmentposter === 0) {
+      addSchoolNoticeAram(value.postId);
       ok_go();
+    }else if(selectdepartmentposter === 1) {
+      addDepartmentNoticeAram(value.postId);
+      ok_go();
+    }
 
     } catch (error) {
       console.error('게시글 쓰기 실패!', error);
