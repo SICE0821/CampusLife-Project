@@ -1,52 +1,123 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Text, Image } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, StyleSheet, Dimensions, Text, Image, Alert, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import IconSetting from 'react-native-vector-icons/Entypo';
+import { UserData } from '../types/type';
+import config from '../config';
+import { useFocusEffect } from '@react-navigation/native';
+
+type userInfo = {
+  user_id: number,
+  id: string,
+  point: number,
+  profilePhoto: string,
+  title: string,
+  report_confirm: number,
+  student_name: string,
+  student_id: number,
+  department_id: number,
+  department_name: string,
+  campus_id: number,
+  caution : number, 
+};
 
 const width = Dimensions.get("window").width;
 
-const admin_check = ['관리자', '일반유저', '학과대표', '학과조교'];
-const departments = ['컴퓨터소프트웨어학과', '기계공학과', '전자공학과']; // 필요에 따라 학과를 추가하세요
-
-const userData = [
-  { userId: 1, image: require('../assets/event1.jpg'), name: '홍길동', id: 'Hong01', department: '컴퓨터소프트웨어학과', report: 1, admin: 1, point: 2000 },
-  { userId: 2, image: require('../assets/event1.jpg'), name: '김철수', id: 'Kim01', department: '기계공학과', report: 4, admin: 0, point: 1500 },
-  { userId: 3, image: require('../assets/event1.jpg'), name: '이영희', id: 'Lee01', department: '전자공학과', report: 2, admin: 2, point: 1800 },
-  { userId: 4, image: require('../assets/event1.jpg'), name: '홍길동', id: 'Hong01', department: '컴퓨터소프트웨어학과', report: 1, admin: 1, point: 2000 },
-  { userId: 5, image: require('../assets/event1.jpg'), name: '김철수', id: 'Kim01', department: '기계공학과', report: 4, admin: 0, point: 1500 },
-  { userId: 6, image: require('../assets/event1.jpg'), name: '이영희', id: 'Lee01', department: '전자공학과', report: 2, admin: 2, point: 1800 },
-  { userId: 7, image: require('../assets/event1.jpg'), name: '홍길동', id: 'Hong01', department: '컴퓨터소프트웨어학과', report: 1, admin: 1, point: 2000 },
-  { userId: 8, image: require('../assets/event1.jpg'), name: '김철수', id: 'Kim01', department: '기계공학과', report: 4, admin: 0, point: 1500 },
-  { userId: 9, image: require('../assets/event1.jpg'), name: '이영희', id: 'Lee01', department: '전자공학과', report: 2, admin: 2, point: 1800 },
-
-];
-
-const getRoleColor = (role: number) => {
+const getRoleColor = (role: string) => {
   switch (role) {
-    case 0:
+    case '반장':
       return 'red';
-    case 1:
-      return 'black';
-    case 2:
+    case '학우회장':
       return 'green';
-    case 3:
+    case '일반학생':
+      return 'black';
+    case '학교':
       return 'blue';
     default:
       return 'black';
   }
-};
+};  
 
-const ManagementUserScreen = () => {
+const ManagementUserScreen = ({route} : any) => {
+  const { userdata } = route.params;
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedAdmin, setSelectedAdmin] = useState('');
   const [selectedUser, setSelectedUser] = useState<any>(null); // 선택된 사용자 상태
+  const [departments, setDepartments] = useState<string[]>([]);
+  const [usergetData, setUserData] = useState<UserData>(userdata);
+  const [userData, setUserDataState] = useState<userInfo[]>([]);
+  const [admin_check, setAdminCheck] = useState<string[]>([]);
+  const [roleModalVisible, setRoleModalVisible] = useState(false); // 권한 변경 모달의 가시성 상태
+  const [pointsModalVisible, setPointsModalVisible] = useState(false); // 포인트 수정 모달의 가시성 상태
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [newPoints, setNewPoints] = useState<number | undefined>(undefined);
 
-  // 사용자 데이터를 필터링하여 선택된 학과와 관리자 유형에 따라 필터링합니다.
+  const get_department = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/get_department`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: usergetData.campus_pk
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log(data); // API에서 받아온 데이터 확인
+
+      // 데이터에서 학과 이름들을 추출하여 departments 배열에 저장
+      const departmentNames = data.map((item: any) => item.department_name); // 예시로 department_name을 가져오는 코드
+
+      setDepartments(departmentNames); // departments 배열 업데이트
+    } catch (error) {
+      console.error('Failed to fetch departments:', error);
+    }
+  };
+
+  const get_user_Info = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/get_user_Info`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: usergetData.campus_pk
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const data = await response.json();
+      console.log(data); // API에서 받아온 데이터 확인
+  
+      // title이 '학교'인 데이터는 필터링하여 제외
+      const filteredData = data.filter((item: any) => item.title !== '학교');
+  
+      // 필터링된 데이터에서 adminCheckNames 추출
+      const adminCheckNames = filteredData.map((item: any) => item.title);
+      const uniqueAdminCheckNames = Array.from(new Set(adminCheckNames)) as string[];
+      setAdminCheck(uniqueAdminCheckNames);
+  
+      setUserDataState(filteredData);
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+    }
+  };
+
   const filteredUserData = userData.filter((user) => {
     return (
-      (selectedDepartment === '' || user.department === selectedDepartment) &&
-      (selectedAdmin === '' || admin_check[user.admin] === selectedAdmin)
+      (selectedDepartment === '' || user.department_name === selectedDepartment) &&
+      (selectedAdmin === '' || (user.title === selectedAdmin && user.title !== '학교'))
     );
   });
 
@@ -55,29 +126,199 @@ const ManagementUserScreen = () => {
     setSelectedUser(user);
   };
 
-  // 신고 확인 기능
-  const handleReportCheck = () => {
+  // 경고 주기 기능
+  const handleReportCheck = async () => {
     if (selectedUser) {
-      console.log(`선택된 유저의 신고 누적 횟수: ${selectedUser.report}`);
-      // 여기에 신고 확인 기능을 구현할 수 있습니다.
+      Alert.alert(
+        '경고 주기',
+        `선택된 사용자에게 경고를 주시겠습니까?`,
+        [
+          {
+            text: '취소',
+            style: 'cancel'
+          },
+          {
+            text: '확인',
+            onPress: async () => {
+              try {
+                const response = await fetch(`${config.serverUrl}/update_user_caution`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    user_pk: selectedUser.user_id // 선택된 사용자의 user_id를 서버로 전송
+                  })
+                });
+  
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+  
+                // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
+                const updatedUserData = [...userData];
+                const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
+                if (index !== -1) {
+                  updatedUserData[index].caution += 1; // 경고 누적 횟수 1 증가
+                  setUserDataState(updatedUserData); // 상태 업데이트
+                }
+  
+                // 성공 또는 실패 메시지 출력
+                const data = await response.json();
+                console.log(data.message);
+  
+                // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
+  
+              } catch (error) {
+                console.error('Failed to update caution:', error);
+                // 실패 처리
+              }
+            }
+          }
+        ]
+      );
     }
+  };
+
+const handleRoleChange = async () => {
+  try {
+    const response = await fetch(`${config.serverUrl}/update_user_title`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_pk: selectedUser.user_id, // 선택된 사용자의 user_id
+        title: selectedRole // 선택된 권한
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
+    const updatedUserData = [...userData];
+    const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
+    if (index !== -1) {
+      updatedUserData[index].title = selectedRole; // 사용자의 title 상태 업데이트
+      setUserDataState(updatedUserData); // 상태 업데이트
+    }
+
+    const data = await response.json();
+    console.log(data.message); // 성공 또는 실패 메시지 출력
+
+    // 알림창 표시
+    Alert.alert(
+      '완료',
+      '권한이 성공적으로 변경되었습니다.',
+      [
+        { text: '확인', onPress: () => closeRoleModal() }
+      ],
+      { cancelable: false }
+    );
+
+    // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
+
+  } catch (error) {
+    console.error('Failed to update user title:', error);
+    // 실패 처리
+  }
+};
+
+  // 권한 변경 모달 열기
+  const openRoleModal = () => {
+    setRoleModalVisible(true);
+  };
+
+  // 포인트 수정 모달 열기
+  const openPointsModal = () => {
+    setPointsModalVisible(true);
   };
 
   // 권한 변경 기능
   const handleChangeRole = () => {
     if (selectedUser) {
-      console.log(`선택된 유저의 현재 권한: ${admin_check[selectedUser.admin]}`);
-      // 여기에 권한 변경 기능을 구현할 수 있습니다.
+      openRoleModal();
     }
   };
 
   // 포인트 수정 기능
   const handleModifyPoints = () => {
     if (selectedUser) {
-      console.log(`선택된 유저의 현재 포인트: ${selectedUser.point}`);
-      // 여기에 포인트 수정 기능을 구현할 수 있습니다.
+      openPointsModal();
     }
   };
+
+  // 권한 변경 모달 닫기
+  const closeRoleModal = () => {
+    setRoleModalVisible(false);
+  };
+
+  // 포인트 수정 모달 닫기
+  const closePointsModal = () => {
+    setPointsModalVisible(false);
+  };
+
+  const handleRoleSelect = (role: string) => {
+    setSelectedRole(role); // 선택된 권한 업데이트
+  };
+
+  const handlePointsChange = (text: string) => {
+    // Parse the input text to a number and update the state
+    const points = parseInt(text, 10); // 문자열을 숫자로 변환
+    if (!isNaN(points)) {
+      setNewPoints(points); // 숫자가 유효하면 newPoints 상태 업데이트
+    } else {
+      setNewPoints(undefined); // 유효하지 않은 경우 newPoints 초기화
+    }
+  };
+
+  const handlePointsModify = async () => {
+    if (selectedUser && newPoints !== undefined) {
+        try {
+            const response = await fetch(`${config.serverUrl}/update_user_allpoint`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_pk: selectedUser.user_id,
+                    point: newPoints,
+                }),
+            });
+
+            const data = await response.json();
+            console.log(data.message);
+
+            // Update local state upon successful update
+            const updatedUserData = userData.map(user =>
+                user.user_id === selectedUser.user_id ? { ...user, point: newPoints } : user
+            );
+            setUserDataState(updatedUserData);
+
+            Alert.alert(
+                '완료',
+                '포인트가 성공적으로 수정되었습니다.',
+                [{ text: '확인', onPress: closePointsModal }],
+                { cancelable: false }
+            );
+
+        } catch (error) {
+            console.error('Failed to update user points:', error);
+            Alert.alert('오류', '포인트 업데이트 실패', [{ text: '확인' }]);
+        }
+    }
+};
+
+  
+
+  useFocusEffect(
+    useCallback(() => {
+      get_department();
+      get_user_Info(); // 추가: 사용자 정보를 가져오는 함수 호출
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
@@ -100,7 +341,7 @@ const ManagementUserScreen = () => {
         >
           <Picker.Item label="전체 유저 타입" value="" />
           {admin_check.map((role, index) => (
-            <Picker.Item key={index} label={role} value={role} />
+            role !== '학교' && <Picker.Item key={index} label={role} value={role} />
           ))}
         </Picker>
       </View>
@@ -109,21 +350,21 @@ const ManagementUserScreen = () => {
       <ScrollView>
         {filteredUserData.map((user, index) => (
           <View key={index} style={styles.userInfoBox}>
-            <View style={styles.imageArea}>
-              <Image style={styles.image} source={user.image} />
+            <View style={styles.imageArea}> 
+              <Image style={styles.image} source={{ uri: `${config.serverUrl}/${user.profilePhoto}` }} />
             </View>
             <View style={styles.userInfoArea}>
               <View style={styles.userInfo}>
-                <Text style={styles.name}>{user.name}</Text>
+                <Text style={styles.name}>{user.student_name}</Text>
                 <Text style={styles.id}>{user.id}</Text>
-                <Text style={styles.department}>{user.department}</Text>
+                <Text style={styles.department}>{user.department_name}</Text>
               </View>
               <View style={styles.userInfo}>
-                <Text style={[styles.report, user.report > 3 && { color: 'red' }]}>
-                  신고누적횟수 : {user.report}회
+                <Text style={[styles.report, user.report_confirm > 3 && { color: 'red' }]}>
+                  경고누적횟수 : {user.caution}회
                 </Text>
-                <Text style={[styles.admin, { color: getRoleColor(user.admin) }]}>
-                  {admin_check[user.admin]}
+                <Text style={[styles.admin, { color: getRoleColor(user.title) }]}>
+                  {user.title}
                 </Text>
                 <Text style={styles.point}>{user.point} P</Text>
               </View>
@@ -136,18 +377,16 @@ const ManagementUserScreen = () => {
               >
                 <IconSetting style={styles.userSettingIcon} name='dots-three-vertical' />
               </TouchableOpacity>
-
-              
             </View>
             {/* 선택된 사용자에 대한 드롭다운 메뉴 */}
-            {selectedUser && selectedUser.userId === user.userId && (
+            {selectedUser && selectedUser.user_id === user.user_id && (
                 <View style={styles.dropdown}>
                   <TouchableOpacity style={styles.dropdownItem} onPress={handleReportCheck}>
-                    <Text style={styles.dropdownText}>신고확인</Text>
+                    <Text style={styles.dropdownText}>경고주기</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.dropdownItem} onPress={handleChangeRole}>
                     <Text style={styles.dropdownText}>권한 변경</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> 
                   <TouchableOpacity style={styles.dropdownItem} onPress={handleModifyPoints}>
                     <Text style={styles.dropdownText}>포인트 수정</Text>
                   </TouchableOpacity>
@@ -156,6 +395,81 @@ const ManagementUserScreen = () => {
           </View>
         ))}
       </ScrollView>
+
+      {/* 권한 변경 모달 */}
+      <Modal
+        visible={roleModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeRoleModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.roleOptionsContainer}>
+              <TouchableOpacity
+                style={[styles.roleOption, selectedRole === '반장' && styles.selectedRoleOption]}
+                onPress={() => handleRoleSelect('반장')}
+              >
+                <Text style={styles.roleOptionText}>반장</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.roleOption, selectedRole === '학우회장' && styles.selectedRoleOption]}
+                onPress={() => handleRoleSelect('학우회장')}
+              >
+                <Text style={styles.roleOptionText}>학우회장</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.roleOption, selectedRole === '일반학생' && styles.selectedRoleOption]}
+                onPress={() => handleRoleSelect('일반학생')}
+              >
+                <Text style={styles.roleOptionText}>일반학생</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.cancelButton} onPress={closeRoleModal}>
+                <Text style={styles.buttonText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.confirmButton} onPress={handleRoleChange}>
+                <Text style={styles.buttonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+
+      {/* 포인트 수정 모달 */}
+      <Modal
+        visible={pointsModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closePointsModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>포인트 수정</Text>
+            <View style={styles.modalInputContainer}>
+              {/* Example input field (adjust as per your application's requirements) */}
+              <TextInput
+                style={styles.modalInput}
+                placeholder={selectedUser?.point.toString()}
+                keyboardType="numeric"
+                value={newPoints !== undefined ? newPoints.toString() : ''}
+                onChangeText={handlePointsChange}
+              />
+            </View> 
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity style={styles.modalButton} onPress={handlePointsModify}>
+                <Text style={styles.modalButtonText}>확인</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={closePointsModal}>
+                <Text style={styles.modalButtonText}>취소</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
@@ -265,7 +579,102 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: 'black',
     fontSize: 18
-  }
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 검정 배경
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    width: '80%',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  roleOptionsContainer: {
+    marginTop: 20,
+  },
+  roleOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    alignItems: 'center',
+  },
+  selectedRoleOption: {
+    backgroundColor: '#F0F0F0', // 선택된 항목의 배경색
+  },
+  roleOptionText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 20,
+  },
+  cancelButton: {
+    backgroundColor: 'gray',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  confirmButton: {
+    backgroundColor: '#4E93E3',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalInputContainer: {
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+  },
+  modalInput: {
+    fontSize: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  modalButton: {
+    backgroundColor: '#4E93E3',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
 
 export default ManagementUserScreen;

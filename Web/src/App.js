@@ -1,45 +1,55 @@
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
+import './App.css'; // Import the CSS file
 
 function App() {
-  const [qrData, setQrData] = useState(""); // QR 코드 데이터 상태 추가
-  const [remainingTime, setRemainingTime] = useState(20); // 남은 시간 상태 추가
+  const [qrData, setQrData] = useState(""); 
+  const [remainingTime, setRemainingTime] = useState(5); // QR 코드 유효 시간 설정 (초)
+  const qrTime = 1; // QR 코드 재생성 간격 (초)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      // 랜덤한 QR 데이터 생성
-      const randomData = generateRandomQRData();
-      setQrData(randomData);
+    const generateQRDataWithTimestamp = () => {
+      const prefix = "myApp_";
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+      return prefix + timestamp;
+    };
 
-      // 남은 시간 업데이트
-      setRemainingTime(20);
-    }, 20000); // 20초
+    const updateQRCode = () => {
+      setQrData(generateQRDataWithTimestamp());
+      setRemainingTime(qrTime); // 남은 시간 재설정
+    };
+
+    updateQRCode(); // 초기 QR 코드 생성
+
+    const interval = setInterval(updateQRCode, qrTime * 1000); // 주기적으로 QR 코드 갱신
 
     const countdown = setInterval(() => {
-      // 매 초마다 남은 시간 업데이트
-      setRemainingTime(prevTime => prevTime - 1);
-    }, 1000); // 1초
+      setRemainingTime(prevTime => prevTime > 0 ? prevTime - 1 : 0); // 남은 시간 감소
+    }, 1000);
 
-    // 컴포넌트가 언마운트될 때 타이머 해제
+    // 컴포넌트 언마운트 시 interval과 countdown 정리
     return () => {
-      clearInterval(timer);
+      clearInterval(interval);
       clearInterval(countdown);
     };
   }, []);
 
-  const generateRandomQRData = () => {
-    // 랜덤한 문자열 생성
-    const randomString = Math.random().toString(36).substring(2, 15);
-    return randomString;
-  };
+  useEffect(() => {
+    // remainingTime이 0이 되면 QR 코드를 비움
+    if (remainingTime === 0) {
+      setQrData("");
+    }
+  }, [remainingTime]);
 
   return (
     <div className="App">
-      <h1>QRCode Check</h1>
-      <div>
-        <QRCode value={qrData} />
-        <p>남은 시간: {remainingTime}초</p> {/* 남은 시간을 텍스트로 표시 */}
-      </div>
+      <header className="App-header">
+        <h1>출석 체크</h1>
+        <div>
+          <QRCode value={qrData} bgColor={'white'} size={512}/>
+        </div>
+      </header>
     </div>
   );
 }

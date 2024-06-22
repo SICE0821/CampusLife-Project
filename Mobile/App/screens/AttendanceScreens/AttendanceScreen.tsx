@@ -208,7 +208,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
       lecture.today_lecture_state = false;
     }
   };
-
+  
   React.useEffect(() =>{
     requestPermission();
   }, [])

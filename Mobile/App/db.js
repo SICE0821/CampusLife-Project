@@ -2700,6 +2700,91 @@ async function GetUserEventPhoto(event_id, user_id) {
     }
 }
 
+
+async function getuserInfo(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 조회 쿼리 작성
+        const rows = await conn.query(`
+            SELECT 
+                u.user_id, 
+                u.id, 
+                u.point, 
+                u.profilePhoto, 
+                u.title, 
+                u.report_confirm,
+                u.caution, 
+                s.name AS student_name, 
+                s.student_id, 
+                s.department_id, 
+                s.campus_id,
+                d.name AS department_name
+            FROM 
+                user u
+            JOIN 
+                student s ON u.student_id = s.student_id
+            JOIN 
+                department d ON s.department_id = d.department_id
+            WHERE 
+                s.campus_id = ?
+        `, [campus_id]);
+
+        return rows;
+    } catch (err) {
+        console.error('Error fetching data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function update_user_caution(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET caution = caution + 1 WHERE user_id = ?';
+        const result = await conn.query(query, [user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function update_user_title(user_pk, title) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET title = ? WHERE user_id = ?';
+        const result = await conn.query(query, [title, user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // Release the connection
+    }
+}
+
+async function update_user_allpoint(user_pk, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET point = ? WHERE user_id = ?';
+        const result = await conn.query(query, [point, user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // Release connection
+    }
+}
+
+
+
 //해당 이벤트의 모든 투표 정보 가져오기
 async function GetEventVote(campus_id) {
     let conn;
@@ -2833,7 +2918,6 @@ module.exports = {
     insert_user_have_object,
     getUserHaveCoupon,
     getyourpoint,
-    update_user_point,
     Updatelecture,
     getCampus,
     insert_student_study_room,
@@ -2894,6 +2978,11 @@ module.exports = {
     DeleteEvent,
     RegistorEventVotesAdmin,
     GetUserSendEvent,
+    GetUserEventPhoto,
+    getuserInfo,
+    update_user_caution,
+    update_user_title,
+    update_user_allpoint,
     GetUserEventPhoto,
     GetEventVote,
     GetoneEventVote,

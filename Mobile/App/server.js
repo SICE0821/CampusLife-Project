@@ -114,6 +114,11 @@ const { getGeneralPosts,
   RegistorEventVotesAdmin,
   GetUserSendEvent,
   GetUserEventPhoto,
+  getuserInfo,
+  update_user_caution,
+  update_user_title,
+  update_user_allpoint,
+  GetUserEventPhoto,
   GetEventVote,
   GetoneEventVote,
   SendUserEventVote,
@@ -2272,6 +2277,76 @@ app.post('/GetUserEventPhoto', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+
+app.post('/get_user_Info', async (req, res) => {
+  const { campus_id } = req.body;
+  
+  try {
+    const rows = await getuserInfo(campus_id);
+
+    const userData = rows.map(row => ({
+      user_id: row.user_id,
+      id: row.id,
+      point: row.point,
+      profilePhoto: row.profilePhoto,
+      title: row.title,
+      report_confirm: row.report_confirm,
+      student_name: row.student_name,
+      student_id: row.student_id,
+      department_id: row.department_id,
+      department_name: row.department_name,
+      campus_id: row.campus_id,
+      caution : row.caution,
+    }));
+
+    res.json(userData);
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    res.status(500).json({ error: 'Failed to fetch user info' });
+  }
+});
+
+app.post('/update_user_caution', async (req, res) => {
+  const { user_pk } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await update_user_caution(user_pk); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "경고 업데이트 성공." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "경고 업데이트 실패" });
+  }
+});
+
+app.post('/update_user_title', async (req, res) => {
+  const { user_pk, title } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await update_user_title(user_pk, title); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "경고 업데이트 성공." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "경고 업데이트 실패" });
+  }
+});
+
+app.post('/update_user_allpoint', async (req, res) => {
+  const { user_pk, point } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await update_user_allpoint(user_pk, point); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "포인트 업데이트 성공." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "포인트 업데이트 실패" });
+  }
+});
+
+
 
 //해당 이벤트의 모든 투표 정보 가져오기
 app.post('/GetEventVote', async (req, res) => {
