@@ -114,7 +114,10 @@ const { getGeneralPosts,
   RegistorEventVotesAdmin,
   GetUserSendEvent,
   GetUserEventPhoto,
-  getuserInfo
+  getuserInfo,
+  update_user_caution,
+  update_user_title,
+  update_user_allpoint
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -2202,7 +2205,8 @@ app.post('/get_user_Info', async (req, res) => {
       student_id: row.student_id,
       department_id: row.department_id,
       department_name: row.department_name,
-      campus_id: row.campus_id
+      campus_id: row.campus_id,
+      caution : row.caution,
     }));
 
     res.json(userData);
@@ -2211,6 +2215,46 @@ app.post('/get_user_Info', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch user info' });
   }
 });
+
+app.post('/update_user_caution', async (req, res) => {
+  const { user_pk } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await update_user_caution(user_pk); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "경고 업데이트 성공." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "경고 업데이트 실패" });
+  }
+});
+
+app.post('/update_user_title', async (req, res) => {
+  const { user_pk, title } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await update_user_title(user_pk, title); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "경고 업데이트 성공." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "경고 업데이트 실패" });
+  }
+});
+
+app.post('/update_user_allpoint', async (req, res) => {
+  const { user_pk, point } = req.body;
+  console.log("성공적으로 값 넣음");
+  try {
+    await update_user_allpoint(user_pk, point); // await 추가
+    console.log("성공적으로 업데이트 됨");
+    res.status(200).send({ message: "포인트 업데이트 성공." });
+  } catch (error) {
+    console.error("계정 업데이트 실패", error);
+    res.status(500).send({ message: "포인트 업데이트 실패" });
+  }
+});
+
 
 
 //서버 시작

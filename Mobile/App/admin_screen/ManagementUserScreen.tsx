@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { View, StyleSheet, Dimensions, Text, Image } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Image, Alert, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import IconSetting from 'react-native-vector-icons/Entypo';
 import { UserData } from '../types/type';
 import config from '../config';
@@ -18,11 +18,11 @@ type userInfo = {
   student_id: number,
   department_id: number,
   department_name: string,
-  campus_id: number
+  campus_id: number,
+  caution : number, 
 };
 
 const width = Dimensions.get("window").width;
-
 
 const getRoleColor = (role: string) => {
   switch (role) {
@@ -48,6 +48,10 @@ const ManagementUserScreen = ({route} : any) => {
   const [usergetData, setUserData] = useState<UserData>(userdata);
   const [userData, setUserDataState] = useState<userInfo[]>([]);
   const [admin_check, setAdminCheck] = useState<string[]>([]);
+  const [roleModalVisible, setRoleModalVisible] = useState(false); // 권한 변경 모달의 가시성 상태
+  const [pointsModalVisible, setPointsModalVisible] = useState(false); // 포인트 수정 모달의 가시성 상태
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [newPoints, setNewPoints] = useState<number | undefined>(undefined);
 
   const get_department = async () => {
     try {
@@ -109,7 +113,6 @@ const ManagementUserScreen = ({route} : any) => {
       console.error('Failed to fetch user info:', error);
     }
   };
-  
 
   const filteredUserData = userData.filter((user) => {
     return (
@@ -123,29 +126,192 @@ const ManagementUserScreen = ({route} : any) => {
     setSelectedUser(user);
   };
 
-  // 신고 확인 기능
-  const handleReportCheck = () => {
+  // 경고 주기 기능
+  const handleReportCheck = async () => {
     if (selectedUser) {
-      console.log(`선택된 유저의 신고 누적 횟수: ${selectedUser.report_confirm}`);
-      // 여기에 신고 확인 기능을 구현할 수 있습니다.
+      Alert.alert(
+        '경고 주기',
+        `선택된 사용자에게 경고를 주시겠습니까?`,
+        [
+          {
+            text: '취소',
+            style: 'cancel'
+          },
+          {
+            text: '확인',
+            onPress: async () => {
+              try {
+                const response = await fetch(`${config.serverUrl}/update_user_caution`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    user_pk: selectedUser.user_id // 선택된 사용자의 user_id를 서버로 전송
+                  })
+                });
+  
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+  
+                // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
+                const updatedUserData = [...userData];
+                const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
+                if (index !== -1) {
+                  updatedUserData[index].caution += 1; // 경고 누적 횟수 1 증가
+                  setUserDataState(updatedUserData); // 상태 업데이트
+                }
+  
+                // 성공 또는 실패 메시지 출력
+                const data = await response.json();
+                console.log(data.message);
+  
+                // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
+  
+              } catch (error) {
+                console.error('Failed to update caution:', error);
+                // 실패 처리
+              }
+            }
+          }
+        ]
+      );
     }
+  };
+
+const handleRoleChange = async () => {
+  try {
+    const response = await fetch(`${config.serverUrl}/update_user_title`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user_pk: selectedUser.user_id, // 선택된 사용자의 user_id
+        title: selectedRole // 선택된 권한
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
+    const updatedUserData = [...userData];
+    const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
+    if (index !== -1) {
+      updatedUserData[index].title = selectedRole; // 사용자의 title 상태 업데이트
+      setUserDataState(updatedUserData); // 상태 업데이트
+    }
+
+    const data = await response.json();
+    console.log(data.message); // 성공 또는 실패 메시지 출력
+
+    // 알림창 표시
+    Alert.alert(
+      '완료',
+      '권한이 성공적으로 변경되었습니다.',
+      [
+        { text: '확인', onPress: () => closeRoleModal() }
+      ],
+      { cancelable: false }
+    );
+
+    // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
+
+  } catch (error) {
+    console.error('Failed to update user title:', error);
+    // 실패 처리
+  }
+};
+
+  // 권한 변경 모달 열기
+  const openRoleModal = () => {
+    setRoleModalVisible(true);
+  };
+
+  // 포인트 수정 모달 열기
+  const openPointsModal = () => {
+    setPointsModalVisible(true);
   };
 
   // 권한 변경 기능
   const handleChangeRole = () => {
     if (selectedUser) {
-      console.log(`선택된 유저의 현재 권한: ${admin_check[selectedUser.report_confirm]}`);
-      // 여기에 권한 변경 기능을 구현할 수 있습니다.
+      openRoleModal();
     }
   };
 
   // 포인트 수정 기능
   const handleModifyPoints = () => {
     if (selectedUser) {
-      console.log(`선택된 유저의 현재 포인트: ${selectedUser.point}`);
-      // 여기에 포인트 수정 기능을 구현할 수 있습니다.
+      openPointsModal();
     }
   };
+
+  // 권한 변경 모달 닫기
+  const closeRoleModal = () => {
+    setRoleModalVisible(false);
+  };
+
+  // 포인트 수정 모달 닫기
+  const closePointsModal = () => {
+    setPointsModalVisible(false);
+  };
+
+  const handleRoleSelect = (role: string) => {
+    setSelectedRole(role); // 선택된 권한 업데이트
+  };
+
+  const handlePointsChange = (text: string) => {
+    // Parse the input text to a number and update the state
+    const points = parseInt(text, 10); // 문자열을 숫자로 변환
+    if (!isNaN(points)) {
+      setNewPoints(points); // 숫자가 유효하면 newPoints 상태 업데이트
+    } else {
+      setNewPoints(undefined); // 유효하지 않은 경우 newPoints 초기화
+    }
+  };
+
+  const handlePointsModify = async () => {
+    if (selectedUser && newPoints !== undefined) {
+        try {
+            const response = await fetch(`${config.serverUrl}/update_user_allpoint`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_pk: selectedUser.user_id,
+                    point: newPoints,
+                }),
+            });
+
+            const data = await response.json();
+            console.log(data.message);
+
+            // Update local state upon successful update
+            const updatedUserData = userData.map(user =>
+                user.user_id === selectedUser.user_id ? { ...user, point: newPoints } : user
+            );
+            setUserDataState(updatedUserData);
+
+            Alert.alert(
+                '완료',
+                '포인트가 성공적으로 수정되었습니다.',
+                [{ text: '확인', onPress: closePointsModal }],
+                { cancelable: false }
+            );
+
+        } catch (error) {
+            console.error('Failed to update user points:', error);
+            Alert.alert('오류', '포인트 업데이트 실패', [{ text: '확인' }]);
+        }
+    }
+};
+
+  
 
   useFocusEffect(
     useCallback(() => {
@@ -195,7 +361,7 @@ const ManagementUserScreen = ({route} : any) => {
               </View>
               <View style={styles.userInfo}>
                 <Text style={[styles.report, user.report_confirm > 3 && { color: 'red' }]}>
-                  신고누적횟수 : {user.report_confirm}회
+                  경고누적횟수 : {user.caution}회
                 </Text>
                 <Text style={[styles.admin, { color: getRoleColor(user.title) }]}>
                   {user.title}
@@ -220,7 +386,7 @@ const ManagementUserScreen = ({route} : any) => {
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.dropdownItem} onPress={handleChangeRole}>
                     <Text style={styles.dropdownText}>권한 변경</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> 
                   <TouchableOpacity style={styles.dropdownItem} onPress={handleModifyPoints}>
                     <Text style={styles.dropdownText}>포인트 수정</Text>
                   </TouchableOpacity>
@@ -229,9 +395,85 @@ const ManagementUserScreen = ({route} : any) => {
           </View>
         ))}
       </ScrollView>
+
+      {/* 권한 변경 모달 */}
+      <Modal
+        visible={roleModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeRoleModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.roleOptionsContainer}>
+              <TouchableOpacity
+                style={[styles.roleOption, selectedRole === '반장' && styles.selectedRoleOption]}
+                onPress={() => handleRoleSelect('반장')}
+              >
+                <Text style={styles.roleOptionText}>반장</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.roleOption, selectedRole === '학우회장' && styles.selectedRoleOption]}
+                onPress={() => handleRoleSelect('학우회장')}
+              >
+                <Text style={styles.roleOptionText}>학우회장</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.roleOption, selectedRole === '일반학생' && styles.selectedRoleOption]}
+                onPress={() => handleRoleSelect('일반학생')}
+              >
+                <Text style={styles.roleOptionText}>일반학생</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.cancelButton} onPress={closeRoleModal}>
+                <Text style={styles.buttonText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.confirmButton} onPress={handleRoleChange}>
+                <Text style={styles.buttonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+
+      {/* 포인트 수정 모달 */}
+      <Modal
+        visible={pointsModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closePointsModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>포인트 수정</Text>
+            <View style={styles.modalInputContainer}>
+              {/* Example input field (adjust as per your application's requirements) */}
+              <TextInput
+                style={styles.modalInput}
+                placeholder={selectedUser?.point.toString()}
+                keyboardType="numeric"
+                value={newPoints !== undefined ? newPoints.toString() : ''}
+                onChangeText={handlePointsChange}
+              />
+            </View> 
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity style={styles.modalButton} onPress={handlePointsModify}>
+                <Text style={styles.modalButtonText}>확인</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalButton} onPress={closePointsModal}>
+                <Text style={styles.modalButtonText}>취소</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -337,7 +579,102 @@ const styles = StyleSheet.create({
   dropdownText: {
     color: 'black',
     fontSize: 18
-  }
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 검정 배경
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    width: '80%',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.27,
+    shadowRadius: 4.65,
+    elevation: 6,
+  },
+  roleOptionsContainer: {
+    marginTop: 20,
+  },
+  roleOption: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginBottom: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'transparent',
+    alignItems: 'center',
+  },
+  selectedRoleOption: {
+    backgroundColor: '#F0F0F0', // 선택된 항목의 배경색
+  },
+  roleOptionText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 20,
+  },
+  cancelButton: {
+    backgroundColor: 'gray',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  confirmButton: {
+    backgroundColor: '#4E93E3',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalInputContainer: {
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+  },
+  modalInput: {
+    fontSize: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  modalButton: {
+    backgroundColor: '#4E93E3',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
 
 export default ManagementUserScreen;

@@ -2622,7 +2622,8 @@ async function getuserInfo(campus_id) {
                 u.point, 
                 u.profilePhoto, 
                 u.title, 
-                u.report_confirm, 
+                u.report_confirm,
+                u.caution, 
                 s.name AS student_name, 
                 s.student_id, 
                 s.department_id, 
@@ -2645,6 +2646,52 @@ async function getuserInfo(campus_id) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
+async function update_user_caution(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET caution = caution + 1 WHERE user_id = ?';
+        const result = await conn.query(query, [user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function update_user_title(user_pk, title) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET title = ? WHERE user_id = ?';
+        const result = await conn.query(query, [title, user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // Release the connection
+    }
+}
+
+async function update_user_allpoint(user_pk, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET point = ? WHERE user_id = ?';
+        const result = await conn.query(query, [point, user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // Release connection
+    }
+}
+
 
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
@@ -2701,7 +2748,6 @@ module.exports = {
     insert_user_have_object,
     getUserHaveCoupon,
     getyourpoint,
-    update_user_point,
     Updatelecture,
     getCampus,
     insert_student_study_room,
@@ -2763,5 +2809,8 @@ module.exports = {
     RegistorEventVotesAdmin,
     GetUserSendEvent,
     GetUserEventPhoto,
-    getuserInfo
+    getuserInfo,
+    update_user_caution,
+    update_user_title,
+    update_user_allpoint
 };
