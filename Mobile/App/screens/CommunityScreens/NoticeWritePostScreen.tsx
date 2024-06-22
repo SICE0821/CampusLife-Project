@@ -33,13 +33,14 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     navigation.goBack();
   };
 
-  useEffect(() => {
 
+  useEffect(() => {
+    
     // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
     if (selectallposter === 1) {
-      setpostfontoption("학교 공지사항");
+      setpostfontoption("전체 게시판");
     } else if (selectdepartmentposter === 1) {
-      setpostfontoption("학과 공지사항");
+      setpostfontoption("학과 게시판");
     } else {
       setpostfontoption("게시판을 정해주세요");
     }
@@ -71,49 +72,12 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     setmainText(inputText);
   };
 
-  const addSchoolNoticeAram = async (post_id : number) => {
-    try {
-      const response = await fetch(`${config.serverUrl}/addSchoolNoticeAram`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          target_id: post_id
-        })
-      });
-    } catch (error) {
-      console.error('알람 전송 실패', error);
-    }
-  }
-
-  const addDepartmentNoticeAram = async (post_id : number) => {
-    try {
-      const response = await fetch(`${config.serverUrl}/addDepartmentNoticeAram`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          target_id: post_id
-        })
-      });
-    } catch (error) {
-      console.error('알람 전송 실패', error);
-    }
-  }
-
   const changeHeaderRightContent = () => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={async () => {
-          const post_result = await write_post();
-          const { result, selectdepartmentposter }: any = post_result
-          if (selectdepartmentposter == 1) {
-            addDepartmentNoticeAram(result.postId);
-          } else if (selectdepartmentposter == 0) {
-            addSchoolNoticeAram(result.postId);
-          }
+        <TouchableOpacity onPress={() => {
+          write_post();
+
         }}>
           <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
             <Text style={{ color: 'white', fontSize: 17, fontWeight: "bold" }}>완료</Text>
@@ -134,9 +98,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   };
 
   const adminCheck = () => {
-    if (userData.title === "일반학생") {
+    if(userData.title === "일반학생"){
       return 0;
-    } else {
+    }else{
       return 1;
     }
   }
@@ -151,15 +115,16 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         body: JSON.stringify({
           user_id: userData.user_pk,
           department_check: selectdepartmentposter,
-          inform_check: 1,
+          inform_check: adminCheck(),
           title: titletext,
           contents: maintext,
         })
       });
       console.log("게시글 작성완료!");
-      const result = await response.json(); // 서버 응답을 JSON 형식으로 파싱
+      const value = await response.json();
+      console.log(value);
       ok_go();
-      return { result, selectdepartmentposter }
+
     } catch (error) {
       console.error('게시글 쓰기 실패!', error);
     }
@@ -302,7 +267,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginTop: 15,
   },
-
+  
   yesallposterfont: {
     fontSize: 25,
     marginTop: 15,
