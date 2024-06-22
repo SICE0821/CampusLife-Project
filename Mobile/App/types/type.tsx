@@ -238,3 +238,4 @@ export type VoteDataItem = {
   id: number;
   results: number[];
 }
+

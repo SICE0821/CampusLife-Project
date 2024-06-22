@@ -124,6 +124,7 @@ const { getGeneralPosts,
   Get_One_Event_Data,
   reportPostAram,
   reportCommentAram,
+  AttendanceCheck,
   
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -2329,6 +2330,18 @@ app.post('/AdminSendPoint', async (req, res) => {
   const { user_id, event_point } = req.body;
   try {
     await AdminSendPoint(user_id, event_point);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//출석 체크 시 포인트 상승
+app.post('/AttendanceCheck', async (req, res) => {
+  const { user_id, event_point } = req.body;
+  try {
+    await AttendanceCheck(user_id, event_point);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);

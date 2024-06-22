@@ -2762,6 +2762,23 @@ async function AdminSendPoint(user_id, event_point) {
     }
 }
 
+//출석 체크 시 포인트 상승
+async function AttendanceCheck(user_id, event_point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query =
+            `UPDATE user
+        SET point = point + ?
+        WHERE user_id = ?;`
+        const result = await conn.query(query, [event_point, user_id]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -2887,5 +2904,6 @@ module.exports = {
     addDepartmentNoticeAram,
     Get_One_Event_Data,
     reportPostAram,
-    reportCommentAram
+    reportCommentAram,
+    AttendanceCheck
 };

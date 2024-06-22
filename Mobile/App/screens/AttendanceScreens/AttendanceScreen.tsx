@@ -127,6 +127,26 @@ const AttendanceScreen = ({navigation, route}: any) => {
     await Updatelecture(updatedLectureList); 
   };
   
+  const AttendanceCheck = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AttendanceCheck`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          event_point : 10,
+        }),
+      })
+      const data = await response.json();
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+
 
   const Updatelecture = async (lecture: Lecture[]) => {
     try {
@@ -216,6 +236,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
       `스캔된 코드: ${scannedCode}`,
       [{ text: '확인', onPress: () => {
         updateAttendanceStatus(selectedLecture);
+        AttendanceCheck();
         }}],
       { cancelable: false }
     );

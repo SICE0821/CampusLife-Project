@@ -43,12 +43,17 @@ type PostData = {
   admin_check: boolean
 }
 
+export type UserPoint = {
+  point : number,
+}
+
 const MainPage = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
   const [schoolpostdata, setschollpostdata] = useState<PostData[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
+  const [userPoint, setUserPoint] = useState<UserPoint>();
   const [eventData, setEventData] = useState<EventData[]>([]);
   const [Userdepartment, setUserDepartment] = useState();
   const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
@@ -198,6 +203,8 @@ const MainPage = ({ navigation, route }: any) => {
         })
       })
       const userPoint = await response.json();
+      console.log(userPoint);
+      setUserPoint(userPoint);
     } catch (error) {
       console.error('유저 정보 가져오기 실패:', error);
     }
@@ -233,7 +240,6 @@ const MainPage = ({ navigation, route }: any) => {
     }
   };
 
-  
   //이벤트 이미지 가져오기
   const GetEditEventImage = async (event_id : number) => {
     try {
@@ -329,7 +335,7 @@ const MainPage = ({ navigation, route }: any) => {
                 </View>
                 <View style={styles.pointArea}>
                   <IconA style={styles.pointIcon} name="payments" size={36} />
-                  <Text style={styles.userPoint}>{userData.point}</Text>
+                  <Text style={styles.userPoint}>{userPoint?.point}</Text>
                   <TouchableOpacity
                     onPress={() => navigation.navigate("EventScreenStackNavigator")}>
                     <IconB name={"caretright"} size={22} style={styles.pointNavigationIcon} />
