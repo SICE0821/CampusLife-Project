@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, RefreshControl, TouchableHighlight, Alert } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
-import { UserData, aramData } from '../../types/type'
+import { UserData, aramData, EventData } from '../../types/type'
 
 const bellpng = require('../../assets/bell.png'); // 기본 알람 이미지
 const announcementpng = require('../../assets/announcement.png'); // 공지사항 알람 이미지
@@ -36,6 +36,56 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     }, 500);
   }, []);
 
+  const Get_One_Event_Data = async (event_id: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/Get_One_Event_Data`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: event_id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('서버 응답 오류');
+      }
+      const eventData = await response.json();
+      const eventImage = await GetEditEventImage(eventData.event_id);
+      const eventWithImage = {
+        ...eventData,
+        event_photo: eventImage
+      };
+
+      return (eventWithImage);
+      console.log(JSON.stringify(eventWithImage, null, 2));
+    } catch (error) {
+      return null;
+      console.error(error);
+    }
+  };
+
+  //이벤트 이미지 가져오기
+  const GetEditEventImage = async (event_id: number) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: event_id
+        }),
+      })
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
 
   const get_aram_data = async () => {
     try {
@@ -113,24 +163,24 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     );
   };
 
-  const deleteMyaram = async (aram_id : number) => {
+  const deleteMyaram = async (aram_id: number) => {
     try {
-        const response = await fetch(`${config.serverUrl}/deleteMyaram`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              aram_id: aram_id
-            }),
-        })
-        const postsdata = await response.json();
-        await get_aram_data();
+      const response = await fetch(`${config.serverUrl}/deleteMyaram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          aram_id: aram_id
+        }),
+      })
+      const postsdata = await response.json();
+      await get_aram_data();
     } catch (error) {
-        console.error(error);
+      console.error(error);
     } finally {
     }
-}
+  }
 
   const delete_aram = () => {
     Alert.alert(
@@ -182,36 +232,64 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     const item = postList[0];
     navigation.navigate("PostDetailScreen", { item, userData });
   }
+  const go_detail_screen6 = (postList: any) => {
+    const item = postList[0];
+    console.log(item);
+    navigation.navigate("PostDetailScreen", { item, userData });
+  }
+  const go_detail_screen7 = (postList: any) => {
+    const item = postList[0];
+    //console.log(item);
+    navigation.navigate("PostDetailScreen", { item, userData });
+  }
 
   const NavigationPage = async (item2: aramData) => {
     switch (item2.target_type) {
-      case 'my_post_comment':
+      case 'my_post_comment':  // 내 게시물 댓글
         const postList1 = await go_post_detail(item2.post_comment_id);
         await view_count_up(item2.post_comment_id);
         go_detail_screen1(postList1);
         break;
-      case 'hot_post':
+      case 'hot_post': // 핫 게시물
         const postList2 = await go_post_detail(item2.hot_post_id);
         await view_count_up(item2.hot_post_id);
         go_detail_screen2(postList2);
         break;
-      case 'school_notice':
+      case 'school_notice': // 학교 공지사항
         const postList3 = await go_post_detail(item2.school_notice_id);
         await view_count_up(item2.school_notice_id);
         console.log(postList3)
         go_detail_screen3(postList3);
-      case 'department_notice':
+      case 'department_notice': // 학과 공지사항
         const postList4 = await go_post_detail(item2.department_notice_id);
         await view_count_up(item2.department_notice_id);
         go_detail_screen4(postList4);
         break;
-      case 'my_post_like':
+      case 'my_post_like': // 내 게시물 좋아요
         const postList5 = await go_post_detail(item2.my_post_like_id);
         await view_count_up(item2.my_post_like_id);
         go_detail_screen5(postList5);
         break;
-      case 'new_event':
-        navigation.navigate("DeadlineEventScreen");
+      case 'new_event': // 새 이벤트
+        const eventData: EventData | null = await Get_One_Event_Data(item2.new_event_id);
+        if (eventData) {
+          navigation.navigate("DeadlineEventScreen", { userdata: userData, eventdata: eventData });
+        } else {
+          Alert.alert("이벤트 마감 및 삭제",
+            `해당 이벤트는 마감되었거나 삭제되었습니다! 
+다음 이벤트를 노려주세요.`);
+        }
+        break;
+      case 'report_post': // 신고
+        const postList6 = await go_post_detail(item2.report_post_id);
+        //console.log(postList6);
+        console.log(postList6.report_comment_title);
+        go_detail_screen6(postList6);
+        break;
+      case 'report_comment': // 신고 댓글
+        const postList7 = await go_post_detail(item2.report_comment_id);
+        console.log(postList7.report_comment_title);
+        go_detail_screen7(postList7);
         break;
       default:
         console.log("이동 드가자");
@@ -234,6 +312,10 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={styles.content}>{item.new_event_name}</Text>
       case 'friend_code':
         return <Text style={styles.content}>{item.friend_code_my_name}님이 코드를 입력했습니다</Text>
+      case 'report_post':
+        return <Text style={styles.content}>{item.report_post_title}</Text>
+      case 'report_comment':
+        return <Text style={styles.content}>{item.report_comment_title}</Text>
       default:
         return null;
     }
@@ -255,6 +337,10 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={{ color: '#F29F05' }}><IconD name={"mail"} size={30} /></Text>
       case 'friend_code':
         return <Text style={{ color: '#F29F05' }}><IconE name={"user-friends"} size={30} /></Text>
+      case 'report_post':
+        return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
+      case 'report_comment':
+        return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
       default:
 
         return null;

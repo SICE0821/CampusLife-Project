@@ -194,7 +194,7 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
                 }),
             })
             const postsdata = await response.json();
-            console.log(postsdata);
+            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error);

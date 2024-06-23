@@ -88,7 +88,7 @@ const BookmarkScreen = ({ route, navigation }: any) => {
 
     const view_count_up = async (post_id: any) => {
         try {
-            const response = await fetch('${config.serverUrl}/view_count_up', {
+            const response = await fetch(`${config.serverUrl}/view_count_up`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

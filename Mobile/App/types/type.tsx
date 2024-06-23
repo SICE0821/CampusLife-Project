@@ -126,6 +126,7 @@ export type Lecture = {
   lecture_credit : number;
   lecture_grades : string;
   session_duration: number;
+  today_lecture_state : boolean;
 }
 
 export type aramData = {
@@ -149,6 +150,10 @@ export type aramData = {
   new_event_name : string,
   friend_code_id : number,
   friend_code_my_name : string,
+  report_post_id : number,
+  report_post_title : string,
+  report_comment_id : number,
+  report_comment_title : string,
 }
 
 export type EventData = {
@@ -203,6 +208,7 @@ export type UserSendEventWithPhoto = {
   campus_id : number,
   user_login_id : number,
   user_name : string,
+  event_point : number,
   photodata: {
     event_id : number,
     user_id : number,
@@ -215,3 +221,21 @@ export type UserSendEventPhotoData = {
   user_id : number,
   event_photo : string,
 }
+
+export type VoteEvnetData = {
+  event_id : number,
+  vote_count : number,
+  vote_index : number,
+  vote_name : string,
+}
+
+export type VoteInfoItem = {
+  id: number;
+  votes: string[];
+}
+
+export type VoteDataItem = {
+  id: number;
+  results: number[];
+}
+

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Text, Image, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { View, StyleSheet, Dimensions, Text, Image, ScrollView, TouchableOpacity, Modal, Alert } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -54,6 +54,37 @@ const SendUserEventScreen = ({ route }: any) => {
     }, [])
   );
 
+  
+  const handlePrizeUser = (user_id : number, event_point : number) => {
+    Alert.alert(
+      "이벤트 당첨!",
+      "해당 유저에게 포인트를 보여하시겠습니까??",
+      [
+        { text: "취소", style: "cancel" },
+        {
+          text: "확인", onPress: () => {
+            good_404();
+            AdminSendPoint(user_id, event_point);
+          }
+        }
+      ]
+    );
+  };
+
+  const good_404 = () => {
+    Alert.alert(
+      "포인트 전송 성공!",
+      `해당 유저에게 포인트가 전송되었습니다.
+해당 유저에게 자동으로 알람이 가게 됩니다!!`,
+      [
+        {
+          text: "확인", onPress: () => {
+          }
+        }
+      ]
+    );
+  };
+
   //유저의 이벤트 목록 가져오기
   const GetUserSendEvent = async () => {
     try {
@@ -103,6 +134,28 @@ const SendUserEventScreen = ({ route }: any) => {
       } finally {
       }
     }
+
+        //당첨!!
+        const AdminSendPoint = async (user_id : any, event_point : any) => {
+          try {
+            const response = await fetch(`${config.serverUrl}/AdminSendPoint`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                user_id : user_id,
+                event_point : event_point,
+              }),
+            })
+            const data = await response.json();
+            console.log(data);
+            return data
+          } catch (error) {
+            console.error(error);
+          } finally {
+          }
+        }
 
   //설정한 이벤트 보여주기
   const GetEventList = async () => {
@@ -163,7 +216,15 @@ const SendUserEventScreen = ({ route }: any) => {
       </View>
       {filteredEvents.length > 0 ? (
         filteredEvents.map((event, index) => (
-          <View key={index} style={styles.eventBox}>
+          <TouchableOpacity 
+            key={index} 
+            style={styles.eventBox}
+            onPress={() => {{
+              console.log(event.user_name)
+              console.log(event.event_point)}}}
+            onLongPress={() => {
+                handlePrizeUser(event.user_id, event.event_point);
+              }}>
             <View style={styles.topInfoArea}>
               <Text style={styles.eventName}>{eventList.find(item => item.event_id === event.event_id)?.name}</Text>
               <View style={styles.userInfoArea}>
@@ -183,7 +244,7 @@ const SendUserEventScreen = ({ route }: any) => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
-          </View>
+          </TouchableOpacity>
         ))
       ) : (
         <Text style={styles.noEventText}>해당 이벤트 참여자가 없습니다.</Text>

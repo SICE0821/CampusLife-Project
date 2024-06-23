@@ -139,8 +139,9 @@ const EditItemScreen = ({ route, navigation }: any) => {
       const newPath = res.path;
       setSelectedImagePath(newPath);
       setSelectedImageFormData(formData);
-      const imageData = await RegistorItemImage(formData);
-      setImageNum(imageData);
+      //const imageData = await RegistorItemImage(formData);
+      //setImageNum(imageData);
+      
     } catch (error) {
       console.error(error);
     }
@@ -163,7 +164,8 @@ const EditItemScreen = ({ route, navigation }: any) => {
             },
             { text: "확인", onPress: async () => {
               successEditItemAlert();
-              await ChangeItemInfoANDCountUp();
+              const imageData = await RegistorItemImage();
+              await ChangeItemInfoANDCountUp(imageData);
             }}
         ]
     );
@@ -186,7 +188,8 @@ const DeleteItemAlert = () => {
           },
           { text: "확인", onPress: async () => {
             successEditItemAlert();
-            await ChangeItemInfoANDCountDown();
+            const imageData = await RegistorItemImage();
+            await ChangeItemInfoANDCountDown(imageData);
           }}
       ]
   );
@@ -207,7 +210,8 @@ const EditItemAlert = () => {
           },
           { text: "확인", onPress: async () => {
             successEditItemAlert();
-            await ChangeItemInfo();
+            const imageData = await RegistorItemImage();
+            await ChangeItemInfo(imageData);
           }}
       ]
   );
@@ -223,11 +227,11 @@ Alert.alert(
 );
 };
 
-  const RegistorItemImage = async (selectImageFormData: FormData) => {
+  const RegistorItemImage = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/RegistorItemImage`, {
         method: 'POST',
-        body: selectImageFormData,
+        body: selectedImageFormData,
       });
       const imageData = await response.json();
       console.log(imageData.fileName);
@@ -238,7 +242,8 @@ Alert.alert(
   };
 
   //수량은 변화하지 않고 DB의 아이템 정보만 변경한다.
-  const ChangeItemInfo = async () => {
+  const ChangeItemInfo = async (ImageNum : string) => {
+    const imageUrl = ImageNum || ItemInformation.image_num // ImageNum이 null이면 ItemInformation.image_num을 사용
     try {
       const response = await fetch(`${config.serverUrl}/ChangeItemInfo`, {
         method: 'POST',
@@ -250,7 +255,7 @@ Alert.alert(
           name: itemName,
           price: itemPoint,
           using_time: deadlineDate,
-          image_num: ImageNum,
+          image_num: imageUrl,
           explian: itemExplain,
         }),
       })
@@ -261,7 +266,8 @@ Alert.alert(
   }
 
   //수량이 증가하고 DB의 아이템 정보를 변경한다.
-  const ChangeItemInfoANDCountUp = async () => {
+  const ChangeItemInfoANDCountUp = async (ImageNum : string) => {
+    const imageUrl = ImageNum || ItemInformation.image_num // ImageNum이 null이면 ItemInformation.image_num을 사용
     try {
       const response = await fetch(`${config.serverUrl}/ChangeItemInfoANDCountUp`, {
         method: 'POST',
@@ -274,7 +280,7 @@ Alert.alert(
           name: itemName,
           price: itemPoint,
           using_time: deadlineDate,
-          image_num: ImageNum,
+          image_num: imageUrl,
           explian: itemExplain,
           count: changeitemCount,
         }),
@@ -286,7 +292,8 @@ Alert.alert(
   }
 
   //수량이 감소하고 DB의 아이템 정보를 변경한다.
-  const ChangeItemInfoANDCountDown = async () => {
+  const ChangeItemInfoANDCountDown = async (ImageNum : string) => {
+    const imageUrl = ImageNum || ItemInformation.image_num // ImageNum이 null이면 ItemInformation.image_num을 사용
     try {
       const response = await fetch(`${config.serverUrl}/ChangeItemInfoANDCountDown`, {
         method: 'POST',
@@ -299,7 +306,7 @@ Alert.alert(
           name: itemName,
           price: itemPoint,
           using_time: deadlineDate,
-          image_num: ImageNum,
+          image_num: imageUrl,
           explian: itemExplain,
           count: Math.abs(changeitemCount),
         }),
@@ -357,10 +364,13 @@ Alert.alert(
     if (typeof changeitemCount === 'undefined' || changeitemCount === null) {
       console.log("changeitemCount is undefined or null");
     } else if (changeitemCount > 0) {
+      console.log("추가")
       ADDItemAlert();
     } else if (changeitemCount < 0) {
+      console.log("삭제")
       DeleteItemAlert();
     } else if (changeitemCount === 0) {
+      console.log("변경")
       EditItemAlert();
     }
   };

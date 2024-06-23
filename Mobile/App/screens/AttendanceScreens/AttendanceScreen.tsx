@@ -29,7 +29,10 @@ const AttendanceScreen = ({navigation, route}: any) => {
   
 
   const filterLectures = (lectures: Lecture[]) => {
-    return lectures.filter(
+    return lectures.map(lecture => ({
+      ...lecture,
+      today_lecture_state: true  // 기본값으로 true 설정
+    })).filter(
       (lecture) =>
         lecture.lecture_grade === userData.grade &&
         lecture.lecture_semester === userData.student_semester
@@ -124,6 +127,26 @@ const AttendanceScreen = ({navigation, route}: any) => {
     await Updatelecture(updatedLectureList); 
   };
   
+  const AttendanceCheck = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AttendanceCheck`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          event_point : 10,
+        }),
+      })
+      const data = await response.json();
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+
 
   const Updatelecture = async (lecture: Lecture[]) => {
     try {
@@ -165,9 +188,14 @@ const AttendanceScreen = ({navigation, route}: any) => {
     setIsCameraButton(false); // 모달을 닫을 때 카메라 버튼 상태도 false로 변경합니다.
   };
 
+
+  //카메라를 키는함수
   const openCamera = (lecture: Lecture) => {
+    //console.log(lecture.today_lecture_state);
     const currentTime = new Date().getTime();
-    if (isScanned && lastScannedTime && (currentTime - new Date(lastScannedTime).getTime()) < (24 * 60 * 60 * 1000) ) {
+    if (!lecture.today_lecture_state) {
+      // 이미 출석 처리가 되어 있고, 마지막 출석 시간이 있으며, 오늘 출석을 이미 했으면,
+      
       Alert.alert(
         '출석 처리됨',
         '이미 출석 처리가 완료되었습니다. 하루에 한 번만 출석할 수 있습니다.',
@@ -177,13 +205,15 @@ const AttendanceScreen = ({navigation, route}: any) => {
     } else {
       setIsScanned(false);
       setIsCameraButton(true);
+      lecture.today_lecture_state = false;
     }
   };
-
+  
   React.useEffect(() =>{
     requestPermission();
   }, [])
   
+  //카메라를 키는게 아니라, 카메라의 속성을 가지고있는 페이지로 이동하는야
   React.useEffect(() => {
     if (isCameraButton) {
       navigation.navigate('FullScreenCamera');
@@ -204,7 +234,10 @@ const AttendanceScreen = ({navigation, route}: any) => {
     Alert.alert(
       'QR 코드 스캔됨',
       `스캔된 코드: ${scannedCode}`,
-      [{ text: '확인', onPress: () => updateAttendanceStatus(selectedLecture) }],
+      [{ text: '확인', onPress: () => {
+        updateAttendanceStatus(selectedLecture);
+        AttendanceCheck();
+        }}],
       { cancelable: false }
     );
   }
@@ -222,7 +255,9 @@ const AttendanceScreen = ({navigation, route}: any) => {
       {lectureList.map((Lecture, index) => (
         Lecture.week === nowday && (
           <View key={index} style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(Lecture)}>
+            <TouchableOpacity style={styles.AttendanceList} onPress={() => {
+              openModal(Lecture)
+              console.log(Lecture.today_lecture_state)}}>
               <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
               <View style={styles.ListArea}>
                 <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}</Text>
@@ -239,7 +274,9 @@ const AttendanceScreen = ({navigation, route}: any) => {
       {lectureList.map((Lecture, index) => (
         Lecture.week !== nowday && (
           <View key={index} style={styles.buttonContainer2}>
-            <TouchableOpacity style={styles.AttendanceList} onPress={() => openModal(Lecture)}>
+            <TouchableOpacity style={styles.AttendanceList} onPress={() => {
+              openModal(Lecture)
+              console.log(Lecture.today_lecture_state)}}>
               <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
               <View style={styles.ListArea}>
                 <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}</Text>
@@ -266,7 +303,10 @@ const AttendanceScreen = ({navigation, route}: any) => {
                 <Text style={styles.ListText2}>{selectedLecture?.lecture_name}</Text>
                 </View>
                   <View style={styles.Icon}>
-                  <TouchableOpacity onPress={() => openCamera(selectedLecture)} disabled={nowday !== selectedLecture?.week}>
+                  <TouchableOpacity onPress={() => {
+                    openCamera(selectedLecture)
+                   }} 
+                    disabled={nowday !== selectedLecture?.week}>
                     <IconA name="camera" size={32} color={nowday === selectedLecture?.week ? "black" : "gray"} />
                   </TouchableOpacity>
                 </View>

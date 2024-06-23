@@ -370,7 +370,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -468,6 +468,24 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     },
                     headerRight: () => (
                         <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이벤트',
+                }} />
+
+            <AdminMainStack.Screen
+                name="AttendanceCheckEventScreen"
+                component={AttendanceCheckEventScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),

@@ -659,7 +659,7 @@ async function admin_get_event_objcet(campus_id) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            `SELECT * FROM event_object WHERE campus_id = ?`
+            `SELECT * FROM event_object WHERE campus_id = ? ORDER BY object_id DESC`
             , [campus_id]);
         return rows;
 
@@ -1217,8 +1217,9 @@ async function write_post(user_id, department_check, inform_check, title, conten
         conn = await pool.getConnection();
         const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
         VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
-        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
-        return true;
+        const result = await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        const postId = result.insertId.toString(); // Retrieve the inserted post's ID
+        return postId;
     } catch (err) {
         console.log(err);
         return false;
@@ -1350,21 +1351,6 @@ async function recomment_like_up(recomment_id) {
     }
 }
 
-async function write_post(user_id, department_check, inform_check, title, contents) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
-        VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
-        await conn.query(query, [user_id, department_check, inform_check, title, contents]);
-        return true;
-    } catch (err) {
-        console.log(err);
-        return false;
-    } finally {
-        if (conn) conn.release(); // 연결 해제
-    }
-}
 
 //학과 게시판에서 전체 게시글을 가져오는 쿼리
 async function searchPost(search_text) {
@@ -1610,7 +1596,11 @@ async function get_aram_data(user_id) {
             new_event.event_id AS new_event_id,
             new_event.name AS new_event_name,
             friend_code.friend_code_id AS friend_code_id,
-            friend_code.my_name AS friend_code_my_name
+            friend_code.my_name AS friend_code_my_name,
+            report_post.post_id AS report_post_id,
+            report_post.title AS report_post_title,
+            report_comment.post_id AS report_comment_id,
+            report_comment.title AS report_comment_title
         FROM
             aram
         LEFT JOIN
@@ -1627,6 +1617,10 @@ async function get_aram_data(user_id) {
             event AS new_event ON aram.target_type = 'new_event' AND aram.target_id = new_event.event_id
         LEFT JOIN
             user_friend_code AS friend_code ON aram.target_type = 'friend_code' AND aram.target_id = friend_code.friend_code_id
+        LEFT JOIN
+        		post AS report_post ON aram.target_type = 'report_post' AND aram.target_id = report_post.post_id
+        LEFT JOIN
+        		post AS report_comment ON aram.target_type = 'report_comment' AND aram.target_id = report_comment.post_id
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -1684,13 +1678,92 @@ async function addCommentAram(user_id, target_id) {
     }
 }
 
-async function addHotAram(user_id, target_id) {
+async function addHotAram(target_id) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "오늘의 HOT 게시물입니다!", "hot_post");`
-        await conn.query(query, [user_id, target_id]);
+        const query = `CALL SendEventNotification(?, '오늘의 HOT 게시물입니다!', 'hot_post');`
+        await conn.query(query, [target_id]);
         console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function reportPostAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL InsertIntoAramForAdminUsers(?, '게시물 신고 요청이 들어왔습니다!', 'report_post');`
+        await conn.query(query, [target_id]);
+        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function reportCommentAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL InsertIntoAramForAdminUsers(?, '댓글 신고 요청이 들어왔습니다!', 'report_comment');`
+        await conn.query(query, [target_id]);
+        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addSchoolNoticeAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL SendEventNotification(?, '학교 공지사항 글이 등록되었습니다!', 'school_notice');`
+        await conn.query(query, [target_id]);
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addDepartmentNoticeAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL SendEventNotification(?, '학과 공지사항 글이 등록되었습니다!', 'department_notice');`
+        await conn.query(query, [target_id]);
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addNewEventAram(target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `CALL SendEventNotification(?, '새로운 이벤트가 등록되었습니다!', 'new_event');`
+        await conn.query(query, [target_id]);
         return true;
     } catch (err) {
         console.log(err);
@@ -1908,6 +1981,23 @@ async function Get_Event_Data(campus_id) {
             `SELECT * FROM event WHERE EVENT.campus_id = ?`
         );
         const row = await conn.query(query, [campus_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//메인화면에서 이벤트 데이터 전부 불러와
+async function Get_One_Event_Data(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM event WHERE event_id = ?`
+        );
+        const row = await conn.query(query, [event_id]);
         return row;
     } catch (err) {
         throw err;
@@ -2457,7 +2547,7 @@ async function GetEventList(campus_id) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-        `SELECT
+            `SELECT
             e.event_id,
             e.name,
             e.info,
@@ -2571,7 +2661,8 @@ async function GetUserSendEvent(campus_id) {
                 us.content,
                 e.campus_id,
                 userdata.id,
-                st.name
+                st.name,
+                e.get_point
             FROM
                 user_send_event us
             JOIN
@@ -2606,6 +2697,170 @@ async function GetUserEventPhoto(event_id, user_id) {
         throw err;
     } finally {
         if (conn) conn.end();
+    }
+}
+
+
+async function getuserInfo(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 조회 쿼리 작성
+        const rows = await conn.query(`
+            SELECT 
+                u.user_id, 
+                u.id, 
+                u.point, 
+                u.profilePhoto, 
+                u.title, 
+                u.report_confirm,
+                u.caution, 
+                s.name AS student_name, 
+                s.student_id, 
+                s.department_id, 
+                s.campus_id,
+                d.name AS department_name
+            FROM 
+                user u
+            JOIN 
+                student s ON u.student_id = s.student_id
+            JOIN 
+                department d ON s.department_id = d.department_id
+            WHERE 
+                s.campus_id = ?
+        `, [campus_id]);
+
+        return rows;
+    } catch (err) {
+        console.error('Error fetching data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function update_user_caution(user_pk) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET caution = caution + 1 WHERE user_id = ?';
+        const result = await conn.query(query, [user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function update_user_title(user_pk, title) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET title = ? WHERE user_id = ?';
+        const result = await conn.query(query, [title, user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // Release the connection
+    }
+}
+
+async function update_user_allpoint(user_pk, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET point = ? WHERE user_id = ?';
+        const result = await conn.query(query, [point, user_pk]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // Release connection
+    }
+}
+
+
+
+//해당 이벤트의 모든 투표 정보 가져오기
+async function GetEventVote(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(`SELECT * FROM event_vote`);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//해당 이벤트의 모든 투표 정보 가져오기
+async function GetoneEventVote(event_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(`SELECT * FROM event_vote WHERE event_id = ?`, [event_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
+async function SendUserEventVote(event_id, vote_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query =
+            `UPDATE event_vote
+        SET vote_count = vote_count + 1
+        WHERE event_id = ? AND vote_name = ?;`
+        const result = await conn.query(query, [event_id, vote_name]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//당첨
+async function AdminSendPoint(user_id, event_point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query =
+            `UPDATE user
+        SET point = point + ?
+        WHERE user_id = ?;`
+        const result = await conn.query(query, [event_point, user_id]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//출석 체크 시 포인트 상승
+async function AttendanceCheck(user_id, event_point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query =
+            `UPDATE user
+        SET point = point + ?
+        WHERE user_id = ?;`
+        const result = await conn.query(query, [event_point, user_id]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
     }
 }
 
@@ -2663,7 +2918,6 @@ module.exports = {
     insert_user_have_object,
     getUserHaveCoupon,
     getyourpoint,
-    update_user_point,
     Updatelecture,
     getCampus,
     insert_student_study_room,
@@ -2724,5 +2978,20 @@ module.exports = {
     DeleteEvent,
     RegistorEventVotesAdmin,
     GetUserSendEvent,
-    GetUserEventPhoto
+    GetUserEventPhoto,
+    getuserInfo,
+    update_user_caution,
+    update_user_title,
+    update_user_allpoint,
+    GetEventVote,
+    GetoneEventVote,
+    SendUserEventVote,
+    AdminSendPoint,
+    addNewEventAram,
+    addSchoolNoticeAram,
+    addDepartmentNoticeAram,
+    Get_One_Event_Data,
+    reportPostAram,
+    reportCommentAram,
+    AttendanceCheck
 };

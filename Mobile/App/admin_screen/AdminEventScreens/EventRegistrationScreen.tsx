@@ -168,6 +168,8 @@ const EventRegistrationScreen = ({ route }: any) => {
           const event_photo = await uploadImages();  //사진을 서버에 업로드
           RegistorEventPhoto(event_pk, event_photo);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
           RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
+          addNewEventAram(event_pk); //알람보내기
+
         } else {
           Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
         }
@@ -178,6 +180,23 @@ const EventRegistrationScreen = ({ route }: any) => {
       Alert.alert("이벤트 제목과 내용을 입력해주세요.");
     }
   };
+
+  //이벤트 등록시에 
+  const addNewEventAram = async (event_pk : number) => {
+    try {
+        const response = await fetch(`${config.serverUrl}/addNewEventAram`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                target_id: event_pk,
+            })
+        });
+    } catch (error) {
+        console.error('알람 전송 실패', error);
+    }
+  }
 
   // 이미지 선택 함수
   const handleImagePick = () => {

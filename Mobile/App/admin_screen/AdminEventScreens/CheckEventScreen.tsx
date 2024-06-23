@@ -2,28 +2,22 @@ import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, Scr
 import React, { useState } from 'react';
 import Icon_event from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { UserData, AdminEventList } from '../../types/type'
+import { UserData, AdminEventList, VoteEvnetData, VoteInfoItem, VoteDataItem } from '../../types/type'
 const width = Dimensions.get("window").width;
 import config from '../../config';
-const voteInfo = [
-  { id: 78, votes: ['투표 항목1', '투표 항목2', '투표 항목3', '투표 항목4', '투표 항목5'] },
-  { id: 2, votes: ['투표 항목1', '투표 항목2'] },
-];
-
-const voteData = [
-  { id: 78, results: [50, 12, 43, 52, 1] },
-  { id: 2, results: [21, 12] },
-];
 
 const CheckEventScreen = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   const [eventList, setEventList] = useState<AdminEventList[]>([]); //이벤트 리스트
+  const [voteData, setVoteData] = useState<VoteDataItem[]>([]);
+  const [voteInfo, setVoteInfo] = useState<VoteInfoItem[]>([]);
 
   useFocusEffect(
     React.useCallback(() => {
       setUserData(userdata);
       GetEventList();
+      GetEventVote();
     }, [])
   );
 
@@ -62,6 +56,71 @@ const CheckEventScreen = ({ route, navigation }: any) => {
         }),
       })
       //GetEventList();
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //설정한 이벤트 보여주기
+  const GetEventVote = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEventVote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userData.campus_pk
+        }),
+      })
+      const data : VoteEvnetData[] = await response.json();
+      const groupedData : any = {};
+
+      // rawData를 순회하여 groupedData 객체에 이벤트별로 그룹화
+      data.forEach(item => {
+        if (!groupedData[item.event_id]) {
+          groupedData[item.event_id] = {
+            votes: [],
+            results: []
+          };
+        }
+        groupedData[item.event_id].votes[item.vote_index - 1] = item.vote_name;
+        groupedData[item.event_id].results[item.vote_index - 1] = item.vote_count;
+      });
+
+      // 결과 배열 초기화
+      const voteInfo : any = [];
+      const voteData : any = [];
+
+      // groupedData 객체를 순회하여 voteInfo와 voteData 배열을 생성
+      Object.keys(groupedData).forEach(event_id => {
+        const { votes, results } = groupedData[event_id];
+
+        // 투표 항목이 비어 있는 경우 기본 값을 설정
+        for (let i = 0; i < votes.length; i++) {
+          if (!votes[i]) {
+            votes[i] = `투표 항목${i + 1}`;
+          }
+        }
+
+        voteInfo.push({
+          id: parseInt(event_id, 10),
+          votes: votes
+        });
+
+        voteData.push({
+          id: parseInt(event_id, 10),
+          results: results
+        });
+      });
+
+      setVoteData(voteData);
+      setVoteInfo(voteInfo);
+      console.log('voteInfo:', voteInfo);
+      console.log('voteData:', voteData);
+      //console.log(data);
+      //console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
