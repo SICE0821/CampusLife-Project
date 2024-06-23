@@ -209,7 +209,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
             <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.firstImage_Num}.png` }} />
           </View>
           <View style={styles.iteminfo}>
-            <Text style={{ fontSize: 20, color: 'black', }}>{item.firstName}</Text>
+            <Text style={{ fontSize: 20, color: 'black', }} numberOfLines={1} ellipsizeMode='tail'>{item.firstName}</Text>
             <Text style={{ fontSize: 16, color: 'grey', }} numberOfLines={1} ellipsizeMode='tail'>
               {item.firstExplain}
             </Text>
@@ -236,7 +236,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
               <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.secondImage_Num}.png` }} />
             </View>
             <View style={styles.iteminfo}>
-              <Text style={{ fontSize: 20, color: 'black', }}>{item.secondName}</Text>
+              <Text style={{ fontSize: 20, color: 'black', }} numberOfLines={1} ellipsizeMode='tail'>{item.secondName}</Text>
               <Text style={{ fontSize: 16, color: 'grey', }} numberOfLines={1} ellipsizeMode='tail'>
                 {item.secondExplain}
               </Text>
@@ -285,6 +285,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           <View style={styles.itemInfo}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15 }}>
               <View style={{
+                width : '60%'
               }}>
                 <Text style={{
                   fontSize: 30,
@@ -293,7 +294,8 @@ const EventShopScreen = ({ navigation, route }: any) => {
                 }}>{SelectItem?.name}</Text>
               </View>
               <View style={{
-                justifyContent: 'center'
+                justifyContent: 'center',
+                width : '40%'
               }}>
                 <Text style={{
                   fontSize: 16,

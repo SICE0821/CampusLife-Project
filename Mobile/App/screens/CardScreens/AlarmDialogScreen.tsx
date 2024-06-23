@@ -14,6 +14,8 @@ import IconA from 'react-native-vector-icons/Fontisto';
 import IconC from 'react-native-vector-icons/Ionicons';
 import IconD from 'react-native-vector-icons/Entypo';
 import IconE from 'react-native-vector-icons/FontAwesome5';
+import IconF from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 const AlarmDialogScreen = ({ route, navigation }: any) => {
   const { userdata } = route.params;
@@ -99,7 +101,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         })
       })
       const get_aram_data = await response.json();
-      //console.log(get_aram_data);
+      console.log(get_aram_data);
       setAaramList(get_aram_data);
     } catch (error) {
       console.error('알람 정보 가져오기 실패:', error);
@@ -316,6 +318,8 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={styles.content}>{item.report_post_title}</Text>
       case 'report_comment':
         return <Text style={styles.content}>{item.report_comment_title}</Text>
+      case 'good_event':
+        return <Text style={styles.content}>{item.good_event_name}</Text>
       default:
         return null;
     }
@@ -341,6 +345,8 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
       case 'report_comment':
         return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
+      case 'good_event':
+        return <Text style={{ color: '#F29F05' }}><IconF name={"emoticon-happy"} size={30} /></Text>
       default:
 
         return null;

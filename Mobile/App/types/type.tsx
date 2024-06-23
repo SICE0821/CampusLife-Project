@@ -154,6 +154,8 @@ export type aramData = {
   report_post_title : string,
   report_comment_id : number,
   report_comment_title : string,
+  good_event_id : number,
+  good_event_name : string,
 }
 
 export type EventData = {

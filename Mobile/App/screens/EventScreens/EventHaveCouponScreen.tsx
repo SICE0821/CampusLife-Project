@@ -71,14 +71,14 @@ const EventHaveCouponScreen = ({ route }: any) => {
         <View style={{ height: '100%', width: '50%', padding: 5 }}>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ width: '50%' }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginTop: 20 }}>[ {item.name} ]</Text>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginTop: 20 }} numberOfLines={1} ellipsizeMode='tail'>[ {item.name} ]</Text>
             </View>
             <View>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ED9E2B', marginTop: 20 }}>[ {item.price}P ]</Text>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ED9E2B', marginTop: 20 }} numberOfLines={1} ellipsizeMode='tail'>[ {item.price}P ]</Text>
             </View>
           </View>
-          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.explain}</Text>
-          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.using_time}</Text>
+          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }} numberOfLines={1} ellipsizeMode='tail'>{item.explain}</Text>
+          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }} numberOfLines={1} ellipsizeMode='tail'>{item.using_time}</Text>
         </View>
         <View style={{ width: '20%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <View style={{ width: '90%', height: '95%', backgroundColor: '#F7B02E', justifyContent: 'center', alignItems: 'center' }}>

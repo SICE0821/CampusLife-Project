@@ -130,6 +130,7 @@ const { getGeneralPosts,
   reportCommentAram,
   AttendanceCheck,
   RegistorEvent,
+  addGoodEventAram,
   
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -1338,7 +1339,9 @@ app.post('/get_aram_data', async (req, res) => {
       report_post_id : item.report_post_id,
       report_post_title : item.report_post_title,
       report_comment_id : item.report_comment_id,
-      report_comment_title : item.report_comment_title
+      report_comment_title : item.report_comment_title,
+      good_event_id : item.good_event_id,
+      good_event_name : item.good_event_name,
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -1377,6 +1380,24 @@ app.post('/addCommentAram', async (req, res) => {
     const { user_id, target_id } = req.body;
     //console.log(post_id);
     const result = await addCommentAram(user_id, target_id);
+    if (result == true) {
+      console.log("알람 보냄");
+      res.json(result);
+    } else if (result == false) {
+      console.log("알람 안보냄");
+      res.json(result);
+    }
+  } catch (error) {
+    console.error("알람 보내기 실패:", error);
+  }
+});
+
+//댓글 알람 전송
+app.post('/addGoodEventAram', async (req, res) => {
+  try {
+    const { user_id, target_id } = req.body;
+    //console.log(post_id);
+    const result = await addGoodEventAram(user_id, target_id);
     if (result == true) {
       console.log("알람 보냄");
       res.json(result);
