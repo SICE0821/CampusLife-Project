@@ -180,51 +180,64 @@ const ManagementUserScreen = ({route} : any) => {
     }
   };
 
-const handleRoleChange = async () => {
-  try {
-    const response = await fetch(`${config.serverUrl}/update_user_title`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user_pk: selectedUser.user_id, // 선택된 사용자의 user_id
-        title: selectedRole // 선택된 권한
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+  const handleRoleChange = async () => {
+    if (!selectedUser || !selectedRole) {
+      // 선택된 사용자나 권한이 없는 경우 사용자에게 알림을 보여줄 수 있습니다.
+      Alert.alert(
+        '경고',
+        '권한을 선택해주세요.',
+        [
+          { text: '확인', onPress: () => {} }
+        ],
+        { cancelable: false }
+      );
+      return;
     }
-
-    // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
-    const updatedUserData = [...userData];
-    const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
-    if (index !== -1) {
-      updatedUserData[index].title = selectedRole; // 사용자의 title 상태 업데이트
-      setUserDataState(updatedUserData); // 상태 업데이트
+  
+    try {
+      const response = await fetch(`${config.serverUrl}/update_user_title`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_pk: selectedUser.user_id,
+          title: selectedRole
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
+      const updatedUserData = [...userData];
+      const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
+      if (index !== -1) {
+        updatedUserData[index].title = selectedRole;
+        setUserDataState(updatedUserData);
+      }
+  
+      const data = await response.json();
+      console.log(data.message); // 성공 또는 실패 메시지 출력
+  
+      // 알림창 표시
+      Alert.alert(
+        '완료',
+        '권한이 성공적으로 변경되었습니다.',
+        [
+          { text: '확인', onPress: () => closeRoleModal() }
+        ],
+        { cancelable: false }
+      );
+  
+      // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
+  
+    } catch (error) {
+      console.error('Failed to update user title:', error);
     }
-
-    const data = await response.json();
-    console.log(data.message); // 성공 또는 실패 메시지 출력
-
-    // 알림창 표시
-    Alert.alert(
-      '완료',
-      '권한이 성공적으로 변경되었습니다.',
-      [
-        { text: '확인', onPress: () => closeRoleModal() }
-      ],
-      { cancelable: false }
-    );
-
-    // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
-
-  } catch (error) {
-    console.error('Failed to update user title:', error);
-    // 실패 처리
-  }
-};
+  };
+  
 
   // 권한 변경 모달 열기
   const openRoleModal = () => {

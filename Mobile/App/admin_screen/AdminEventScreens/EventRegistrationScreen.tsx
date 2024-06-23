@@ -490,45 +490,24 @@ const EventRegistrationScreen = ({ route }: any) => {
           mode={'date'}
           onConfirm={onConfirmStartDate}
           onCancel={onCancel}
-          date={startDate} />
+          date={startDate} 
+          minimumDate={new Date()}
+          />
+          
 
         <DateTimePickerModal
           isVisible={endVisible}
           mode={'date'}
           onConfirm={onConfirmEndDate}
           onCancel={onCancel}
-          date={endDate} />
+          date={endDate} 
+          minimumDate={new Date()}
+          />
 
         {/* 등록 버튼 */}
         <TouchableOpacity style={styles.submitButton} onPress={() => EventRegister()}>
           <Text style={styles.submitButtonText}>등록하기</Text>
         </TouchableOpacity>
-
-        {/* 제출 후 결과 표시 */}
-        {submittedData && (
-          <View>
-            <Text style={{ color: 'black', marginTop: 20 }}>결과값</Text>
-            <Text style={{ color: 'black' }}>제목: {submittedData.title}</Text>
-            <Text style={{ color: 'black' }}>내용: {submittedData.content}</Text>
-            <Text style={{ color: 'black' }}>간략설명: {submittedData.simpleInfo}</Text>
-            <Text style={{ color: 'black' }}>부여 포인트: {submittedData.grantPoint}P</Text>
-            {submittedData.votes.length > 0 && (
-              <Text style={{ color: 'black' }}>투표 옵션:</Text>
-            )}
-            {submittedData.votes.map((vote: string, index: number) => (
-              <Text key={index} style={{ color: 'black' }}>{index + 1}. {vote}</Text>
-            ))}
-            {submittedData.images.length > 0 && (
-              <Text style={{ color: 'black' }}>첨부된 이미지:</Text>
-            )}
-            {submittedData.images.map((image: string, index: number) => (
-              <Image key={index} source={{ uri: image }} style={styles.imagePreview} />
-            ))}
-            <Text style={{ color: 'black' }}>시작 날짜: {format(new Date(submittedData.startDate), 'PPP',)}</Text>
-            <Text style={{ color: 'black' }}>종료 날짜: {format(new Date(submittedData.endDate), 'PPP',)}</Text>
-          </View>
-        )}
-
       </ScrollView>
       <View style={{ height: 100 }} />
     </View>

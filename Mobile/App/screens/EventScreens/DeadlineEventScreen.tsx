@@ -245,7 +245,7 @@ const DeadlineEventScreen = ({ route }: any) => {
 
     // 사용자가 이벤트를 등록하지 않은 경우, 초기화 코드 실행
     setSelectedFiles([]);
-    setMainText("이곳에 글을 입력해 주세요");
+    setMainText("");
   };
 
   const handleFileRemove = (index: number) => {
@@ -296,6 +296,8 @@ const DeadlineEventScreen = ({ route }: any) => {
             ))}
           </Swiper>
         </View>
+        {voteOptions && voteOptions.length === 0 ? (
+      <>
         <View style={styles.fileInputArea}>
           <TouchableOpacity style={styles.fileButton} onPress={() => {
             handleFilePick();
@@ -322,7 +324,8 @@ const DeadlineEventScreen = ({ route }: any) => {
             placeholderTextColor={'gray'}
           />
         </View>
-
+      </>
+    ) : null}
         
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity onPress={async () => {
@@ -469,6 +472,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     minHeight: 250,
     margin: 20,
+    marginBottom : 5,
     borderWidth: 1,
     borderRadius: 5,
   },
@@ -477,6 +481,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   sendArea: {
+    marginTop : 30,
     width: width - 40,
     height: 50,
     alignItems: 'center',

@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
-    maxWidth: '50%',
+    maxWidth: '40%',
   },
   userInfoArea: {
     flexDirection: 'row',
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
     maxWidth: '50%'
   },
   userInfoText: {
-    maxWidth: '50%',
+    maxWidth: '60%',
     color: 'black',
     fontSize: 16,
     marginLeft: 10,
