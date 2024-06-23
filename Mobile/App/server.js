@@ -129,7 +129,7 @@ const { getGeneralPosts,
   reportPostAram,
   reportCommentAram,
   AttendanceCheck,
-  RegistorEvent
+  RegistorEvent,
   
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -157,7 +157,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.64',
+  host: '127.0.0.1',
   port: 3306,
   user: 'dohyun',
   password: '0000',

@@ -368,9 +368,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10, 
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
-        //backgroundColor: 'red',
+        backgroundColor: 'white',
         width: '100%',
         height: 70,
+        
     },
 
     writetitle: {
