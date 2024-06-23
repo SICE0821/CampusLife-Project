@@ -2983,7 +2983,6 @@ module.exports = {
     update_user_caution,
     update_user_title,
     update_user_allpoint,
-    GetUserEventPhoto,
     GetEventVote,
     GetoneEventVote,
     SendUserEventVote,
@@ -2994,5 +2993,6 @@ module.exports = {
     Get_One_Event_Data,
     reportPostAram,
     reportCommentAram,
-    AttendanceCheck
+    AttendanceCheck,
+    RegistorEvent
 };

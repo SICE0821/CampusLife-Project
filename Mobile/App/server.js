@@ -118,7 +118,6 @@ const { getGeneralPosts,
   update_user_caution,
   update_user_title,
   update_user_allpoint,
-  GetUserEventPhoto,
   GetEventVote,
   GetoneEventVote,
   SendUserEventVote,
@@ -130,6 +129,7 @@ const { getGeneralPosts,
   reportPostAram,
   reportCommentAram,
   AttendanceCheck,
+  RegistorEvent
   
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
