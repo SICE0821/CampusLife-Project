@@ -105,7 +105,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                                         shadowColor="#EEEEEE"
                                         bgColor="#fff">
                                         <Text style={styles.circleText}>
-                                            {`${config.label}\n${config.value.toFixed(2)}/${config.maxValue}`}
+                                            {`${config.label}\n${config.value.toFixed(config.label.includes('학점') ? 0 : 2)}/${config.maxValue}`}
                                         </Text>
                                     </ProgressCircle>
                                 </View>

@@ -18,6 +18,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const [items, setItemData]: any = useState([]);
   const [SelectItem, SetSelectItem] = useState<ShopItemData | undefined>(undefined);
+  const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -181,14 +182,19 @@ const EventShopScreen = ({ navigation, route }: any) => {
             update_object_state(SelectItem?.object_id);
             insert_user_have_object();
             user_buy_action();
-            console.log("상태변경 성공");
+  
+            // 추가 알림창 띄우기
+            Alert.alert(
+              "알림",
+              "상품 구매가 완료되었습니다.",
+              [{ text: "확인"}]
+            );
           }
         },
-        { text: "취소 " }
+        { text: "취소" }
       ]
     );
   };
-
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -196,6 +202,12 @@ const EventShopScreen = ({ navigation, route }: any) => {
   const selectItem = async (selectItem: any) => {
     await getOneItem(selectItem);
     setIsModalOpen(true);
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true); // 새로고침 시작
+    await getItems(); // 데이터 다시 불러오기 (또는 원하는 다른 작업 수행)
+    setRefreshing(false); // 새로고침 완료
   };
 
 
@@ -270,7 +282,10 @@ const EventShopScreen = ({ navigation, route }: any) => {
       <FlatList
         data={items}
         renderItem={renderItem}
-        ListFooterComponent={renderEmptyItem} />
+        ListFooterComponent={renderEmptyItem}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+      />
       <ModalBox
         isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
         style={styles.modal}

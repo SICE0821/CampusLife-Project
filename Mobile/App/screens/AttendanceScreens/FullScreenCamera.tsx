@@ -8,6 +8,7 @@ const FullScreenCamera = ({ navigation } : any) => {
   const device = useCameraDevice('back'); // 후면 카메라를 사용하도록 가정
 
   const isValidQRCode = (code : string) => {
+    /*
     // 현재 날짜와 시간을 포함하는 정규식 패턴 생성
     const now = new Date();
     const currentSeconds = now.getSeconds();
@@ -29,6 +30,8 @@ const FullScreenCamera = ({ navigation } : any) => {
       }
     }
     return false;
+    */
+    return code.startsWith("myApp_");
   };
 
   const codeScanner = useCodeScanner({
