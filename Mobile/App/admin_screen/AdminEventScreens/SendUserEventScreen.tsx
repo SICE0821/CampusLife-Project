@@ -54,8 +54,26 @@ const SendUserEventScreen = ({ route }: any) => {
     }, [])
   );
 
-  
-  const handlePrizeUser = (user_id : number, event_point : number) => {
+
+  const addGoodEventAram = async (user_id : number, event_id :number) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/addGoodEventAram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user_id,
+          target_id: event_id,
+        })
+      });
+    } catch (error) {
+      console.error('알람 전송 실패', error);
+    }
+  }
+
+
+  const handlePrizeUser = (user_id: number, event_point: number, evnet_id : number) => {
     Alert.alert(
       "이벤트 당첨!",
       "해당 유저에게 포인트를 보여하시겠습니까??",
@@ -64,6 +82,7 @@ const SendUserEventScreen = ({ route }: any) => {
         {
           text: "확인", onPress: () => {
             good_404();
+            addGoodEventAram(user_id, evnet_id);
             AdminSendPoint(user_id, event_point);
           }
         }
@@ -94,68 +113,68 @@ const SendUserEventScreen = ({ route }: any) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          campus_id : userData.campus_pk
+          campus_id: userData.campus_pk
         }),
       })
       const data = await response.json();
       const UserSendEventWithPhoto = await Promise.all(
-        data.map(async (eventData : any) => {
-            const photoData = await GetUserEventPhoto(eventData.event_id, eventData.user_id);
-            return { ...eventData, photodata: photoData };
+        data.map(async (eventData: any) => {
+          const photoData = await GetUserEventPhoto(eventData.event_id, eventData.user_id);
+          return { ...eventData, photodata: photoData };
         })
-    );
-    console.log(JSON.stringify(UserSendEventWithPhoto, null, 2));
-    //console.log(UserSendEventWithPhoto);
-    setUserSendEventData(UserSendEventWithPhoto);
+      );
+      console.log(JSON.stringify(UserSendEventWithPhoto, null, 2));
+      //console.log(UserSendEventWithPhoto);
+      setUserSendEventData(UserSendEventWithPhoto);
     } catch (error) {
       console.error(error);
     } finally {
     }
   }
 
-    //유저의 이벤트 목록 중 사진 가져오기
-    const GetUserEventPhoto = async (event_id : any, user_id : any) => {
-      try {
-        const response = await fetch(`${config.serverUrl}/GetUserEventPhoto`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            event_id : event_id,
-            user_id : user_id,
-          }),
-        })
-        const data = await response.json();
-        console.log(data);
-        return data
-      } catch (error) {
-        console.error(error);
-      } finally {
-      }
+  //유저의 이벤트 목록 중 사진 가져오기
+  const GetUserEventPhoto = async (event_id: any, user_id: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetUserEventPhoto`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: event_id,
+          user_id: user_id,
+        }),
+      })
+      const data = await response.json();
+      console.log(data);
+      return data
+    } catch (error) {
+      console.error(error);
+    } finally {
     }
+  }
 
-        //당첨!!
-        const AdminSendPoint = async (user_id : any, event_point : any) => {
-          try {
-            const response = await fetch(`${config.serverUrl}/AdminSendPoint`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                user_id : user_id,
-                event_point : event_point,
-              }),
-            })
-            const data = await response.json();
-            console.log(data);
-            return data
-          } catch (error) {
-            console.error(error);
-          } finally {
-          }
-        }
+  //당첨!!
+  const AdminSendPoint = async (user_id: any, event_point: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AdminSendPoint`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: user_id,
+          event_point: event_point,
+        }),
+      })
+      const data = await response.json();
+      console.log(data);
+      return data
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
 
   //설정한 이벤트 보여주기
   const GetEventList = async () => {
@@ -216,15 +235,18 @@ const SendUserEventScreen = ({ route }: any) => {
       </View>
       {filteredEvents.length > 0 ? (
         filteredEvents.map((event, index) => (
-          <TouchableOpacity 
-            key={index} 
+          <TouchableOpacity
+            key={index}
             style={styles.eventBox}
-            onPress={() => {{
-              console.log(event.user_name)
-              console.log(event.event_point)}}}
+            onPress={() => {
+              {
+                console.log(event.user_name)
+                console.log(event.event_point)
+              }
+            }}
             onLongPress={() => {
-                handlePrizeUser(event.user_id, event.event_point);
-              }}>
+              handlePrizeUser(event.user_id, event.event_point, event.event_id);
+            }}>
             <View style={styles.topInfoArea}>
               <Text style={styles.eventName}>{eventList.find(item => item.event_id === event.event_id)?.name}</Text>
               <View style={styles.userInfoArea}>
@@ -239,7 +261,7 @@ const SendUserEventScreen = ({ route }: any) => {
                 <TouchableOpacity key={idx} onPress={() => {
                   //console.log(event.photodata);
                   handleImagePress(idx, event.photodata)
-                  }}>
+                }}>
                   <Image source={{ uri: `${config.photoUrl}/${file.event_photo}.png` }} style={styles.image} />
                 </TouchableOpacity>
               ))}
@@ -325,7 +347,7 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
-    maxWidth: '50%',
+    maxWidth: '40%',
   },
   userInfoArea: {
     flexDirection: 'row',
@@ -333,7 +355,7 @@ const styles = StyleSheet.create({
     maxWidth: '50%'
   },
   userInfoText: {
-    maxWidth: '50%',
+    maxWidth: '60%',
     color: 'black',
     fontSize: 16,
     marginLeft: 10,

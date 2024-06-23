@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -1600,7 +1600,9 @@ async function get_aram_data(user_id) {
             report_post.post_id AS report_post_id,
             report_post.title AS report_post_title,
             report_comment.post_id AS report_comment_id,
-            report_comment.title AS report_comment_title
+            report_comment.title AS report_comment_title,
+            good_event.event_id AS good_event_id,
+            good_event.name AS good_event_name
         FROM
             aram
         LEFT JOIN
@@ -1621,6 +1623,8 @@ async function get_aram_data(user_id) {
         		post AS report_post ON aram.target_type = 'report_post' AND aram.target_id = report_post.post_id
         LEFT JOIN
         		post AS report_comment ON aram.target_type = 'report_comment' AND aram.target_id = report_comment.post_id
+        LEFT JOIN 
+             EVENT AS good_event ON aram.target_type = 'good_event' AND aram.target_id = good_event.event_id
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -1667,6 +1671,22 @@ async function addCommentAram(user_id, target_id) {
     try {
         conn = await pool.getConnection();
         const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "게시물에 답글이 달렸습니다!", "my_post_comment");`
+        await conn.query(query, [user_id, target_id]);
+        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        return true;
+    } catch (err) {
+        console.log(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addGoodEventAram(user_id, target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "이벤트에 당첨되셨습니다 축하드립니다!", "good_event");`
         await conn.query(query, [user_id, target_id]);
         console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
@@ -2496,11 +2516,9 @@ async function RegistorEventVotes(event_id, votes) {
     let conn;
     try {
         conn = await pool.getConnection();
-        for (const vote of votes) {
-            const { vote_index, vote_name } = vote;
-            const query = `INSERT INTO event_vote(event_id, vote_name, vote_count, vote_index) VALUES (?, ?, 0, ?)`
-            const result = await conn.query(query, [event_id, vote_name, vote_index]);
-        }
+        const votesJson = JSON.stringify(votes);
+        const query = `CALL RegisterEventVotes(?, ?)`;
+        await conn.query(query, [event_id, votesJson]);
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2513,11 +2531,9 @@ async function RegistorEventVotesAdmin(event_id, votes) {
     let conn;
     try {
         conn = await pool.getConnection();
-        for (const vote of votes) {
-            const { id, text } = vote;
-            const query = `INSERT INTO event_vote(event_id, vote_name, vote_count, vote_index) VALUES (?, ?, 0, ?)`
-            const result = await conn.query(query, [event_id, text, id]);
-        }
+        const votesJson = JSON.stringify(votes);
+        const query = `CALL RegisterEventVotes(?, ?)`;
+        await conn.query(query, [event_id, votesJson]);
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2530,10 +2546,9 @@ async function RegistorEventPhoto(event_id, event_photo) {
     let conn;
     try {
         conn = await pool.getConnection();
-        for (const one_photo of event_photo) {
-            const query = `INSERT INTO event_photo(event_id, event_photo) VALUES (?, ?)`
-            const result = await conn.query(query, [event_id, one_photo]);
-        }
+        const photosJson = JSON.stringify(event_photo);
+        const query = `CALL RegisterEventPhotos(?, ?)`;
+        await conn.query(query, [event_id, photosJson]);
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2993,5 +3008,7 @@ module.exports = {
     Get_One_Event_Data,
     reportPostAram,
     reportCommentAram,
-    AttendanceCheck
+    AttendanceCheck,
+    addGoodEventAram,
+    RegistorEvent,
 };

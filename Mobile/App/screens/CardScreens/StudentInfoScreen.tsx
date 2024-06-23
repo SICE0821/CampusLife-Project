@@ -85,7 +85,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                 })
             })
             const data = await response.json(); // 서버로부터의 응답을 JSON으로 파싱
-            if (response.ok) {
+            if (response.ok && userdata.title !== "학교") {
                 UpdateImg();
                 Alert.alert(data.message, "", [
                     {
@@ -94,7 +94,13 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                     }
                 ]); // 성공적으로 삭제되면 알림창 표시
             } else {
-                throw new Error(data.message); // 실패 시 에러 처리
+                UpdateImg();
+                Alert.alert(data.message, "", [
+                    {
+                        text: "확인",
+                        onPress: () => navigation.navigate("AdminScreen", { updatedUserData: userdata })
+                    }
+                ]); // 성공적으로 삭제되면 알림창 표시
             }
         } catch (error) {
             console.error('계정 업데이트 실패:', error);
@@ -145,12 +151,14 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
     */
 
     const getPhotos = async () => {
-        ImageCropPicker.openPicker({
-            multiple: true,
-            mediaType: 'photo',
-            includeBase64: true,
-            includeExif: true,
-        }).then(res => {
+        try {
+            const res = await ImageCropPicker.openPicker({
+                multiple: true,
+                mediaType: 'photo',
+                includeBase64: true,
+                includeExif: true,
+            });
+    
             const formData = new FormData();
             res.forEach(image => {
                 formData.append('images', {
@@ -159,9 +167,15 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                     name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
                 });
             });
+    
             uploadImages(formData);
-        });
+        } catch (error) {
+            // 사용자가 이미지 선택을 취소한 경우 오류가 발생할 수 있음
+            console.log('사용자가 이미지 선택을 취소했습니다.');
+            // 또는 다른 방법으로 사용자에게 메시지를 보여줄 수 있음
+        }
     };
+    
 
     const uploadImages = async (formData: FormData) => {
         try {
@@ -306,40 +320,35 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                         </View>
                     </View>
 
-                    <View style={styles.infoArea}>
-                        {userdata.currentstatus !== "졸업" && (
-                            <View style={styles.schoolInfoLabel}>
-                                <Text style={styles.schoolInfoText}>학년</Text>
-                                    <View style={styles.listBoxArea}>
+                    {userdata.title !== '학교' && (  // 학교일 경우 아래 학년 및 재학상태 UI를 표시하지 않음
+                        <View style={styles.infoArea}>
+                            {userdata.currentstatus !== "졸업" && (
+                                <View style={styles.schoolInfoLabel}>
+                                    <Text style={styles.schoolInfoText}>학년</Text>
+                                    <View>
                                         <Text style={styles.listBoxText}>{userdata.grade}학년</Text>
                                     </View>
-                            </View>
-                        )}
-                        {userdata.currentstatus !== "졸업" ? (
-                            <View style={styles.schoolInfoLabel}>
-                                <Text style={styles.schoolInfoText}>재학상태</Text>
-                                <TouchableOpacity onPress={openStatusModal}>
-                                    <View style={styles.listBoxArea}>
-                                        <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
-                                        <IconB style={styles.listBoxIcon} name="down" size={30} />
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        ) : (
-                            <View>
+                                </View>
+                            )}
+                            {userdata.currentstatus !== "졸업" ? (
                                 <View style={styles.schoolInfoLabel}>
                                     <Text style={styles.schoolInfoText}>재학상태</Text>
-                                    <TouchableOpacity onPress={openStatusModal}>
-                                        <View style={styles.listBoxArea}>
-                                            <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
-                                            <IconB style={styles.listBoxIcon} name="down" size={30} />
-                                        </View>
-                                    </TouchableOpacity>
+                                    <View>
+                                        <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
+                                    </View>
                                 </View>
-                            </View>
-                        )}
-                    </View>
-
+                            ) : (
+                                <View>
+                                    <View style={styles.schoolInfoLabel}>
+                                        <Text style={styles.schoolInfoText}>재학상태</Text>
+                                        <View>
+                                            <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
+                        </View>
+                    )}
                     <View style={styles.infoArea}>
                         <Text style={styles.infoLabelText}>아이디</Text>
                         <View style={styles.infoBox}>
@@ -519,7 +528,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         marginRight: 15
     },
-    listBoxArea: {
+    /*listBoxArea: {
         flexDirection: "row",
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -529,7 +538,7 @@ const styles = StyleSheet.create({
         width: 120,
         height: 45,
         paddingHorizontal: 10
-    },
+    },*/
     listBoxText: {
         fontSize: 17,
         fontWeight: "bold",
