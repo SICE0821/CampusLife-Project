@@ -1,6 +1,6 @@
 const config = {
-    serverUrl: 'http://172.30.1.88:3000',
-    photoUrl : 'http://172.30.1.88:3000'
+    serverUrl: 'http://192.168.35.150:3000',
+    photoUrl : 'http://192.168.35.150:3000'
 };
 
 export default config;
