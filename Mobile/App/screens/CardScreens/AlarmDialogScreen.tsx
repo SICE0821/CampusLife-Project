@@ -247,32 +247,32 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
 
   const NavigationPage = async (item2: aramData) => {
     switch (item2.target_type) {
-      case 'my_post_comment':
+      case 'my_post_comment':  // 내 게시물 댓글
         const postList1 = await go_post_detail(item2.post_comment_id);
         await view_count_up(item2.post_comment_id);
         go_detail_screen1(postList1);
         break;
-      case 'hot_post':
+      case 'hot_post': // 핫 게시물
         const postList2 = await go_post_detail(item2.hot_post_id);
         await view_count_up(item2.hot_post_id);
         go_detail_screen2(postList2);
         break;
-      case 'school_notice':
+      case 'school_notice': // 학교 공지사항
         const postList3 = await go_post_detail(item2.school_notice_id);
         await view_count_up(item2.school_notice_id);
         console.log(postList3)
         go_detail_screen3(postList3);
-      case 'department_notice':
+      case 'department_notice': // 학과 공지사항
         const postList4 = await go_post_detail(item2.department_notice_id);
         await view_count_up(item2.department_notice_id);
         go_detail_screen4(postList4);
         break;
-      case 'my_post_like':
+      case 'my_post_like': // 내 게시물 좋아요
         const postList5 = await go_post_detail(item2.my_post_like_id);
         await view_count_up(item2.my_post_like_id);
         go_detail_screen5(postList5);
         break;
-      case 'new_event':
+      case 'new_event': // 새 이벤트
         const eventData: EventData | null = await Get_One_Event_Data(item2.new_event_id);
         if (eventData) {
           navigation.navigate("DeadlineEventScreen", { userdata: userData, eventdata: eventData });
@@ -282,13 +282,13 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
 다음 이벤트를 노려주세요.`);
         }
         break;
-      case 'report_post':
+      case 'report_post': // 신고
         const postList6 = await go_post_detail(item2.report_post_id);
         //console.log(postList6);
         console.log(postList6.report_comment_title);
         go_detail_screen6(postList6);
         break;
-      case 'report_comment':
+      case 'report_comment': // 신고 댓글
         const postList7 = await go_post_detail(item2.report_comment_id);
         console.log(postList7.report_comment_title);
         go_detail_screen7(postList7);

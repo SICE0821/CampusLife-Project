@@ -1212,6 +1212,7 @@ const styles = StyleSheet.create({
         elevation: 5,
         paddingVertical: 10,
         paddingHorizontal: 5,
+        zIndex : 999
     },
 
     optionsContainer2: {

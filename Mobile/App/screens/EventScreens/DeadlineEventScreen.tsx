@@ -322,6 +322,8 @@ const DeadlineEventScreen = ({ route }: any) => {
             placeholderTextColor={'gray'}
           />
         </View>
+
+        
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <TouchableOpacity onPress={async () => {
             sendEvent();
