@@ -1,10 +1,11 @@
 .header {
     background-color: #FFDECF;
     padding: 10px 0;
+    text-align: center;
   }
 
   .image {
-    width: 250px;
+    width: 200px;
     padding: 20px;
   }
   
@@ -23,6 +24,7 @@
   .navLink {
     color: white;
     text-decoration: none;
+    font-size: 18pt;
     font-weight: bold;
     transition: color 0.3s ease;
   }

@@ -29,8 +29,8 @@ function Login() {
       <h2 className={styles.h2}>강의 출석체크 홈페이지</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
         {error && <div className={styles.error}>{error}</div>}
-        <div>
-          <label htmlFor="username">사용자 이름:</label>
+        <div className={styles.inputArea}>
+          <label htmlFor="username" className={styles.inputText}>아이디 :</label>
           <input
             id="username"
             type="text"
@@ -40,8 +40,8 @@ function Login() {
             className={styles.input}
           />
         </div>
-        <div>
-          <label htmlFor="password">비밀번호:</label>
+        <div className={styles.inputArea}>
+          <label htmlFor="password" className={styles.inputText}>비밀번호 :</label>
           <input
             id="password"
             type="password"
@@ -51,7 +51,9 @@ function Login() {
             className={styles.input}
           />
         </div>
-        <button type="submit" className={styles.button}>로그인</button>
+        <div className={styles.buttonArea}>
+          <button type="submit" className={styles.button}>로그인</button>
+        </div>
       </form>
     </div>
   );
