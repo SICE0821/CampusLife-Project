@@ -218,7 +218,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       }}>
         <View style={styles.square}>
           <View style={styles.picturebox}>
-            <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.firstImage_Num}.png` }} />
+            <Image style={{ flex: 1, width: '100%', borderTopLeftRadius: 20, borderTopRightRadius: 20, }} source={{ uri: `${config.photoUrl}/${item.firstImage_Num}.png` }} />
           </View>
           <View style={styles.iteminfo}>
             <Text style={{ fontSize: 20, color: 'black', }} numberOfLines={1} ellipsizeMode='tail'>{item.firstName}</Text>
@@ -245,7 +245,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
         }}>
           <View style={styles.square}>
             <View style={styles.picturebox}>
-              <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.secondImage_Num}.png` }} />
+              <Image style={{ flex: 1, width: '100%', borderTopLeftRadius: 20, borderTopRightRadius: 20, }} source={{ uri: `${config.photoUrl}/${item.secondImage_Num}.png` }} />
             </View>
             <View style={styles.iteminfo}>
               <Text style={{ fontSize: 20, color: 'black', }} numberOfLines={1} ellipsizeMode='tail'>{item.secondName}</Text>
