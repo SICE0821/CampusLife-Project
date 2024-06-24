@@ -19,13 +19,13 @@ const HeaderPage = () => {
           <li className={styles.navItem}>
             <Link to="/" className={styles.navLink}>Home</Link>
           </li>
-          <li className={styles.navItem}>
+          {/* <li className={styles.navItem}>
             <Link to="/Test" className={styles.navLink}>Test Page</Link>
           </li>
           <li className={styles.navItem}>
             <Link to="/QrCheck" className={styles.navLink}>QrCheck Page</Link>
           </li>
-          {/* Add more navigation links as needed */}
+          Add more navigation links as needed */}
         </ul>
       </nav>
     </div>

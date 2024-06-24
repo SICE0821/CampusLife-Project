@@ -697,7 +697,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             writerecomment();
             addCommentAram();
         }
-        setcommenttext('댓글을 입력해주세요');
+        setcommenttext('');
         Keyboard.dismiss(); // 키보드 숨기기
     };
 
@@ -903,7 +903,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                             </View>
                                         </View>
                                         {activeCommentId === subitem.recomment_id && (
-                                            <View style={styles.optionsContainer2}>
+                                            <View style={styles.optionsContainer3}>
                                                 <TouchableOpacity>
                                                     <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
                                                 </TouchableOpacity>
@@ -1233,6 +1233,24 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 5,
         zIndex : 1000,
+    },
+    optionsContainer3: {
+        position: 'absolute',
+        top: 45,
+        right: 30,
+        width: 120,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
     },
       
 })

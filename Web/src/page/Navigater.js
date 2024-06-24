@@ -16,6 +16,7 @@ function Navigator() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={isLoggedIn ? <Main /> : <Navigate to="/login" />} />
+        <Route path="/main" element={isLoggedIn ? <Main /> : <Navigate to="/login" />} />
         <Route path="/test" element={isLoggedIn ? <Test /> : <Navigate to="/login" />} />
         <Route path="/qrcheck" element={isLoggedIn ? <QrCheck /> : <Navigate to="/login" />} />
       </Routes>
