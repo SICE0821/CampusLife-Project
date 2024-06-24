@@ -2048,7 +2048,7 @@ async function send_user_event_info(user_id, event_id, content) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `INSERT INTO user_send_event (user_id, event_id, time, content) VALUES (?, ?, DEFAULT, ?);`
+        const query = `INSERT INTO user_send_event (user_id, event_id, time, content, good_event) VALUES (?, ?, DEFAULT, ?, 0);`
         await conn.query(query, [user_id, event_id, content]);
         console.log("입력 성공");
         return true;
@@ -2688,7 +2688,9 @@ async function GetUserSendEvent(campus_id) {
             JOIN
                 student st ON st.student_id = userdata.student_id
             WHERE 
-                e.campus_id = ? `
+                e.campus_id = ?
+            ORDER BY 
+                us.time DESC `
             , [campus_id]);
         return rows;
     } catch (err) {
