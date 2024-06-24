@@ -219,7 +219,7 @@ const EventRegistrationScreen = ({ route }: any) => {
         setSelectedFormImages(formDataArray);
         //console.log(formDataArray);
       } else if (response.errorCode) {
-        console.log('Image picker error: ', response.errorMessage);
+        //console.log('Image picker error: ', response.errorMessage);
       }
     });
   };
@@ -249,7 +249,7 @@ const EventRegistrationScreen = ({ route }: any) => {
           //console.error('Image upload failed');
         }
       }
-      console.log(uploadedImageDatas);
+      //console.log(uploadedImageDatas);
       return uploadedImageDatas;
     } catch (error) {
       console.error('Error uploading images: ', error);

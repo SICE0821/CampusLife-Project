@@ -38,9 +38,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     
     // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
     if (selectallposter === 1) {
-      setpostfontoption("전체 게시판");
+      setpostfontoption("학교 공지사항");
     } else if (selectdepartmentposter === 1) {
-      setpostfontoption("학과 게시판");
+      setpostfontoption("학과 공지사항");
     } else {
       setpostfontoption("게시판을 정해주세요");
     }
@@ -154,10 +154,10 @@ const addDepartmentNoticeAram = async (value : number) => {
           contents: maintext,
         })
       });
-      console.log("게시글 작성완료!");
+      //console.log("게시글 작성완료!");
       const value = await response.json();
-      console.log(value);
-      console.log(selectdepartmentposter);
+      //console.log(value);
+      //console.log(selectdepartmentposter);
       if(selectdepartmentposter === 0) {
       addSchoolNoticeAram(value.postId);
       ok_go();

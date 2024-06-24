@@ -168,13 +168,13 @@ const AttendanceScreen = ({navigation, route}: any) => {
         });
         const data = await response.json();
 
-        console.log("출석 정보 업데이트 성공:", data);
+        //console.log("출석 정보 업데이트 성공:", data);
         
       });
   
       await Promise.all(promises);
     } catch (error) {
-      console.log('출석 정보 업데이트 실패:', error);
+      //console.log('출석 정보 업데이트 실패:', error);
     }
   };
   
@@ -252,12 +252,12 @@ const AttendanceScreen = ({navigation, route}: any) => {
         <Text style={styles.date}>{getCurrentDate()}</Text>
       </View>
 
-      {lectureList.map((Lecture, index) => (
-        Lecture.week === nowday && (
-          <View key={index} style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.AttendanceList} onPress={() => {
-              openModal(Lecture)
-              console.log(Lecture.today_lecture_state)}}>
+        {lectureList.map((Lecture, index) => (
+          Lecture.week === nowday && (
+            <View key={index} style={styles.buttonContainer}>
+              <TouchableOpacity style={styles.AttendanceList} onPress={() => {
+                openModal(Lecture)
+              }}>
               <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
               <View style={styles.ListArea}>
                 <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}</Text>
@@ -276,7 +276,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
           <View key={index} style={styles.buttonContainer2}>
             <TouchableOpacity style={styles.AttendanceList} onPress={() => {
               openModal(Lecture)
-              console.log(Lecture.today_lecture_state)}}>
+            }}>
               <Text style={styles.ListText}>{Lecture.lecture_name}</Text>
               <View style={styles.ListArea}>
                 <Text style={styles.ListInfo}>{Lecture.professor_name} | {Lecture.lecture_room}</Text>

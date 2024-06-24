@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import Icon from 'react-native-vector-icons/Entypo';
 import { Table, Row, Rows } from "react-native-table-component";
 import { UserData, Lecture } from '../../../types/type';
 
@@ -22,6 +21,11 @@ const AcademicRecord = ({ route }: any) => {
             semesters.push(year * 2); // Even semester
         }
         setVisibleSemesters(semesters);
+
+        // 초기 선택 값 설정 (예를 들어 첫 번째 학기로 설정)
+        if (semesters.length > 0) {
+            setSelectedSemester(semesters[0]);
+        }
     }, [userData.college]);
 
     const semesterLabels: Record<number, string> = {
@@ -45,24 +49,6 @@ const AcademicRecord = ({ route }: any) => {
         7: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 1),
         8: userLecture.filter(lecture => lecture.lecture_grade === 4 && lecture.lecture_semester === 2),
     };
-
-    const [visibility, setVisibility] = useState<Record<number, boolean>>({});
-
-    const toggleVisibility = (semester: number) => {
-        setVisibility(prev => ({
-            ...prev,
-            [semester]: !prev[semester]
-        }));
-    };
-
-    // 초기에 모든 학기를 숨김 상태로 설정
-    useEffect(() => {
-        const initialVisibility: Record<number, boolean> = {};
-        visibleSemesters.forEach(semester => {
-            initialVisibility[semester] = false;
-        });
-        setVisibility(initialVisibility);
-    }, [visibleSemesters]);
 
     return (
         <View style={styles.container}>

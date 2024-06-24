@@ -39,11 +39,11 @@ const FullScreenCamera = ({ navigation } : any) => {
     onCodeScanned: (codes) => {
       if (!hasScanned) {
         setHasScanned(true);
-        console.log("인식된 QR 코드 목록:", codes);
+        //console.log("인식된 QR 코드 목록:", codes);
         const validQRCode = codes.find(code => code.value && isValidQRCode(code.value));
         if (validQRCode) {
-          console.log("유효한 QR 코드입니다 : ", validQRCode.value);
-          navigation.navigate('AttendanceScreen', { scannedCode: validQRCode.value });
+          //console.log("유효한 QR 코드입니다 : ", validQRCode.value);
+          navigation.goBack({ scannedCode: validQRCode.value });
         } else {
           Alert.alert("허용되지 않은 QR 코드입니다.");
           navigation.goBack();
