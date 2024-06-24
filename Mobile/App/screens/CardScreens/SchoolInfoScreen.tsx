@@ -23,7 +23,7 @@ export type SchoolBuildingData = {
   longitude: string,
 };
 
-const info_data_head = ["층", "학과 홈페이지", "학과 사무실 전화번호"];
+const info_data_head = ["층", "학과", "학과 사무실 전화번호"];
 const widthArrs = [width * 0.2, width * 0.4, width * 0.4];
 const tableBorderColor = 'gray';
 

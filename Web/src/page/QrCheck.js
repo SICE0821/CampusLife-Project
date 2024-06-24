@@ -4,7 +4,7 @@ import styles from './QrCheck.module.css';
 
 function QrCheck() {
   const [qrData, setQrData] = useState("");
-  const [remainingTime, setRemainingTime] = useState(5); // QR code validity time (seconds)
+  const [remainingTime, setRemainingTime] = useState(1); // QR code validity time (seconds)
   const qrTime = 1; // QR code regeneration interval (seconds)
 
   useEffect(() => {
@@ -51,7 +51,7 @@ function QrCheck() {
         <div>
           <QRCode value={qrData} bgColor={'white'} size={512} />
         </div>
-        <p>남은 시간: {remainingTime}초</p>
+        {/* <p>남은 시간: {remainingTime}초</p> */}
       </header>
     </div>
   );

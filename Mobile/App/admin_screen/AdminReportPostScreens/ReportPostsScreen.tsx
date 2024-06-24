@@ -397,6 +397,8 @@ const styles = StyleSheet.create({
   },
   picker: {
     flex: 1,
+    marginHorizontal: 5,
+    backgroundColor: '#eeeeee',
   },
   flatliststyle: {
     // marginTop: 40,
