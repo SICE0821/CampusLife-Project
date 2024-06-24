@@ -115,9 +115,9 @@ const FriendCodeEventScreen = ({ route }: any) => {
       }
 
       const aram_data = await response.json();
-      console.log(aram_data.friend_code);
-      console.log(aram_data.friend_code_id);
-      console.log(aram_data.my_name);
+      //(aram_data.friend_code);
+      //console.log(aram_data.friend_code_id);
+      //console.log(aram_data.my_name);
 
       await addFriendCodeAram(aram_data.friend_code, aram_data.friend_code_id, aram_data.my_name);
     } catch (error: any) {
@@ -144,7 +144,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
           point: 100
         })
       })
-      console.log("포인트 올리기 성공")
+      //console.log("포인트 올리기 성공")
       clearTimeout(timeoutId);
     } catch (error) {
       console.error('포인트 올리기 실패', error);
@@ -173,7 +173,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
       if (!response.ok) {
         throw new Error('서버 응답 오류');
       }
-      console.log("알림전송!");
+      //console.log("알림전송!");
     } catch (error: any) {
       if (error.name === 'AbortError') {
         //console.error('요청이 타임아웃되었습니다');
@@ -239,7 +239,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
       } else if (result == '코드X') {
         no_code();
       } else {
-        console.log("???????????")
+        //console.log("???????????")
       }
     }
   };

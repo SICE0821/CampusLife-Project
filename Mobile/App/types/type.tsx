@@ -211,6 +211,7 @@ export type UserSendEventWithPhoto = {
   user_login_id : number,
   user_name : string,
   event_point : number,
+  good_event : number,
   photodata: {
     event_id : number,
     user_id : number,

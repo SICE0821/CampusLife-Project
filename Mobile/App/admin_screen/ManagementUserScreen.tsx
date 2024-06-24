@@ -27,13 +27,13 @@ const width = Dimensions.get("window").width;
 const getRoleColor = (role: string) => {
   switch (role) {
     case '반장':
-      return 'red';
-    case '학우회장':
       return 'green';
+    case '학우회장':
+      return 'blue';
     case '일반학생':
       return 'black';
     case '학교':
-      return 'blue';
+      return 'red';
     default:
       return 'black';
   }
@@ -70,7 +70,7 @@ const ManagementUserScreen = ({route} : any) => {
       }
 
       const data = await response.json();
-      console.log(data); // API에서 받아온 데이터 확인
+      //console.log(data); // API에서 받아온 데이터 확인
 
       // 데이터에서 학과 이름들을 추출하여 departments 배열에 저장
       const departmentNames = data.map((item: any) => item.department_name); // 예시로 department_name을 가져오는 코드
@@ -98,7 +98,7 @@ const ManagementUserScreen = ({route} : any) => {
       }
   
       const data = await response.json();
-      console.log(data); // API에서 받아온 데이터 확인
+      //console.log(data); // API에서 받아온 데이터 확인
   
       // title이 '학교'인 데이터는 필터링하여 제외
       const filteredData = data.filter((item: any) => item.title !== '학교');
@@ -165,7 +165,7 @@ const ManagementUserScreen = ({route} : any) => {
   
                 // 성공 또는 실패 메시지 출력
                 const data = await response.json();
-                console.log(data.message);
+                //console.log(data.message);
   
                 // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
   
@@ -219,7 +219,7 @@ const ManagementUserScreen = ({route} : any) => {
       }
   
       const data = await response.json();
-      console.log(data.message); // 성공 또는 실패 메시지 출력
+      //console.log(data.message); // 성공 또는 실패 메시지 출력
   
       // 알림창 표시
       Alert.alert(
@@ -302,7 +302,7 @@ const ManagementUserScreen = ({route} : any) => {
             });
 
             const data = await response.json();
-            console.log(data.message);
+            //console.log(data.message);
 
             // Update local state upon successful update
             const updatedUserData = userData.map(user =>

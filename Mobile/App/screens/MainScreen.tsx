@@ -30,7 +30,7 @@ const volunteerpng = require('../assets/MainPhoto_Event.png');
 
 const width = Dimensions.get('window').width;
 
-console.log(width)
+//console.log(width)
 
 type PostData = {
   post_id: number,
@@ -70,7 +70,7 @@ const MainPage = ({ navigation, route }: any) => {
         })
       })
       const result = await response.json();
-      console.log("포스트 View 올리기 성공!")
+      //console.log("포스트 View 올리기 성공!")
     } catch (error) {
       console.error('포스트 View 올리기 누르기 실패', error);
     }
@@ -91,26 +91,26 @@ const MainPage = ({ navigation, route }: any) => {
           name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
         });
       });
-      console.log(formData);
+      //console.log(formData);
       //uploadImages(formData);
     });
   };
 
-  const uploadImages = async (formData: FormData) => {
+  /*const uploadImages = async (formData: FormData) => {
     try {
       const response = await fetch(`${config.serverUrl}/upload`, {
         method: 'POST',
         body: formData,
       });
       if (response.ok) {
-        console.log('Images uploaded successfully');
+        //console.log('Images uploaded successfully');
       } else {
         console.error('Error uploading images');
       }
     } catch (error) {
       console.error('Error uploading images:', error);
     }
-  };
+  };*/
 
   const get_user_department = async () => {
     try {
@@ -203,7 +203,7 @@ const MainPage = ({ navigation, route }: any) => {
         })
       })
       const userPoint = await response.json();
-      console.log(userPoint);
+      //console.log(userPoint);
       setUserPoint(userPoint);
     } catch (error) {
       console.error('유저 정보 가져오기 실패:', error);
@@ -221,22 +221,24 @@ const MainPage = ({ navigation, route }: any) => {
           campus_id: userData.campus_pk,
         }),
       });
-
+  
       if (!response.ok) {
         throw new Error('서버 응답 오류');
       }
       const eventData = await response.json();
-      const eventsWithImages = await Promise.all(eventData.map(async (event : any) => {
-        const eventImage = await GetEditEventImage(event.event_id);
-        return {
-          ...event,
-          event_photo: eventImage
-        };
-      }));
+  
+      // Ensure each event has a valid event_photo array
+      const eventsWithImages = await Promise.all(
+        eventData.map(async (event : any) => {
+          const eventImage = await GetEditEventImage(event.event_id);
+          return {
+            ...event,
+            event_photo: eventImage || [{ event_photo: 'default_image_url' }], // Set a default image if eventImage is undefined
+          };
+        })
+      );
       setEventData(eventsWithImages);
-      console.log(JSON.stringify(eventsWithImages, null, 2));
     } catch (error) {
-      console.error(error);
     }
   };
 
@@ -253,10 +255,11 @@ const MainPage = ({ navigation, route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data;
     } catch (error) {
       console.error(error);
+      console.log("asd3");
     } finally {
     }
   }
@@ -293,7 +296,7 @@ const MainPage = ({ navigation, route }: any) => {
     ];
 
   const StudentInfo = async () => {
-    console.log(userData);
+    //console.log(userData);
     navigation.navigate('StudentInfoNavigator', { userData, Userdepartment });
   }
 

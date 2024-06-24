@@ -5,6 +5,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, AdminEventList, UserSendEventWithPhoto, UserSendEventPhotoData } from '../../types/type'
 import config from '../../config';
+import IconA from 'react-native-vector-icons/MaterialIcons'
 
 const width = Dimensions.get("window").width;
 
@@ -72,18 +73,44 @@ const SendUserEventScreen = ({ route }: any) => {
     }
   }
 
+  const setUserSendtype = async (user_send_event : number) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/setUserSendtype`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_send_event: user_send_event,
+        })
+      });
+    } catch (error) {
+      console.error('알람 전송 실패', error);
+    }
+  }
 
-  const handlePrizeUser = (user_id: number, event_point: number, evnet_id : number) => {
+
+  const handlePrizeUser = (user_id: number, event_point: number, evnet_id : number, user_send_event : number) => {
     Alert.alert(
       "이벤트 당첨!",
       "해당 유저에게 포인트를 보여하시겠습니까??",
       [
         { text: "취소", style: "cancel" },
         {
-          text: "확인", onPress: () => {
-            good_404();
-            addGoodEventAram(user_id, evnet_id);
-            AdminSendPoint(user_id, event_point);
+          text: "확인", onPress: async () => {
+            try {
+              await Promise.all([
+                good_404(),
+                addGoodEventAram(user_id, evnet_id),
+                AdminSendPoint(user_id, event_point),
+                setUserSendtype(user_send_event),
+                GetUserSendEvent()
+              ]);
+              console.log("모든 요청이 성공적으로 완료되었습니다.");
+            } catch (error) {
+              console.error("요청 중 오류가 발생했습니다:", error);
+            }
+
           }
         }
       ]
@@ -123,7 +150,7 @@ const SendUserEventScreen = ({ route }: any) => {
           return { ...eventData, photodata: photoData };
         })
       );
-      console.log(JSON.stringify(UserSendEventWithPhoto, null, 2));
+      //console.log(JSON.stringify(UserSendEventWithPhoto, null, 2));
       //console.log(UserSendEventWithPhoto);
       setUserSendEventData(UserSendEventWithPhoto);
     } catch (error) {
@@ -146,7 +173,7 @@ const SendUserEventScreen = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data
     } catch (error) {
       console.error(error);
@@ -168,7 +195,7 @@ const SendUserEventScreen = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data
     } catch (error) {
       console.error(error);
@@ -235,17 +262,36 @@ const SendUserEventScreen = ({ route }: any) => {
       </View>
       {filteredEvents.length > 0 ? (
         filteredEvents.map((event, index) => (
-          <TouchableOpacity
+          event.good_event === 1 ? (
+            <TouchableOpacity
             key={index}
-            style={styles.eventBox}
+            style={styles.good_event_Box}
             onPress={() => {
               {
                 console.log(event.user_name)
                 console.log(event.event_point)
               }
             }}
+            >
+            <View style={styles.topInfoArea}>
+              <Text style={styles.eventName}>{eventList.find(item => item.event_id === event.event_id)?.name}</Text>
+              <View style={styles.userInfoArea}>
+                <Text style={styles.userInfoText}>이름: {event.user_name}</Text>
+                <Text style={styles.userInfoText}>아이디: {event.user_login_id}</Text>
+              </View>
+            </View>
+            <Text style={styles.sendText}>{event.content}</Text>
+            <View style = {styles.good_event_box}>
+            <Text style = {{fontSize : 23, color : '#FF7F27', fontWeight: 'bold'}}>해당 유저가 이벤트에 당첨되었습니다!!</Text>
+              <IconA name={"celebration"} size={60} style = {{color : '#FF7F27'}}/>
+            </View>  
+          </TouchableOpacity>
+          ) : (
+          <TouchableOpacity
+            key={index}
+            style={styles.eventBox}
             onLongPress={() => {
-              handlePrizeUser(event.user_id, event.event_point, event.event_id);
+              handlePrizeUser(event.user_id, event.event_point, event.event_id, event.user_send_event);
             }}>
             <View style={styles.topInfoArea}>
               <Text style={styles.eventName}>{eventList.find(item => item.event_id === event.event_id)?.name}</Text>
@@ -267,6 +313,7 @@ const SendUserEventScreen = ({ route }: any) => {
               ))}
             </ScrollView>
           </TouchableOpacity>
+          )
         ))
       ) : (
         <Text style={styles.noEventText}>해당 이벤트 참여자가 없습니다.</Text>
@@ -334,7 +381,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 10,
     borderRadius: 15,
-    elevation: 5
+    elevation: 5,
+  },
+
+  good_event_Box: {
+    backgroundColor: '#FFFFE0',
+    width: width * 0.95,
+    marginBottom: 10,
+    padding: 10,
+    borderRadius: 15,
+    elevation: 5,
   },
   topInfoArea: {
     width: '100%',
@@ -420,6 +476,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: 'bold',
   },
+  good_event_box : {
+    justifyContent : 'center',
+    alignItems : 'center',
+    flexDirection : 'row'
+  }
 });
 
 export default SendUserEventScreen;

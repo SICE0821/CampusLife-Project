@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -298,30 +298,31 @@ async function getBookmarkPosts(user_id) {
         conn = await pool.getConnection();
         const query = (
             `SELECT 
-            post.post_id, 
-            post.title, 
-            post.contents, 
-            post.date, 
-            post.view, 
-            post.\`like\`, 
-            student.name, 
-            user.title AS user_title
-        FROM 
-            post
-        LEFT JOIN 
-            user ON post.user_id = user.user_id
-        LEFT JOIN 
-            student ON user.student_id = student.student_id
-        LEFT JOIN 
-            user_have_post ON post.post_id = user_have_post.post_id
-        WHERE 
-            post.department_check = 0 
-            AND post.inform_check = 0 
-            AND user_have_post.user_id = ?
-        GROUP BY 
-            post.post_id
-        ORDER BY 
-            COUNT(user_have_post.post_id) DESC;`
+                post.post_id, 
+                post.title, 
+                post.contents, 
+                post.date, 
+                post.view, 
+                post.\`like\`, 
+                student.name, 
+                user.title AS user_title,
+                COUNT(user_have_post.post_id) AS bookmark_count
+            FROM 
+                post
+            LEFT JOIN 
+                user ON post.user_id = user.user_id
+            LEFT JOIN 
+                student ON user.student_id = student.student_id
+            LEFT JOIN 
+                user_have_post ON post.post_id = user_have_post.post_id
+            WHERE 
+                post.department_check = 0 
+                AND post.inform_check = 0 
+                AND user_have_post.user_id = ?
+            GROUP BY 
+                post.post_id
+            ORDER BY 
+                post.date DESC;`
         );
         const rows = await conn.query(query, [user_id]);
         return rows;
@@ -524,7 +525,7 @@ async function insertDataIntoDB(post_id, user_id, department_check, inform_check
                VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?)`;
         // 쿼리 실행
         const result = await conn.query(query, [post_id, user_id, department_check, inform_check, title, contents, view, like]);
-        console.log('Data inserted successfully:', result);
+        //console.log('Data inserted successfully:', result);
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -630,7 +631,7 @@ async function Updatelecture(student_id, lecture_id, nonattendance, attendance, 
         `;
         const result = await conn.query(query, [nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -696,7 +697,7 @@ async function PostItem(campus_id, name, price, code_num, using_time, image_num,
 
         // 쿼리 실행
         const result = await conn.query(query, [campus_id, name, price, code_num, using_time, image_num, sell_check, explain]);
-        console.log('Data inserted successfully:', result);
+        //console.log('Data inserted successfully:', result);
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -714,7 +715,7 @@ async function UpdateItem(name, newname, price, using_time, image_num, sell_chec
             + " name = ?, price = ?, using_time = ?, image_num = ?, sell_check = ?, `explain` = ? WHERE NAME = ?"
         const result = await conn.query(query, [newname, price, using_time, image_num, sell_check, explain, name]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -733,7 +734,7 @@ async function DeleteItem(name, deltenum) {
             + "LIMIT ?"
         const result = await conn.query(query, [name, deltenum]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -751,7 +752,7 @@ async function DeleteUser(user_pk) {
             + "WHERE user_id = ?"
         const result = await conn.query(query, [user_pk]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -788,7 +789,7 @@ async function get_department(campus_id) {
             WHERE department_have_object.campus_id = ?;
         `;
         const result = await conn.query(query, [campus_id]);
-        console.log(result);
+        //console.log(result);
         return result;
 
     } catch (err) {
@@ -807,7 +808,7 @@ async function get_university_name(university_name) {
         // 데이터 업데이트 쿼리 작성
         const query = "SELECT campus.name FROM campus WHERE campus_id = ?"
         const result = await conn.query(query, [university_name]);
-        console.log(result);
+        //console.log(result);
         return result;
     } catch (err) {
         console.error('Error updating data:', err);
@@ -826,7 +827,7 @@ async function DeleteUser(user_pk) {
             + "WHERE user_id = ?"
         const result = await conn.query(query, [user_pk]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
         alert(data.message);
@@ -846,7 +847,7 @@ async function Updateaccount(email, grade, currentstatus, student_id) {
             + " email = ?, grade = ?, currentstatus = ? WHERE student_id = ?"
         const result = await conn.query(query, [email, grade, currentstatus, student_id]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -863,7 +864,7 @@ async function UpdateImg(profilePhoto, user_id) {
         const query = "UPDATE user SET profilePhoto = ? WHERE user_id = ?"
         const result = await conn.query(query, [profilePhoto, user_id]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -881,7 +882,7 @@ async function DeleteImg(profilePhoto) {
             + "WHERE profilePhoto = ? "
         const result = await conn.query(query, [profilePhoto]);
         // 쿼리 실행
-        console.log('Data updated successfully:', result);
+        //console.log('Data updated successfully:', result);
     } catch (err) {
         console.error('Error updating data:', err);
     } finally {
@@ -895,7 +896,7 @@ async function get_user_have_posts(user_pk) {
         conn = await pool.getConnection();
         const query = "SELECT * FROM user_have_post WHERE user_id = ?"
         const result = await conn.query(query, [user_pk]);
-        console.log(result);
+        //console.log(result);
         return result;
     } catch (err) {
         console.error('Error updating data:', err);
@@ -996,7 +997,7 @@ async function getComment(post_ida) {
 
 //대댓글 가져오기
 async function getReComment(comment_id) {
-    console.log(comment_id);
+    //console.log(comment_id);
     let conn;
     try {
         conn = await pool.getConnection();
@@ -1049,7 +1050,7 @@ async function get_campus_Info() {
                 campus ON campus_have_department.campus_id = campus.campus_id;
         `;
         const result = await conn.query(query);
-        console.log(result);
+        //console.log(result);
         return result;
     } catch (err) {
         console.error('Error updating data:', err);
@@ -1076,7 +1077,7 @@ async function get_campus_building_Info() {
                 campus ON campus_building.campus_id = campus.campus_id;
         `;
         const result = await conn.query(query);
-        console.log(result);
+        //console.log(result);
         return result;
     } catch (err) {
         console.error('Error updating data:', err);
@@ -1096,7 +1097,7 @@ async function updateUserImg(user_pk, photopath) {
         SET profilePhoto = ?
         WHERE user_id = ?;`
         await conn.query(query, [photopath, user_pk]);
-        console.log("업데이트 성공");
+        //console.log("업데이트 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -1149,7 +1150,7 @@ async function post_recomment(comment_id, user_id, contents) {
         conn = await pool.getConnection();
         const query = `INSERT INTO recomment (comment_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
         await conn.query(query, [comment_id, user_id, contents]);
-        console.log("대댓글달기 성공!");
+        //console.log("대댓글달기 성공!");
         return true;
     } catch (err) {
         //console.error('대댓글달기 실패!:', err);
@@ -1221,7 +1222,7 @@ async function write_post(user_id, department_check, inform_check, title, conten
         const postId = result.insertId.toString(); // Retrieve the inserted post's ID
         return postId;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1289,7 +1290,7 @@ async function post_recomment(comment_id, user_id, contents) {
         conn = await pool.getConnection();
         const query = `INSERT INTO recomment (comment_id, user_id, contents, \`like\`)VALUES (?, ?, ?, DEFAULT);`
         await conn.query(query, [comment_id, user_id, contents]);
-        console.log("대댓글달기 성공!");
+        //console.log("대댓글달기 성공!");
         return true;
     } catch (err) {
         //console.error('대댓글달기 실패!:', err);
@@ -1399,7 +1400,7 @@ async function getyourpoint(user_id) {
         // 데이터 삽입 쿼리 작성
         const rows = await conn.query(
             'SELECT user.point FROM user WHERE user_id = ?', [user_id]);
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (err) {
         console.error('Error inserting data:', err);
@@ -1449,7 +1450,7 @@ async function insert_user_have_object(user_id, object_id) {
         await conn.query(query, [user_id, object_id]);
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1501,7 +1502,7 @@ async function getCampus(campus_id) {
             WHERE study_room.campus_id = ?
         `;
         const rows = await conn.query(query, [campus_id]);
-        console.log(rows);
+        //console.log(rows);
         return rows;
     } catch (err) {
         console.error('Error fetching data:', err);
@@ -1519,7 +1520,7 @@ async function insert_student_study_room(student, study_room, study_room_date, s
         await conn.query(query, [student, study_room, study_room_date, study_room_time]);
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1546,7 +1547,7 @@ async function get_student_study_room(student) {
         const rows = await conn.query(query, [student]);
         return rows;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1563,7 +1564,7 @@ async function get_studyroom_date() {
         const rows = await conn.query(query);
         return rows;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1672,10 +1673,10 @@ async function addCommentAram(user_id, target_id) {
         conn = await pool.getConnection();
         const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "게시물에 답글이 달렸습니다!", "my_post_comment");`
         await conn.query(query, [user_id, target_id]);
-        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1688,10 +1689,10 @@ async function addGoodEventAram(user_id, target_id) {
         conn = await pool.getConnection();
         const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "이벤트에 당첨되셨습니다 축하드립니다!", "good_event");`
         await conn.query(query, [user_id, target_id]);
-        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1704,10 +1705,10 @@ async function addHotAram(target_id) {
         conn = await pool.getConnection();
         const query = `CALL SendEventNotification(?, '오늘의 HOT 게시물입니다!', 'hot_post');`
         await conn.query(query, [target_id]);
-        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1720,10 +1721,10 @@ async function reportPostAram(target_id) {
         conn = await pool.getConnection();
         const query = `CALL InsertIntoAramForAdminUsers(?, '게시물 신고 요청이 들어왔습니다!', 'report_post');`
         await conn.query(query, [target_id]);
-        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1736,10 +1737,10 @@ async function reportCommentAram(target_id) {
         conn = await pool.getConnection();
         const query = `CALL InsertIntoAramForAdminUsers(?, '댓글 신고 요청이 들어왔습니다!', 'report_comment');`
         await conn.query(query, [target_id]);
-        console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
+        //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1755,7 +1756,7 @@ async function addSchoolNoticeAram(target_id) {
         //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1771,7 +1772,7 @@ async function addDepartmentNoticeAram(target_id) {
         //console.log("해당 포스터의 당사자에게 댓글을 달아서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1786,7 +1787,7 @@ async function addNewEventAram(target_id) {
         await conn.query(query, [target_id]);
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1812,10 +1813,10 @@ async function addLikeAram(user_id, target_id) {
         conn = await pool.getConnection();
         const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "내 게시물에 좋아요를 눌러줬습니다!", "my_post_like");`
         await conn.query(query, [user_id, target_id]);
-        console.log("해당 포스터의 당사자에게 좋아요를 눌러서 알람을 보냄");
+        //console.log("해당 포스터의 당사자에게 좋아요를 눌러서 알람을 보냄");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -1969,10 +1970,10 @@ async function addFriendCodeAram(user_pk, friend_code_id, my_name) {
         conn = await pool.getConnection();
         const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "친구가 초대코드를 입력하셨니다!", "friend_code");`
         await conn.query(query, [user_pk, friend_code_id, my_name]);
-        console.log("알람 보내기 성공");
+        //console.log("알람 보내기 성공");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -2035,7 +2036,7 @@ async function Get_Event_Photos(event_id) {
             `SELECT event_photo.event_photo FROM event_photo WHERE event_photo.event_id = ?`
         );
         const row = await conn.query(query, [event_id]);
-        console.log(row);
+        //console.log(row);
         return row;
     } catch (err) {
         throw err;
@@ -2048,12 +2049,12 @@ async function send_user_event_info(user_id, event_id, content) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `INSERT INTO user_send_event (user_id, event_id, time, content) VALUES (?, ?, DEFAULT, ?);`
+        const query = `INSERT INTO user_send_event (user_id, event_id, time, content, good_event) VALUES (?, ?, DEFAULT, ?, 0);`
         await conn.query(query, [user_id, event_id, content]);
-        console.log("입력 성공");
+        //console.log("입력 성공");
         return true;
     } catch (err) {
-        console.log(err);
+        console.error(err);
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
@@ -2068,7 +2069,7 @@ async function select_user_event_info() {
             SELECT user_send_event.user_id, user_send_event.event_id, user_send_event.user_send_event FROM user_send_event
         `;
         const row = await conn.query(query);
-        console.log(row);
+        //console.log(row);
         return row;
     } catch (err) {
         throw err;
@@ -2083,7 +2084,7 @@ async function user_send_photo(user_id, event_id, fileNameWithoutExtension) {
         conn = await pool.getConnection();
         const query = `INSERT INTO user_send_event_photo (event_id, user_id, event_photo) VALUES (?, ?, ?);`
         await conn.query(query, [event_id, user_id, fileNameWithoutExtension]);
-        console.log("사진 넣기 성공");
+        //console.log("사진 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2154,7 +2155,7 @@ async function is_user_post_like(user_id, post_id) {
             `SELECT * FROM is_user_post_like WHERE post_id = ? AND user_id = ?`
         );
         const row = await conn.query(query, [post_id, user_id]);
-        console.log(row);
+        //console.log(row);
         return row.length === 0; // row가 비어 있으면 true, 비어 있지 않으면 false
     } catch (err) {
         throw err;
@@ -2170,7 +2171,7 @@ async function put_user_post_like(user_id, post_id) {
         conn = await pool.getConnection();
         const query = `INSERT INTO is_user_post_like (user_id, post_id) VALUES (?, ?);`
         await conn.query(query, [user_id, post_id]);
-        console.log("값 넣기 성공");
+        //console.log("값 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2184,7 +2185,7 @@ async function put_user_report(post_id, report_name) {
         conn = await pool.getConnection();
         const query = `INSERT INTO report (post_id, report_name) VALUES (?, ?);`
         await conn.query(query, [post_id, report_name]);
-        console.log("신고 넣기 성공");
+        //console.log("신고 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2201,7 +2202,7 @@ async function get_user_report() {
                         JOIN post ON report.post_id = post.post_id
                         JOIN user ON post.user_id = user.user_id;`;
         const rows = await conn.query(query);
-        console.log("신고 조회 성공");
+        //console.log("신고 조회 성공");
         return rows; // 쿼리 결과 반환
 
     } catch (err) {
@@ -2218,7 +2219,7 @@ async function put_user_comment_report(comment_id, report_comment_name) {
         conn = await pool.getConnection();
         const query = `INSERT INTO report_comment (comment_id, report_comment_name) VALUES (?, ?);`
         await conn.query(query, [comment_id, report_comment_name]);
-        console.log("신고 넣기 성공");
+        //console.log("신고 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2234,7 +2235,7 @@ async function get_user_comment_report() {
                         FROM report_comment
                         JOIN comment ON report_comment.comment_id = comment.comment_id`;
         const rows = await conn.query(query);
-        console.log("신고 조회 성공");
+        //console.log("신고 조회 성공");
         return rows; // 쿼리 결과 반환
     } catch (err) {
         console.error('Error querying data:', err);
@@ -2317,7 +2318,7 @@ async function RegistorItem(campus_id, name, price, using_time, image_num, expli
         conn = await pool.getConnection();
         const query = `CALL example_while(?, ?, ?, ?, ?, ?, ?);`
         await conn.query(query, [campus_id, name, price, using_time, image_num, explian, count]);
-        console.log("값 넣기 성공");
+        //console.log("값 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2339,7 +2340,7 @@ async function ChangeItemInfo(origin_name, name, price, using_time, image_num, e
              \`explain\` = ? 
          WHERE name = ? `
         await conn.query(query, [name, price, using_time, image_num, explian, origin_name]);
-        console.log("값 넣기 성공");
+        //console.log("값 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2353,7 +2354,7 @@ async function ChangeItemInfoANDCountUp(origin_name, campus_id, name, price, usi
         conn = await pool.getConnection();
         const query = `CALL Change_AND_Insert_Item(?, ?, ?, ?, ?, ?, ?, ?);`
         await conn.query(query, [origin_name, campus_id, name, price, using_time, image_num, explian, count]);
-        console.log("값 넣기 성공");
+        //console.log("값 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2368,7 +2369,7 @@ async function ChangeItemInfoANDCountDown(origin_name, campus_id, name, price, u
         conn = await pool.getConnection();
         const query = `CALL Change_And_Delete_Items(?, ?, ?, ?, ?, ?, ?, ?);`
         await conn.query(query, [origin_name, campus_id, name, price, using_time, image_num, explian, count]);
-        console.log("값 넣기 성공");
+        //console.log("값 넣기 성공");
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2500,7 +2501,7 @@ async function RegistorEvent(campus_id, user_id, event_name, get_point, info, si
         close_date,
         is_event_close) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
         const result = await conn.query(query, [campus_id, user_id, event_name, get_point, info, simple_info, start_date, close_date, 0]);
-        console.log(result);
+        //console.log(result);
         const event_id = result.insertId.toString();
         return event_id;
     } catch (err) {
@@ -2674,6 +2675,7 @@ async function GetUserSendEvent(campus_id) {
                 us.event_id,
                 us.time,  
                 us.content,
+                us.good_event,
                 e.campus_id,
                 userdata.id,
                 st.name,
@@ -2687,7 +2689,9 @@ async function GetUserSendEvent(campus_id) {
             JOIN
                 student st ON st.student_id = userdata.student_id
             WHERE 
-                e.campus_id = ? `
+                e.campus_id = ?
+            ORDER BY 
+                us.time DESC `
             , [campus_id]);
         return rows;
     } catch (err) {
@@ -2879,6 +2883,24 @@ async function AttendanceCheck(user_id, event_point) {
     }
 }
 
+//출석 체크 시 포인트 상승
+async function setUserSendtype(user_send_event) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query =
+            `UPDATE user_send_event
+        SET good_event = 1
+        WHERE user_send_event = ?;`
+        const result = await conn.query(query, [user_send_event]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -3011,4 +3033,5 @@ module.exports = {
     AttendanceCheck,
     addGoodEventAram,
     RegistorEvent,
+    setUserSendtype,
 };

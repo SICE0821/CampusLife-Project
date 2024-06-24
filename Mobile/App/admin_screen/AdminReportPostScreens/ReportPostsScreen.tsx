@@ -131,7 +131,7 @@ const ReportPostsScreen = ({ route, navigation }: any) => {
       }
 
       const data = await response.json();
-      console.log(data); // API에서 받아온 데이터 확인
+      //console.log(data); // API에서 받아온 데이터 확인
 
       // 데이터에서 학과 이름들을 추출하여 departments 배열에 저장
       const departmentNames = data.map((item: any) => item.department_name); // 예시로 department_name을 가져오는 코드
@@ -151,7 +151,7 @@ const ReportPostsScreen = ({ route, navigation }: any) => {
     }, [])
   );
 
-  console.log(userCommentReport);
+  //console.log(userCommentReport);
   useEffect(() => {
     if (selectedCategory === '학과 게시판' && !selectedDepartment) {
       setSelectedDepartment(departments[0]);

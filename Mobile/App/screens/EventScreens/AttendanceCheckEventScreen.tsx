@@ -73,7 +73,7 @@ const AttendanceCheckEventScreen = ({route} : any) => {
           point : 10
         })
       })
-      console.log("포인트 올리기 성공")
+      //console.log("포인트 올리기 성공")
       userData.point = userData.point + 10
     } catch (error) {
       console.error('포인트 올리기 실패', error);
@@ -88,7 +88,7 @@ const AttendanceCheckEventScreen = ({route} : any) => {
 
   const handleAttendanceCheck = async () => {
     const today = new Date().toISOString().split('T')[0];
-    console.log(today);
+    //console.log(today);
 
     if (selectedDates.includes(today)) {
       Alert.alert('이미 출석체크를 하셨습니다.');

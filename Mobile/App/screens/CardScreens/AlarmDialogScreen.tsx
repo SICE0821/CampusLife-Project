@@ -61,7 +61,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
       };
 
       return (eventWithImage);
-      console.log(JSON.stringify(eventWithImage, null, 2));
+      //console.log(JSON.stringify(eventWithImage, null, 2));
     } catch (error) {
       return null;
       console.error(error);
@@ -81,7 +81,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data;
     } catch (error) {
       console.error(error);
@@ -101,7 +101,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         })
       })
       const get_aram_data = await response.json();
-      console.log(get_aram_data);
+      //console.log(get_aram_data);
       setAaramList(get_aram_data);
     } catch (error) {
       console.error('알람 정보 가져오기 실패:', error);
@@ -138,7 +138,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         })
       })
       const result = await response.json();
-      console.log("포스트 View 올리기 성공!")
+      //console.log("포스트 View 올리기 성공!")
     } catch (error) {
       console.error('포스트 View 올리기 누르기 실패', error);
     }
@@ -156,7 +156,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         },
         {
           text: "확인", onPress: async () => {
-            console.log(aram_id);
+            //console.log(aram_id);
             deleteMyaram(aram_id);
             delete_aram()
           }
@@ -236,7 +236,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
   }
   const go_detail_screen6 = (postList: any) => {
     const item = postList[0];
-    console.log(item);
+    //console.log(item);
     navigation.navigate("PostDetailScreen", { item, userData });
   }
   const go_detail_screen7 = (postList: any) => {
@@ -260,7 +260,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
       case 'school_notice': // 학교 공지사항
         const postList3 = await go_post_detail(item2.school_notice_id);
         await view_count_up(item2.school_notice_id);
-        console.log(postList3)
+        //console.log(postList3)
         go_detail_screen3(postList3);
       case 'department_notice': // 학과 공지사항
         const postList4 = await go_post_detail(item2.department_notice_id);
@@ -285,16 +285,16 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
       case 'report_post': // 신고
         const postList6 = await go_post_detail(item2.report_post_id);
         //console.log(postList6);
-        console.log(postList6.report_comment_title);
+        //console.log(postList6.report_comment_title);
         go_detail_screen6(postList6);
         break;
       case 'report_comment': // 신고 댓글
         const postList7 = await go_post_detail(item2.report_comment_id);
-        console.log(postList7.report_comment_title);
+        //console.log(postList7.report_comment_title);
         go_detail_screen7(postList7);
         break;
       default:
-        console.log("이동 드가자");
+        //console.log("이동 드가자");
     }
   };
 
