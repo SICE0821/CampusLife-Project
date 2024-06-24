@@ -99,13 +99,11 @@ const SendUserEventScreen = ({ route }: any) => {
         {
           text: "확인", onPress: async () => {
             try {
-              await Promise.all([
-                good_404(),
-                addGoodEventAram(user_id, evnet_id),
-                AdminSendPoint(user_id, event_point),
-                setUserSendtype(user_send_event),
-                GetUserSendEvent()
-              ]);
+                good_404();
+                addGoodEventAram(user_id, evnet_id);
+                AdminSendPoint(user_id, event_point);
+                setUserSendtype(user_send_event);
+                GetEventList();
               console.log("모든 요청이 성공적으로 완료되었습니다.");
             } catch (error) {
               console.error("요청 중 오류가 발생했습니다:", error);
