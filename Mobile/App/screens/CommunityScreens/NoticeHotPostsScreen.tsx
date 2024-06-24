@@ -60,7 +60,7 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
                 })
             })
             const result = await response.json();
-            console.log("포스트 View 올리기 성공!")
+            //console.log("포스트 View 올리기 성공!")
         } catch (error) {
             console.error('포스트 View 올리기 누르기 실패', error);
         }
@@ -90,9 +90,9 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
             const result = await response.json();
 
             if (result.message === "북마크 추가 완료") {
-                console.log('북마크가 성공적으로 추가되었습니다.');
+                //console.log('북마크가 성공적으로 추가되었습니다.');
             }else {
-                console.log('알 수 없는 응답:', result);
+               // console.log('알 수 없는 응답:', result);
             }
         } catch (error : any) {
             if (error.name === 'AbortError') {
@@ -127,9 +127,9 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
             const result = await response.json();
 
             if (result.message === "북마크 추가 완료") {
-                console.log('북마크가 성공적으로 추가되었습니다.');
+               // console.log('북마크가 성공적으로 추가되었습니다.');
             }else {
-                console.log('알 수 없는 응답:', result);
+                //console.log('알 수 없는 응답:', result);
             }
         } catch (error : any) {
             if (error.name === 'AbortError') {
@@ -192,7 +192,7 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
                 }),
             })
             const postsdata = await response.json();
-            console.log(postsdata);
+            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error);

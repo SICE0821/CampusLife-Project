@@ -99,8 +99,8 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 })
             });
             const result = await response.json();
-            console.log(result);
-            console.log("댓글 작성완료!");
+            //console.log(result);
+            //console.log("댓글 작성완료!");
             const newCommentList: any = await CommentList();
             //console.log(newCommentList);
             //setComments((prev) => [...prev, newCommentList]);
@@ -111,7 +111,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
 
     //대댓글 달기
     const writerecomment = async () => {
-        console.log(commentspk);
+        //console.log(commentspk);
         try {
             const response = await fetch(`${config.serverUrl}/rewritecomment`, {
                 method: 'POST',
@@ -126,7 +126,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             });
             //const result = await response.json();
             //console.log(result);
-            console.log("대댓글 작성완료!");
+            //console.log("대댓글 작성완료!");
             const newCommentList: any = await CommentList();
             //console.log(newCommentList);
             //setComments((prev) => [...prev, newCommentList]);
@@ -168,7 +168,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             })
             const result = await response.json();
             await DeatilPost();
-            console.log("포스트 좋아요 누르기 성공!")
+            //console.log("포스트 좋아요 누르기 성공!")
         } catch (error) {
             console.error('포스트 좋아요 누르기 실패', error);
         }
@@ -188,7 +188,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
             })
             const result = await response.json();
             await CommentList();
-            console.log("댓글 좋아요 누르기 성공!")
+            //console.log("댓글 좋아요 누르기 성공!")
         } catch (error) {
             console.error('댓글 좋아요 누르기 실패', error);
         }
@@ -208,7 +208,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                 })
                 const result = await response.json();
                 await CommentList();
-                console.log("대댓글 좋아요 누르기 성공!")
+                //console.log("대댓글 좋아요 누르기 성공!")
             } catch (error) {
                 console.error('대댓글 좋아요 누르기 실패', error);
             }

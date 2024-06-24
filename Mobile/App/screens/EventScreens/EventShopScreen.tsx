@@ -115,7 +115,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       })
       const result = await response.json();
       await getItems();
-      console.log("상점 업데이트 성공")
+      //console.log("상점 업데이트 성공")
     } catch (error) {
       console.error('상점 업데이트 실패', error);
     }
@@ -134,7 +134,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           object_id : SelectItem?.object_id
         })
       });
-      console.log("상점 사기 성공");
+      //console.log("상점 사기 성공");
       const value = await response.json();
 
     } catch (error) {
@@ -154,7 +154,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           price : SelectItem?.price
         })
       })
-      console.log("포인트 차감 성공")
+      //console.log("포인트 차감 성공")
       userData.point = userData.point - (SelectItem ? SelectItem.price : 0)
     } catch (error) {
       console.error('포인트 차감 실패', error);

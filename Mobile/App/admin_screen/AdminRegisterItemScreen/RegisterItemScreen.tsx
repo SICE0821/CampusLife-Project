@@ -136,7 +136,7 @@ const successAlert = () => {
         body: selectedImageFormData,
       });
       const imageData = await response.json();
-      console.log(imageData.fileName);
+      //console.log(imageData.fileName);
       return imageData.fileName;
     } catch (error) {
       console.error(error);

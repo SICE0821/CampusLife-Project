@@ -234,7 +234,7 @@ Alert.alert(
         body: selectedImageFormData,
       });
       const imageData = await response.json();
-      console.log(imageData.fileName);
+      //console.log(imageData.fileName);
       return imageData.fileName;
     } catch (error) {
       console.error(error);
@@ -362,15 +362,15 @@ Alert.alert(
   // 상품의 증가, 감소, 0에 대한 구분을 해준다.
   const choice_item_action = () => {
     if (typeof changeitemCount === 'undefined' || changeitemCount === null) {
-      console.log("changeitemCount is undefined or null");
+      //console.log("changeitemCount is undefined or null");
     } else if (changeitemCount > 0) {
-      console.log("추가")
+      //console.log("추가")
       ADDItemAlert();
     } else if (changeitemCount < 0) {
-      console.log("삭제")
+      //console.log("삭제")
       DeleteItemAlert();
     } else if (changeitemCount === 0) {
-      console.log("변경")
+      //console.log("변경")
       EditItemAlert();
     }
   };

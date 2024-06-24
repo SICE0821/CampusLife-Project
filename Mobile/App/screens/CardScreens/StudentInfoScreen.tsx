@@ -171,7 +171,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             uploadImages(formData);
         } catch (error) {
             // 사용자가 이미지 선택을 취소한 경우 오류가 발생할 수 있음
-            console.log('사용자가 이미지 선택을 취소했습니다.');
+            //console.log('사용자가 이미지 선택을 취소했습니다.');
             // 또는 다른 방법으로 사용자에게 메시지를 보여줄 수 있음
         }
     };
@@ -187,11 +187,11 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             });
             clearTimeout(timeoutId);
             const imageName = await response.text();
-            console.log(imageName);
+            //console.log(imageName);
             setImageUrl(`http://10.0.2.2:3000/${imageName}`);
             setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: imageName }));
             if (response.ok) {
-                console.log('Images uploaded successfully');
+                //console.log('Images uploaded successfully');
             } else {
                 console.error('Error uploading images');
             }

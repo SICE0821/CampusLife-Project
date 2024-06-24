@@ -123,7 +123,7 @@ const SendUserEventScreen = ({ route }: any) => {
           return { ...eventData, photodata: photoData };
         })
       );
-      console.log(JSON.stringify(UserSendEventWithPhoto, null, 2));
+      //console.log(JSON.stringify(UserSendEventWithPhoto, null, 2));
       //console.log(UserSendEventWithPhoto);
       setUserSendEventData(UserSendEventWithPhoto);
     } catch (error) {
@@ -146,7 +146,7 @@ const SendUserEventScreen = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data
     } catch (error) {
       console.error(error);
@@ -168,7 +168,7 @@ const SendUserEventScreen = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data
     } catch (error) {
       console.error(error);
@@ -238,12 +238,6 @@ const SendUserEventScreen = ({ route }: any) => {
           <TouchableOpacity
             key={index}
             style={styles.eventBox}
-            onPress={() => {
-              {
-                console.log(event.user_name)
-                console.log(event.event_point)
-              }
-            }}
             onLongPress={() => {
               handlePrizeUser(event.user_id, event.event_point, event.event_id);
             }}>

@@ -44,7 +44,7 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
       const campusplace = await response.json();
       const campusPlace = campusplace;
       setSchoolBuildingData(campusPlace);
-      console.log(campusPlace)
+      //console.log(campusPlace)
       const campusPlaces = ['전체', ...new Set(campusPlace.map((data: BuildingData) => data.campus_place))] as string[];
       setCampus(campusPlaces);
 
@@ -108,7 +108,7 @@ const StudyRoomScreen = ({ route, navigation}: any) => {
           study_room_time: studyRoomTime,
         })
       });
-      console.log("스터디룸 예약 성공");
+      //console.log("스터디룸 예약 성공");
       const value = await response.json();
     } catch (error) {
       console.error('스터디룸 예약 실패!', error);

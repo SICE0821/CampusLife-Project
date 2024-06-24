@@ -66,7 +66,7 @@ const DeadlineEventScreen = ({ route }: any) => {
       const data : VoteEvnetData[] = await response.json();
       const voteInfo : VoteEvnetData[]= data.filter(info => info.vote_name !== 'null');
       setVoteOptions(voteInfo.map(info => info.vote_name));
-      console.log(data);
+      //console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -86,7 +86,7 @@ const DeadlineEventScreen = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -123,7 +123,7 @@ const DeadlineEventScreen = ({ route }: any) => {
       }
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
-        console.log('User cancelled the picker');
+        //console.log('User cancelled the picker');
       } else {
         throw err;
       }
@@ -139,7 +139,7 @@ const DeadlineEventScreen = ({ route }: any) => {
         name: `${Date.now()}_${userData.user_pk}_${eventData.event_id}.png`
       });
     });
-    console.log(formData);
+    //console.log(formData);
     await uploadImages(formData);
   };
 
@@ -153,9 +153,9 @@ const DeadlineEventScreen = ({ route }: any) => {
       });
       clearTimeout(timeoutId);
       const imageName = await response.text();
-      console.log(imageName);
+      //console.log(imageName);
       if (response.ok) {
-        console.log('Images uploaded successfully');
+        //console.log('Images uploaded successfully');
       } else {
         console.error('Error uploading images');
       }
@@ -270,7 +270,7 @@ const DeadlineEventScreen = ({ route }: any) => {
                 style={styles.eventVoteBox}
                 onPress={() => {
                   setChecked(option)
-                  console.log(option)
+                  //console.log(option)
                 }}
               >
                 <Text style={styles.eventVoteText}>{index + 1}. {option}</Text>
@@ -301,7 +301,7 @@ const DeadlineEventScreen = ({ route }: any) => {
         <View style={styles.fileInputArea}>
           <TouchableOpacity style={styles.fileButton} onPress={() => {
             handleFilePick();
-            console.log(selectedFiles);
+            //console.log(selectedFiles);
           }}>
             <Text style={styles.fileButtonText}>파일 첨부</Text>
           </TouchableOpacity>

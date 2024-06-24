@@ -41,7 +41,7 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                 })
             })
             const result = await response.json();
-            console.log("포스트 View 올리기 성공!")
+            //console.log("포스트 View 올리기 성공!")
         } catch (error) {
             console.error('포스트 View 올리기 누르기 실패', error);
         }
@@ -49,7 +49,7 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
 
     const getGeneralposts = async () => {
         try {
-            console.log('Search text:', searchtext);
+            //console.log('Search text:', searchtext);
             const response = await fetch(`${config.serverUrl}/search_post`, {
                 method: 'POST',
                 headers: {
@@ -121,7 +121,7 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
         </TouchableWithoutFeedback>
     );
 
-    console.log(communityData);
+    //console.log(communityData);
 
     return (
         <View style={styles.container}>

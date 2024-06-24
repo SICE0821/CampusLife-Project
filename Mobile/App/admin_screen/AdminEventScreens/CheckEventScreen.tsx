@@ -117,8 +117,8 @@ const CheckEventScreen = ({ route, navigation }: any) => {
 
       setVoteData(voteData);
       setVoteInfo(voteInfo);
-      console.log('voteInfo:', voteInfo);
-      console.log('voteData:', voteData);
+      //console.log('voteInfo:', voteInfo);
+      //console.log('voteData:', voteData);
       //console.log(data);
       //console.log(data);
     } catch (error) {

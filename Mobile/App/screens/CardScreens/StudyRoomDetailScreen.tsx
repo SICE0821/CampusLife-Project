@@ -40,7 +40,7 @@ const StudyRoomDetailScreen = ({ route }: any) => {
         })
       });
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
       return data;
     } catch (error) {
       console.error('과목 가져오기 실패:', error);
@@ -67,7 +67,7 @@ const StudyRoomDetailScreen = ({ route }: any) => {
       }
 
       const result = await response.json();
-      console.log('스터디룸 삭제 성공:', result);
+      //console.log('스터디룸 삭제 성공:', result);
       fetchAndGroupData();
     } catch (error) {
       console.error('스터디룸 삭제 실패:', error);
