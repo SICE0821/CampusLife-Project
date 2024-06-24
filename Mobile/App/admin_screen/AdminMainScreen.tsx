@@ -92,7 +92,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
         })
       })
       const result = await response.json();
-      console.log("포스트 View 올리기 성공!")
+      //console.log("포스트 View 올리기 성공!")
     } catch (error) {
       console.error('포스트 View 올리기 누르기 실패', error);
     }
@@ -113,7 +113,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
           name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
         });
       });
-      console.log(formData);
+      //console.log(formData);
       //uploadImages(formData);
     });
   };
@@ -125,7 +125,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
         body: formData,
       });
       if (response.ok) {
-        console.log('Images uploaded successfully');
+        //console.log('Images uploaded successfully');
       } else {
         console.error('Error uploading images');
       }
@@ -284,7 +284,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
 
 
   const StudentInfo = async () => {
-    console.log(userData);
+    //console.log(userData);
     navigation.navigate('StudentInfoNavigator', { userData, Userdepartment });
   }
 

@@ -128,7 +128,7 @@ const EventEditScreen = ({ route }: any) => {
       const data = await response.json();
       setServerImages(data);
       //setSelectedImages(data);
-      console.log(data);
+      //console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -148,7 +148,7 @@ const EventEditScreen = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      console.log(data);
+      //console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -158,10 +158,10 @@ const EventEditScreen = ({ route }: any) => {
   //기존의 이미지 배열과 새로운 데이터의 이미지 배열을 합칠거임
   const chagneImageArray = (addImage : any) => {
     const ChangeServerImageArray = serverImages.map(photo => photo.event_photo);
-    console.log(ChangeServerImageArray);
+    //console.log(ChangeServerImageArray);
 
     const combinedImageArray = ChangeServerImageArray.concat(addImage);
-    console.log('결합된 이미지 배열:', combinedImageArray);
+    //console.log('결합된 이미지 배열:', combinedImageArray);
 
     return combinedImageArray;
   }
@@ -204,7 +204,7 @@ const EventEditScreen = ({ route }: any) => {
 
   // 투표 옵션 변경 함수
   const handleVoteChange = (id: number, text: string) => {
-    console.log(id);
+    //console.log(id);
     const newVotes = votes.map(vote =>
       vote.vote_index === id ? { ...vote, vote_name: text } : vote
     );
@@ -330,7 +330,7 @@ const EventEditScreen = ({ route }: any) => {
         setSelectedFormImages(formDataArray);
         //console.log(formDataArray);
       } else if (response.errorCode) {
-        console.log('Image picker error: ', response.errorMessage);
+        //console.log('Image picker error: ', response.errorMessage);
       }
     });
   };
@@ -343,14 +343,14 @@ const EventEditScreen = ({ route }: any) => {
     const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
     setSelectedFormImages(updatedFormImages);
 
-    console.log("로컬 이미지 배열 삭제")
+    //console.log("로컬 이미지 배열 삭제")
   };
 
   // 서버에서 가져온 이미지 삭제 함수
   const handleServerImageRemove = (index: number) => {
     const updatedServerImages = serverImages.filter((_, i) => i !== index);
     setServerImages(updatedServerImages);
-    console.log("서버 이미지 배열 삭제")
+    //console.log("서버 이미지 배열 삭제")
   };
 
   // 이미지 업로드 함수
@@ -370,7 +370,7 @@ const EventEditScreen = ({ route }: any) => {
           //console.error('Image upload failed');
         }
       }
-      console.log(uploadedImageDatas);
+      //console.log(uploadedImageDatas);
       return uploadedImageDatas;
     } catch (error) {
       console.error('Error uploading images: ', error);
@@ -407,7 +407,7 @@ const EventEditScreen = ({ route }: any) => {
 
   //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
   const RegistorEventVotes = async (event_id: number) => {
-    console.log(votes)
+    //console.log(votes)
     try {
       const response = await fetch(`${config.serverUrl}/RegistorEventVotesEdit`, {
         method: 'POST',

@@ -260,7 +260,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 
     //대댓글 달기
     const writerecomment = async () => {
-        console.log(commentspk);
+        //console.log(commentspk);
         try {
             const response = await fetch(`${config.serverUrl}/rewritecomment`, {
                 method: 'POST',
@@ -275,7 +275,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             });
             //const result = await response.json();
             //console.log(result);
-            console.log("대댓글 작성완료!");
+            //console.log("대댓글 작성완료!");
             const newCommentList: any = await CommentList();
             //console.log(newCommentList);
             //setComments((prev) => [...prev, newCommentList]);
@@ -318,7 +318,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             })
             const result = await response.json();
             await DeatilPost();
-            console.log("포스트 좋아요 누르기 성공!")
+            //console.log("포스트 좋아요 누르기 성공!")
         } catch (error) {
             console.error('포스트 좋아요 누르기 실패', error);
         }
@@ -338,7 +338,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             })
             const result = await response.json();
             await CommentList();
-            console.log("댓글 좋아요 누르기 성공!")
+            //console.log("댓글 좋아요 누르기 성공!")
         } catch (error) {
             console.error('댓글 좋아요 누르기 실패', error);
         }
@@ -358,7 +358,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             })
             const result = await response.json();
             await CommentList();
-            console.log("대댓글 좋아요 누르기 성공!")
+            //console.log("대댓글 좋아요 누르기 성공!")
         } catch (error) {
             console.error('대댓글 좋아요 누르기 실패', error);
         }
@@ -413,7 +413,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
           }
       
           const result = await response.json();
-          console.log('게시글 삭제 완료:', result);
+          //console.log('게시글 삭제 완료:', result);
       
           // 게시글 삭제가 성공하면 알림창을 띄우고 확인 버튼을 눌렀을 때 navigation.goBack()을 호출합니다.
           Alert.alert(
@@ -482,7 +482,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             }
     
             const result = await response.json();
-            console.log('댓글 삭제 완료:', result);
+            //console.log('댓글 삭제 완료:', result);
             await CommentList();
 
             Alert.alert(
@@ -518,7 +518,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             }
     
             const result = await response.json();
-            console.log('댓글 삭제 완료:', result);
+            //console.log('댓글 삭제 완료:', result);
             await CommentList();
 
             Alert.alert(
@@ -539,8 +539,8 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     
 
       const ReportUserduplicate = () => {
-        console.log(postDetailInfo);
-        console.log(userReport);
+        //console.log(postDetailInfo);
+        //console.log(userReport);
         const isDuplicateReport = userReport.some((report) =>
             userdata.name === report.report_name && postDetailInfo?.post_id === report.post_id
         );
@@ -553,8 +553,8 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     }
 
     const ReportUserduplicate2= (comment_id : number) => {
-        console.log(postDetailInfo);
-        console.log(userReport);
+        //console.log(postDetailInfo);
+        //console.log(userReport);
         const isDuplicateReport = usercommentReport.some((report) =>
         userdata.name === report.report_comment_name && comment_id === report.comment_id
         );

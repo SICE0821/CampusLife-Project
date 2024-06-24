@@ -110,9 +110,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           contents: maintext,
         })
       });
-      console.log("게시글 작성완료!");
+      //console.log("게시글 작성완료!");
       const value = await response.json();
-      console.log(value);
+      //console.log(value);
       ok_go();
 
     } catch (error) {
