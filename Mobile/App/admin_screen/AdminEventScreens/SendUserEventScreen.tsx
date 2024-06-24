@@ -349,6 +349,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#eeeeee',
     padding: 10,
+    paddingBottom: 100
   },
   pickerArea: {
     backgroundColor: 'white',
