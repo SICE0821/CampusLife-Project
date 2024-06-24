@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.64',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -2674,6 +2674,7 @@ async function GetUserSendEvent(campus_id) {
                 us.event_id,
                 us.time,  
                 us.content,
+                us.good_event,
                 e.campus_id,
                 userdata.id,
                 st.name,
@@ -2879,6 +2880,24 @@ async function AttendanceCheck(user_id, event_point) {
     }
 }
 
+//출석 체크 시 포인트 상승
+async function setUserSendtype(user_send_event) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query =
+            `UPDATE user_send_event
+        SET good_event = 1
+        WHERE user_send_event = ?;`
+        const result = await conn.query(query, [user_send_event]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -3011,4 +3030,5 @@ module.exports = {
     AttendanceCheck,
     addGoodEventAram,
     RegistorEvent,
+    setUserSendtype,
 };

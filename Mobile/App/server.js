@@ -131,6 +131,7 @@ const { getGeneralPosts,
   AttendanceCheck,
   RegistorEvent,
   addGoodEventAram,
+  setUserSendtype,
   
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -158,7 +159,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.64',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -2271,7 +2272,8 @@ app.post('/GetUserSendEvent', async (req, res) => {
       campus_id : item.campus_id,
       user_login_id : item.id,
       user_name : item.name,
-      event_point : item.get_point
+      event_point : item.get_point,
+      good_event : item.good_event
     }));
     res.json(processedData);
     console.log("성공적으로 데이터 보냄");
@@ -2438,6 +2440,18 @@ app.post('/AttendanceCheck', async (req, res) => {
   const { user_id, event_point } = req.body;
   try {
     await AttendanceCheck(user_id, event_point);
+    console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//출석 체크 시 포인트 상승
+app.post('/setUserSendtype', async (req, res) => {
+  const { user_send_event } = req.body;
+  try {
+    await setUserSendtype(user_send_event);
     console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
