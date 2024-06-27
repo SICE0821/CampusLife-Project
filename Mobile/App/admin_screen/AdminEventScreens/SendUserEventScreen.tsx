@@ -93,7 +93,7 @@ const SendUserEventScreen = ({ route }: any) => {
   const handlePrizeUser = (user_id: number, event_point: number, evnet_id : number, user_send_event : number) => {
     Alert.alert(
       "이벤트 당첨!",
-      "해당 유저에게 포인트를 보여하시겠습니까??",
+      "해당 유저에게 포인트를 부여하시겠습니까??",
       [
         { text: "취소", style: "cancel" },
         {

@@ -308,7 +308,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
                     <View style={styles.writeboxcontainer}>
                         <View style={styles.writetitle}>
                             <View style={styles.titlebox}>
-                                <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}>{item.title}</Text>
+                                <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}  numberOfLines={1} ellipsizeMode='tail'>{item.title}</Text>
                             </View>
                             <View style={styles.eyesnum}>
                                 <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
