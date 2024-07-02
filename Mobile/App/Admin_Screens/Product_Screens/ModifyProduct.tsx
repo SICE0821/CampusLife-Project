@@ -23,7 +23,7 @@ const parseDateString = (dateString: string) => {
   return { start, end };
 };
 
-const EditItemScreen = ({ route, navigation }: any) => {
+const ModifyProduct = ({ route, navigation }: any) => {
   const { userdata, ItemInfo } = route.params;
   //console.log(ItemInfo);
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
@@ -222,7 +222,7 @@ Alert.alert(
     "상품이 편집되었습니다.",
     `상품이 성공적으로 편집되었습니다!!` ,
     [
-        { text: "확인", onPress: () => {navigation.navigate("CheckRegistItemScreen", userData)}}
+        { text: "확인", onPress: () => {navigation.navigate("CheckProduct", userData)}}
     ]
 );
 };
@@ -681,4 +681,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default EditItemScreen;
+export default ModifyProduct;

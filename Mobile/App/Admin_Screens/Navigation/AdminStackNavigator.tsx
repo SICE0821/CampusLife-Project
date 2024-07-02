@@ -3,17 +3,17 @@ import { Text, Touchable, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
-import EventRegistrationScreen from "../AdminEventScreens/EventRegistrationScreen"
-import CheckEventScreen from '../AdminEventScreens/CheckEventScreen';
-import SendUserEventScreen from '../AdminEventScreens/SendUserEventScreen';
-import SendUserEventDetailScreen from '../AdminEventScreens/SendUserEventDetailScreen';
-import ReportPostsScreen from '../AdminReportPostScreens/ReportPostsScreen';
-import CheckRegistItemScreen from '../AdminRegisterItemScreen/CheckRegistItemScreen';
-import RegisterItemScreen from '../AdminRegisterItemScreen/RegisterItemScreen';
-import EditItemScreen from '../AdminRegisterItemScreen/EditItemScreen';
-import EventEditScreen from '../AdminEventScreens/EventEditScreen';
+import RegisterEvent from "../Event_Screens/RegisterEvent"
+import CheckEvent from '../Event_Screens/CheckEvent';
+import ParticipantEvent from '../Event_Screens/ParticipantEvent';
+import SendUserEventDetailScreen from '../Event_Screens/SendUserEventDetailScreen';
+import CheckReportPost from '../Report_Screens/CheckReportPost';
+import CheckProduct from '../Product_Screens/CheckProduct';
+import RegisterProduct from '../Product_Screens/RegisterProduct';
+import ModifyProduct from '../Product_Screens/ModifyProduct';
+import ModifyEvent from '../Event_Screens/ModifyEvent';
 import IconD from 'react-native-vector-icons/AntDesign';
-import ManagementUserScreen from '../managementUserScreen';
+import ManagementUserScreen from '../UserManagement';
 
 
 const AdminEventStack = createStackNavigator();
@@ -25,16 +25,16 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
     const { userdata } = route.params;
     return (
         <AdminEventStack.Navigator>
-            <AdminEventStack.Screen name="CheckEventScreen"
+            <AdminEventStack.Screen name="CheckEvent"
                 initialParams={{ userdata }}
-                component={CheckEventScreen}
+                component={CheckEvent}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("AdminScreen")}>
+                            onPress={() => navigation.navigate("AdminMain")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -52,7 +52,7 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("SendUserEventScreen")}>
+                            onPress={() => navigation.navigate("ParticipantEvent")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -61,16 +61,16 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                     title: '이벤트',
                 }} />
 
-            <AdminEventStack.Screen name="SendUserEventScreen"
+            <AdminEventStack.Screen name="ParticipantEvent"
                 initialParams={{ userdata }}
-                component={SendUserEventScreen}
+                component={ParticipantEvent}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("CheckEventScreen")}>
+                            onPress={() => navigation.navigate("CheckEvent")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -79,16 +79,16 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                     title: '이벤트',
                 }} />
 
-            <AdminEventStack.Screen name="EventRegistrationScreen"
+            <AdminEventStack.Screen name="RegisterEvent"
                 initialParams={{ userdata }}
-                component={EventRegistrationScreen}
+                component={RegisterEvent}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("CheckEventScreen")}>
+                            onPress={() => navigation.navigate("CheckEvent")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -97,16 +97,16 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                     title: '이벤트',
                 }} />
             
-            <AdminEventStack.Screen name="EventEditScreen"
+            <AdminEventStack.Screen name="ModifyEvent"
                 initialParams={{ userdata }}
-                component={EventEditScreen}
+                component={ModifyEvent}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("CheckEventScreen")}>
+                            onPress={() => navigation.navigate("CheckEvent")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -123,8 +123,8 @@ export const ReportStackNavigator = ({ navigation, route }: any) => {
     const { userdata } = route.params;
     return (
         <ReportPostStack.Navigator>
-            <ReportPostStack.Screen name="ReportPostsScreen"
-                component={ReportPostsScreen}
+            <ReportPostStack.Screen name="CheckReportPost"
+                component={CheckReportPost}
                 initialParams={{ userdata }}
                 options={{
                     headerStyle: {
@@ -132,7 +132,7 @@ export const ReportStackNavigator = ({ navigation, route }: any) => {
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("AdminScreen")}>
+                            onPress={() => navigation.navigate("AdminMain")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -149,8 +149,8 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
     const { userdata } = route.params;
     return (
         <RegisterItemStack.Navigator>
-            <RegisterItemStack.Screen name="CheckRegistItemScreen"
-                component={CheckRegistItemScreen}
+            <RegisterItemStack.Screen name="CheckProduct"
+                component={CheckProduct}
                 initialParams={{ userdata }}
                 options={{
                     headerStyle: {
@@ -158,7 +158,7 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("AdminScreen")}>
+                            onPress={() => navigation.navigate("AdminMain")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -167,8 +167,8 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     title: '물품 등록 현황',
                 }} />
                 
-            <RegisterItemStack.Screen name="RegisterItemScreen"
-                component={RegisterItemScreen}
+            <RegisterItemStack.Screen name="RegisterProduct"
+                component={RegisterProduct}
                 initialParams={{ userdata }}
                 options={{
                     headerStyle: {
@@ -176,7 +176,7 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("CheckRegistItemScreen")}>
+                            onPress={() => navigation.navigate("CheckProduct")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -185,8 +185,8 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     title: '물품 등록',
                 }} />
 
-            <RegisterItemStack.Screen name="EditItemScreen"
-                component={EditItemScreen}
+            <RegisterItemStack.Screen name="ModifyProduct"
+                component={ModifyProduct}
                 initialParams={{ userdata }}
                 options={{
                     headerStyle: {
@@ -194,7 +194,7 @@ export const RegisterItemStackNavigator = ({ navigation, route }: any) => {
                     },
                     headerLeft: () => (
                         <TouchableOpacity
-                            onPress={() => navigation.navigate("CheckRegistItemScreen")}>
+                            onPress={() => navigation.navigate("CheckProduct")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),

@@ -6,7 +6,7 @@ import { UserData, AdminEventList, VoteEvnetData, VoteInfoItem, VoteDataItem } f
 const width = Dimensions.get("window").width;
 import config from '../../config';
 
-const CheckEventScreen = ({ route, navigation }: any) => {
+const CheckEvent = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   const [eventList, setEventList] = useState<AdminEventList[]>([]); //이벤트 리스트
@@ -128,7 +128,7 @@ const CheckEventScreen = ({ route, navigation }: any) => {
   }
 
   const handleEditEvent = (eventId: number) => {
-    navigation.navigate("EventEditScreen", { userdata, eventId })
+    navigation.navigate("ModifyEvent", { userdata, eventId })
   };
 
   const handleDeleteEvent = (eventId: number) => {
@@ -159,11 +159,11 @@ const CheckEventScreen = ({ route, navigation }: any) => {
   return (
     <View style={styles.container}>
       <View style={styles.btnArea}>
-        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("EventRegistrationScreen", userdata)}>
+        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("RegisterEvent", userdata)}>
           <Icon_event style={styles.eventRegistIcon} name='note-plus-outline' />
           <Text style={styles.eventRegistText}>이벤트 등록</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("SendUserEventScreen", userdata)}>
+        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("ParticipantEvent", userdata)}>
           <Icon_event style={styles.eventRegistIcon} name='note-text-outline' />
           <Text style={styles.eventCheckText}>참여 확인</Text>
         </TouchableOpacity>
@@ -335,4 +335,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default CheckEventScreen;
+export default CheckEvent;

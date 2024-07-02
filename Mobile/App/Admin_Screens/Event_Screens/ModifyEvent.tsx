@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  Image
+  Image,
 } from 'react-native';
 import config from '../../config';
 import { TextInput } from 'react-native-gesture-handler';
@@ -22,25 +22,27 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale'; // date-fns의 한국어 locale 불러오기
-import { UserData } from '../../types/type'
+import { UserData, EditEventInfo, EditEventVote } from '../../types/type'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 
 const width = Dimensions.get("window").width;
 
-const EventRegistrationScreen = ({ route }: any) => {
-  const { userdata } = route.params;
+const ModifyEvent = ({ route }: any) => {
+  const { userdata, eventId } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   // 이벤트 정보 관련 상태 변수들
   const [title, setTitle] = useState(''); // 이벤트 제목
   const [content, setContent] = useState(''); // 이벤트 내용
   const [simpleInfo, setSimpleInfo] = useState('')//이벤트 간략 설명
   const [grantPoint, setGrantPoint] = useState('');
-  const [votes, setVotes] = useState<{ id: number, text: string }[]>([]); // 투표 옵션
+  const [votes, setVotes] = useState<EditEventVote[]>([]); // 투표 옵션
   const [showVoteSection, setShowVoteSection] = useState(false); // 투표 섹션 표시 여부
   const [submittedData, setSubmittedData] = useState<any>(null); // 제출된 데이터
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
+  const [serverImages, setServerImages] = useState<any[]>([]); //서버에서 가져온다 이미지를 담는다.
   const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 선택된 이미지를 폼데이터에 저장
+  const [editEventInfo, setEditEventInfo] = useState<EditEventInfo>();
 
   // useState Hook를 사용하여 시작 및 종료 날짜와 모달 유형, 노출 여부를 설정할 변수를 생성
   const [startDate, onChangeStartDate] = useState(new Date()); // 시작 날짜
@@ -51,8 +53,118 @@ const EventRegistrationScreen = ({ route }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       setUserData(userdata);
+      GetEditEventInfo();
+      GetEditEventVote();
+      GetEditEventImage();
     }, [])
   );
+
+  //이벤트 편집할 이벤트 정보 가져오기
+  const GetEditEventInfo = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventInfo`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      setEditEventInfo(data);
+      setTitle(data.name);
+      setContent(data.info);
+      setSimpleInfo(data.simple_info);
+      setGrantPoint(String(data.get_point));
+      onChangeStartDate(new Date(data.start_date));
+      onChangeEndDate(new Date(data.close_date));
+      //console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //이벤트 편집할 이벤트 투표 가져오기
+  const GetEditEventVote = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventVote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      setVotes(data);
+      if (data && data.length > 0) {
+        setVotes(data);
+        setShowVoteSection(true);
+      } else {
+        setShowVoteSection(false);
+      }
+      //console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //이벤트 편집할 이벤트 이미지 가져오기
+  const GetEditEventImage = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      setServerImages(data);
+      //setSelectedImages(data);
+      //console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //해당 이벤트 초기화 후 다시 행삽입
+  const DeleteEvent= async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/DeleteEvent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId
+        }),
+      })
+      const data = await response.json();
+      //console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
+  //기존의 이미지 배열과 새로운 데이터의 이미지 배열을 합칠거임
+  const chagneImageArray = (addImage : any) => {
+    const ChangeServerImageArray = serverImages.map(photo => photo.event_photo);
+    //console.log(ChangeServerImageArray);
+
+    const combinedImageArray = ChangeServerImageArray.concat(addImage);
+    //console.log('결합된 이미지 배열:', combinedImageArray);
+
+    return combinedImageArray;
+  }
 
   //Date 타입의 문자열을 sql문에 넣을 수 있게 변환하는 함수.
   const formatDateToSQL = (date: Date) => {
@@ -86,21 +198,22 @@ const EventRegistrationScreen = ({ route }: any) => {
   // 투표 옵션 추가 함수
   const handleAddVote = () => {
     if (votes.length < 5) {
-      setVotes(prevVotes => [...prevVotes, { id: prevVotes.length + 1, text: '' }]);
+      setVotes(prevVotes => [...prevVotes, { vote_index: prevVotes.length + 1, vote_name: '' }]);
     }
   };
 
   // 투표 옵션 변경 함수
   const handleVoteChange = (id: number, text: string) => {
+    //console.log(id);
     const newVotes = votes.map(vote =>
-      vote.id === id ? { ...vote, text } : vote
+      vote.vote_index === id ? { ...vote, vote_name: text } : vote
     );
     setVotes(newVotes);
   };
 
   // 투표 옵션 삭제 함수
   const handleDeleteVote = (id: number) => {
-    const newVotes = votes.filter(vote => vote.id !== id);
+    const newVotes = votes.filter(vote => vote.vote_index !== id);
     setVotes(newVotes);
     if (newVotes.length < 2) {
       setShowVoteSection(false);
@@ -112,8 +225,8 @@ const EventRegistrationScreen = ({ route }: any) => {
     setShowVoteSection(true);
     if (votes.length <= 1) {
       setVotes([
-        { id: 1, text: '' },
-        { id: 2, text: '' }
+        { vote_index: 1, vote_name: '' },
+        { vote_index: 2, vote_name: '' }
       ]);
     }
   };
@@ -126,19 +239,33 @@ const EventRegistrationScreen = ({ route }: any) => {
 
   const EventRegister = () => {
     Alert.alert(
-      "이벤트 등록!",
-      "정말로 이대로 이벤트를 등록 하시겠습니까??",
+      "이벤트 편집!",
+      `정말로 이대로 이벤트를 편집 하시겠습니까??
+주의!!(해당 이벤트를 작성한 유저 정보가 삭제됩니다)`,
       [
         { text: "취소", style: "cancel" },
-        { text: "확인", onPress: () => handleSubmit() }
+        { text: "확인", onPress: () => {
+          good404();
+          handleSubmit(); }}
       ]
     );
   };
 
+  const good404 = () => {
+    Alert.alert(
+      "이벤트 편집 성공!!",
+      `이벤트 편집이 성공적으로 마무리 되었습니다!!`,
+      [
+        { text: "확인" }
+      ]
+    );
+  };
+
+
   // 제출 처리 함수
   const handleSubmit = async () => {
     if (title.trim() !== '' && content.trim() !== '') {
-      if (!showVoteSection || (showVoteSection && votes.every(vote => vote.text.trim() !== ''))) {
+      if (!showVoteSection || (showVoteSection && votes.every(vote => vote.vote_name.trim() !== ''))) {
         // Validate start date and end date
         if (startDate <= endDate) {
           const submittedData = {
@@ -146,39 +273,31 @@ const EventRegistrationScreen = ({ route }: any) => {
             content,
             simpleInfo,
             grantPoint,
-            votes: showVoteSection ? votes.map(vote => vote.text.trim()) : [],
+            votes: showVoteSection ? votes.map(vote => vote.vote_name.trim()) : [],
             images: selectedImages.map(image => image.uri),
             startDate,
             endDate
           };
           setSubmittedData(submittedData);
 
-          try {
-            // 폼 필드 초기화
-            setTitle('');
-            setContent('');
-            setSimpleInfo('');
-            setGrantPoint('');
-            setVotes([]);
-            setShowVoteSection(false);
-            setSelectedImages([]);
-            setSelectedFormImages([]);
+          // 폼 필드 초기화
+          setTitle('');
+          setContent('');
+          setSimpleInfo('');
+          setGrantPoint('');
+          setVotes([]);
+          setShowVoteSection(false);
+          setSelectedImages([]);
+          hideVoteOptions();
 
-            hideVoteOptions();
-            const event_pk_string = await RegistorEvent(); //우선 이벤트 등록으로 등록된 이벤트의 PK값을 받아옴
-            const event_pk = parseInt(event_pk_string);
-            const event_photo = await uploadImages();  //사진을 서버에 업로드
-            await RegistorEventPhoto(event_pk, event_photo);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
-            await RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
-            await addNewEventAram(event_pk); //알람보내기
 
-            // 이후 추가적인 처리나 화면 이동 등을 수행할 수 있음
-
-          } catch (error) {
-            console.error('이벤트 등록 처리 중 오류 발생', error);
-            // 오류 처리 로직 추가
-          }
-
+          DeleteEvent();  
+          const event_pk_string = await RegistorEvent(); //우선 이벤트 등록으로 등록된 이벤트의 PK값을 받아옴
+          const event_pk = parseInt(event_pk_string);
+          const event_photo = await uploadImages();  //사진을 서버에 업로드
+          const newImageArray = chagneImageArray(event_photo);
+          RegistorEventPhoto(event_pk, newImageArray);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
+          RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
         } else {
           Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
         }
@@ -189,23 +308,6 @@ const EventRegistrationScreen = ({ route }: any) => {
       Alert.alert("이벤트 제목과 내용을 입력해주세요.");
     }
   };
-
-  //이벤트 등록시에 
-  const addNewEventAram = async (event_pk : number) => {
-    try {
-        const response = await fetch(`${config.serverUrl}/addNewEventAram`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                target_id: event_pk,
-            })
-        });
-    } catch (error) {
-        console.error('알람 전송 실패', error);
-    }
-  }
 
   // 이미지 선택 함수
   const handleImagePick = () => {
@@ -232,13 +334,23 @@ const EventRegistrationScreen = ({ route }: any) => {
       }
     });
   };
-  // 이미지 삭제 함수
-  const handleImageRemove = (index: number) => {
-    const updatedImages = selectedImages.filter((_, i) => i !== index);
-    setSelectedImages(updatedImages);
+
+  // 선택한 이미지 삭제 함수
+  const handleSelectedImageRemove = (index: number) => {
+    const updatedSelectedImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(updatedSelectedImages);
 
     const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
     setSelectedFormImages(updatedFormImages);
+
+    //console.log("로컬 이미지 배열 삭제")
+  };
+
+  // 서버에서 가져온 이미지 삭제 함수
+  const handleServerImageRemove = (index: number) => {
+    const updatedServerImages = serverImages.filter((_, i) => i !== index);
+    setServerImages(updatedServerImages);
+    //console.log("서버 이미지 배열 삭제")
   };
 
   // 이미지 업로드 함수
@@ -295,8 +407,9 @@ const EventRegistrationScreen = ({ route }: any) => {
 
   //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
   const RegistorEventVotes = async (event_id: number) => {
+    //console.log(votes)
     try {
-      const response = await fetch(`${config.serverUrl}/RegistorEventVotesRegistor`, {
+      const response = await fetch(`${config.serverUrl}/RegistorEventVotesEdit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -421,18 +534,18 @@ const EventRegistrationScreen = ({ route }: any) => {
           {showVoteSection && (
             <View style={[styles.inputArea, { marginTop: 0 }]}>
               <Text style={styles.inputText}>투표 옵션</Text>
-              {votes.map((vote, index) => (
-                <View key={vote.id}
+              {votes.map((vote) => (
+                <View key={vote.vote_index}
                   style={[styles.inputBox, styles.voteOptionArea]}>
                   <TextInput
                     style={styles.input}
-                    placeholder={`옵션 ${index + 1}`}
+                    placeholder={`옵션 ${vote.vote_index + 1}`}
                     placeholderTextColor={'gray'}
                     maxLength={50}
-                    value={vote.text}
-                    onChangeText={(text) => handleVoteChange(vote.id, text)}
+                    value={vote.vote_name}
+                    onChangeText={(text) => handleVoteChange(vote.vote_index, text)}
                   />
-                  <TouchableOpacity onPress={() => handleDeleteVote(vote.id)}>
+                  <TouchableOpacity onPress={() => handleDeleteVote(vote.vote_index)}>
                     <IconTrash name='trash' size={22} color='red' style={styles.icon} />
                   </TouchableOpacity>
                 </View>
@@ -459,10 +572,18 @@ const EventRegistrationScreen = ({ route }: any) => {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={true}>
+            {serverImages.map((image, index) => (
+              <View key={`server-${index}`} style={styles.fileInfo}>
+                <Image source={{ uri: `${config.photoUrl}/${image.event_photo}.png` }} style={styles.imagePreview} />
+                <TouchableOpacity onPress={() => handleServerImageRemove(index)} style={styles.cancelButton}>
+                  <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+                </TouchableOpacity>
+              </View>
+            ))}
             {selectedImages.map((image, index) => (
               <View key={index} style={styles.fileInfo}>
                 <Image source={{ uri: image.uri }} style={styles.imagePreview} />
-                <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
+                <TouchableOpacity onPress={() => handleSelectedImageRemove(index)} style={styles.cancelButton}>
                   <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
                 </TouchableOpacity>
               </View>
@@ -499,24 +620,44 @@ const EventRegistrationScreen = ({ route }: any) => {
           mode={'date'}
           onConfirm={onConfirmStartDate}
           onCancel={onCancel}
-          date={startDate} 
-          minimumDate={new Date()}
-          />
-          
+          date={startDate} />
 
         <DateTimePickerModal
           isVisible={endVisible}
           mode={'date'}
           onConfirm={onConfirmEndDate}
           onCancel={onCancel}
-          date={endDate} 
-          minimumDate={new Date()}
-          />
+          date={endDate} />
 
         {/* 등록 버튼 */}
         <TouchableOpacity style={styles.submitButton} onPress={() => EventRegister()}>
           <Text style={styles.submitButtonText}>등록하기</Text>
         </TouchableOpacity>
+
+        {/* 제출 후 결과 표시 */}
+        {submittedData && (
+          <View>
+            <Text style={{ color: 'black', marginTop: 20 }}>결과값</Text>
+            <Text style={{ color: 'black' }}>제목: {submittedData.title}</Text>
+            <Text style={{ color: 'black' }}>내용: {submittedData.content}</Text>
+            <Text style={{ color: 'black' }}>간략설명: {submittedData.simpleInfo}</Text>
+            <Text style={{ color: 'black' }}>부여 포인트: {submittedData.grantPoint}P</Text>
+            {submittedData.votes.length > 0 && (
+              <Text style={{ color: 'black' }}>투표 옵션:</Text>
+            )}
+            {submittedData.votes.map((vote: string, index: number) => (
+              <Text key={index} style={{ color: 'black' }}>{index + 1}. {vote}</Text>
+            ))}
+            {submittedData.images.length > 0 && (
+              <Text style={{ color: 'black' }}>첨부된 이미지:</Text>
+            )}
+            {submittedData.images.map((image: string, index: number) => (
+              <Image key={index} source={{ uri: image }} style={styles.imagePreview} />
+            ))}
+            <Text style={{ color: 'black' }}>시작 날짜: {format(new Date(submittedData.startDate), 'PPP',)}</Text>
+            <Text style={{ color: 'black' }}>종료 날짜: {format(new Date(submittedData.endDate), 'PPP',)}</Text>
+          </View>
+        )}
       </ScrollView>
       <View style={{ height: 100 }} />
     </View>
@@ -666,4 +807,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventRegistrationScreen;
+export default ModifyEvent;

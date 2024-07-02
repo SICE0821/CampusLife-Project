@@ -35,7 +35,7 @@ const takePartInfo = [
   { userName: '정유환', userId: 'aaaa', eventId: 1, sendText: '이벤트 참여 내용 3', sendFile: [require('../../assets/event1.jpg')], vote: 3 },
 ];
 
-const SendUserEventScreen = ({ route }: any) => {
+const ParticipantEvent = ({ route }: any) => {
   const { userdata } = route.params;
   //console.log(userdata);
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
@@ -482,4 +482,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default SendUserEventScreen;
+export default ParticipantEvent;

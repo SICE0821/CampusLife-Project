@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 
 const width = Dimensions.get("window").width;
 
-const RegisterItemScreen = ({ route, navigation }: any) => {
+const RegisterProduct = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
   const [itemName, setItemName] = useState("");
@@ -124,7 +124,7 @@ const successAlert = () => {
       "상품등록완료",
       `상품 등록을 성공적으로 완료했습니다!` ,
       [
-          { text: "확인", onPress: () => {navigation.navigate("CheckRegistItemScreen", userData)}}
+          { text: "확인", onPress: () => {navigation.navigate("CheckProduct", userData)}}
       ]
   );
 };
@@ -424,4 +424,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default RegisterItemScreen;
+export default RegisterProduct;
