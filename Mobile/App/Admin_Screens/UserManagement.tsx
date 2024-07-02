@@ -22,8 +22,7 @@ type userInfo = {
   caution: number,
 };
 
-const width = Dimensions.get("window").width;
-
+/** 유저 등급에 따른 색상 지정 */
 const getRoleColor = (role: string) => {
   switch (role) {
     case '반장':
@@ -39,6 +38,7 @@ const getRoleColor = (role: string) => {
   }
 };
 
+/** 유저 관리 */
 const UserManagement = ({ route }: any) => {
   const { userdata } = route.params;
   const [selectedDepartment, setSelectedDepartment] = useState('');
@@ -126,7 +126,7 @@ const UserManagement = ({ route }: any) => {
     setSelectedUser(user);
   };
 
-  // 경고 주기 기능
+  /** 경고 주기 기능 */
   const handleReportCheck = async () => {
     if (selectedUser) {
       Alert.alert(
@@ -180,6 +180,7 @@ const UserManagement = ({ route }: any) => {
     }
   };
 
+  /** 권한 변경 */
   const handleRoleChange = async () => {
     if (!selectedUser || !selectedRole) {
       // 선택된 사용자나 권한이 없는 경우 사용자에게 알림을 보여줄 수 있습니다.
@@ -239,46 +240,47 @@ const UserManagement = ({ route }: any) => {
   };
 
 
-  // 권한 변경 모달 열기
+  /** 권한 변경 모달 열기 */
   const openRoleModal = () => {
     setRoleModalVisible(true);
   };
 
-  // 포인트 수정 모달 열기
+  /** 포인트 수정 모달 열기 */ 
   const openPointsModal = () => {
     setPointsModalVisible(true);
   };
 
-  // 권한 변경 기능
+  /** 권한 변경 기능 */
   const handleChangeRole = () => {
     if (selectedUser) {
       openRoleModal();
     }
   };
 
-  // 포인트 수정 기능
+  /** 포인트 수정 기능 */
   const handleModifyPoints = () => {
     if (selectedUser) {
       openPointsModal();
     }
   };
 
-  // 권한 변경 모달 닫기
+  /** 권한 변경 모달 닫기 */
   const closeRoleModal = () => {
     setRoleModalVisible(false);
   };
 
-  // 포인트 수정 모달 닫기
+  /** 포인트 수정 모달 닫기 */
   const closePointsModal = () => {
     setPointsModalVisible(false);
   };
 
+  /** 선택된 권한 업데이트 */
   const handleRoleSelect = (role: string) => {
-    setSelectedRole(role); // 선택된 권한 업데이트
+    setSelectedRole(role);
   };
 
+  /** 선택된 유저 포인트 변경 */
   const handlePointsChange = (text: string) => {
-    // Parse the input text to a number and update the state
     const points = parseInt(text, 10); // 문자열을 숫자로 변환
     if (!isNaN(points)) {
       setNewPoints(points); // 숫자가 유효하면 newPoints 상태 업데이트
@@ -287,6 +289,7 @@ const UserManagement = ({ route }: any) => {
     }
   };
 
+  /** 선택된 유저 포인트 변경 서버 업데이트 */
   const handlePointsModify = async () => {
     if (selectedUser && newPoints !== undefined) {
       try {
@@ -323,8 +326,6 @@ const UserManagement = ({ route }: any) => {
       }
     }
   };
-
-
 
   useFocusEffect(
     useCallback(() => {
@@ -486,6 +487,8 @@ const UserManagement = ({ route }: any) => {
     </View>
   );
 };
+
+const width = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   container: {

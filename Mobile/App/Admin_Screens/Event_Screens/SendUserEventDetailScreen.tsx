@@ -1,9 +1,5 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { UserData } from '../../types/type'
-import config from '../../config';
+import React from 'react';
+import { View, StyleSheet, Dimensions, Text, } from 'react-native';
 
 const width = Dimensions.get("window").width;
 

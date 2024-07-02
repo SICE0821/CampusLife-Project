@@ -9,12 +9,6 @@ import IconA from 'react-native-vector-icons/MaterialIcons'
 
 const width = Dimensions.get("window").width;
 
-const eventName = [
-  { id: 1, name: '123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890' },
-  { id: 2, name: '이벤트 2' },
-  { id: 3, name: '이벤트 3' },
-];
-
 type EventVoteInfo = {
   id: number;
   vote1: string;
@@ -22,18 +16,9 @@ type EventVoteInfo = {
   vote3: string;
   vote4: string;
   vote5: string;
-  [key: string]: any;  // Index signature
+  [key: string]: any;
 }
 
-const eventVoteInfo: EventVoteInfo[] = [
-  { id: 1, vote1: '투표 내용 1', vote2: '투표 내용 2', vote3: '투표 내용 3', vote4: '투표 내용 4', vote5: '투표 내용 5' }
-];
-
-const takePartInfo = [
-  { userName: '홍길동', userId: 'asdasdasdadada', eventId: 1, sendText: '이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1 이벤트 참여 내용 1', sendFile: [require('../../assets/event1.jpg'), require('../../assets/event2.png'), require('../../assets/event1.jpg'), require('../../assets/event2.png'), require('../../assets/event1.jpg'), require('../../assets/AttendanceCheckEvent.jpg')], vote: 1 },
-  { userName: '남도현', userId: 'basdasdasdadsbbb', eventId: 2, sendText: '이벤트 참여 내용 2', sendFile: [require('../../assets/event2.png')], vote: 2 },
-  { userName: '정유환', userId: 'aaaa', eventId: 1, sendText: '이벤트 참여 내용 3', sendFile: [require('../../assets/event1.jpg')], vote: 3 },
-];
 
 const ParticipantEvent = ({ route }: any) => {
   const { userdata } = route.params;

@@ -3,24 +3,23 @@ import { Text, Touchable, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
-import RegisterEvent from "../Event_Screens/RegisterEvent"
-import CheckEvent from '../Event_Screens/CheckEvent';
-import ParticipantEvent from '../Event_Screens/ParticipantEvent';
-import SendUserEventDetailScreen from '../Event_Screens/SendUserEventDetailScreen';
-import CheckReportPost from '../Report_Screens/CheckReportPost';
-import CheckProduct from '../Product_Screens/CheckProduct';
-import RegisterProduct from '../Product_Screens/RegisterProduct';
-import ModifyProduct from '../Product_Screens/ModifyProduct';
-import ModifyEvent from '../Event_Screens/ModifyEvent';
 import IconD from 'react-native-vector-icons/AntDesign';
+import CheckEvent from '../Event_Screens/CheckEvent';
+import ModifyEvent from '../Event_Screens/ModifyEvent';
+import ParticipantEvent from '../Event_Screens/ParticipantEvent';
+import RegisterEvent from "../Event_Screens/RegisterEvent"
+import SendUserEventDetailScreen from '../Event_Screens/SendUserEventDetailScreen';
+import CheckProduct from '../Product_Screens/CheckProduct';
+import ModifyProduct from '../Product_Screens/ModifyProduct';
+import RegisterProduct from '../Product_Screens/RegisterProduct';
+import CheckReportPost from '../Report_Screens/CheckReportPost';
 import ManagementUserScreen from '../UserManagement';
-
 
 const AdminEventStack = createStackNavigator();
 const ReportPostStack = createStackNavigator();
 const RegisterItemStack = createStackNavigator();
 
-//관리자 이벤트 스택 네비게이터
+/** 관리자 이벤트 스택 네비게이터 */
 export const AdminEventStackNavigator = ({ navigation, route }: any) => {
     const { userdata } = route.params;
     return (

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, FlatList } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, FlatList } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ModalBox from 'react-native-modalbox';
 import { UserData, UserHaveCouponData } from '../../types/type'

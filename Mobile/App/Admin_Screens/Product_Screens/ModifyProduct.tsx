@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, TextInput } from 'react-native';
-import { Calendar } from 'react-native-calendars';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, UserHaveCouponData } from '../../types/type'
@@ -30,11 +29,11 @@ const ModifyProduct = ({ route, navigation }: any) => {
   const [itemName, setItemName] = useState(ItemInfo.name);  //상품 이름
   const [itemExplain, setItemExplain] = useState(ItemInfo.explain); //상품 설명
   const [itemPoint, setItemPoint] = useState(ItemInfo.price.toString()); //상품 포인트
-  const [itemCount, setItemCount] = useState(ItemInfo.count.toString()); //상품 수량
+  //const [itemCount, setItemCount] = useState(ItemInfo.count.toString()); //상품 수량
   const [changeitemCount, setChangeitemCount] = useState<number>(0);
   const [selectedImagePath, setSelectedImagePath]: any = useState();
   const [selectedImageFormData, setSelectedImageFormData] = useState<FormData | null>(null);
-  const [ImageNum, setImageNum] = useState(ItemInfo.image_num);
+  //const [ImageNum, setImageNum] = useState(ItemInfo.image_num);
   const [showStartDatePicker, setShowStartDatePicker]: any = useState(false);
   const [showStartEndPicker, setShowEndDatePicker]: any = useState(false);
   const { start, end } = parseDateString(ItemInfo.using_time);

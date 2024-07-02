@@ -6,6 +6,7 @@ import { UserData, AdminEventList, VoteEvnetData, VoteInfoItem, VoteDataItem } f
 const width = Dimensions.get("window").width;
 import config from '../../config';
 
+/** 현재 등록되어 있는 이벤트들을 확인 합니다. */
 const CheckEvent = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터

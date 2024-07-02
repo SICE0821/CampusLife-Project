@@ -44,8 +44,6 @@ type commentReport = {
   department_name: string
 }
 
-const width = Dimensions.get("window").width;
-
 const CheckReportPost = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const ref = useRef(null);
