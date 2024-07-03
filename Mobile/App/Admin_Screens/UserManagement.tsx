@@ -19,11 +19,10 @@ type userInfo = {
   department_id: number,
   department_name: string,
   campus_id: number,
-  caution : number, 
+  caution: number,
 };
 
-const width = Dimensions.get("window").width;
-
+/** 유저 등급에 따른 색상 지정 */
 const getRoleColor = (role: string) => {
   switch (role) {
     case '반장':
@@ -37,9 +36,10 @@ const getRoleColor = (role: string) => {
     default:
       return 'black';
   }
-};  
+};
 
-const ManagementUserScreen = ({route} : any) => {
+/** 유저 관리 */
+const UserManagement = ({ route }: any) => {
   const { userdata } = route.params;
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [selectedAdmin, setSelectedAdmin] = useState('');
@@ -92,22 +92,22 @@ const ManagementUserScreen = ({route} : any) => {
           campus_id: usergetData.campus_pk
         })
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       const data = await response.json();
       //console.log(data); // API에서 받아온 데이터 확인
-  
+
       // title이 '학교'인 데이터는 필터링하여 제외
       const filteredData = data.filter((item: any) => item.title !== '학교');
-  
+
       // 필터링된 데이터에서 adminCheckNames 추출
       const adminCheckNames = filteredData.map((item: any) => item.title);
       const uniqueAdminCheckNames = Array.from(new Set(adminCheckNames)) as string[];
       setAdminCheck(uniqueAdminCheckNames);
-  
+
       setUserDataState(filteredData);
     } catch (error) {
       console.error('Failed to fetch user info:', error);
@@ -126,7 +126,7 @@ const ManagementUserScreen = ({route} : any) => {
     setSelectedUser(user);
   };
 
-  // 경고 주기 기능
+  /** 경고 주기 기능 */
   const handleReportCheck = async () => {
     if (selectedUser) {
       Alert.alert(
@@ -150,11 +150,11 @@ const ManagementUserScreen = ({route} : any) => {
                     user_pk: selectedUser.user_id // 선택된 사용자의 user_id를 서버로 전송
                   })
                 });
-  
+
                 if (!response.ok) {
                   throw new Error('Network response was not ok');
                 }
-  
+
                 // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
                 const updatedUserData = [...userData];
                 const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
@@ -162,13 +162,13 @@ const ManagementUserScreen = ({route} : any) => {
                   updatedUserData[index].caution += 1; // 경고 누적 횟수 1 증가
                   setUserDataState(updatedUserData); // 상태 업데이트
                 }
-  
+
                 // 성공 또는 실패 메시지 출력
                 const data = await response.json();
                 //console.log(data.message);
-  
+
                 // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
-  
+
               } catch (error) {
                 console.error('Failed to update caution:', error);
                 // 실패 처리
@@ -180,6 +180,7 @@ const ManagementUserScreen = ({route} : any) => {
     }
   };
 
+  /** 권한 변경 */
   const handleRoleChange = async () => {
     if (!selectedUser || !selectedRole) {
       // 선택된 사용자나 권한이 없는 경우 사용자에게 알림을 보여줄 수 있습니다.
@@ -187,13 +188,13 @@ const ManagementUserScreen = ({route} : any) => {
         '경고',
         '권한을 선택해주세요.',
         [
-          { text: '확인', onPress: () => {} }
+          { text: '확인', onPress: () => { } }
         ],
         { cancelable: false }
       );
       return;
     }
-  
+
     try {
       const response = await fetch(`${config.serverUrl}/update_user_title`, {
         method: 'POST',
@@ -205,11 +206,11 @@ const ManagementUserScreen = ({route} : any) => {
           title: selectedRole
         })
       });
-  
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+
       // 서버에서 데이터 업데이트 완료 후, 클라이언트 측에서 상태 업데이트
       const updatedUserData = [...userData];
       const index = updatedUserData.findIndex(user => user.user_id === selectedUser.user_id);
@@ -217,10 +218,10 @@ const ManagementUserScreen = ({route} : any) => {
         updatedUserData[index].title = selectedRole;
         setUserDataState(updatedUserData);
       }
-  
+
       const data = await response.json();
       //console.log(data.message); // 성공 또는 실패 메시지 출력
-  
+
       // 알림창 표시
       Alert.alert(
         '완료',
@@ -230,55 +231,56 @@ const ManagementUserScreen = ({route} : any) => {
         ],
         { cancelable: false }
       );
-  
+
       // 여기에 필요한 UI 업데이트 등을 처리할 수 있습니다.
-  
+
     } catch (error) {
       console.error('Failed to update user title:', error);
     }
   };
-  
 
-  // 권한 변경 모달 열기
+
+  /** 권한 변경 모달 열기 */
   const openRoleModal = () => {
     setRoleModalVisible(true);
   };
 
-  // 포인트 수정 모달 열기
+  /** 포인트 수정 모달 열기 */ 
   const openPointsModal = () => {
     setPointsModalVisible(true);
   };
 
-  // 권한 변경 기능
+  /** 권한 변경 기능 */
   const handleChangeRole = () => {
     if (selectedUser) {
       openRoleModal();
     }
   };
 
-  // 포인트 수정 기능
+  /** 포인트 수정 기능 */
   const handleModifyPoints = () => {
     if (selectedUser) {
       openPointsModal();
     }
   };
 
-  // 권한 변경 모달 닫기
+  /** 권한 변경 모달 닫기 */
   const closeRoleModal = () => {
     setRoleModalVisible(false);
   };
 
-  // 포인트 수정 모달 닫기
+  /** 포인트 수정 모달 닫기 */
   const closePointsModal = () => {
     setPointsModalVisible(false);
   };
 
+  /** 선택된 권한 업데이트 */
   const handleRoleSelect = (role: string) => {
-    setSelectedRole(role); // 선택된 권한 업데이트
+    setSelectedRole(role);
   };
 
+  /** 선택된 유저 포인트 변경 */
   const handlePointsChange = (text: string) => {
-    // Parse the input text to a number and update the state
     const points = parseInt(text, 10); // 문자열을 숫자로 변환
     if (!isNaN(points)) {
       setNewPoints(points); // 숫자가 유효하면 newPoints 상태 업데이트
@@ -287,44 +289,43 @@ const ManagementUserScreen = ({route} : any) => {
     }
   };
 
+  /** 선택된 유저 포인트 변경 서버 업데이트 */
   const handlePointsModify = async () => {
     if (selectedUser && newPoints !== undefined) {
-        try {
-            const response = await fetch(`${config.serverUrl}/update_user_allpoint`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_pk: selectedUser.user_id,
-                    point: newPoints,
-                }),
-            });
+      try {
+        const response = await fetch(`${config.serverUrl}/update_user_allpoint`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_pk: selectedUser.user_id,
+            point: newPoints,
+          }),
+        });
 
-            const data = await response.json();
-            //console.log(data.message);
+        const data = await response.json();
+        //console.log(data.message);
 
-            // Update local state upon successful update
-            const updatedUserData = userData.map(user =>
-                user.user_id === selectedUser.user_id ? { ...user, point: newPoints } : user
-            );
-            setUserDataState(updatedUserData);
+        // Update local state upon successful update
+        const updatedUserData = userData.map(user =>
+          user.user_id === selectedUser.user_id ? { ...user, point: newPoints } : user
+        );
+        setUserDataState(updatedUserData);
 
-            Alert.alert(
-                '완료',
-                '포인트가 성공적으로 수정되었습니다.',
-                [{ text: '확인', onPress: closePointsModal }],
-                { cancelable: false }
-            );
+        Alert.alert(
+          '완료',
+          '포인트가 성공적으로 수정되었습니다.',
+          [{ text: '확인', onPress: closePointsModal }],
+          { cancelable: false }
+        );
 
-        } catch (error) {
-            console.error('Failed to update user points:', error);
-            Alert.alert('오류', '포인트 업데이트 실패', [{ text: '확인' }]);
-        }
+      } catch (error) {
+        console.error('Failed to update user points:', error);
+        Alert.alert('오류', '포인트 업데이트 실패', [{ text: '확인' }]);
+      }
     }
-};
-
-  
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -363,7 +364,7 @@ const ManagementUserScreen = ({route} : any) => {
       <ScrollView>
         {filteredUserData.map((user, index) => (
           <View key={index} style={styles.userInfoBox}>
-            <View style={styles.imageArea}> 
+            <View style={styles.imageArea}>
               <Image style={styles.image} source={{ uri: `${config.serverUrl}/${user.profilePhoto}` }} />
             </View>
             <View style={styles.userInfoArea}>
@@ -393,18 +394,18 @@ const ManagementUserScreen = ({route} : any) => {
             </View>
             {/* 선택된 사용자에 대한 드롭다운 메뉴 */}
             {selectedUser && selectedUser.user_id === user.user_id && (
-                <View style={styles.dropdown}>
-                  <TouchableOpacity style={styles.dropdownItem} onPress={handleReportCheck}>
-                    <Text style={styles.dropdownText}>경고주기</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.dropdownItem} onPress={handleChangeRole}>
-                    <Text style={styles.dropdownText}>권한 변경</Text>
-                  </TouchableOpacity> 
-                  <TouchableOpacity style={styles.dropdownItem} onPress={handleModifyPoints}>
-                    <Text style={styles.dropdownText}>포인트 수정</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              <View style={styles.dropdown}>
+                <TouchableOpacity style={styles.dropdownItem} onPress={handleReportCheck}>
+                  <Text style={styles.dropdownText}>경고주기</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.dropdownItem} onPress={handleChangeRole}>
+                  <Text style={styles.dropdownText}>권한 변경</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.dropdownItem} onPress={handleModifyPoints}>
+                  <Text style={styles.dropdownText}>포인트 수정</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         ))}
       </ScrollView>
@@ -470,7 +471,7 @@ const ManagementUserScreen = ({route} : any) => {
                 value={newPoints !== undefined ? newPoints.toString() : ''}
                 onChangeText={handlePointsChange}
               />
-            </View> 
+            </View>
             <View style={styles.modalButtonContainer}>
               <TouchableOpacity style={styles.modalButton} onPress={handlePointsModify}>
                 <Text style={styles.modalButtonText}>확인</Text>
@@ -486,6 +487,8 @@ const ManagementUserScreen = ({route} : any) => {
     </View>
   );
 };
+
+const width = Dimensions.get("window").width;
 
 const styles = StyleSheet.create({
   container: {
@@ -690,4 +693,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ManagementUserScreen;
+export default UserManagement;

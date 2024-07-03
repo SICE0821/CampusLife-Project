@@ -3,7 +3,7 @@ import { Text, Touchable, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { useFocusEffect } from '@react-navigation/native';
-import ManagementUserScreen from "../admin_screen/ManagementUserScreen"
+import ManagementUserScreen from "../Admin_Screens/UserManagement"
 import MainScreen from '../screens/MainScreen';
 import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
@@ -33,11 +33,11 @@ import { PostTopTabNavigator } from './TopTabNavigator';
 import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator, NoticeTopbTabNavigator } from './TopTabNavigator'
-import AdminMainScreen from '../admin_screen/AdminMainScreen';
+import AdminMainScreen from '../Admin_Screens/AdminMain';
 import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPostsScreen'
 import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen';
 import MyPostScreen from '../screens/CommunityScreens/MyPostScreen';
-import { RegisterItemStackNavigator } from '../admin_screen/Admin_navigation/AdminStackNavigator';
+import { RegisterItemStackNavigator } from '../Admin_Screens/Navigation/AdminStackNavigator';
 
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -330,7 +330,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
     const { userdata, LectureData } = route.params;
     React.useLayoutEffect(() => {
         const routeName = getFocusedRouteNameFromRoute(route);
-        if (routeName === "AdminScreen" || routeName === undefined) {
+        if (routeName === "AdminMain" || routeName === undefined) {
             navigation.setOptions({
                 tabBarStyle: {
                     height: 65,
@@ -348,7 +348,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
     }, [navigation, route])
     return (
         <AdminMainStack.Navigator>
-            <AdminMainStack.Screen name="AdminScreen" component={AdminMainScreen} initialParams={{ userdata, LectureData }} options={{ headerShown: false }} />
+            <AdminMainStack.Screen name="AdminMain" component={AdminMainScreen} initialParams={{ userdata, LectureData }} options={{ headerShown: false }} />
             <AdminMainStack.Screen
                 name="StudentInfoNavigator"
                 component={StudentInfoScreen}
@@ -370,7 +370,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -388,7 +388,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -407,7 +407,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -417,7 +417,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                 }}
             />
             <AdminMainStack.Screen
-                name="RegisterItemStackNavigator"
+                name="AdminStackNavigator"
                 initialParams={{ userdata }}
                 component={RegisterItemStackNavigator}
                 options={{
@@ -433,7 +433,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -451,7 +451,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -467,7 +467,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -485,7 +485,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
                             <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
                         </TouchableOpacity>
                     ),

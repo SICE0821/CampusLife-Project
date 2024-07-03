@@ -1,5 +1,5 @@
 import React, { useState, } from 'react';
-import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, Dimensions } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IconD from 'react-native-vector-icons/FontAwesome6';
 import IconC from 'react-native-vector-icons/FontAwesome';
@@ -8,7 +8,7 @@ import ModalBox from 'react-native-modalbox';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { UserData, UserHaveCouponData } from '../../types/type'
 import config from '../../config';
-
+const width = Dimensions.get("window").width;
 
 const EventHaveCouponScreen = ({ route }: any) => {
   const { userdata } = route.params;
@@ -115,7 +115,7 @@ const EventHaveCouponScreen = ({ route }: any) => {
           </View>
           <View style = {{height : '65%', justifyContent : 'center', alignItems : 'center'}}>
             <Barcode
-                style = {{marginBottom : 20,}}
+                style = {{marginBottom : 20}}
                 value = {
                   (SelectItem ? SelectItem.code_num : 0).toString().replace(/(.{4})/g, '$1 ').toString()
                 }

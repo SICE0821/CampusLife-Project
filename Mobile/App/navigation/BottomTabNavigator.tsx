@@ -6,8 +6,8 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { PostTopTabNavigator } from "../navigation/TopTabNavigator"
 import { MainScreenStackNavigator, AdminMainScreenStackNavigator } from './StackNavigator';
 import { CommunityScreenStackNavigator, NoticeScreenStackNavigator } from './StackNavigator';
-import { AdminEventStackNavigator } from '../admin_screen/Admin_navigation/AdminStackNavigator';
-import { ReportStackNavigator } from '../admin_screen/Admin_navigation/AdminStackNavigator';
+import { AdminEventStackNavigator } from '../Admin_Screens/Navigation/AdminStackNavigator';
+import { ReportStackNavigator } from '../Admin_Screens/Navigation/AdminStackNavigator';
 import { AttendanceScreenStackNavigator } from './StackNavigator';
 import { TimetableScreenStackNavigator } from './StackNavigator';
 
@@ -193,7 +193,7 @@ export const AdminTabNavigator = ({ route }: any) => {
         initialParams={{ userdata }}
       />
       <Tab.Screen
-        name="AdminEventStackNavigator"
+        name="AdminStackNavigator"
         component={AdminEventStackNavigator}
         options={{
           headerShown: false,

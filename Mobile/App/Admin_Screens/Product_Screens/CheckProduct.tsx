@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, FlatList } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, FlatList } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import ModalBox from 'react-native-modalbox';
 import { UserData, UserHaveCouponData } from '../../types/type'
@@ -10,7 +9,7 @@ import IconD from 'react-native-vector-icons/AntDesign';
 
 const width = Dimensions.get("window").width;
 
-const CheckRegistItemScreen = ({ navigation, route }: any) => {
+const CheckProduct = ({ navigation, route }: any) => {
   const { userdata } = route.params;
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [userData, setUserData] = useState<UserData>(userdata);
@@ -53,7 +52,7 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
   const renderItem = ({ item }: { item: UserHaveCouponData }) => (
     <TouchableOpacity
       style={styles.itemcontainer}
-      onPress={() => navigation.navigate("EditItemScreen", {userdata, ItemInfo : item })}>
+      onPress={() => navigation.navigate("ModifyProduct", {userdata, ItemInfo : item })}>
       <View style={styles.photobox}>
         <View style={styles.photo}>
           <Image style={{ height: "100%", width: "100%", borderRadius: 15 }} source={{ uri: `${config.photoUrl}/${item.image_num}.png` }} />
@@ -80,7 +79,7 @@ const CheckRegistItemScreen = ({ navigation, route }: any) => {
       <View style={styles.topbox}>
         <Text style={{ fontSize: 20, color: 'black', marginLeft: 10, fontWeight: 'bold' }}>현재 등록한 상품 수 : {AdminRegisterItem.length}</Text>
         <TouchableOpacity style={styles.registerButton}
-          onPress={() => { navigation.navigate("RegisterItemScreen") }}>
+          onPress={() => { navigation.navigate("RegisterProduct") }}>
           <Text style={{ fontSize: 18, color: 'white', fontWeight: 'bold' }}>상품등록</Text>
         </TouchableOpacity>
       </View>
@@ -201,4 +200,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CheckRegistItemScreen;
+export default CheckProduct;

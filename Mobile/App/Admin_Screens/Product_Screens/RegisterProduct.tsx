@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, TextInput } from 'react-native';
-import { Calendar } from 'react-native-calendars';
 import ImageCropPicker from 'react-native-image-crop-picker';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData } from '../../types/type'
@@ -13,7 +12,7 @@ import { format } from 'date-fns';
 
 const width = Dimensions.get("window").width;
 
-const RegisterItemScreen = ({ route, navigation }: any) => {
+const RegisterProduct = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
   const [itemName, setItemName] = useState("");
@@ -22,13 +21,13 @@ const RegisterItemScreen = ({ route, navigation }: any) => {
   const [itemCount, setItemCount] = useState("");
   const [selectedImagePath, setSelectedImagePath]: any = useState();
   const [selectedImageFormData, setSelectedImageFormData] = useState<FormData | null>(null);
-  const [ImageNum, setImageNum] = useState();
+  //const [ImageNum, setImageNum] = useState();
   const [showStartDatePicker, setShowStartDatePicker]: any = useState(false);
   const [showStartEndPicker, setShowEndDatePicker]: any = useState(false);
   const [selectedStartDate, setSelectedStartDate]: any = useState(new Date());
   const [selectedEndDate, setSelectedEndDate]: any = useState(new Date());
   const [deadlineDate, setDeadlineDate] = useState<string>("");
-  const [selectedFormImages, setSelectedFormImages] = useState<FormData>(); // 선택된 이미지를 폼데이터에 저장
+  //const [selectedFormImages, setSelectedFormImages] = useState<FormData>(); // 선택된 이미지를 폼데이터에 저장
 
   useFocusEffect(
     React.useCallback(() => {
@@ -124,7 +123,7 @@ const successAlert = () => {
       "상품등록완료",
       `상품 등록을 성공적으로 완료했습니다!` ,
       [
-          { text: "확인", onPress: () => {navigation.navigate("CheckRegistItemScreen", userData)}}
+          { text: "확인", onPress: () => {navigation.navigate("CheckProduct", userData)}}
       ]
   );
 };
@@ -424,4 +423,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default RegisterItemScreen;
+export default RegisterProduct;

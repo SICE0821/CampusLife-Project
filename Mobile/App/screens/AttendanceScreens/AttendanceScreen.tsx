@@ -232,8 +232,8 @@ const AttendanceScreen = ({navigation, route}: any) => {
     setLastScannedTime(new Date());
     setIsScanned(true);
     Alert.alert(
-      'QR 코드 스캔됨',
-      `스캔된 코드: ${scannedCode}`,
+      '출석 확인',
+      `출석 확인 되었습니다!`,
       [{ text: '확인', onPress: () => {
         updateAttendanceStatus(selectedLecture);
         AttendanceCheck();

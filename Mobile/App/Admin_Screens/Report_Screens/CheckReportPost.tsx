@@ -44,9 +44,7 @@ type commentReport = {
   department_name: string
 }
 
-const width = Dimensions.get("window").width;
-
-const ReportPostsScreen = ({ route, navigation }: any) => {
+const CheckReportPost = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const ref = useRef(null);
   const [userReport, setUserReport] = useState<ReportUser[]>([]);
@@ -397,6 +395,8 @@ const styles = StyleSheet.create({
   },
   picker: {
     flex: 1,
+    marginHorizontal: 5,
+    backgroundColor: '#eeeeee',
   },
   flatliststyle: {
     // marginTop: 40,
@@ -441,4 +441,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReportPostsScreen;
+export default CheckReportPost;

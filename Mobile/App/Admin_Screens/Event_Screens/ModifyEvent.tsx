@@ -28,7 +28,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const width = Dimensions.get("window").width;
 
-const EventEditScreen = ({ route }: any) => {
+const ModifyEvent = ({ route }: any) => {
   const { userdata, eventId } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   // 이벤트 정보 관련 상태 변수들
@@ -807,4 +807,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventEditScreen;
+export default ModifyEvent;

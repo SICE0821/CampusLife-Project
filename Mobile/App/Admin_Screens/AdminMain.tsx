@@ -14,19 +14,13 @@ import { UserData, EventData } from '../types/type'
 import ImageCropPicker from 'react-native-image-crop-picker';
 import config from '../config';
 
-import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconB from 'react-native-vector-icons/AntDesign';
-import IconC from 'react-native-vector-icons/FontAwesome';
 import IconD from 'react-native-vector-icons/Feather';
 import IconE from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Fontisto';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
 import IconI from 'react-native-vector-icons/FontAwesome5';
-
-const attendancepng = require('../assets/handup.jpg');
-const friendsinvitepng = require('../assets/friend3.jpg');
-const volunteerpng = require('../assets/MainPhoto_Event.png');
 
 const width = Dimensions.get('window').width;
 
@@ -41,7 +35,7 @@ type PostData = {
   admin_check: boolean
 }
 
-const AdminMainScreen = ({ navigation, route }: any) => {
+const AdminMain = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
   const [schoolpostdata, setschollpostdata] = useState<PostData[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
@@ -51,7 +45,8 @@ const AdminMainScreen = ({ navigation, route }: any) => {
   const [Userdepartment, setUserDepartment] = useState();
   const fileUri = `${config.serverUrl}/${userData.profile_photo}.png`;
 
-  const initialEvents = [  // 이벤트 추가 재거는 여기서 
+  /** 기본 이벤트 정보 */
+  const initialEvents = [
     {
       screen: "AttendanceCheckEventScreen",
       imageSource: "1718551969957-1718551969312_12",
@@ -68,14 +63,14 @@ const AdminMainScreen = ({ navigation, route }: any) => {
     },
   ];
 
-  // eventData 배열을 풀어서 기존 이벤트 배열에 추가
+  /** eventData 배열을 풀어서 기존 이벤트 배열에 추가 */
   const allEvents = [
     ...initialEvents,
     ...eventData.map(event => ({
       screen: "DeadlineEventScreen",
       label: event.name,
       info: event.simple_info,
-      imageSource: event.event_photo[0].event_photo, // assuming event_photo is the correct source for the image
+      imageSource: event.event_photo[0].event_photo,
       params: { userdata: userData, eventdata: event }
     })),
   ];
@@ -229,7 +224,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
       console.error('유저 정보 가져오기 실패:', error);
     }
   }
-  //이벤트 이미지 가져오기
+  /** 이벤트 이미지 가져오기 */
   const GetEditEventImage = async (event_id: number) => {
     try {
       const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
@@ -350,7 +345,7 @@ const AdminMainScreen = ({ navigation, route }: any) => {
                 <Text style={styles.tabText}>학교정보</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("RegisterItemStackNavigator")}>
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AdminStackNavigator")}>
                 <IconD style={styles.tabIcon} name="shopping-cart" size={28} />
                 <Text style={styles.tabText}>물품 등록</Text>
               </TouchableOpacity>
@@ -913,5 +908,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AdminMainScreen;
+export default AdminMain;
 

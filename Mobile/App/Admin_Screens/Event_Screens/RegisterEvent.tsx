@@ -28,7 +28,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 const width = Dimensions.get("window").width;
 
-const EventRegistrationScreen = ({ route }: any) => {
+const RegisterEvent = ({ route }: any) => {
   const { userdata } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
   // 이벤트 정보 관련 상태 변수들
@@ -667,4 +667,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventRegistrationScreen;
+export default RegisterEvent;
