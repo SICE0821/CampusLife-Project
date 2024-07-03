@@ -54,6 +54,7 @@ const EventRegistrationScreen = ({ route }: any) => {
     }, [])
   );
 
+
   //Date 타입의 문자열을 sql문에 넣을 수 있게 변환하는 함수.
   const formatDateToSQL = (date: Date) => {
     return date.toISOString().slice(0, 19).replace('T', ' ');
@@ -153,22 +154,31 @@ const EventRegistrationScreen = ({ route }: any) => {
           };
           setSubmittedData(submittedData);
 
-          // 폼 필드 초기화
-          setTitle('');
-          setContent('');
-          setSimpleInfo('');
-          setGrantPoint('');
-          setVotes([]);
-          setShowVoteSection(false);
-          setSelectedImages([]);
+          try {
+            // 폼 필드 초기화
+            setTitle('');
+            setContent('');
+            setSimpleInfo('');
+            setGrantPoint('');
+            setVotes([]);
+            setShowVoteSection(false);
+            setSelectedImages([]);
+            setSelectedFormImages([]);
 
-          hideVoteOptions();
-          const event_pk_string = await RegistorEvent(); //우선 이벤트 등록으로 등록된 이벤트의 PK값을 받아옴
-          const event_pk = parseInt(event_pk_string);
-          const event_photo = await uploadImages();  //사진을 서버에 업로드
-          RegistorEventPhoto(event_pk, event_photo);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
-          RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
-          addNewEventAram(event_pk); //알람보내기
+            hideVoteOptions();
+            const event_pk_string = await RegistorEvent(); //우선 이벤트 등록으로 등록된 이벤트의 PK값을 받아옴
+            const event_pk = parseInt(event_pk_string);
+            const event_photo = await uploadImages();  //사진을 서버에 업로드
+            await RegistorEventPhoto(event_pk, event_photo);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
+            await RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
+            await addNewEventAram(event_pk); //알람보내기
+
+            // 이후 추가적인 처리나 화면 이동 등을 수행할 수 있음
+
+          } catch (error) {
+            console.error('이벤트 등록 처리 중 오류 발생', error);
+            // 오류 처리 로직 추가
+          }
 
         } else {
           Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
