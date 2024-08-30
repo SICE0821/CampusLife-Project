@@ -28,6 +28,7 @@ const renderEmptyItem = () => {
 }
 
 const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
+    console.log("you are in NoticeSchoolPostsScreen")
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { department_check, userdata } = route.params;

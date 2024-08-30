@@ -20,6 +20,7 @@ type PostData = {
 }
 
 const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
+    console.log("you are in SearchPostScreen")
     const {  userdata } = route.params;
     const [searchtext, setsearchtext] = useState('');
     const [communityData, setCommunityData] = useState<PostData[]>([]);

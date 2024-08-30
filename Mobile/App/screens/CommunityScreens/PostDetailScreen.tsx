@@ -24,6 +24,7 @@ type ReportCommentUser = {
 
 
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
+    console.log("you are in PostDetailScreen")
     const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);

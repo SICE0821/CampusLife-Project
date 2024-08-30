@@ -31,6 +31,7 @@ const renderEmptyItem = () => {
 
 //화면.
 const MyPostScreen = ({ route, navigation }: any) => {
+    console.log("you are in MyPostScreen")
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { userdata } = route.params;

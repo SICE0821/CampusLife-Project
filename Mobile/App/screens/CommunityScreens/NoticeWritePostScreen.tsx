@@ -8,6 +8,7 @@ import { UserData } from '../../types/type'
 import config from '../../config';
 
 const WritePostPage: React.FC = ({ navigation, route }: any) => {
+  console.log("you are in NoticeWritePostScreen")
   const { userdata } = route.params;
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [selectallposter, setselectapllposterOption] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리

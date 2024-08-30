@@ -27,6 +27,7 @@ const renderEmptyItem = () => {
 
 //화면.
 const NoticeHotPostsScreen = ({ route, navigation }: any) => {
+    console.log("you are in NoticeHotPostsScreen")
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { department_check, userdata } = route.params;

@@ -28,6 +28,7 @@ const renderEmptyItem = () => {
 
 //화면.
 const NoticeBookmarkScreen = ({ route, navigation }: any) => {
+    console.log("yor are in NoticeBookmarkScreen")
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { department_check, userdata } = route.params;

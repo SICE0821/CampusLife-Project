@@ -24,13 +24,7 @@ import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
 import IconI from 'react-native-vector-icons/FontAwesome5';
 
-const attendancepng = require('../assets/handup.jpg');
-const friendsinvitepng = require('../assets/friend3.jpg');
-const volunteerpng = require('../assets/MainPhoto_Event.png');
-
 const width = Dimensions.get('window').width;
-
-//console.log(width)
 
 type PostData = {
   post_id: number,

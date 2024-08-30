@@ -12,6 +12,7 @@ import config from '../../config';
 
 
 const PostDetailScreen: React.FC = ({ route }: any) => {
+    console.log("you are in NoticePostDetailScreen")
     const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
     const [inputheight, setinputheight] = useState(40);

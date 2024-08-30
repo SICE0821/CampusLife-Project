@@ -18,8 +18,7 @@ type PostData = {
     user_title: string
 }
 
-const renderEmptyItem = () => {
-
+const renderEmptyItem = () => { /** 하단바 크기의 공백 */
     return (
         <View style={{ height: 85 }}>
         </View>
@@ -28,6 +27,7 @@ const renderEmptyItem = () => {
 
 //화면.
 const HotPostsScreen = ({ route, navigation }: any) => {
+    console.log("you are in HotPostsScreen")
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { department_check, userdata } = route.params;
@@ -306,8 +306,8 @@ const HotPostsScreen = ({ route, navigation }: any) => {
                                 <Text> | {item.date}</Text>
                             </View>
                             <View style={styles.likenum}>
-                                <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
-                                <Text style={{ color: 'black', marginLeft: 7, marginBottom: 4 }}>{item.like}</Text>
+                                <Text style={{ color: '#F29F05' }}> <IconB name="like1" size={21} /></Text>
+                                <Text style={{ color: 'black', marginLeft: 7 }}>{item.like}</Text>
                             </View>
                         </View>
                     </View>
@@ -320,7 +320,6 @@ const HotPostsScreen = ({ route, navigation }: any) => {
         <View style={styles.container} ref={ref}>
             <View style = {{height : 120, backgroundColor : 'white'}}></View>
             <FlatList
-                style={styles.flatliststyle}
                 data={communityData}
                 renderItem={renderItem}
                 ListFooterComponent={renderEmptyItem}
@@ -341,78 +340,53 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
     },
-    topnavigationborder: {
-        flex: 1,
-        //backgroundColor : "blue",
-        borderWidth: 2,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        marginTop: 57,
-    },
-
-    flatlisttopline: {
-        //backgroundColor : 'red',
-        //right : 118,
-        height: 60,
-        borderBottomWidth: 1,
-        borderBottomColor: '#CCCCCC'
-    },
-
-    flatliststyle: {
-        //marginTop : 40,
-        //backgroundColor : 'blue',
-    },
-
-    writeboxcontainer: {
-        //padding: 50, 
+    writeboxcontainer: { // 게시물 박스
+        paddingHorizontal: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
-        //backgroundColor: 'red',
+        backgroundColor: 'white',
+        flex: 1,
         height: 70,
     },
-
-    writetitle: {
-        flex: 0.6,
+    writetitle: { // 게시물 상단 영역
+        flex: 1,
+        height: '60%',
         flexDirection: 'row',
-        marginTop: 5,
         //backgroundColor : 'yellow'
     },
-
-    wirterandtime: {
-        flex: 0.4,
-        flexDirection: 'row'
-        //backgroundColor : 'yellow'
+    wirterandtime: { // 게시물 하단 영역
+        width: '100%',
+        height: '40%',
+        flexDirection: 'row',
+        //backgroundColor : 'blue'
     },
 
-    titlebox: {
-        flex: 0.85,
+    titlebox: { // 상단 제목 영역
+        width: '87%',
+        justifyContent: 'center',
         //backgroundColor : 'green'
     },
-    eyesnum: {
-        flex: 0.15,
+    eyesnum: { // 상단 조회수 영역
+        width: '13%',
         flexDirection: 'row',
-        // backgroundColor : 'red',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+        //backgroundColor : 'red',
     },
-    writerbox: {
-        flex: 0.85,
+    writerbox: { // 하단 작성자, 시간 영역
+        width: '87%',
         flexDirection: 'row',
         //backgroundColor : 'yellow',
     },
-    likenum: {
-        flex: 0.15,
+    likenum: { // 하단 추천수 영역
+        width: '13%',
         flexDirection: 'row',
-        //backgroundColor : 'red',
+        bottom: 5,
+        left: 2,
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
+        //backgroundColor : 'red',
     },
-    delete: {
-        width: 20,
-        height: 20,
-        backgroundColor: 'red',
-    }
-
 }
 )
 export default HotPostsScreen;
