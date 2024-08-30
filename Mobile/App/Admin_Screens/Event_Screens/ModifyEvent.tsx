@@ -52,12 +52,19 @@ const ModifyEvent = ({ route }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      GetEditEventInfo();
-      GetEditEventVote();
-      GetEditEventImage();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await GetEditEventInfo();
+              await GetEditEventVote();
+              await GetEditEventImage();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
 
   //이벤트 편집할 이벤트 정보 가져오기
   const GetEditEventInfo = async () => {
@@ -127,8 +134,6 @@ const ModifyEvent = ({ route }: any) => {
       })
       const data = await response.json();
       setServerImages(data);
-      //setSelectedImages(data);
-      //console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -291,13 +296,14 @@ const ModifyEvent = ({ route }: any) => {
           hideVoteOptions();
 
 
-          DeleteEvent();  
+          await DeleteEvent();  
           const event_pk_string = await RegistorEvent(); //우선 이벤트 등록으로 등록된 이벤트의 PK값을 받아옴
           const event_pk = parseInt(event_pk_string);
           const event_photo = await uploadImages();  //사진을 서버에 업로드
           const newImageArray = chagneImageArray(event_photo);
-          RegistorEventPhoto(event_pk, newImageArray);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
-          RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
+          await RegistorEventPhoto(event_pk, newImageArray);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
+          await RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
+          console.log("함수 잘 끝남");
         } else {
           Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
         }

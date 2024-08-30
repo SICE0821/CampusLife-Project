@@ -16,11 +16,18 @@ const CheckEvent = ({ route, navigation }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      GetEventList();
-      GetEventVote();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await GetEventList();
+              await GetEventVote();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
 
   //설정한 이벤트 보여주기
   const GetEventList = async () => {
@@ -139,9 +146,10 @@ const CheckEvent = ({ route, navigation }: any) => {
       [
         { text: "Cancel", style: "cancel" },
         {
-          text: "OK", onPress: () => {
-            DeleteEvent(eventId)
-            GetEventList()
+          text: "OK", onPress: async () => {
+            await DeleteEvent(eventId)
+            await GetEventList();
+            await GetEventVote();
           }
         }
       ]

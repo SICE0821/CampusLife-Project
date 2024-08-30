@@ -109,10 +109,10 @@ const RegisterProduct = ({ route, navigation }: any) => {
                 onPress: () => console.log("취소 클릭"),
                 style: "cancel"
             },
-            { text: "확인", onPress: async () => {
-              successAlert();
+            { text: "확인", onPress: async () => { 
               const ImageName = await RegistorItemImage();
               await RegistorItem(ImageName);
+              successAlert();
             }}
         ]
     );

@@ -37,13 +37,16 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
     const [isSwipeableOpen, setIsSwipeableOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     ;
+    /*
     const onRefresh = async () => {
         setRefreshing(true);
         await AreYouHavePost();
+        console.log("함수 잘 마무리")
         setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
     };
+    */
 
-    const closebookmark = useCallback((index : any) => {
+    const closebookmark = useCallback((index: any) => {
         //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
         swipeableRefs.current[index]?.close();
     }, []);
@@ -66,7 +69,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
             console.error('포스트 View 올리기 누르기 실패', error);
         }
     }
-
+    
     const Addbookmark = async (user_pk: number, post_pk: number) => {
         try {
             const controller = new AbortController();
@@ -141,7 +144,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         }
     };
 
-    const handleBookmark = async (item: PostData, index : number) => {
+    const handleBookmark = async (item: PostData, index: number) => {
         try {
             if (userHavePost.some(posts => item.post_id === posts.post_id)) {
                 // 이미 북마크에 있는 경우, 북마크를 삭제합니다.
@@ -162,7 +165,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         }
     };
 
-    const renderRightActions = (item: PostData, index : number) => {
+    const renderRightActions = (item: PostData, index: number) => {
         return (
             // 왼쪽으로 스와이프할 때 나타날 컴포넌트
             <TouchableOpacity
@@ -190,8 +193,8 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    campus_id : userData.campus_pk,
-                    department_id : userData.department_pk
+                    campus_id: userData.campus_pk,
+                    department_id: userData.department_pk
                 }),
             })
             const postsdata = await response.json();
@@ -211,7 +214,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    department_id : userData.department_pk
+                    department_id: userData.department_pk
                 }),
             })
             const postsdata = await response.json();
@@ -258,27 +261,32 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            if (department_check == 0) {
-                getGeneralposts();
-            } else if (department_check == 1) {
-                getDepartmentposts();
-            }
-            setUserData(userdata);
-            AreYouHavePost();
+            const fetchData = async () => {
+                try {
+                    if (department_check == 0) {
+                        await getGeneralposts(); //전체 전체 포스터 가져오기
+                    } else if (department_check == 1) {
+                        await getDepartmentposts(); //전체 학과 포스터 가져오기
+                    }
+                    setUserData(userdata);
+                    await AreYouHavePost();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
-
 
     const renderItem = ({ item, index }: { item: PostData, index: number }) => (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
                 ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}
-                onSwipeableWillOpen={() => console.log(index + " 스와이프 열림")}
-                onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
+                renderRightActions={() => renderRightActions(item, index)}>
                 <TouchableWithoutFeedback onPress={async () => {
-                        await view_count_up(item.post_id);
-                        navigation.navigate("PostDetailScreen", { item, userData })}}>
+                    await view_count_up(item.post_id);
+                    navigation.navigate("PostDetailScreen", { item, userData })
+                }}>
                     <View style={styles.writeboxcontainer}>
                         <View style={styles.writetitle}>
                             <View style={styles.titlebox}>
@@ -291,15 +299,15 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                         </View>
                         <View style={styles.wirterandtime}>
                             <View style={styles.writerbox}>
-                            <Text
+                                <Text
                                     style={{
                                         fontSize: 13,
                                         marginLeft: 10,
                                         color:
                                             item.user_title === "학교" ? 'red' :
-                                            item.user_title === "반장" ? 'green' :
-                                            item.user_title === "학우회장" ? 'blue' :
-                                            'black'
+                                                item.user_title === "반장" ? 'green' :
+                                                    item.user_title === "학우회장" ? 'blue' :
+                                                        'black'
                                     }}
                                 >
                                     {item.name}
@@ -328,7 +336,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
-                        onRefresh={onRefresh}
+                        //onRefresh={onRefresh}
                     />
                 }
             //keyExtractor={(item) => item.id}
@@ -365,13 +373,13 @@ const styles = StyleSheet.create({
     },
 
     writeboxcontainer: {
-        paddingHorizontal: 10, 
+        paddingHorizontal: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
         backgroundColor: 'white',
         width: '100%',
         height: 70,
-        
+
     },
 
     writetitle: {

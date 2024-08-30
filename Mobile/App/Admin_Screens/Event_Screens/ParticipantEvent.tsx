@@ -32,13 +32,24 @@ const ParticipantEvent = ({ route }: any) => {
   const [eventList, setEventList] = useState<AdminEventList[]>([]); //이벤트 리스트
 
 
+
+
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      GetEventList();
-      GetUserSendEvent();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await GetEventList();
+              await GetUserSendEvent();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
+
+
 
 
   const addGoodEventAram = async (user_id : number, event_id :number) => {
@@ -85,11 +96,10 @@ const ParticipantEvent = ({ route }: any) => {
           text: "확인", onPress: async () => {
             try {
                 good_404();
-                addGoodEventAram(user_id, evnet_id);
-                AdminSendPoint(user_id, event_point);
-                setUserSendtype(user_send_event);
-                GetEventList();
-              console.log("모든 요청이 성공적으로 완료되었습니다.");
+                await addGoodEventAram(user_id, evnet_id);
+                await AdminSendPoint(user_id, event_point);
+                await setUserSendtype(user_send_event);
+                await GetUserSendEvent();
             } catch (error) {
               console.error("요청 중 오류가 발생했습니다:", error);
             }
@@ -156,7 +166,6 @@ const ParticipantEvent = ({ route }: any) => {
         }),
       })
       const data = await response.json();
-      //console.log(data);
       return data
     } catch (error) {
       console.error(error);

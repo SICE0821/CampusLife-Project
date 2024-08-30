@@ -22,10 +22,17 @@ const EventShopScreen = ({ navigation, route }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      getItems();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await getItems();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  )
+);
 
   const groupData = (data: any) => {
     const groupedData = [];
@@ -78,7 +85,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       groupData(items);
       //console.log(items);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
+      console.error(error);
     }
   }
 
@@ -97,7 +104,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       const item = await response.json();
       SetSelectItem(item);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
+      console.error(error);
     }
   }
 
@@ -134,7 +141,6 @@ const EventShopScreen = ({ navigation, route }: any) => {
           object_id : SelectItem?.object_id
         })
       });
-      //console.log("상점 사기 성공");
       const value = await response.json();
 
     } catch (error) {
@@ -178,10 +184,10 @@ const EventShopScreen = ({ navigation, route }: any) => {
       [
         {
           text: "확인",
-          onPress: () => {
-            update_object_state(SelectItem?.object_id);
-            insert_user_have_object();
-            user_buy_action();
+          onPress: async () => {
+            await update_object_state(SelectItem?.object_id);
+            await insert_user_have_object();
+            await user_buy_action();
   
             // 추가 알림창 띄우기
             Alert.alert(

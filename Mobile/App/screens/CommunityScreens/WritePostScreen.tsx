@@ -25,9 +25,6 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     }, [selectdepartmentposter, titletext, maintext])
   );
 
-  const checkopenModal = () => {
-    setIsModalVisible(true); // 모달 열기
-  };
 
   const goback = () => {
     navigation.goBack();
@@ -110,9 +107,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           contents: maintext,
         })
       });
-      //console.log("게시글 작성완료!");
-      const value = await response.json();
-      //console.log(value);
+      await response.json();
       ok_go();
 
     } catch (error) {

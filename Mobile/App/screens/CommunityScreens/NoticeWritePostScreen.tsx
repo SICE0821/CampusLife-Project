@@ -25,10 +25,6 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     }, [selectdepartmentposter, titletext, maintext])
   );
 
-  const checkopenModal = () => {
-    setIsModalVisible(true); // 모달 열기
-  };
-
   const goback = () => {
     navigation.goBack();
   };
@@ -75,8 +71,8 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const changeHeaderRightContent = () => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => {
-          write_post();
+        <TouchableOpacity onPress={async () => {
+          await write_post();
 
         }}>
           <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
@@ -154,15 +150,14 @@ const addDepartmentNoticeAram = async (value : number) => {
           contents: maintext,
         })
       });
-      //console.log("게시글 작성완료!");
       const value = await response.json();
-      //console.log(value);
-      //console.log(selectdepartmentposter);
       if(selectdepartmentposter === 0) {
-      addSchoolNoticeAram(value.postId);
+      await addSchoolNoticeAram(value.postId);
+      //console.log('함수 잘 마무리!');
       ok_go();
     }else if(selectdepartmentposter === 1) {
-      addDepartmentNoticeAram(value.postId);
+      await addDepartmentNoticeAram(value.postId);
+      //console.log('함수 잘 마무리!');
       ok_go();
     }
 

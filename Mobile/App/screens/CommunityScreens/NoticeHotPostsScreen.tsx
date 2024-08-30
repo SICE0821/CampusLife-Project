@@ -42,11 +42,13 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
         swipeableRefs.current[index]?.close();
     }, []);
 
+    /*
     const onRefresh = async () => {
         setRefreshing(true);
         await AreYouHavePost();
         setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
       };
+      */
     
       const view_count_up = async (post_id: any) => {
         try {
@@ -192,7 +194,6 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
                 }),
             })
             const postsdata = await response.json();
-            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error);
@@ -255,13 +256,20 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            if (department_check == 0) {
-                getNoticeHotposts();
-            } else if (department_check == 1) {
-                getNoticeDepartmentHotposts();
-            }
-            setUserData(userdata);
-            AreYouHavePost();
+            const fetchData = async () => {
+                try {
+                    if (department_check == 0) {
+                        await  getNoticeHotposts();
+                    } else if (department_check == 1) {
+                        await getNoticeDepartmentHotposts();
+                    }
+                    setUserData(userdata);
+                    await AreYouHavePost();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
 
@@ -271,9 +279,7 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
                 ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}
-                onSwipeableWillOpen={() => console.log(index + " 스와이프 열림")}
-                onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
+                renderRightActions={() => renderRightActions(item, index)}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
                         navigation.navigate("NoticePostDetailScreen", { item, userData })}}>
@@ -326,7 +332,7 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
                 refreshControl={
                     <RefreshControl
                       refreshing={refreshing}
-                      onRefresh={onRefresh}
+                      //onRefresh={onRefresh}
                     />
                   }
             //keyExtractor={(item) => item.id}

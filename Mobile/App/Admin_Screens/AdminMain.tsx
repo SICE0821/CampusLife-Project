@@ -293,7 +293,6 @@ const AdminMain = ({ navigation, route }: any) => {
       fetchhotpostData();
       settingUserData();
       get_user_department();
-      get_user_point();
       Get_Event_Data();
       if (navigation.getState().routes[navigation.getState().index].params?.updatedUserData) {
         const updatedUserData = navigation.getState().routes[navigation.getState().index].params.updatedUserData;

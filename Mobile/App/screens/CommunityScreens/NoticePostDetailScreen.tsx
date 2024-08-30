@@ -23,16 +23,17 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const [commentspk, setCommentspk]: any = useState();
     const inputRef = useRef<TextInput>(null);
 
-    const onFocusName = useCallback(() => {
-        //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
-        inputRef.current?.focus();
-    }, []);
-
     useFocusEffect(
         React.useCallback(() => {
-            DeatilPost();
-            CommentList();
-            setUserData(userdata);
+            const fetchData = async () => {
+                try {
+                    await DeatilPost();
+                    setUserData(userdata);
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
 
@@ -56,104 +57,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         }
     }
 
-    //댓글 리스트 가져오기
-    const CommentList = async () => {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            const response = await fetch(`${config.serverUrl}/get_comment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    post_ida: item.post_id
-                })
-            })
-            const get_comment = await response.json();
-            const commentsWithRecomments = await Promise.all(
-                get_comment.map(async (comment: any) => {
-                    const recommentData = await fetchRecommentData(comment.comment_id);
-                    return { ...comment, recomments: recommentData };
-                })
-            );
-            setComments(commentsWithRecomments);
-            clearTimeout(timeoutId);
-            return (commentsWithRecomments);
-        } catch (error) {
-            console.error('댓글리스트 가져오기 실패:', error);
-        }
-    }
-    //댓글달기
-    const writecomment = async () => {
-        try {
-            const response = await fetch(`${config.serverUrl}/writecomment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    post_id: postDetailInfo?.post_id,
-                    user_id: userdata.user_pk,
-                    contents: commenttext
-                })
-            });
-            const result = await response.json();
-            //console.log(result);
-            //console.log("댓글 작성완료!");
-            const newCommentList: any = await CommentList();
-            //console.log(newCommentList);
-            //setComments((prev) => [...prev, newCommentList]);
-        } catch (error) {
-            console.error('댓글 쓰기 실패!', error);
-        }
-    }
-
-    //대댓글 달기
-    const writerecomment = async () => {
-        //console.log(commentspk);
-        try {
-            const response = await fetch(`${config.serverUrl}/rewritecomment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    comment_id: commentspk,
-                    user_id: userdata.user_pk,
-                    contents: commenttext
-                })
-            });
-            //const result = await response.json();
-            //console.log(result);
-            //console.log("대댓글 작성완료!");
-            const newCommentList: any = await CommentList();
-            //console.log(newCommentList);
-            //setComments((prev) => [...prev, newCommentList]);
-        } catch (error) {
-            console.error('대댓글 쓰기 실패!', error);
-        }
-    }
-
-    //대댓글 리스트 가져오기(잘 작동하고.)
-    const fetchRecommentData = async (comment_pk: any) => {
-        try {
-            const response = await fetch(`${config.serverUrl}/get_recomment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    comment_id: comment_pk
-                })
-            })
-            const recomment = await response.json();
-            return recomment;
-        } catch (error) {
-            console.error('대댓글 하나 가져오기 실패:', error);
-        }
-    }
-
     //포스트 좋아요 누르기
     const like_num_up = async (post_id: any) => {
         try {
@@ -174,45 +77,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         }
     }
 
-    //댓글 좋아요 누르기
-    const comment_like_num_up = async (comment_id: any) => {
-        try {
-            const response = await fetch(`${config.serverUrl}/comment_like_up`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    comment_id: comment_id
-                })
-            })
-            const result = await response.json();
-            await CommentList();
-            //console.log("댓글 좋아요 누르기 성공!")
-        } catch (error) {
-            console.error('댓글 좋아요 누르기 실패', error);
-        }
-    }
 
-        //댓글 좋아요 누르기
-        const recomment_like_num_up = async (recomment_id: any) => {
-            try {
-                const response = await fetch(`${config.serverUrl}/recomment_like_up`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        recomment_id: recomment_id
-                    })
-                })
-                const result = await response.json();
-                await CommentList();
-                //console.log("대댓글 좋아요 누르기 성공!")
-            } catch (error) {
-                console.error('대댓글 좋아요 누르기 실패', error);
-            }
-        }
 
     const Post_Like_alert = (post_id: any) => {
         Alert.alert(
@@ -224,59 +89,13 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     onPress: () => console.log("취소 클릭"),
                     style: "cancel"
                 },
-                { text: "확인", onPress: () => like_num_up(post_id) }
-            ]
-        );
-    };
-
-    const comment_Like_alert = (comment_id: any) => {
-        Alert.alert(
-            "댓글 좋아요!!",
-            "댓글에 좋아요를 누르시겠습니까?",
-            [
-                {
-                    text: "취소",
-                    onPress: () => console.log("취소 클릭"),
-                    style: "cancel"
-                },
-                { text: "확인", onPress: () => comment_like_num_up(comment_id) }
+                { text: "확인", onPress: async () => await like_num_up(post_id) }
             ]
         );
     };
 
 
-    const recomment_Like_alert = (recomment_id: any) => {
-        Alert.alert(
-            "대댓글 좋아요!!",
-            "대댓글에 좋아요를 누르시겠습니까?",
-            [
-                {
-                    text: "취소",
-                    onPress: () => console.log("취소 클릭"),
-                    style: "cancel"
-                },
-                { text: "확인", onPress: () => recomment_like_num_up(recomment_id) }
-            ]
-        );
-    };
-    /*
-    const loadCommentsWithRecomments = async () => {
-        try {
-          const commentsWithRecomments = await Promise.all(
-            commentData.map(async (comment) => {
-              const recommentData = await fetchRecommentData(comment.comment_id);
-              console.log(recommentData);
-              return { ...comment, recomments: recommentData };
-            })
-          );
-          console.log(commentsWithRecomments);
-          return commentsWithRecomments;
 
-        } catch (error) {
-          console.error('Failed to load recomment data:', error);
-        }
-      };
-      */
 
     const handleContentSizeChange = (e: any) => {
         const maxlineHeight = 112;
@@ -289,16 +108,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     }
     const handleInputChange = (inputText: string) => {
         setcommenttext(inputText);
-    };
-
-    const writeComment = async () => {
-        if (IsCommentorRecomment == 0) {
-            writecomment();
-        } else if (IsCommentorRecomment == 1) {
-            writerecomment();
-        }
-        setcommenttext('댓글을 입력해주세요');
-        Keyboard.dismiss(); // 키보드 숨기기
     };
 
     return (
@@ -323,9 +132,9 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                 <Text style={{ fontSize: 17, color: 'black' }}>{postDetailInfo?.write_date}</Text>
                             </View>
                         </View>
-                        <View style={styles.listcontainer}>
+                        <TouchableOpacity style={styles.listcontainer} onPress = {() => console.log("공지사항 리스트 기능 x")}>
                             <Text><IconA size={35} color="black" name={"dots-three-vertical"} /></Text>
-                        </View>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
@@ -371,13 +180,12 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                             onPress={() => {
                                                 setIsCommentorRecomment(1);
                                                 setCommentspk(item.comment_id);
-                                                onFocusName();
                                             }}>
                                             <Text><IconD size={27} color="black" name={"comment"} /></Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity 
                                             style={styles.likebox}
-                                            onPress={() => comment_Like_alert(item.comment_id)}>
+                                           >
                                             <Text><IconD size={29} color="black" name={"like"} /></Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity style={styles.reallistbox}>
@@ -423,7 +231,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                                                 <View style={styles.LikeListBox2}>
                                                     <TouchableOpacity 
                                                         style={styles.likebox2}
-                                                        onPress={() => recomment_Like_alert(subitem.recomment_id)}>
+                                                        >
                                                         <Text><IconD size={29} color="black" name={"like"} /></Text>
                                                     </TouchableOpacity>
                                                     <TouchableOpacity style={styles.reallistbox2}>
