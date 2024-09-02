@@ -20,10 +20,17 @@ const FriendCodeEventScreen = ({ route }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      get_invite_num();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await get_invite_num();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
 
   const duplication = () => {
     Alert.alert(
@@ -84,7 +91,6 @@ const FriendCodeEventScreen = ({ route }: any) => {
       const invite = await response.json();
 
       setuserInviteNum(invite);
-      //console.log(invite);
     } catch (error) {
       console.error(error);
     } finally {
@@ -115,10 +121,6 @@ const FriendCodeEventScreen = ({ route }: any) => {
       }
 
       const aram_data = await response.json();
-      //(aram_data.friend_code);
-      //console.log(aram_data.friend_code_id);
-      //console.log(aram_data.my_name);
-
       await addFriendCodeAram(aram_data.friend_code, aram_data.friend_code_id, aram_data.my_name);
     } catch (error: any) {
       if (error.name === 'AbortError') {
@@ -203,8 +205,8 @@ const FriendCodeEventScreen = ({ route }: any) => {
       if (check_end_send.success == "중복코드") {
         return result = "중복";
       } else if (check_end_send.success == "성공") {
-        last_friendCode_Info();
-        user_update_point();
+        await last_friendCode_Info();
+        await user_update_point();
         userData.point = userData.point + 100;
         return result = "성공";
       } else if (check_end_send.success == "코드없음") {
@@ -242,6 +244,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
         //console.log("???????????")
       }
     }
+    console.log("함수 마무리 성공");
   };
 
   const onRefresh = async () => {

@@ -18,10 +18,18 @@ const CheckProduct = ({ navigation, route }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      getItems();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await getItems();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
+
 
   const closeModal = () => {
     setIsModalOpen(false);

@@ -133,22 +133,26 @@ const CheckReportPost = ({ route, navigation }: any) => {
 
       // 데이터에서 학과 이름들을 추출하여 departments 배열에 저장
       const departmentNames = data.map((item: any) => item.department_name); // 예시로 department_name을 가져오는 코드
-
       setDepartments(departmentNames); // departments 배열 업데이트
     } catch (error) {
       console.error('Failed to fetch departments:', error);
     }
   };
 
-
   useFocusEffect(
-    useCallback(() => {
-      get_user_report();
-      get_department();
-      get_user_comment_report();
+    React.useCallback(() => {
+        const fetchData = async () => {
+            try {
+              await get_user_report();
+              await get_department();
+              await get_user_comment_report();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
-
+);
   //console.log(userCommentReport);
   useEffect(() => {
     if (selectedCategory === '학과 게시판' && !selectedDepartment) {

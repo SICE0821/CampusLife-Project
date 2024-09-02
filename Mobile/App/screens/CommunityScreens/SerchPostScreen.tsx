@@ -75,13 +75,6 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
         }
     };
 
-    useFocusEffect(
-        React.useCallback(() => {
-            //getGeneralposts();
-        }, [])
-    );
-
-
     const renderItem = ({ item, index }: { item: PostData, index: number }) => (
         <TouchableWithoutFeedback onPress={async () => {
                 await view_count_up(item.post_id);
@@ -139,7 +132,7 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                             value={searchtext}
                             placeholder="글 제목, 내용"
                             placeholderTextColor={'gray'}
-                            onSubmitEditing={() => getGeneralposts()}
+                            onSubmitEditing={async () => await getGeneralposts()}
                         />
                     </View>
                 </View>

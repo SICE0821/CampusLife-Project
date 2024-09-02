@@ -6,10 +6,12 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 import ImageCropPicker from 'react-native-image-crop-picker';
+import { launchImageLibrary, ImagePickerResponse } from 'react-native-image-picker';
 import { UserData } from "../../types/type"
 import config from '../../config';
 
 const width = Dimensions.get('window').width;
+let content : any;
 
 const StudentInfoScreen = ({ route, navigation }: any) => {
     const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -21,6 +23,35 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
     const [selectedstatus, setSelectedstatus] = useState<string | null>(null);  // 선택된 학년을 추적하는 state
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState(`${config.photoUrl}/${userData.profile_photo}`);
+    const [imageResponse, setImageResponse] = useState<ImagePickerResponse | null>(null);
+    const [imageFormData, setImageFormData] = useState<FormData | null>(null);
+    const [imageFileName, setImageFileName] = useState<string | null>(null);
+    
+
+    const getPhotos = () => {
+        const options : any = {
+            mediaType : 'photo',
+        };
+        launchImageLibrary(options, (response) => {
+            if (response.didCancel) {
+                console.log("사진 선택 취소");
+            } else if (response.errorCode) {
+                console.log(`imagePicker Error : ${response.errorCode}`)
+            } else {
+                if (response.assets && response.assets.length > 0) {
+                    setImageResponse(response);
+                    response.assets[0].fileName = `${Date.now()}.png`
+                    const formData = new FormData();
+                    formData.append('images', {
+                        uri: response.assets[0].uri,
+                        type: response.assets[0].type,
+                        name: response.assets[0].fileName
+                    });
+                    setImageFormData(formData);
+                }
+            }
+        })
+    }
 
     const get_user_university = async () => {
         try {
@@ -86,7 +117,14 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             })
             const data = await response.json(); // 서버로부터의 응답을 JSON으로 파싱
             if (response.ok && userdata.title !== "학교") {
-                UpdateImg();
+                if(imageFormData) {
+                    const imageFileName = await uploadImages(imageFormData);
+                    //console.log(imageFileName);
+                    if(imageFileName) {
+                        userdata.profile_photo = imageFileName;
+                        await UpdateImg(imageFileName); //학생게정
+                    }
+                }
                 Alert.alert(data.message, "", [
                     {
                         text: "확인",
@@ -94,7 +132,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                     }
                 ]); // 성공적으로 삭제되면 알림창 표시
             } else {
-                UpdateImg();
+                //await UpdateImg(); //학교계정
                 Alert.alert(data.message, "", [
                     {
                         text: "확인",
@@ -112,7 +150,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
         setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: null }));
     }
 
-    const UpdateImg = async () => {
+    const UpdateImg = async (imageFileName : string | null) => {
         try {
             const response = await fetch(`${config.serverUrl}/updateImg`, {
                 method: 'POST',
@@ -120,7 +158,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    profilePhoto: userdata.profile_photo,
+                    profilePhoto: imageFileName,
                     user_id: userdata.user_pk
                 })
             });
@@ -129,27 +167,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             console.error('이미지 업데이트 실패:', error);
         }
     }
-
     /*
-    const getPhotos = async () => {
-        try {
-          const res = await ImageCropPicker.openPicker({
-            multiple: true,
-            mediaType: 'photo',
-            includeBase64: true,
-            includeExif: true,
-          });
-          const profile_photo = res.map(image => image.path);
-          console.log(profile_photo);
-          setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: profile_photo[0] })); // 첫 번째 사진 경로로 업데이트
-          // 여기서 UpdateImg 함수를 호출하여 변경된 userdata를 서버에 업데이트할 수 있습니다.
-        } catch (error) {
-          console.error('사진 선택 실패:', error);
-          throw error; // 오류 발생 시 throw
-        }
-    };
-    */
-
     const getPhotos = async () => {
         try {
             const res = await ImageCropPicker.openPicker({
@@ -158,7 +176,6 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                 includeBase64: true,
                 includeExif: true,
             });
-    
             const formData = new FormData();
             res.forEach(image => {
                 formData.append('images', {
@@ -167,38 +184,30 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                     name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
                 });
             });
-    
-            uploadImages(formData);
+            await uploadImages(formData); 
         } catch (error) {
             // 사용자가 이미지 선택을 취소한 경우 오류가 발생할 수 있음
             //console.log('사용자가 이미지 선택을 취소했습니다.');
             // 또는 다른 방법으로 사용자에게 메시지를 보여줄 수 있음
         }
     };
+    */
     
-
+    
     const uploadImages = async (formData: FormData) => {
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
             const response = await fetch(`${config.serverUrl}/upload`, {
                 method: 'POST',
                 body: formData,
             });
-            clearTimeout(timeoutId);
-            const imageName = await response.text();
-            //console.log(imageName);
-            setImageUrl(`http://10.0.2.2:3000/${imageName}`);
-            setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: imageName }));
-            if (response.ok) {
-                //console.log('Images uploaded successfully');
-            } else {
-                console.error('Error uploading images');
-            }
-        } catch (error) {
-            console.error('Error uploading images:', error);
+            const imageName = await response.text(); // Assuming the server sends plain text
+            return imageName;
+        } catch (error : any) {
+            console.error('Image upload failed:', error);
+            // Provide more details for debugging
         }
     };
+    
 
 
     const handleGradeSelect = (grade: number) => {
@@ -251,6 +260,16 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
         }, [])
     )
 
+    if (imageResponse) {
+        if(imageResponse && imageResponse.assets) {
+            content = <Image source={{ uri: imageResponse.assets[0].uri }} style={styles.image} />;
+        }
+    } else if (userData.profile_photo) {
+        content = <Image source={{ uri: `${config.photoUrl}/${userData.profile_photo}` }} style={styles.image} />;
+    } else {
+        content = <IconA name="user" size={50} color="black" style={styles.image} />;
+    }
+
     useEffect(() => {
         // userData.grade가 1학년이면 selectedGrade를 1로 설정
         if (userdata.grade === 1) {
@@ -276,11 +295,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
         <View style={styles.container}>
             <ScrollView>
                 <View style={styles.profilePicture}>
-                    {userdata.profile_photo ? (
-                        <Image source={{ uri: imageUrl }} style={styles.image} />
-                    ) : (
-                        <IconA name="user" size={50} color="black" style={styles.image} />
-                    )}
+                    {content}
                     <TouchableOpacity style={styles.cameraButton} onPress={openCameraModal}>
                         <IconA name="camera" size={32} color="black" />
                     </TouchableOpacity>
@@ -438,7 +453,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             >
                 <View style={{ alignItems: "center", justifyContent: "center" }}>
                     <Text style={{ fontSize: 18, color: "black", fontWeight: "bold" }}>프로필 사진 변경</Text>
-                    <TouchableOpacity onPress={getPhotos} style={{ marginTop: 20 }} >
+                    <TouchableOpacity onPress={() => getPhotos()} style={{ marginTop: 20 }} >
                         <Text style={{ fontSize: 22, color: "blue", fontWeight: "bold" }}>앨범에서 사진 선택</Text>
                     </TouchableOpacity>
                     <View style={{ borderColor: "black", borderWidth: 2, width: 270, marginTop: 10, marginBottom: 10, }}>

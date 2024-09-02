@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef,  } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Dimensions, Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, Row, Rows } from "react-native-table-component";
 import { Picker } from '@react-native-picker/picker';
@@ -86,10 +87,20 @@ const SchoolInfoScreen = () => {
       ))
   );
 
-  useEffect(() => {
-    fetchSchoolData();
-    fetchSchoolBuildingData();
-  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+        const fetchData = async () => {
+            try {
+              await fetchSchoolData();
+              await fetchSchoolBuildingData();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [])
+);
 
   useEffect(() => {
     const filtered = schoolBuildingData.filter(

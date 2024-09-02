@@ -256,13 +256,20 @@ const HotPostsScreen = ({ route, navigation }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            if (department_check == 0) {
-                getHotposts();
-            } else if (department_check == 1) {
-                getDepartmenHotposts();
-            }
-            setUserData(userdata);
-            AreYouHavePost();
+            const fetchData = async () => {
+                try {
+                    if (department_check == 0) {
+                        await getHotposts(); //전체 전체 포스터 가져오기
+                    } else if (department_check == 1) {
+                        await getDepartmenHotposts(); //전체 학과 포스터 가져오기
+                    }
+                    setUserData(userdata);
+                    await AreYouHavePost();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
 
@@ -272,9 +279,7 @@ const HotPostsScreen = ({ route, navigation }: any) => {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
                 ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}
-                onSwipeableWillOpen={() => console.log(index + " 스와이프 열림")}
-                onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
+                renderRightActions={() => renderRightActions(item, index)}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
                         navigation.navigate("PostDetailScreen", { item, userData })}}>

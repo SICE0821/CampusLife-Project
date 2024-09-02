@@ -8,7 +8,6 @@ import CheckEvent from '../Event_Screens/CheckEvent';
 import ModifyEvent from '../Event_Screens/ModifyEvent';
 import ParticipantEvent from '../Event_Screens/ParticipantEvent';
 import RegisterEvent from "../Event_Screens/RegisterEvent"
-import SendUserEventDetailScreen from '../Event_Screens/SendUserEventDetailScreen';
 import CheckProduct from '../Product_Screens/CheckProduct';
 import ModifyProduct from '../Product_Screens/ModifyProduct';
 import RegisterProduct from '../Product_Screens/RegisterProduct';
@@ -34,24 +33,6 @@ export const AdminEventStackNavigator = ({ navigation, route }: any) => {
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate("AdminMain")}>
-                            <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
-                    headerTintColor: 'white',
-                    headerTitleAlign: 'center',
-                    title: '이벤트',
-                }} />
-
-            <AdminEventStack.Screen name="SendUserEventDetailScreen"
-                initialParams={{ userdata }}
-                component={SendUserEventDetailScreen}
-                options={{
-                    headerStyle: {
-                        backgroundColor: '#F27405',
-                    },
-                    headerLeft: () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate("ParticipantEvent")}>
                             <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),

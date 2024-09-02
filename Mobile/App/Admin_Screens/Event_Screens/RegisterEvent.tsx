@@ -190,7 +190,7 @@ const RegisterEvent = ({ route }: any) => {
     }
   };
 
-  //이벤트 등록시에 
+  //이벤트 등록시 
   const addNewEventAram = async (event_pk : number) => {
     try {
         const response = await fetch(`${config.serverUrl}/addNewEventAram`, {

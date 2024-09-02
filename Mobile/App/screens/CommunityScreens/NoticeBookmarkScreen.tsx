@@ -44,11 +44,13 @@ const NoticeBookmarkScreen = ({ route, navigation }: any) => {
         swipeableRefs.current[index]?.close();
     }, []);
 
+    /*
     const onRefresh = async () => {
         setRefreshing(true);
         await AreYouHavePost();
         setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
       };
+      */
 
       const Addbookmark = async (user_pk : number, post_pk : number) => {
         try {
@@ -258,13 +260,20 @@ const NoticeBookmarkScreen = ({ route, navigation }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            if (department_check == 0) {
-                getNoticeBookmarkposts();
-            } else if (department_check == 1) {
-                getNoticeDepartmentBookmarkposts();
-            }
-            setUserData(userdata);
-            AreYouHavePost();
+            const fetchData = async () => {
+                try {
+                    if (department_check == 0) {
+                        await getNoticeBookmarkposts();
+                    } else if (department_check == 1) {
+                        await getNoticeDepartmentBookmarkposts();
+                    }
+                    setUserData(userdata);
+                    await AreYouHavePost();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
 
@@ -274,9 +283,7 @@ const NoticeBookmarkScreen = ({ route, navigation }: any) => {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
                 ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}
-                onSwipeableWillOpen={() => console.log(index + " 스와이프 열림")}
-                onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
+                renderRightActions={() => renderRightActions(item, index)}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
                         navigation.navigate("NoticePostDetailScreen", { item, userData })}}>
@@ -329,7 +336,7 @@ const NoticeBookmarkScreen = ({ route, navigation }: any) => {
                 refreshControl={
                     <RefreshControl
                       refreshing={refreshing}
-                      onRefresh={onRefresh}
+                      //onRefresh={onRefresh}
                     />
                   }
             //keyExtractor={(item) => item.id}

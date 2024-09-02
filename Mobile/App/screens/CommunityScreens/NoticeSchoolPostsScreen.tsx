@@ -38,11 +38,14 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
     const [isSwipeableOpen, setIsSwipeableOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     ;
+
+    /*
     const onRefresh = async () => {
         setRefreshing(true);
         await AreYouHavePost();
         setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
     };
+    */
 
     const closebookmark = useCallback((index : any) => {
         //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
@@ -195,7 +198,6 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
                 }),
             })
             const postsdata = await response.json();
-            //console.log(postsdata);
             setCommunityData(postsdata);
         } catch (error) {
             console.error(error);
@@ -259,13 +261,20 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            if (department_check == 0) {
-                getNoiceSchollposts();
-            } else if (department_check == 1) {
-                getNoiceDepartmentposts();
-            }
-            setUserData(userdata);
-            AreYouHavePost();
+            const fetchData = async () => {
+                try {
+                    if (department_check == 0) {
+                        await getNoiceSchollposts();
+                    } else if (department_check == 1) {
+                        await getNoiceDepartmentposts();
+                    }
+                    setUserData(userdata);
+                    await AreYouHavePost();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
 
@@ -275,9 +284,7 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
                 ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}
-                onSwipeableWillOpen={() => console.log(index + " 스와이프 열림")}
-                onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
+                renderRightActions={() => renderRightActions(item, index)}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
                         navigation.navigate("NoticePostDetailScreen", { item, userData })}}>
@@ -330,7 +337,7 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
-                        onRefresh={onRefresh}
+                        //onRefresh={onRefresh}
                     />
                 }
             //keyExtractor={(item) => item.id}

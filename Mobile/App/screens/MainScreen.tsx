@@ -51,7 +51,6 @@ const MainPage = ({ navigation, route }: any) => {
   const [eventData, setEventData] = useState<EventData[]>([]);
   const [Userdepartment, setUserDepartment] = useState();
   const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
-
   const view_count_up = async (post_id: any) => {
     try {
       const response = await fetch(`${config.serverUrl}/view_count_up`, {
@@ -140,7 +139,7 @@ const MainPage = ({ navigation, route }: any) => {
       const data = await response.json();
       setschollpostdata(data);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
+      console.error('학교 공지사항 가져오기 실패', error);
     }
   }
 
@@ -200,7 +199,7 @@ const MainPage = ({ navigation, route }: any) => {
       //console.log(userPoint);
       setUserPoint(userPoint);
     } catch (error) {
-      console.error('유저 정보 가져오기 실패:', error);
+      console.error('유저 포인트 가져오기 실패:', error);
     }
   }
 
@@ -221,9 +220,10 @@ const MainPage = ({ navigation, route }: any) => {
       }
       const eventData = await response.json();
   
-      // Ensure each event has a valid event_photo array
+      
       const eventsWithImages = await Promise.all(
         eventData.map(async (event : any) => {
+          //이벤트 이미지 가져와서 기존 이벤트 배열이랑 합친다.
           const eventImage = await GetEditEventImage(event.event_id);
           return {
             ...event,
@@ -236,7 +236,7 @@ const MainPage = ({ navigation, route }: any) => {
     }
   };
 
-  //이벤트 이미지 가져오기
+  //해당 학교 이벤트 이미지 전부 가져오기
   const GetEditEventImage = async (event_id : number) => {
     try {
       const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
@@ -299,19 +299,29 @@ const MainPage = ({ navigation, route }: any) => {
   }
   useFocusEffect(
     React.useCallback(() => {
-      fetchschoolpostData();
-      fetchdepartmentpostData();
-      fetchhotpostData();
-      settingUserData();
-      get_user_department();
-      get_user_point();
-      Get_Event_Data();
-      if (navigation.getState().routes[navigation.getState().index].params?.updatedUserData) {
-        const updatedUserData = navigation.getState().routes[navigation.getState().index].params.updatedUserData;
-        setUserData(updatedUserData);
-      }
+      const fetchData = async () => {
+        try {
+          await fetchschoolpostData();
+          await fetchdepartmentpostData();
+          await fetchhotpostData();
+          settingUserData();
+          await get_user_department();
+          await get_user_point();
+          await Get_Event_Data();
+          const currentRoute = navigation.getState().routes[navigation.getState().index];
+          if (currentRoute.params?.updatedUserData) {
+            const updatedUserData = currentRoute.params.updatedUserData;
+            setUserData(updatedUserData);
+          }
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+  
+      fetchData();
     }, [navigation])
-  )
+  );
+  
   return (
     <View style={styles.container}>
       <ScrollView>

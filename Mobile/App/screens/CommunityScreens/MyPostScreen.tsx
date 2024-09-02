@@ -7,8 +7,6 @@ import { UserData } from '../../types/type'
 import { Swipeable, GestureHandlerRootView, RectButton } from 'react-native-gesture-handler';
 import config from '../../config';
 
-
-
 type PostData = {
     post_id: number,
     title: string,
@@ -20,9 +18,7 @@ type PostData = {
     user_title: string
 }
 
-
 const renderEmptyItem = () => {
-
     return (
         <View style={{ height: 85 }}>
         </View>
@@ -261,9 +257,16 @@ const MyPostScreen = ({ route, navigation }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            getMyPostData();
-            setUserData(userdata);
-            AreYouHavePost();
+            const fetchData = async () => {
+                try {
+                    await getMyPostData();
+                    setUserData(userdata);
+                    await AreYouHavePost();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
 
@@ -278,7 +281,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
                     style: "cancel"
                 },
                 { text: "확인", onPress: async () => {
-                    deleteMyPostData(post_id)
+                    await deleteMyPostData(post_id)
                     delete_post_aram()} }
             ]
         );
@@ -299,9 +302,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
                 ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}
-                onSwipeableWillOpen={() => console.log(index + " 스와이프 열림")}
-                onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
+                renderRightActions={() => renderRightActions(item, index)}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
                         navigation.navigate("PostDetailScreen", { item, userData })}}

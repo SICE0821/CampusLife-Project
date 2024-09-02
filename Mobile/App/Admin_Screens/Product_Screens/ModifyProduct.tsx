@@ -46,12 +46,19 @@ const ModifyProduct = ({ route, navigation }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      setItemInformation(ItemInfo);
-      getRestItemCount();
-      getSellItemCount();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              setItemInformation(ItemInfo);
+              await getRestItemCount();
+              await getSellItemCount();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
 
   //상품의 수량 증가와 감소를 계산해서 나중에 수량을 증가시킬건지, 감소시킬건지 확인할때 사용
   const calculator_ItemCount = (before_count: number, after_count: number) => {
@@ -119,7 +126,7 @@ const ModifyProduct = ({ route, navigation }: any) => {
     }
   }
 
-  // 사진 선택
+  //사진 선택
   const getPhotos = async () => {
     try {
       const res = await ImageCropPicker.openPicker({
@@ -138,9 +145,6 @@ const ModifyProduct = ({ route, navigation }: any) => {
       const newPath = res.path;
       setSelectedImagePath(newPath);
       setSelectedImageFormData(formData);
-      //const imageData = await RegistorItemImage(formData);
-      //setImageNum(imageData);
-      
     } catch (error) {
       console.error(error);
     }
@@ -162,9 +166,9 @@ const ModifyProduct = ({ route, navigation }: any) => {
                 style: "cancel"
             },
             { text: "확인", onPress: async () => {
-              successEditItemAlert();
               const imageData = await RegistorItemImage();
               await ChangeItemInfoANDCountUp(imageData);
+              successEditItemAlert();
             }}
         ]
     );
@@ -186,9 +190,9 @@ const DeleteItemAlert = () => {
               style: "cancel"
           },
           { text: "확인", onPress: async () => {
-            successEditItemAlert();
             const imageData = await RegistorItemImage();
             await ChangeItemInfoANDCountDown(imageData);
+            successEditItemAlert();
           }}
       ]
   );
@@ -208,9 +212,9 @@ const EditItemAlert = () => {
               style: "cancel"
           },
           { text: "확인", onPress: async () => {
-            successEditItemAlert();
             const imageData = await RegistorItemImage();
             await ChangeItemInfo(imageData);
+            successEditItemAlert();
           }}
       ]
   );
@@ -233,7 +237,6 @@ Alert.alert(
         body: selectedImageFormData,
       });
       const imageData = await response.json();
-      //console.log(imageData.fileName);
       return imageData.fileName;
     } catch (error) {
       console.error(error);
@@ -330,7 +333,7 @@ Alert.alert(
         }),
       })
       const rest_item_pks = await response.json();
-      setItemRestCount(rest_item_pks.length)
+      setItemRestCount(rest_item_pks.length);
     } catch (error) {
       console.error(error);
     } finally {
@@ -386,7 +389,7 @@ Alert.alert(
         <View style={styles.imageChangeButtonBox}>
           <TouchableOpacity
             style={styles.imageChangeButton}
-            onPress={() => getPhotos()}>
+            onPress={async () => await getPhotos()}>
             <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>변경</Text>
           </TouchableOpacity>
         </View>

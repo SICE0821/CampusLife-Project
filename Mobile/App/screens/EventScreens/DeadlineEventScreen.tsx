@@ -44,13 +44,19 @@ const DeadlineEventScreen = ({ route }: any) => {
   const [voteOptions, setVoteOptions] = useState<string[]>(); // Initial voting options
   const [onevoteInfo, setOneVoteInfo] = useState<VoteEvnetData[]>([]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      settingDate();
-      GetoneEventVote();
-    }, []
-    )
-  );
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchData = async () => {
+                try {
+                  settingDate();
+                  await GetoneEventVote();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
+        }, [])
+    );
 
   const GetoneEventVote = async () => {
     try {
@@ -66,7 +72,6 @@ const DeadlineEventScreen = ({ route }: any) => {
       const data : VoteEvnetData[] = await response.json();
       const voteInfo : VoteEvnetData[]= data.filter(info => info.vote_name !== 'null');
       setVoteOptions(voteInfo.map(info => info.vote_name));
-      //console.log(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -94,8 +99,15 @@ const DeadlineEventScreen = ({ route }: any) => {
   }
 
   useEffect(() => {
-    fetchEventData();
-  }, []);
+    const fetchDataAsync = async () => {
+        try {
+          await fetchEventData();
+        } catch (error) {
+            console.error('Error fetching data:', error); 
+        }
+    };
+    fetchDataAsync(); 
+}, []);
 
   const settingDate = () => {
     setUserData(userData);
@@ -201,7 +213,7 @@ const DeadlineEventScreen = ({ route }: any) => {
       const data = await response.json();
       setUserEventData(data);
     } catch (error) {
-      console.error('과목 가져오기 실패:', error);
+      console.error(error);
     }
   };
 
@@ -226,11 +238,11 @@ const DeadlineEventScreen = ({ route }: any) => {
 종료 일자 : ${eventData.close_date}`,
         [
           {
-            text: "확인", onPress: () => {
-              send_user_event_info();
-              SendUserEventVote();
+            text: "확인", onPress: async () => {
+              await send_user_event_info();
+              await SendUserEventVote();
               if (selectedFiles.length > 0) {
-                uploadAllFiles();
+                await uploadAllFiles();
               }
               // 여기서 이벤트 등록 상태를 업데이트합니다.
               setUserEventData([...usereventData, { user_id: userData.user_pk, event_id: eventData.event_id }]);

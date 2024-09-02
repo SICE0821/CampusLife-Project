@@ -19,11 +19,18 @@ const EventHaveCouponScreen = ({ route }: any) => {
   const [SelectItem, SetSelectItem] = useState<UserHaveCouponData>();
 
 
-  useFocusEffect(
-    React.useCallback(() => {
-        setUserData(userdata);
-        getUserHaveCoupon();
-    }, [])
+useFocusEffect(
+  React.useCallback(() => {
+      const fetchData = async () => {
+          try {
+            setUserData(userdata);
+            await getUserHaveCoupon();
+          } catch (error) {
+              console.error('Error fetching data:', error);
+          }
+      };
+      fetchData();
+  }, [])
 );
 
   const openmodal = (selectItem: UserHaveCouponData) => {

@@ -26,10 +26,17 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      get_aram_data();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await get_aram_data();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -37,6 +44,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
       setRefreshing(false);
     }, 500);
   }, []);
+
 
   const Get_One_Event_Data = async (event_id: any) => {
     try {
@@ -157,7 +165,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         {
           text: "확인", onPress: async () => {
             //console.log(aram_id);
-            deleteMyaram(aram_id);
+            await deleteMyaram(aram_id);
             delete_aram()
           }
         }

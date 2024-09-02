@@ -127,6 +127,8 @@ export type Lecture = {
   lecture_grades : string;
   session_duration: number;
   today_lecture_state : boolean;
+  //주차
+  //차시
 }
 
 export type aramData = {

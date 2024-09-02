@@ -21,9 +21,6 @@ function LoginScreen({ navigation }: any) {
   const [userData, setUserData] = useState<UserData>();
   const [lectureList, setLectureList] = useState<Lecture>();
  
-
-
-
   const get_user_data = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/get_user_data`, {

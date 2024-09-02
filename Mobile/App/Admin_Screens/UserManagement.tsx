@@ -98,7 +98,6 @@ const UserManagement = ({ route }: any) => {
       }
 
       const data = await response.json();
-      //console.log(data); // API에서 받아온 데이터 확인
 
       // title이 '학교'인 데이터는 필터링하여 제외
       const filteredData = data.filter((item: any) => item.title !== '학교');
@@ -304,10 +303,8 @@ const UserManagement = ({ route }: any) => {
           }),
         });
 
-        const data = await response.json();
-        //console.log(data.message);
+        await response.json();
 
-        // Update local state upon successful update
         const updatedUserData = userData.map(user =>
           user.user_id === selectedUser.user_id ? { ...user, point: newPoints } : user
         );
@@ -328,11 +325,18 @@ const UserManagement = ({ route }: any) => {
   };
 
   useFocusEffect(
-    useCallback(() => {
-      get_department();
-      get_user_Info(); // 추가: 사용자 정보를 가져오는 함수 호출
+    React.useCallback(() => {
+        const fetchData = async () => {
+            try {
+              await get_department();
+              await get_user_Info();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
 
   return (
     <View style={styles.container}>

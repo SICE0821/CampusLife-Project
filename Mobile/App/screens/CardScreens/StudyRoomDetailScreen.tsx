@@ -40,7 +40,6 @@ const StudyRoomDetailScreen = ({ route }: any) => {
         })
       });
       const data = await response.json();
-      //console.log(data);
       return data;
     } catch (error) {
       console.error('과목 가져오기 실패:', error);
@@ -68,7 +67,7 @@ const StudyRoomDetailScreen = ({ route }: any) => {
 
       const result = await response.json();
       //console.log('스터디룸 삭제 성공:', result);
-      fetchAndGroupData();
+      await fetchAndGroupData();
     } catch (error) {
       console.error('스터디룸 삭제 실패:', error);
     }
@@ -97,10 +96,19 @@ const StudyRoomDetailScreen = ({ route }: any) => {
     const groupedData = groupByDate(data);
     setGroupedStudyRoomInfo(groupedData);
   };
-
+  
   useEffect(() => {
-    fetchAndGroupData();
-  }, []);
+    const fetchDataAsync = async () => {
+        try {
+          fetchAndGroupData();
+        } catch (error) {
+            console.error('Error fetching data:', error); 
+        }
+    };
+    fetchDataAsync(); 
+}, []);
+
+
 
   const groupByDate = (data: StudyRoomInfo[]): GroupedStudyRoomInfo => {
     const groupedData = data.reduce((acc: GroupedStudyRoomInfo, item: StudyRoomInfo) => {
