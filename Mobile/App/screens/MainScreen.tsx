@@ -897,8 +897,10 @@ const styles = StyleSheet.create({
     elevation: 5
   },
   postLabelArea: {
-    width: '100%',
+    flex: 1,
     height: '20%',
+    marginLeft: 15,
+    marginRight: 13,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
@@ -906,21 +908,21 @@ const styles = StyleSheet.create({
   postLabelTextArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    maxWidth: '80%'
+    maxWidth: '85%',
   },
   postLabelText: {
     color: 'black',
     fontSize: 19,
-    marginHorizontal: 15
   },
   postLabelIcon: {
     color: 'red',
-    marginLeft: -5
+    marginHorizontal: 5,
   },
   postViewArea: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
-    maxWidth: '20%'
+    justifyContent: 'space-between',
+    width: 60,
   },
   postViewIcon: {
     color: '#F29F05',
@@ -928,7 +930,6 @@ const styles = StyleSheet.create({
   postViewText: {
     color: 'black',
     fontSize: 17,
-    marginHorizontal: 5
   },
 });
 
