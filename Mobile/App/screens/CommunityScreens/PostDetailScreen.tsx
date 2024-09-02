@@ -778,7 +778,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                         {postDetailInfo?.title}
                     </Text>
                 </View>
-                <Text style={{ fontSize: 18, color: 'black', marginLeft: 16, marginRight: 20, }}>
+                <Text style={{ fontSize: 18, color: 'black', marginLeft: 26, marginRight: 30, }}>
                     {postDetailInfo?.contents}
                 </Text>
                 <View style={styles.postslikeandlook}>
@@ -834,7 +834,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                         <TouchableOpacity>
                                             <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
                                         </TouchableOpacity>
-                                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
+                                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
                                         <TouchableOpacity
                                             onPress={() => {
                                                 if (userdata.user_pk === item.user_id) {
@@ -978,7 +978,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        //backgroundColor : "red",
+        backgroundColor : "white",
     },
     headersection: {
         height: 75,
@@ -1009,8 +1009,6 @@ const styles = StyleSheet.create({
         //backgroundColor : 'blue',
         justifyContent: 'center',
         alignItems: 'center',
-        
-        
     },
     profilepicturebox: {
         width: 60,
@@ -1022,14 +1020,11 @@ const styles = StyleSheet.create({
         borderWidth: 1,
 
     },
-    maintextcontainer: {
-        flex: 0.45,
-        backgroundColor: 'blue',
-    },
     titlecontainer: {
-        height: 50,
+        minHeight: 50,
         //backgroundColor : 'red',
         justifyContent: 'center',
+        marginHorizontal: 10,
     },
     postslikeandlook: {
         height: 40,
@@ -1037,6 +1032,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 20,
+        marginHorizontal: 10,
     },
     writecommentcontainer: {
         height: 60,
@@ -1067,8 +1063,11 @@ const styles = StyleSheet.create({
         //alignSelf: 'flex-end'
     },
     comentcontainer: {
-        //height: 150,
+        minHeight: 120,
         marginBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'gray',
+        borderRadius: 20,
         //backgroundColor: 'green'
     },
     comentTopsection: {
@@ -1188,7 +1187,7 @@ const styles = StyleSheet.create({
     },
     listbox2: {
         flex: 0.25,
-        //backgroundColor : 'yellow'
+        //\\backgroundColor : 'yellow'
     },
     infobox2: {
         flex: 0.75,
