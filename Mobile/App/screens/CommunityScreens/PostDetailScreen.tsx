@@ -481,7 +481,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 
             const result = await response.json();
             await CommentList();
-            
+
             Alert.alert(
                 '알림',
                 '댓글이 삭제되었습니다.',
@@ -613,7 +613,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                             if (postDetailInfo?.like == 29) {
                                 await addHotAram();
                             }
-                        }else {
+                        } else {
                             console.log("이미 좋아요를 눌렀습니다.")
                         }
                     }
@@ -722,239 +722,212 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     return (
         <View style={styles.container}>
             <ScrollView>
-                <View style={{ height: 15 }}></View>
-                <View style={styles.headersection}>
-                    <View style={styles.headercontainer}>
-                        <View style={styles.profilepicturecontainer}>
-                            <View style={styles.profilepicturebox}>
-                                <Image
-                                    source={{ uri: `${config.photoUrl}/${postDetailInfo?.writer_propile}` }}
-                                    style={{ width: 60, height: 60, borderRadius: 12, justifyContent: 'center', alignItems: 'center' }}
-                                />
-                            </View>
+                <View style={styles.writerArea}>
+                    <View style={styles.writer}>
+                        <View style={styles.writerPic}>
+                            <Image
+                                source={{ uri: `${config.photoUrl}/${postDetailInfo?.writer_propile}` }}
+                                style={{ flex: 1, borderRadius: 12 }}
+                            />
                         </View>
-                        <View style={styles.profileinfocontainer}>
-                            <View style={{ flex: 0.6, justifyContent: 'center', }}>
-                                <Text style={{ fontSize: 17, color: 'black', fontWeight: 'bold', marginTop: 13, }}>{postDetailInfo?.post_writer}({postDetailInfo?.writer_department})</Text>
-                            </View>
-                            <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 9, }}>
-                                <Text style={{ fontSize: 17, color: 'black' }}>{formattedDate}</Text>
-                            </View>
+                        <View style={styles.writerInfo}>
+                            <Text style={styles.writerName}>{postDetailInfo?.post_writer}({postDetailInfo?.writer_department})</Text>
+                            <Text style={styles.writeTime}>{formattedDate}</Text>
                         </View>
-                        <View style={styles.listcontainer}>
-                            <TouchableOpacity>
-                                <IconA size={35} color="black" name={"dots-three-vertical"} onPress={toggleOptions} />
+                    </View>
+                    <TouchableOpacity onPress={toggleOptions} style={{ zIndex: 1000 }} >
+                        <IconA size={35} color="black" name={"dots-three-vertical"} />
+                    </TouchableOpacity>
+
+                    {showOptions && ( // 상단 옵션
+                        <View style={styles.optionBox}>
+                            <TouchableOpacity onPress={() => console.log("수정 기능 x")}>
+                                <Text style={styles.optionText}>수정</Text>
                             </TouchableOpacity>
+                            <View style={styles.optionLine}></View>
+                            <TouchableOpacity
+                                onPress={() => {
+                                    if (userdata.user_pk === postDetailInfo?.user_id) {
+                                        Alert.alert("본인은 신고할 수 없습니다.");
+                                    } else {
+                                        //포스트 신고
+                                        ReportUserduplicate();
+                                    }
+                                }}>
+                                <Text style={styles.optionText}>신고</Text>
+                            </TouchableOpacity>
+                            {(userdata?.title === "학교" || postDetailInfo?.post_writer === userdata?.name) && (
+                                <>
+                                    <View style={styles.optionLine}></View>
+                                    <TouchableOpacity onPress={deletePost}>
+                                        <Text style={styles.optionText}>삭제</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
                         </View>
-                    </View>
+                    )}
                 </View>
-                <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
-                {showOptions && (
-                    <View style={styles.optionsContainer}>
-                        <TouchableOpacity onPress={() => console.log("수정 기능 x")}>
-                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
-                        </TouchableOpacity>
-                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
-                        <TouchableOpacity
-                            onPress={() => {
-                                if (userdata.user_pk === postDetailInfo?.user_id) {
-                                    Alert.alert("본인은 신고할 수 없습니다.");
-                                } else {
-                                    //포스트 신고
-                                    ReportUserduplicate();
-                                }
-                            }}>
-                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
-                        </TouchableOpacity>
-                        {(userdata?.title === "학교" || postDetailInfo?.post_writer === userdata?.name) && (
-                            <>
-                                <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
-                                <TouchableOpacity onPress={deletePost}>
-                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
-                                </TouchableOpacity>
-                            </>
-                        )}
-                    </View>
-                )}
-                <View style={styles.titlecontainer}>
-                    <Text style={{ fontSize: 20, marginLeft: 16, color: 'black', fontWeight: 'bold' }}>
-                        {postDetailInfo?.title}
-                    </Text>
+                <View style={styles.postArea}>
+                    <Text style={styles.postTitle}>{postDetailInfo?.title}</Text>
+                    <Text style={styles.postContent}>{postDetailInfo?.contents}</Text>
+                    <View style={{ width: 200, height: 200, backgroundColor: 'red', alignSelf: 'center' }}></View>
                 </View>
-                <Text style={{ fontSize: 18, color: 'black', marginLeft: 26, marginRight: 30, }}>
-                    {postDetailInfo?.contents}
-                </Text>
-                <View style={styles.postslikeandlook}>
+                <View style={styles.postState}>
                     <TouchableOpacity onPress={() =>
                         Post_Like_alert(postDetailInfo?.post_id)}>
-                        <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
+                        <IconB name="like1" size={24} color={'black'} />
                     </TouchableOpacity>
-                    <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> {postDetailInfo?.like}</Text>
-                    <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}><IconB name="eyeo" size={24} /></Text>
-                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}>{postDetailInfo?.view}</Text>
+                    <Text style={{ color: 'black', fontSize: 20 }}> {postDetailInfo?.like}</Text>
+                    <Text style={{ color: 'black', marginLeft: 5 }}><IconB name="eyeo" size={24} /></Text>
+                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 5 }}>{postDetailInfo?.view}</Text>
                 </View>
                 {
                     comments.map(item => (
-                        <View key={item.comment_id} style={styles.comentcontainer}>
-                            <View style={styles.comentTopsection}>
-                                <View style={styles.infobox}>
-                                    <View style={styles.picturebox}>
-                                        <View style={styles.picture}>
-                                            <Image
-                                                source={{ uri: `${config.photoUrl}/${item?.user_profile}` }}
-                                                style={{ width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center' }}
-                                            />
-                                        </View>
+                        <View key={item.comment_id} style={styles.commentcontainer}>
+                            <View style={styles.commentTop}>
+                                <View style={styles.commentInfo}>
+                                    <View style={styles.commentPic}>
+                                        <Image
+                                            source={{ uri: `${config.photoUrl}/${item?.user_profile}` }}
+                                            style={{ width: 40, height: 40, borderRadius: 8, }}
+                                        />
                                     </View>
-                                    <View style={styles.infotextbox}>
+                                    <View style={styles.commentName}>
                                         <Text style={{ fontSize: 17, color: 'black', fontWeight: "bold", }}>{item.student_name}</Text>
                                         <Text style={{ fontSize: 15, color: 'black' }}>{item.department_name}</Text>
                                     </View>
                                 </View>
-                                <View style={styles.listbox}>
-                                    <View style={styles.ComentLikeListBox}>
-                                        <TouchableOpacity
-                                            style={styles.comentbox}
-                                            onPress={() => {
-                                                setIsCommentorRecomment(1);
-                                                setCommentspk(item.comment_id);
-                                                onFocusName();
-                                            }}>
-                                            <Text><IconD size={27} color="black" name={"comment"} /></Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            style={styles.likebox}
-                                            onPress={() => comment_Like_alert(item.comment_id)}>
-                                            <Text><IconD size={29} color="black" name={"like"} /></Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.reallistbox}>
-                                            <Text><IconA size={19} color="black" name={"dots-three-vertical"} onPress={() => toggleOptions2(item.comment_id)} /></Text>
-                                        </TouchableOpacity>
-                                    </View>
+                                <View style={styles.commentOptionBox}>
+                                    <TouchableOpacity
+                                        style={styles.commentOptionIcon}
+                                        onPress={() => {
+                                            setIsCommentorRecomment(1);
+                                            setCommentspk(item.comment_id);
+                                            onFocusName();
+                                        }}>
+                                        <IconD size={29} color="black"
+                                            name={"comment"} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.commentOptionIcon}
+                                        onPress={() => comment_Like_alert(item.comment_id)}>
+                                        <IconD size={32} color="black" style={{ top: 1, left: 2 }}
+                                            name={"like"} />
+                                    </TouchableOpacity>
+                                    <TouchableOpacity style={styles.commentOptionIcon}>
+                                        <IconA size={20} color="black"
+                                            name={"dots-three-vertical"} onPress={() => toggleOptions2(item.comment_id)} />
+                                    </TouchableOpacity>
                                 </View>
-                                {activeCommentId === item.comment_id && (
-                                    <View style={styles.optionsContainer2}>
-                                        <TouchableOpacity onPress = {() => console.log("댓글 수정 기능 x")}>
-                                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
-                                        </TouchableOpacity>
-                                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                if (userdata.user_pk === item.user_id) {
-                                                    Alert.alert("본인은 신고할 수 없습니다.");
-                                                } else {
-                                                    //댓글
-                                                    ReportUserduplicate2(item.comment_id);
-                                                }
-                                            }}>
-                                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
-                                        </TouchableOpacity>
-                                        {(userdata?.title === "학교" || item.student_name === userdata?.name) && (
-                                            <>
-                                                <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
-                                                <TouchableOpacity onPress={async () => 
-                                                    await deleteComment(item.comment_id)}
-                                                    >
-                                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
-                                                </TouchableOpacity>
-                                            </>
-                                        )}
-                                    </View>
-                                )}
                             </View>
-                            <Text style={{ fontSize: 19, color: 'black', marginLeft: 24, marginRight: 20, }}>
-                                {item.content}
-                            </Text>
-                            <View style={styles.dataandlike}>
-                                <Text style={{ marginTop: 3, marginLeft: 24, fontSize: 15, color: 'black' }}>
-                                    {item.date}
-                                </Text>
-                                <Text style={{ marginTop: 2, }}><IconD size={27} color="black" name={"like"} /></Text>
-                                <Text style={{ fontSize: 15, marginTop: 2, color: 'black' }}>
-                                    {item.like}
-                                </Text>
+                            {activeCommentId === item.comment_id && (
+                                <View style={styles.commentOption}>
+                                    <TouchableOpacity>
+                                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
+                                    </TouchableOpacity>
+                                    <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            if (userdata.user_pk === item.user_id) {
+                                                Alert.alert("본인은 신고할 수 없습니다.");
+                                            } else {
+                                                //댓글
+                                                ReportUserduplicate2(item.comment_id);
+                                            }
+                                        }}>
+                                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
+                                    </TouchableOpacity>
+                                    {(userdata?.title === "학교" || item.student_name === userdata?.name) && (
+                                        <>
+                                            <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
+                                            <TouchableOpacity onPress={() => deleteComment(item.comment_id)}>
+                                                <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                            </TouchableOpacity>
+                                        </>
+                                    )}
+                                </View>
+                            )}
+                            <View style={styles.commentContentArea}>
+                                <Text style={styles.commentContent}>{item.content}</Text>
+                                <View style={styles.commentState}>
+                                    <Text style={styles.commentStateText}>
+                                        {item.date}
+                                    </Text>
+                                    <IconD size={27} color="black" name={"like"} />
+                                    <Text style={styles.commentStateText}>{item.like}</Text>
+                                </View>
                             </View>
                             {item.recomments.map(subitem => (
-                                <View key={subitem.recomment_id} style={styles.subcommentbox}>
-                                    <View style={styles.enterspace}>
-                                        <Text style={{ color: 'black' }}> <IconC name="corner-down-right" size={30} /></Text>
-                                    </View>
-                                    <View style={styles.maincontent}>
-                                        <View style={styles.comentTopsection}>
-                                            <View style={styles.infobox2}>
-                                                <View style={styles.picturebox}>
-                                                    <View style={styles.picture}>
-                                                        <Image
-                                                            source={{ uri: `${config.photoUrl}/${subitem?.user_profile}` }}
-                                                            style={{ width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center', borderWidth: 1 }}
-                                                        />
-                                                    </View>
-                                                </View>
-                                                <View style={styles.infotextbox}>
-                                                    <Text style={{ fontSize: 17, color: 'black', marginLeft: 5, fontWeight: 'bold' }}>{subitem.student_name}</Text>
-                                                    <Text style={{ fontSize: 15, color: 'black', marginLeft: 5 }}>{subitem.department_name}</Text>
-                                                </View>
+                                <View key={subitem.recomment_id}>
+                                    <View style={styles.recommentTop}>
+                                        <View style={styles.commentInfo}>
+                                            <IconC name="corner-down-right" size={30} color={'black'} style={{ marginHorizontal: 5 }} />
+                                            <View style={styles.commentPic}>
+                                                <Image
+                                                    source={{ uri: `${config.photoUrl}/${subitem?.user_profile}` }}
+                                                    style={{ width: 40, height: 40, borderRadius: 8, }}
+                                                />
                                             </View>
-                                            <View style={styles.listbox2}>
-                                                <View style={styles.LikeListBox2}>
-                                                    <TouchableOpacity
-                                                        style={styles.likebox2}
-                                                        onPress={() => recomment_Like_alert(subitem.recomment_id)}>
-                                                        <Text><IconD size={29} color="black" name={"like"} /></Text>
-                                                    </TouchableOpacity>
-                                                    <TouchableOpacity style={styles.reallistbox2}>
-                                                        <IconA size={19} color="black" name={"dots-three-vertical"} onPress={() => toggleOptions2(subitem.recomment_id)} />
-                                                    </TouchableOpacity>
-                                                </View>
+                                            <View style={styles.commentName}>
+                                                <Text style={{ fontSize: 17, color: 'black', fontWeight: "bold", }}>{subitem.student_name}</Text>
+                                                <Text style={{ fontSize: 15, color: 'black' }}>{subitem.department_name}</Text>
                                             </View>
                                         </View>
-                                        {activeCommentId === subitem.recomment_id && (
-                                            <View style={styles.optionsContainer3}>
-                                                <TouchableOpacity onPress = {() => console.log("대댓글 수정 기능 x")}>
-                                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
-                                                </TouchableOpacity>
-                                                <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
-                                                <TouchableOpacity
-                                                    onPress={() => {
-                                                        if (userdata.user_pk === item.user_id) {
-                                                            Alert.alert("본인은 신고할 수 없습니다.");
-                                                        } else {
-                                                            //댓글신고
-                                                            ReportUserduplicate2(item.comment_id);
-                                                        }
-                                                    }}>
-                                                    <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
-                                                </TouchableOpacity>
-                                                {(userdata?.title === "학교" || subitem.student_name === userdata?.name) && (
-                                                    <>
-                                                        <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 10, marginBottom: 10 }}></View>
-                                                        <TouchableOpacity onPress={async () => deleterecomment(subitem.recomment_id)}>
-                                                            <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
-                                                        </TouchableOpacity>
-                                                    </>
-                                                )}
-                                            </View>
-                                        )}
-                                        <Text style={{ fontSize: 19, color: 'black', marginLeft: 20, marginRight: 20, }}>
-                                            {subitem.content}
-                                        </Text>
-                                        <View style={styles.dataandlike}>
-                                            <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 15, color: 'black' }}>
-                                                {subitem.date}
-                                            </Text>
-                                            <Text style={{ marginTop: 2 }}><IconD size={30} color="black" name={"like"} /></Text>
-                                            <Text style={{ fontSize: 15, marginTop: 2, color: 'black' }}>
-                                                {subitem.like}
-                                            </Text>
+                                        <View style={styles.recommentOptionBox}>
+                                            <TouchableOpacity
+                                                style={styles.commentOptionIcon}
+                                                onPress={() => recomment_Like_alert(subitem.recomment_id)}>
+                                                <IconD size={32} color="black" name={"like"} style={{ top: 1, left: 2 }} />
+                                            </TouchableOpacity>
+                                            <TouchableOpacity style={styles.commentOptionIcon}>
+                                                <IconA size={20} color="black" name={"dots-three-vertical"} onPress={() => toggleOptions2(subitem.recomment_id)} />
+                                            </TouchableOpacity>
                                         </View>
                                     </View>
+                                    <View style={[styles.recommentContentArea]}>
+                                        <Text style={[styles.commentContent]}>{subitem.content}</Text>
+                                        <View style={styles.commentState}>
+                                            <Text style={styles.commentStateText}>{subitem.date}</Text>
+                                            <IconD size={27} color="black" name={"like"} />
+                                            <Text style={styles.commentStateText}>{subitem.like}</Text>
+                                        </View>
+                                    </View>
+                                    {activeCommentId === subitem.recomment_id && (
+                                        <View style={styles.recommentOption}>
+                                            <TouchableOpacity>
+                                                <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
+                                            </TouchableOpacity>
+                                            <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
+                                            <TouchableOpacity
+                                                onPress={() => {
+                                                    if (userdata.user_pk === item.user_id) {
+                                                        Alert.alert("본인은 신고할 수 없습니다.");
+                                                    } else {
+                                                        //댓글신고
+                                                        ReportUserduplicate2(item.comment_id);
+                                                    }
+                                                }}>
+                                                <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
+                                            </TouchableOpacity>
+                                            {(userdata?.title === "학교" || subitem.student_name === userdata?.name) && (
+                                                <>
+                                                    <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
+                                                    <TouchableOpacity onPress={() => deleterecomment(subitem.recomment_id)}>
+                                                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                                    </TouchableOpacity>
+                                                </>
+                                            )}
+                                        </View>
+                                    )}
                                 </View>
                             ))}
                         </View>
+                    ))
+                }
+                <View style={{ height: 20 }}></View>
 
-                    ))}
             </ScrollView>
-            <View style={styles.commentbox}>
+            <View style={styles.writeCommentBox}>
                 <View style={[styles.inputtext, { height: inputheight }]}>
                     <TextInput
                         ref={inputRef}
@@ -965,7 +938,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                         value={commenttext}
                         multiline={true}
                         placeholder="댓글을 입력하세요."
-                        placeholderTextColor={'gray'}
+                        placeholderTextColor={'#5a5a5a'}
                     />
                 </View>
                 <TouchableOpacity
@@ -983,226 +956,45 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor : "white",
+        backgroundColor: 'white'
     },
-    headersection: {
-        height: 75,
-        //backgroundColor: 'blue'
+    writerArea: { // 상단 작성자 영역
+        height: 100,
+        borderBottomWidth: 1,
+        borderRadius: 20,
+        borderColor: 'gray',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 35,
+        alignItems: 'center',
+        //backgroundColor: 'orange'
     },
-    headercontainer: {
-        width: '90%',
-        alignSelf: 'center',
-        //backgroundColor : 'red',
+    writer: {
         flexDirection: 'row',
     },
-    profilepicturecontainer: {
-        height: 75,
-        width: '20%',
-        //backgroundColor : 'yellow',
-        justifyContent: 'center',
-        alignItems: 'center',
-
-    },
-    profileinfocontainer: {
-        height: 75,
-        //backgroundColor : 'red',
-        width: '70%',
-
-    },
-    listcontainer: {
-        height: 75,
-        //backgroundColor : 'blue',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    profilepicturebox: {
+    writerPic: { // 작성자 프로필 사진
         width: 60,
         height: 60,
-        backgroundColor: '#CED4DA',
-        justifyContent: 'center',
-        alignItems: 'center',
         borderRadius: 12,
-        borderWidth: 1,
-
+        backgroundColor: 'gray'
     },
-    titlecontainer: {
-        minHeight: 50,
-        //backgroundColor : 'red',
-        justifyContent: 'center',
-        marginHorizontal: 10,
-    },
-    postslikeandlook: {
-        height: 40,
-        //backgroundColor: 'yellow',
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-        marginHorizontal: 10,
-    },
-    writecommentcontainer: {
+    writerInfo: { // 작성자 정보 영역
         height: 60,
-        //backgroundColor: 'yellow',
-        //justifyContent : 'center',
-        //alignItems : 'center'
+        marginHorizontal: 10,
+        justifyContent: 'space-evenly',
     },
-    commentbox: {
-        backgroundColor: '#D9D9D9',
-        margin: 10,
-        borderRadius: 10,
-        flexDirection: 'row',
+    writerName: { // 작성자 이름
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: 'black'
     },
-    inputtext: {
-        width: '88%',
-        //backgroundColor: 'red',
-        borderTopLeftRadius: 10,
-        borderBottomLeftRadius: 10,
+    writeTime: { // 작성 시간
+        fontSize: 17,
+        color: 'black'
     },
-    sendspace: {
-        width: 45,
-        height: 45,
-        //backgroundColor: 'blue',
-        borderRadius: 10,
-        justifyContent: 'center',
-        marginRight: 20,
-        //alignItems : 'center',
-        //alignSelf: 'flex-end'
-    },
-    comentcontainer: {
-        minHeight: 120,
-        marginBottom: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: 'gray',
-        borderRadius: 20,
-        //backgroundColor: 'green'
-    },
-    comentTopsection: {
-        height: 65,
-        //backgroundColor: 'red',
-        flexDirection: 'row',
-    },
-    listbox: {
-        flex: 0.3,
-        //backgroundColor : 'yellow'
-    },
-    infobox: {
-        flex: 0.7,
-        //backgroundColor : "red",
-        flexDirection: 'row',
-    },
-    picturebox: {
-        flex: 0.25,
-        //backgroundColor : 'yellow',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    infotextbox: {
-        flex: 0.75,
-        //backgroundColor : 'green',
-        justifyContent: 'center'
-    },
-    picture: {
-        width: 40,
-        height: 40,
-        backgroundColor: '#CED4DA',
-        borderRadius: 8,
-        marginLeft: 10,
-    },
-    comentBottomsection: {
-        height: 85,
-        //backgroundColor: 'blue'
-    },
-    ComentLikeListBox: {
-        width: 109,
-        height: 29,
-        borderRadius: 8,
-        backgroundColor: '#CED4DA',
-        marginTop: 7,
-        flexDirection: 'row',
-        elevation: 5,
-    },
-    comentbox: {
-        width: 36,
-        //backgroundColor : 'red',
-        marginTop: 3,
-        justifyContent: 'center',
-        alignItems: 'center'
-
-    },
-    likebox: {
-        width: 36,
-        //backgroundColor : 'yellow',
-        borderLeftWidth: 0.5,
-        borderRightWidth: 0.5,
-        marginTop: 3,
-        borderColor: '#333',
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    reallistbox: {
-        width: 36,
-        marginTop: 5,
-        //backgroundColor : 'blue'
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    dataandlike: {
-        height: 30,
-        //backgroundColor : 'yellow',
-        flexDirection: 'row'
-    },
-    subcommentbox: {
-        //backgroundColor: 'yellow',
-        marginBottom: 10,
-        flexDirection: 'row'
-    },
-    enterspace: {
-        flex: 0.1,
-        alignSelf: 'flex-start',
-        //backgroundColor: 'blue',
-        marginTop: 10,
-        marginLeft: 10,
-    },
-    maincontent: {
-        flex: 0.9,
-        //backgroundColor: 'red'
-    },
-    LikeListBox2: {
-        width: 74,
-        height: 29,
-        borderRadius: 8,
-        marginTop: 7,
-        flexDirection: 'row',
-        backgroundColor: '#CED4DA',
-    },
-    likebox2: {
-        width: 37,
-        //backgroundColor : 'yellow',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 2,
-    },
-    reallistbox2: {
-        width: 37,
-        //backgroundColor : 'blue'
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderLeftWidth: 0.5,
-        borderColor: '#333',
-        marginTop: 4,
-    },
-    listbox2: {
-        flex: 0.25,
-        //\\backgroundColor : 'yellow'
-    },
-    infobox2: {
-        flex: 0.75,
-        //backgroundColor : "red",
-        flexDirection: 'row',
-    },
-
-    optionsContainer: {
+    optionBox: {
         position: 'absolute',
-        top: 80,
+        top: 70,
         right: 20,
         width: 120,
         backgroundColor: 'white',
@@ -1219,11 +1011,146 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
         zIndex: 999
     },
-
-    optionsContainer2: {
-        position: 'absolute',
+    optionText: {
+        fontSize: 15,
+        fontWeight: "bold",
+        color: "black",
+        paddingLeft: 10
+    },
+    optionLine: {
+        width: 100,
+        height: 0.4,
+        backgroundColor: 'black',
+        marginRight: 20,
+        marginTop: 10,
+        marginBottom: 10
+    },
+    postArea: {
+        minHeight: 70,
+        paddingHorizontal: 25,
+        paddingVertical: 10,
+    },
+    postTitle: {
+        fontSize: 20,
+        color: 'black',
+        fontWeight: 'bold'
+    },
+    postContent: { // 게시물 내용
+        fontSize: 18,
+        color: 'black',
+        marginTop: 10
+    },
+    postState: { // 게시물 상태 (좋아요 조회수)
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 25,
+        paddingBottom: 20,
+        marginBottom: 20,
+        borderColor: 'gray',
+        borderBottomWidth: 1,
+        borderRadius: 20
+    },
+    //만약에 사진 추가 하려면 여기에
+    commentcontainer: {
+        minHeight: 120,
+        marginBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'gray',
+        borderRadius: 20,
+    },
+    commentTop: {
+        height: 50,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 20,
+        justifyContent: 'space-between'
+    },
+    commentInfo: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    commentPic: {
+        width: 40,
+        height: 40,
+        borderRadius: 8,
+        backgroundColor: 'gray'
+    },
+    commentName: {
+        marginHorizontal: 10,
+    },
+    commentOptionBox: {
+        width: 120,
+        height: 35,
+        backgroundColor: '#CED4DA',
+        borderRadius: 8,
+        elevation: 5,
+        flexDirection: 'row',
+    },
+    commentOptionIcon: {
+        width: 40,
+        height: 35,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    commentContentArea: {
+        paddingHorizontal: 25,
+        paddingVertical: 10,
+    },
+    commentContent: {
+        fontSize: 19,
+        color: 'black',
+    },
+    commentState: {
+        flexDirection: 'row',
+        marginTop: 10
+    },
+    commentStateText: {
+        fontSize: 15,
+        color: 'black',
+    },
+    recommentTop: {
+        height: 50,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 20,
+        marginTop: 15,
+        justifyContent: 'space-between',
+    },
+    recommentOptionBox: {
+        width: 80,
+        height: 35,
+        backgroundColor: '#CED4DA',
+        borderRadius: 8,
+        elevation: 5,
+        flexDirection: 'row',
+    },
+    recommentContentArea: {
+        paddingHorizontal: 25,
+        paddingLeft: 70,
+        paddingVertical: 10,
+    },
+    writeCommentBox: {
+        backgroundColor: '#D9D9D9',
+        margin: 10,
+        borderRadius: 10,
+        flexDirection: 'row',
+    },
+    inputtext: {
+        width: '88%',
+        borderTopLeftRadius: 10,
+        borderBottomLeftRadius: 10,
+    },
+    sendspace: {
+        width: 45,
+        height: 45,
+        borderRadius: 10,
+        justifyContent: 'center',
+        marginRight: 20,
+    },
+    commentOption: {
         top: 45,
-        right: 30,
+        right: 20,
+        position: 'absolute',
         width: 120,
         backgroundColor: 'white',
         borderRadius: 8,
@@ -1237,12 +1164,11 @@ const styles = StyleSheet.create({
         elevation: 5,
         paddingVertical: 10,
         paddingHorizontal: 5,
-        zIndex: 1000,
     },
-    optionsContainer3: {
+    recommentOption: {
+        top: 60,
+        right: 20,
         position: 'absolute',
-        top: 45,
-        right: 30,
         width: 120,
         backgroundColor: 'white',
         borderRadius: 8,
@@ -1257,7 +1183,6 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 5,
     },
-
 })
 
 export default PostDetailScreen;
