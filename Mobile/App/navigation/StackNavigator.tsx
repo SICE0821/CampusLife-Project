@@ -28,6 +28,7 @@ import SchoolInfoScreen from '../screens/CardScreens/SchoolInfoScreen';
 import StudyRoomScreen from '../screens/CardScreens/StudyRoomScreen'
 import AlarmDialogScreen from '../screens/CardScreens/AlarmDialogScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
+import EditPostScreen from '../screens/CommunityScreens/EditPostScreen';
 import { UserData } from "../types/type";
 import { PostTopTabNavigator } from './TopTabNavigator';
 import { MainTabNavigator } from './BottomTabNavigator'
@@ -84,6 +85,25 @@ export const RootStackNavigator = (route: any) => {
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '커뮤니티',
+                })}
+            />
+            <RootStack.Screen
+                name="EditPostScreen"
+                //하단 바텀 탭 바를 없애기 위해선 여기에 있을 수밖에 없다.
+                //포스터의 디테일한 데이터를 인자로 넘겨줘야한다.
+                component={EditPostScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("CommunityScreenStackNavigator")}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '게시물 수정',
                 })}
             />
             <RootStack.Screen

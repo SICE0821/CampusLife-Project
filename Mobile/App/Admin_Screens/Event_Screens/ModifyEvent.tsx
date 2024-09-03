@@ -203,7 +203,7 @@ const ModifyEvent = ({ route }: any) => {
   // 투표 옵션 추가 함수
   const handleAddVote = () => {
     if (votes.length < 5) {
-      setVotes(prevVotes => [...prevVotes, { vote_index: prevVotes.length + 1, vote_name: '' }]);
+      setVotes(prevVotes => [...prevVotes, { id: prevVotes.length + 1, text: '' }]);
     }
   };
 
@@ -211,16 +211,17 @@ const ModifyEvent = ({ route }: any) => {
   const handleVoteChange = (id: number, text: string) => {
     //console.log(id);
     const newVotes = votes.map(vote =>
-      vote.vote_index === id ? { ...vote, vote_name: text } : vote
+      vote.id === id ? { ...vote, text : text } : vote
     );
     setVotes(newVotes);
   };
 
   // 투표 옵션 삭제 함수
   const handleDeleteVote = (id: number) => {
-    const newVotes = votes.filter(vote => vote.vote_index !== id);
+    const newVotes = votes.filter(vote => vote.id !== id);
     setVotes(newVotes);
     if (newVotes.length < 2) {
+      setVotes([]);
       setShowVoteSection(false);
     }
   };
@@ -230,8 +231,8 @@ const ModifyEvent = ({ route }: any) => {
     setShowVoteSection(true);
     if (votes.length <= 1) {
       setVotes([
-        { vote_index: 1, vote_name: '' },
-        { vote_index: 2, vote_name: '' }
+        { id : 1, text: '' },
+        { id : 2, text: '' }
       ]);
     }
   };
@@ -266,11 +267,22 @@ const ModifyEvent = ({ route }: any) => {
     );
   };
 
+  const noImage = () => {
+    Alert.alert(
+      "선택한 이미지가 없습니다.",
+      "이벤트에 관련된 이미지를 하나 이상 선택해주세요",
+      [
+        { text: "취소", style: "cancel" },
+        { text: "확인" }
+      ]
+    );
+  };
+
 
   // 제출 처리 함수
   const handleSubmit = async () => {
     if (title.trim() !== '' && content.trim() !== '') {
-      if (!showVoteSection || (showVoteSection && votes.every(vote => vote.vote_name.trim() !== ''))) {
+      if (!showVoteSection || (showVoteSection && votes.every(vote => vote.text.trim() !== ''))) {
         // Validate start date and end date
         if (startDate <= endDate) {
           const submittedData = {
@@ -278,7 +290,7 @@ const ModifyEvent = ({ route }: any) => {
             content,
             simpleInfo,
             grantPoint,
-            votes: showVoteSection ? votes.map(vote => vote.vote_name.trim()) : [],
+            votes: showVoteSection ? votes.map(vote => vote.text.trim()) : [],
             images: selectedImages.map(image => image.uri),
             startDate,
             endDate
@@ -303,7 +315,6 @@ const ModifyEvent = ({ route }: any) => {
           const newImageArray = chagneImageArray(event_photo);
           await RegistorEventPhoto(event_pk, newImageArray);  // 그 PK값을 이용하여 연결된 사진 테이블에 값을저장
           await RegistorEventVotes(event_pk);   // 그 PK값을 이용하여 연결된 표 테이블에 값을저장
-          console.log("함수 잘 끝남");
         } else {
           Alert.alert("시작 날짜는 종료 날짜보다 이전이어야 합니다.");
         }
@@ -413,7 +424,6 @@ const ModifyEvent = ({ route }: any) => {
 
   //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
   const RegistorEventVotes = async (event_id: number) => {
-    //console.log(votes)
     try {
       const response = await fetch(`${config.serverUrl}/RegistorEventVotesEdit`, {
         method: 'POST',
@@ -541,23 +551,29 @@ const ModifyEvent = ({ route }: any) => {
             <View style={[styles.inputArea, { marginTop: 0 }]}>
               <Text style={styles.inputText}>투표 옵션</Text>
               {votes.map((vote) => (
-                <View key={vote.vote_index}
+                <View key={vote.id}
                   style={[styles.inputBox, styles.voteOptionArea]}>
                   <TextInput
                     style={styles.input}
-                    placeholder={`옵션 ${vote.vote_index + 1}`}
+                    placeholder={`옵션 ${vote.id + 1}`}
                     placeholderTextColor={'gray'}
                     maxLength={50}
-                    value={vote.vote_name}
-                    onChangeText={(text) => handleVoteChange(vote.vote_index, text)}
+                    value={vote.text}
+                    onChangeText={(text) => {
+                      handleVoteChange(vote.id, text);
+                      }}
                   />
-                  <TouchableOpacity onPress={() => handleDeleteVote(vote.vote_index)}>
+                  <TouchableOpacity onPress={() => {
+                    handleDeleteVote(vote.id);
+                    }}>
                     <IconTrash name='trash' size={22} color='red' style={styles.icon} />
                   </TouchableOpacity>
                 </View>
               ))}
               {votes.length < 5 && (
-                <TouchableOpacity onPress={handleAddVote} style={{ marginTop: 10 }}>
+                <TouchableOpacity onPress={() => {
+                  handleAddVote();
+                  }} style={{ marginTop: 10 }}>
                   <IconPlus name='pluscircleo' size={30} color='black' />
                 </TouchableOpacity>
               )}
@@ -636,7 +652,14 @@ const ModifyEvent = ({ route }: any) => {
           date={endDate} />
 
         {/* 등록 버튼 */}
-        <TouchableOpacity style={styles.submitButton} onPress={() => EventRegister()}>
+        <TouchableOpacity style={styles.submitButton} onPress={() => 
+          {
+            if (serverImages.length > 0) {
+              EventRegister();
+            } else {
+              noImage();
+            }
+            }}>
           <Text style={styles.submitButtonText}>등록하기</Text>
         </TouchableOpacity>
 
