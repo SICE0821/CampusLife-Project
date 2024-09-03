@@ -21,9 +21,6 @@ function LoginScreen({ navigation }: any) {
   const [userData, setUserData] = useState<UserData>();
   const [lectureList, setLectureList] = useState<Lecture>();
  
-
-
-
   const get_user_data = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/get_user_data`, {
@@ -45,7 +42,7 @@ function LoginScreen({ navigation }: any) {
   }
 
 
-  const handleLogin = async (userdata : UserData, LectureData : Lecture) => {
+  const handleLogin = async (userdata : UserData, LectureData : Lecture ) => {
     try {
       const response = await fetch(`${config.serverUrl}/login`, {
         method: 'POST',
@@ -75,6 +72,25 @@ function LoginScreen({ navigation }: any) {
   const fetchLectureData = async (userData : UserData) => {
     try {
       const response = await fetch(`${config.serverUrl}/getlecture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          student_pk : userData.student_pk
+        })
+      })
+      const data = await response.json();
+      const Data = data.data; //키값을 치면 값을 json에서 추출할 수 있다.
+      return Data;
+    } catch (error) {
+      console.error('과목 가져오기 실패:', error);
+    }
+  }
+
+  const fetchLectureDataInfo = async (userData : UserData) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/getLectureInfo`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

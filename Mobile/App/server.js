@@ -131,6 +131,8 @@ const { getGeneralPosts,
   AttendanceCheck,
   RegistorEvent,
   addGoodEventAram,
+  addLectureInfo,
+  GetLectureInfo
   
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -158,7 +160,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '172.16.106.42',
+  host: '14.6.152.120',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -713,7 +715,6 @@ app.post('/getlecture', async (req, res) => {
   if (!studentId) {
     return res.status(400).json({ error: 'student_id is required' });
   }
-
   try {
     const rows = await getLectureList(studentId);
     const processedData = rows.map(item => ({
@@ -724,12 +725,12 @@ app.post('/getlecture', async (req, res) => {
       lecture_room: item.lecture_room,
       lecture_time: item.lecture_time,
       week: item.week,
+      lecture_have_week : item.lecture_have_week,
       division: item.division,
       nonattendance: item.nonattendance,
       attendance: item.attendance,
       tardy: item.tardy,
       absent: item.absent,
-      weeknum: item.weeknum,
       lecture_grade: item.lecture_grade,
       lecture_semester: item.lecture_semester,
       lecture_credit: item.lecture_credit,
@@ -744,10 +745,10 @@ app.post('/getlecture', async (req, res) => {
 });
 
 app.post('/updatelecture', async (req, res) => {
-  const { nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id } = req.body;
+  const { nonattendance, attendance, tardy, absent, student_id, lecture_id } = req.body;
   //console.log("성공적으로 값 넣음");
   try {
-    await Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum); // await 추가
+    await Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent); // await 추가
     //console.log("성공적으로 업데이트 됨");
     res.status(200).send({ message: "과목 업데이트가 완료되었습니다." });
   } catch (error) {
@@ -2441,6 +2442,39 @@ app.post('/AttendanceCheck', async (req, res) => {
     //console.log("성공적으로 데이터 보냄");
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/addLectureInfo', async (req, res) => {
+  const { student_id, lecture_id, weeknum, classnum, attendance_Info } = req.body;
+
+  try {
+    const success = await addLectureInfo(student_id, lecture_id, weeknum, classnum, attendance_Info);
+    if (success) {
+      res.json({ message: 'Data added successfully', receivedData: { student_id, lecture_id, weeknum, classnum, attendance_Info } });
+    } else {
+      res.status(500).json({ message: 'Failed to add data' });
+    }
+  } catch (error) {
+    console.error('Error while adding lecture info:', error);
+    res.status(500).json({ message: 'An error occurred while adding lecture info', error: error.message });
+  }
+});
+
+app.post('/GetLectureInfo', async (req, res) => {
+  const { student_id, lecture_id } = req.body;
+  try {
+    const rows = await GetLectureInfo(student_id, lecture_id);
+    const processedData = rows.map(item => ({
+      weeknum : item.weeknum,
+      classnum: item.classnum,
+      attendance_Info : item.attendance_Info
+    }));
+    res.json(processedData);
+    //console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error('API Error:', error);  // API 에러 로그
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '172.16.106.42',
+    host: '14.6.152.120',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -578,22 +578,22 @@ async function getLectureList(studentId) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(`
-            SELECT 
+                    SELECT 
                 lecture.lecture_id, 
                 professor.name, 
                 lecture.credit, 
                 lecture.lecture_name, 
                 lecture.lecture_room, 
                 lecture.lecture_time, 
+                lecture.lecture_grade,
+                lecture.lecture_semester,
                 lecture.week,
                 lecture.division,
+                lecture.lecture_have_week,
                 lecture_have_object.nonattendance, 
                 lecture_have_object.attendance, 
                 lecture_have_object.tardy, 
                 lecture_have_object.absent,
-                lecture_have_object.weeknum,
-                lecture_have_object.lecture_grade,
-                lecture_have_object.lecture_semester,
                 lecture_have_object.lecture_credit,
                 lecture_have_object.lecture_grades
             FROM 
@@ -613,8 +613,9 @@ async function getLectureList(studentId) {
         if (conn) conn.end();
     }
 }
+
 //과목 업데이트 
-async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum) {
+async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -625,11 +626,10 @@ async function Updatelecture(student_id, lecture_id, nonattendance, attendance, 
                 nonattendance = ?, 
                 attendance = ?, 
                 tardy = ?, 
-                absent = ?,
-                weeknum = ?
+                absent = ?
             WHERE student_id = ? AND lecture_id = ?
         `;
-        const result = await conn.query(query, [nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id]);
+        const result = await conn.query(query, [nonattendance, attendance, tardy, absent, student_id, lecture_id]);
         // 쿼리 실행
         //console.log('Data updated successfully:', result);
     } catch (err) {
@@ -2900,6 +2900,51 @@ async function setUserSendtype(user_send_event) {
     }
 }
 
+async function addLectureInfo(student_id, lecture_id, weeknum, classnum, attendance_Info) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            INSERT INTO lecture_week_info 
+            (student_fk, lecture_fk, weeknum, classnum, attendance_Info) 
+            VALUES (?, ?, ?, ?, ?);
+        `;
+        await conn.query(query, [student_id, lecture_id, weeknum, classnum, attendance_Info]);
+        return true;
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function GetLectureInfo(student_id, lecture_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `
+            SELECT 
+                weeknum, 
+                classnum, 
+                attendance_Info
+            FROM 
+                lecture_week_info
+            WHERE 
+                student_fk = ? AND lecture_fk = ?
+            `, 
+            [student_id, lecture_id]
+        );
+        console.log('Query Result:', rows);  // 쿼리 결과 확인
+        return rows;
+    } catch (err) {
+        console.error('Database Error:', err);  // 데이터베이스 에러 로그
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -3034,4 +3079,6 @@ module.exports = {
     addGoodEventAram,
     RegistorEvent,
     setUserSendtype,
+    addLectureInfo,
+    GetLectureInfo
 };
