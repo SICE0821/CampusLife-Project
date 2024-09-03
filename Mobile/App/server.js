@@ -131,6 +131,8 @@ const { getGeneralPosts,
   AttendanceCheck,
   RegistorEvent,
   addGoodEventAram,
+  addLectureInfo,
+  GetLectureInfo,
   setUserSendtype,
   addCommentLikeAram,
   get_recomment_post_pk,
@@ -730,7 +732,6 @@ app.post('/getlecture', async (req, res) => {
   if (!studentId) {
     return res.status(400).json({ error: 'student_id is required' });
   }
-
   try {
     const rows = await getLectureList(studentId);
     const processedData = rows.map(item => ({
@@ -741,12 +742,12 @@ app.post('/getlecture', async (req, res) => {
       lecture_room: item.lecture_room,
       lecture_time: item.lecture_time,
       week: item.week,
+      lecture_have_week : item.lecture_have_week,
       division: item.division,
       nonattendance: item.nonattendance,
       attendance: item.attendance,
       tardy: item.tardy,
       absent: item.absent,
-      weeknum: item.weeknum,
       lecture_grade: item.lecture_grade,
       lecture_semester: item.lecture_semester,
       lecture_credit: item.lecture_credit,
@@ -2657,14 +2658,35 @@ app.post('/AttendanceCheck', async (req, res) => {
   }
 });
 
-app.post('/setUserSendtype', async (req, res) => {
-  const { user_send_event } = req.body;
+app.post('/addLectureInfo', async (req, res) => {
+  const { student_id, lecture_id, weeknum, classnum, attendance_Info } = req.body;
+
   try {
-    await setUserSendtype(user_send_event);
-    console.log("[ParticipantEvnet] : 해당 이벤트 유저의 상태값 변경 성공");
-    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+    const success = await addLectureInfo(student_id, lecture_id, weeknum, classnum, attendance_Info);
+    if (success) {
+      res.json({ message: 'Data added successfully', receivedData: { student_id, lecture_id, weeknum, classnum, attendance_Info } });
+    } else {
+      res.status(500).json({ message: 'Failed to add data' });
+    }
   } catch (error) {
-    console.log("[ParticipantEvnet] : 해당 이벤트 유저의 상태값 변경 성공");
+    console.error('Error while adding lecture info:', error);
+    res.status(500).json({ message: 'An error occurred while adding lecture info', error: error.message });
+  }
+});
+
+app.post('/GetLectureInfo', async (req, res) => {
+  const { student_id, lecture_id } = req.body;
+  try {
+    const rows = await GetLectureInfo(student_id, lecture_id);
+    const processedData = rows.map(item => ({
+      weeknum : item.weeknum,
+      classnum: item.classnum,
+      attendance_Info : item.attendance_Info
+    }));
+    res.json(processedData);
+    //console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error('API Error:', error);  // API 에러 로그
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

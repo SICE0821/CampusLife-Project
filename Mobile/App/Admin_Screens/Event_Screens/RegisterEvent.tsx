@@ -54,6 +54,7 @@ const RegisterEvent = ({ route }: any) => {
     }, [])
   );
 
+
   //Date 타입의 문자열을 sql문에 넣을 수 있게 변환하는 함수.
   const formatDateToSQL = (date: Date) => {
     return date.toISOString().slice(0, 19).replace('T', ' ');
