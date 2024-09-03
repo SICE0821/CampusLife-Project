@@ -152,6 +152,25 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     }
   }
 
+  //대댓글 comment_pk로 post_pk 가져오기
+  const get_recomment_post_pk = async (comment_id: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/get_recomment_post_pk`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          comment_id: comment_id
+        })
+      })
+      const post_pk = await response.json();
+      return post_pk;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const delete_aram_data = (aram_id: number) => {
     Alert.alert(
       "알람 삭제",
@@ -301,6 +320,15 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         //console.log(postList7.report_comment_title);
         go_detail_screen7(postList7);
         break;
+      case 'my_comment_like': //내 댓글에 좋아요 눌렀을 때
+        const postList8 = await go_post_detail(item2.comment_post_id);
+        go_detail_screen7(postList8);
+        break;
+      case 'my_recomment_like':  //내 대댓글에 좋아요 눌렀을 때
+        const recomment_post_pk = await get_recomment_post_pk(item2.recomment_comment_id);
+        const postList9 = await go_post_detail(recomment_post_pk);
+        go_detail_screen7(postList9);
+        break;
       default:
         //console.log("이동 드가자");
     }
@@ -328,6 +356,10 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         return <Text style={styles.content}>{item.report_comment_title}</Text>
       case 'good_event':
         return <Text style={styles.content}>{item.good_event_name}</Text>
+      case 'my_comment_like':
+        return <Text style={styles.content}>{item.comment_contents}</Text>
+      case 'my_recomment_like':
+        return <Text style={styles.content}>{item.recomment_contents}</Text>
       default:
         return null;
     }
@@ -335,26 +367,30 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
 
   const renderTargetIcon = (item: aramData) => {
     switch (item.target_type) {
-      case 'my_post_comment':
+      case 'my_post_comment': //내 포스터에 댓글을 달았을 때
         return <Text style={{ color: '#F29F05' }}><IconD name={"chat"} size={30} /></Text>
-      case 'hot_post':
+      case 'hot_post': //핫 게시물에 포스터가 등록됐을 때
         return <Text style={{ color: 'red' }}><IconA name={"fire"} size={30} /></Text>
-      case 'school_notice':
+      case 'school_notice': //학교 공지사항 등록됐을 때
         return <Text style={{ color: '#F29F05' }}><IconD name={"megaphone"} size={30} /></Text>
-      case 'department_notice':
+      case 'department_notice': //학과 공지사항 등록됐을 때
         return <Text style={{ color: '#F29F05' }}><IconD name={"megaphone"} size={30} /></Text>
-      case 'my_post_like':
+      case 'my_post_like': //내 포스터에 좋아요를 눌렀을 때
         return <Text style={{ color: '#F29F05' }}><IconB name={"like1"} size={30} /></Text>
-      case 'new_event':
+      case 'new_event':  //새 이벤트가 등록됐을 때
         return <Text style={{ color: '#F29F05' }}><IconD name={"mail"} size={30} /></Text>
-      case 'friend_code':
+      case 'friend_code': //내 친구코드를 누가 눌렀을 때
         return <Text style={{ color: '#F29F05' }}><IconE name={"user-friends"} size={30} /></Text>
-      case 'report_post':
+      case 'report_post': //게시물을 신고했을때 
         return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
-      case 'report_comment':
+      case 'report_comment': //??...
         return <Text style={{ color: '#F29F05' }}><IconE name={"exclamation"} size={30} /></Text>
-      case 'good_event':
+      case 'good_event': //이벤트 선정이 됐을 때
         return <Text style={{ color: '#F29F05' }}><IconF name={"emoticon-happy"} size={30} /></Text>
+      case 'my_comment_like': //내 댓글에 좋아요를 눌렀을 때.
+        return <Text style={{ color: '#F29F05' }}><IconB name={"like1"} size={30} /></Text>
+      case 'my_recomment_like': //내 대댓글에 좋아요를 눌렀을 때.
+        return <Text style={{ color: '#F29F05' }}><IconB name={"like1"} size={30} /></Text>
       default:
 
         return null;
