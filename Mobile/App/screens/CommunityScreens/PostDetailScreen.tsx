@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Image, Keyboard, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Image, Keyboard, Alert, Dimensions } from 'react-native';
 import IconA from 'react-native-vector-icons/Entypo';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconD from 'react-native-vector-icons/EvilIcons';
@@ -9,7 +9,16 @@ import { PostDeatilData, PostCommentData, CommentsWithRecomments } from "../../t
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { UserData } from '../../types/type'
 import config from '../../config';
-import { ClipPath } from 'react-native-svg';
+
+const width = Dimensions.get("window").width;
+
+const eventImages = [
+    require('../../assets/001.png'),
+    require('../../assets/002.png'),
+    require('../../assets/부천대.png'),
+    require('../../assets/wjdtkdghk.jpg'),
+    // Add more images here up to a maximum of 10
+];
 
 type ReportUser = {
     post_id: number,
@@ -770,7 +779,8 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 <View style={styles.postArea}>
                     <Text style={styles.postTitle}>{postDetailInfo?.title}</Text>
                     <Text style={styles.postContent}>{postDetailInfo?.contents}</Text>
-                    <View style={{ width: 200, height: 200, backgroundColor: 'red', alignSelf: 'center' }}></View>
+                    {/** 게시물 사진 영역 */}
+                    <Image source={eventImages[2]} style={styles.postImage} />
                 </View>
                 <View style={styles.postState}>
                     <TouchableOpacity onPress={() =>
@@ -1026,9 +1036,9 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     postArea: {
-        minHeight: 70,
-        paddingHorizontal: 25,
-        paddingVertical: 10,
+        flex: 1,
+        marginHorizontal: 25,
+        marginVertical: 10,
     },
     postTitle: {
         fontSize: 20,
@@ -1038,7 +1048,8 @@ const styles = StyleSheet.create({
     postContent: { // 게시물 내용
         fontSize: 18,
         color: 'black',
-        marginTop: 10
+        marginTop: 10,
+        marginBottom: 20
     },
     postState: { // 게시물 상태 (좋아요 조회수)
         flexDirection: 'row',
@@ -1183,6 +1194,13 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 5,
     },
+    postImage: {
+        width: width - 50,
+        minHeight: 100,
+        height: 500,
+        maxHeight: 800,
+        resizeMode: 'contain'
+    }
 })
 
 export default PostDetailScreen;
