@@ -120,7 +120,8 @@ export type Lecture = {
   attendance: number;
   tardy: number;
   absent: number;
-  weeknum: number;
+  weeknum : number;
+  lecture_have_week : number;
   lecture_grade : number;
   lecture_semester : number;
   lecture_credit : number;
