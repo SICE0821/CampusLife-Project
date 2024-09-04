@@ -27,7 +27,7 @@ const renderEmptyItem = () => { /** 하단바 크기의 공백 */
 
 //화면.
 const HotPostsScreen = ({ route, navigation }: any) => {
-    console.log("you are in HotPostsScreen")
+    console.log("you are in HotPostsScreen");
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { department_check, userdata } = route.params;
