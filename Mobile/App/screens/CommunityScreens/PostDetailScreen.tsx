@@ -1,22 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Image, Keyboard, Alert, Dimensions } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Image, Keyboard, Alert, Modal, TouchableOpacity, FlatList, Dimensions } from 'react-native';
 import IconA from 'react-native-vector-icons/Entypo';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconD from 'react-native-vector-icons/EvilIcons';
 import IconC from 'react-native-vector-icons/Feather';
 import { useFocusEffect } from '@react-navigation/native';
-import { PostDeatilData, PostCommentData, CommentsWithRecomments } from "../../types/type"
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { PostDeatilData, CommentsWithRecomments } from "../../types/type"
 import { UserData } from '../../types/type'
 import config from '../../config';
 
 const width = Dimensions.get("window").width;
 
 const eventImages = [
-    require('../../assets/001.png'),
-    require('../../assets/002.png'),
-    require('../../assets/부천대.png'),
-    require('../../assets/wjdtkdghk.jpg'),
+    //require('../../assets/001.png'),
+    // require('../../assets/002.png'),
+     require('../../assets/부천대.png'),
+    // require('../../assets/wjdtkdghk.jpg'),
     // Add more images here up to a maximum of 10
 ];
 
@@ -33,21 +32,22 @@ type ReportCommentUser = {
 
 
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
-    console.log("you are in PostDetailScreen")
     const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);
-    const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>(); //포스터에 대한 정보.
+    const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>();
     const [userdata, setUserData] = useState<UserData>(userData);
     const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
     const [userReport, setUserReport] = useState<ReportUser[]>([]);
     const [usercommentReport, setUsercommentReport] = useState<ReportCommentUser[]>([]);
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
     const [commentspk, setCommentspk]: any = useState();
-    const [ispushlike, Setispushlike]: any = useState();
     const [showOptions, setShowOptions] = useState(false);
     const [activeCommentId, setActiveCommentId] = useState<number | null>(null);
     const inputRef = useRef<TextInput>(null);
+    const [postImages, setpostImages] = useState<any[]>(eventImages);
+    const [showModal, setShowModal] = useState(false);
+    const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
 
     const toggleOptions = () => {
         setShowOptions(!showOptions);
@@ -58,9 +58,19 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     };
 
     const onFocusName = useCallback(() => {
-        //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
         inputRef.current?.focus();
     }, []);
+
+    const openImageModal = (index: number) => {
+        setActiveImageIndex(index);
+        setShowModal(true);
+    };
+
+    const closeModal = () => {
+        console.log('Attempting to close modal...'); // Debug statement
+        setShowModal(false);
+        setActiveImageIndex(null);
+    };
 
     useFocusEffect(
         React.useCallback(() => {
@@ -706,6 +716,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         Keyboard.dismiss(); // 키보드 숨기기
     };
 
+
     const writeDate = postDetailInfo?.write_date;
     let formattedDate = "";
     if (writeDate) {
@@ -779,8 +790,17 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 <View style={styles.postArea}>
                     <Text style={styles.postTitle}>{postDetailInfo?.title}</Text>
                     <Text style={styles.postContent}>{postDetailInfo?.contents}</Text>
-                    {/** 게시물 사진 영역 */}
-                    <Image source={eventImages[2]} style={styles.postImage} />
+                    <ScrollView horizontal style={styles.imagePreviewContainer} showsHorizontalScrollIndicator={false}>
+                        {postImages.map((image, index) => (
+                            <TouchableOpacity key={index} onPress={() => openImageModal(index)}
+                            style={postImages.length === 1 ? styles.previewImageFullArea : null}>
+                                <Image
+                                    source={image}
+                                    style={postImages.length === 1 ? styles.previewImageFullWidth : styles.previewImage}
+                                />
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
                 </View>
                 <View style={styles.postState}>
                     <TouchableOpacity onPress={() =>
@@ -937,6 +957,39 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 <View style={{ height: 20 }}></View>
 
             </ScrollView>
+            {/* Your existing components */}
+            {activeImageIndex !== null && (
+                <Modal
+                    visible={showModal}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={closeModal}
+                >
+                    <View style={styles.modalTop}>
+                        <TouchableOpacity onPress={closeModal} style={styles.closeModalButton}>
+                            <Text style={styles.closeModalText}>X</Text>
+                        </TouchableOpacity>
+
+                    </View>
+                    <View style={styles.modalBackground}>
+                        <FlatList
+                            data={postImages}
+                            horizontal
+                            pagingEnabled
+                            initialScrollIndex={activeImageIndex}
+                            getItemLayout={(data, index) => (
+                                { length: width, offset: width * index, index }
+                            )}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <Image source={item} style={styles.fullImage} />
+                            )}
+                            keyExtractor={(_, index) => index.toString()}
+                        />
+                    </View>
+                </Modal>
+            )}
+
             <View style={styles.writeCommentBox}>
                 <View style={[styles.inputtext, { height: inputheight }]}>
                     <TextInput
@@ -959,6 +1012,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     <Text style={{ color: '#F29F05', justifyContent: 'flex-end' }}> <IconC name="send" size={34} /></Text>
                 </TouchableOpacity>
             </View>
+
         </View>
     );
 };
@@ -1194,13 +1248,53 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 5,
     },
-    postImage: {
-        width: width - 50,
-        minHeight: 100,
-        height: 500,
-        maxHeight: 800,
+    imagePreviewContainer: {
+        flexDirection: 'row',
+    },
+    previewImage: {
+        width: 100,
+        height: 100,
+        marginRight: 10,
+        borderRadius: 10,
+        resizeMode: 'contain',
+    },
+    previewImageFullArea: {
+        width: width - 60,
+        height: width - 60,
+    },
+    previewImageFullWidth: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 10,
+    },
+    fullImage: {
+        flex: 1,
+        width: width,
+        height: '100%',
         resizeMode: 'contain'
-    }
+    },
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    },
+    modalTop: {
+        width: '100%',
+        height: 50,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end'
+    },
+    closeModalButton: {
+        width: 50,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    closeModalText: {
+        color: 'white',
+        fontSize: 30,
+    },
 })
 
 export default PostDetailScreen;
