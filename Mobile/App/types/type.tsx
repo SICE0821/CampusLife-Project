@@ -120,7 +120,8 @@ export type Lecture = {
   attendance: number;
   tardy: number;
   absent: number;
-  weeknum: number;
+  weeknum : number;
+  lecture_have_week : number;
   lecture_grade : number;
   lecture_semester : number;
   lecture_credit : number;
@@ -158,6 +159,12 @@ export type aramData = {
   report_comment_title : string,
   good_event_id : number,
   good_event_name : string,
+  comment_post_id : number,
+  comment_contents : string,
+  comment_comment_id : number,
+  recomment_recomment_id : number,
+  recomment_comment_id : number,
+  recomment_contents : string
 }
 
 export type EventData = {
@@ -199,8 +206,8 @@ export type EditEventInfo = {
 }
 
 export type EditEventVote = {
-  vote_index : number,
-  vote_name : string,
+  id : number,
+  text : string,
 }
 
 export type UserSendEventWithPhoto = {
@@ -242,5 +249,14 @@ export type VoteInfoItem = {
 export type VoteDataItem = {
   id: number;
   results: number[];
+}
+
+export type Edit_Post_Info = {
+  post_id : number,
+  user_id : number,
+  title : string,
+  contents : string,
+  department_check : boolean,
+  inform_check : boolean
 }
 

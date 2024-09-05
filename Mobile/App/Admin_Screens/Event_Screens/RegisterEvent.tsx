@@ -54,6 +54,7 @@ const RegisterEvent = ({ route }: any) => {
     }, [])
   );
 
+
   //Date 타입의 문자열을 sql문에 넣을 수 있게 변환하는 함수.
   const formatDateToSQL = (date: Date) => {
     return date.toISOString().slice(0, 19).replace('T', ' ');
@@ -103,6 +104,7 @@ const RegisterEvent = ({ route }: any) => {
     const newVotes = votes.filter(vote => vote.id !== id);
     setVotes(newVotes);
     if (newVotes.length < 2) {
+      setVotes([]);
       setShowVoteSection(false);
     }
   };
@@ -131,6 +133,17 @@ const RegisterEvent = ({ route }: any) => {
       [
         { text: "취소", style: "cancel" },
         { text: "확인", onPress: () => handleSubmit() }
+      ]
+    );
+  };
+
+  const noImage = () => {
+    Alert.alert(
+      "선택한 이미지가 없습니다.",
+      "이벤트에 관련된 이미지를 하나 이상 선택해주세요",
+      [
+        { text: "취소", style: "cancel" },
+        { text: "확인" }
       ]
     );
   };
@@ -191,19 +204,19 @@ const RegisterEvent = ({ route }: any) => {
   };
 
   //이벤트 등록시 
-  const addNewEventAram = async (event_pk : number) => {
+  const addNewEventAram = async (event_pk: number) => {
     try {
-        const response = await fetch(`${config.serverUrl}/addNewEventAram`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                target_id: event_pk,
-            })
-        });
+      const response = await fetch(`${config.serverUrl}/addNewEventAram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          target_id: event_pk,
+        })
+      });
     } catch (error) {
-        console.error('알람 전송 실패', error);
+      console.error('알람 전송 실패', error);
     }
   }
 
@@ -411,7 +424,9 @@ const RegisterEvent = ({ route }: any) => {
                 <Text style={styles.contentText}>투표</Text>
               </View>
 
-              <TouchableOpacity style={styles.contentTextArea} onPress={showVoteOptions}>
+              <TouchableOpacity style={styles.contentTextArea} onPress={() => {
+                showVoteOptions();
+                }}>
                 <Text style={styles.contentAddText}>추가</Text>
                 <IconPlus name='pluscircleo' style={styles.addIcon} />
               </TouchableOpacity>
@@ -432,13 +447,18 @@ const RegisterEvent = ({ route }: any) => {
                     value={vote.text}
                     onChangeText={(text) => handleVoteChange(vote.id, text)}
                   />
-                  <TouchableOpacity onPress={() => handleDeleteVote(vote.id)}>
+                  <TouchableOpacity onPress={() => {
+                    handleDeleteVote(vote.id);
+                    }}>
                     <IconTrash name='trash' size={22} color='red' style={styles.icon} />
                   </TouchableOpacity>
                 </View>
               ))}
               {votes.length < 5 && (
-                <TouchableOpacity onPress={handleAddVote} style={{ marginTop: 10 }}>
+                <TouchableOpacity onPress={() => {
+                  handleAddVote();
+                  }} 
+                  style={{ marginTop: 10 }}>
                   <IconPlus name='pluscircleo' size={30} color='black' />
                 </TouchableOpacity>
               )}
@@ -499,22 +519,29 @@ const RegisterEvent = ({ route }: any) => {
           mode={'date'}
           onConfirm={onConfirmStartDate}
           onCancel={onCancel}
-          date={startDate} 
+          date={startDate}
           minimumDate={new Date()}
-          />
-          
+        />
+
 
         <DateTimePickerModal
           isVisible={endVisible}
           mode={'date'}
           onConfirm={onConfirmEndDate}
           onCancel={onCancel}
-          date={endDate} 
+          date={endDate}
           minimumDate={new Date()}
-          />
+        />
 
         {/* 등록 버튼 */}
-        <TouchableOpacity style={styles.submitButton} onPress={() => EventRegister()}>
+        <TouchableOpacity style={styles.submitButton} onPress={() => {
+
+          if (selectedImages.length > 0) {
+            EventRegister();
+          } else {
+            noImage();
+          }
+        }}>
           <Text style={styles.submitButtonText}>등록하기</Text>
         </TouchableOpacity>
       </ScrollView>

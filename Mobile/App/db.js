@@ -578,21 +578,22 @@ async function getLectureList(studentId) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(`
-            SELECT 
+                    SELECT 
                 lecture.lecture_id, 
                 professor.name, 
                 lecture.credit, 
                 lecture.lecture_name, 
                 lecture.lecture_room, 
                 lecture.lecture_time, 
+                lecture.lecture_grade,
+                lecture.lecture_semester,
                 lecture.week,
                 lecture.division,
+                lecture.lecture_have_week,
                 lecture_have_object.nonattendance, 
                 lecture_have_object.attendance, 
                 lecture_have_object.tardy, 
                 lecture_have_object.absent,
-                lecture.lecture_grade,
-                lecture.lecture_semester,
                 lecture_have_object.lecture_credit,
                 lecture_have_object.lecture_grades
             FROM 
@@ -612,8 +613,9 @@ async function getLectureList(studentId) {
         if (conn) conn.release();
     }
 }
+
 //과목 업데이트 
-async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent, weeknum) {
+async function Updatelecture(student_id, lecture_id, nonattendance, attendance, tardy, absent) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -624,11 +626,10 @@ async function Updatelecture(student_id, lecture_id, nonattendance, attendance, 
                 nonattendance = ?, 
                 attendance = ?, 
                 tardy = ?, 
-                absent = ?,
-                weeknum = ?
+                absent = ?
             WHERE student_id = ? AND lecture_id = ?
         `;
-        const result = await conn.query(query, [nonattendance, attendance, tardy, absent, weeknum, student_id, lecture_id]);
+        const result = await conn.query(query, [nonattendance, attendance, tardy, absent, student_id, lecture_id]);
         // 쿼리 실행
         console.log('Data updated successfully:', result);
     } catch (err) {
@@ -1167,12 +1168,46 @@ async function post_like_up(post_id) {
     }
 }
 
+async function post_like_down(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE post
+        SET \`like\` = \`like\` - 1
+        WHERE post_id = ?`
+        const result = await conn.query(query, [post_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 async function comment_like_up(comment_id) {
     let conn;
     try {
         conn = await pool.getConnection();
         const query = `UPDATE comment
         SET \`like\` = \`like\` + 1
+        WHERE comment_id = ?`
+        const result = await conn.query(query, [comment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function comment_like_num_down(comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE comment
+        SET \`like\` = \`like\` - 1
         WHERE comment_id = ?`
         const result = await conn.query(query, [comment_id]);
         return true;
@@ -1202,6 +1237,23 @@ async function recomment_like_up(recomment_id) {
     }
 }
 
+async function recomment_like_num_down(recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `UPDATE recomment
+        SET \`like\` = \`like\` - 1
+        WHERE recomment_id = ?`
+        const result = await conn.query(query, [recomment_id]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 async function write_post(user_id, department_check, inform_check, title, contents) {
     let conn;
     try {
@@ -1209,6 +1261,30 @@ async function write_post(user_id, department_check, inform_check, title, conten
         const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
         VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
         const result = await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        const postId = result.insertId.toString(); // Retrieve the inserted post's ID
+        return postId;
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function update_post(post_id, department_check, inform_check, title, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+        UPDATE 
+            post
+        SET 
+            department_check = ?,
+            title = ?,
+            contents = ?
+        WHERE
+            post_id = ?`
+        const result = await conn.query(query, [department_check, title, contents, post_id]);
         const postId = result.insertId.toString(); // Retrieve the inserted post's ID
         return postId;
     } catch (err) {
@@ -1592,7 +1668,13 @@ async function get_aram_data(user_id) {
             report_comment.post_id AS report_comment_id,
             report_comment.title AS report_comment_title,
             good_event.event_id AS good_event_id,
-            good_event.name AS good_event_name
+            good_event.name AS good_event_name,
+            my_comment_like.post_id AS comment_post_id,
+            my_comment_like.contents AS comment_contents,
+            my_comment_like.comment_id AS comment_comment_id,
+            my_recomment_like.recomment_id AS recomment_recomment_id,
+            my_recomment_like.comment_id AS recomment_comment_id,
+            my_recomment_like.contents AS recomment_contents
         FROM
             aram
         LEFT JOIN
@@ -1615,6 +1697,10 @@ async function get_aram_data(user_id) {
         		post AS report_comment ON aram.target_type = 'report_comment' AND aram.target_id = report_comment.post_id
         LEFT JOIN 
              EVENT AS good_event ON aram.target_type = 'good_event' AND aram.target_id = good_event.event_id
+        LEFT JOIN
+             comment AS my_comment_like ON aram.target_type = 'my_comment_like' AND aram.target_id = my_comment_like.comment_id
+        LEFT JOIN
+             recomment AS my_recomment_like ON aram.target_type = 'my_recomment_like' AND aram.target_id = my_recomment_like.recomment_id
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -1797,6 +1883,36 @@ async function addLikeAram(user_id, target_id) {
     try {
         conn = await pool.getConnection();
         const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "내 게시물에 좋아요를 눌러줬습니다!", "my_post_like");`
+        await conn.query(query, [user_id, target_id]);
+        return true;
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addCommentLikeAram(user_id, target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "내 댓글에 좋아요를 눌러줬습니다!", "my_comment_like");`
+        await conn.query(query, [user_id, target_id]);
+        return true;
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function addRecommentLikeAram(user_id, target_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "내 대댓글에 좋아요를 눌러줬습니다!", "my_recomment_like");`
         await conn.query(query, [user_id, target_id]);
         return true;
     } catch (err) {
@@ -2125,7 +2241,7 @@ async function deleteMyaram(aram_id) {
     }
 }
 
-//메인화면에서 이벤트 사진
+//유저가 해당 포스터에 좋아요를 눌렀는지 확인
 async function is_user_post_like(user_id, post_id) {
     let conn;
     try {
@@ -2142,6 +2258,40 @@ async function is_user_post_like(user_id, post_id) {
     }
 }
 
+//유저가 해당 댓글에 좋아요를 눌렀는지 확인
+async function is_user_comment_like(user_id, comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM is_user_comment_like WHERE comment_id = ? AND user_id = ?`
+        );
+        const row = await conn.query(query, [comment_id, user_id]);
+        return row.length === 0; // row가 비어 있으면 true, 비어 있지 않으면 false
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+//유저가 해당 대댓글에 좋아요를 눌렀는지 확인
+async function is_user_recomment_like(user_id, recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM is_user_recomment_like WHERE recomment_id = ? AND user_id = ?`
+        );
+        const row = await conn.query(query, [recomment_id, user_id]);
+        return row.length === 0; // row가 비어 있으면 true, 비어 있지 않으면 false
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
 
 async function put_user_post_like(user_id, post_id) {
     let conn;
@@ -2150,6 +2300,32 @@ async function put_user_post_like(user_id, post_id) {
         const query = `INSERT INTO is_user_post_like (user_id, post_id) VALUES (?, ?);`
         await conn.query(query, [user_id, post_id]);
         //console.log("값 넣기 성공");
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function put_user_comment_like(user_id, comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO is_user_comment_like (user_id, comment_id) VALUES (?, ?);`
+        await conn.query(query, [user_id, comment_id]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function put_user_recomment_like(user_id, recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `INSERT INTO is_user_recomment_like (user_id, recomment_id) VALUES (?, ?);`
+        await conn.query(query, [user_id, recomment_id]);
     } catch (err) {
         console.error('Error inserting data:', err);
     } finally {
@@ -2869,7 +3045,177 @@ async function setUserSendtype(user_send_event) {
     }
 }
 
+async function addLectureInfo(student_id, lecture_id, weeknum, classnum, attendance_Info) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            INSERT INTO lecture_week_info 
+            (student_fk, lecture_fk, weeknum, classnum, attendance_Info) 
+            VALUES (?, ?, ?, ?, ?);
+        `;
+        await conn.query(query, [student_id, lecture_id, weeknum, classnum, attendance_Info]);
+        return true;
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
 
+async function GetLectureInfo(student_id, lecture_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `
+            SELECT 
+                weeknum, 
+                classnum, 
+                attendance_Info
+            FROM 
+                lecture_week_info
+            WHERE 
+                student_fk = ? AND lecture_fk = ?
+            `, 
+            [student_id, lecture_id]
+        );
+        console.log('Query Result:', rows);  // 쿼리 결과 확인
+        return rows;
+    } catch (err) {
+        console.error('Database Error:', err);  // 데이터베이스 에러 로그
+        throw err;
+    } finally {
+        if (conn) conn.end();
+    }
+}
+
+//해당 포스터 pk값 가져오기
+async function get_recomment_post_pk(comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(`SELECT post_id FROM comment WHERE comment.comment_id = ?`, [comment_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+//포스터 수정하기 위해 일단 포스터 정보 가져오기
+async function get_post_info(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(`
+            SELECT
+                post_id,
+                user_id, 
+                department_check,
+                inform_check,
+                title,
+                contents
+            FROM 
+                post
+            WHERE post.post_id = ?`, [post_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function editcomment(comment_pk, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+        UPDATE 
+            comment
+        SET 
+            contents = ?
+        WHERE
+            comment_id = ?`
+        await conn.query(query, [contents, comment_pk]);
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function editrecomment(recomment_pk, contents) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+        UPDATE 
+            recomment
+        SET 
+            contents = ?
+        WHERE
+            recomment_id = ?`
+        await conn.query(query, [contents, recomment_pk]);
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function cancel_post_like(user_id, post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+        DELETE FROM is_user_post_like
+        WHERE post_id = ? AND user_id = ?;`
+        await conn.query(query, [post_id, user_id]);
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function cancel_comment_like(user_id, comment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+        DELETE FROM is_user_comment_like
+        WHERE comment_id = ? AND user_id = ?;`
+        await conn.query(query, [comment_id, user_id]);
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function cancel_recomment_like(user_id, recomment_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+        DELETE FROM is_user_recomment_like
+        WHERE recomment_id = ? AND user_id = ?;`
+        await conn.query(query, [recomment_id, user_id]);
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -3003,4 +3349,23 @@ module.exports = {
     addGoodEventAram,
     RegistorEvent,
     setUserSendtype,
+    addCommentLikeAram,
+    get_recomment_post_pk,
+    addRecommentLikeAram,
+    put_user_comment_like,
+    is_user_comment_like,
+    put_user_recomment_like,
+    is_user_recomment_like,
+    get_post_info,
+    update_post,
+    editcomment,
+    editrecomment,
+    post_like_down,
+    cancel_post_like,
+    comment_like_num_down,
+    cancel_comment_like,
+    recomment_like_num_down,
+    cancel_recomment_like,
+    addLectureInfo,
+    GetLectureInfo
 };

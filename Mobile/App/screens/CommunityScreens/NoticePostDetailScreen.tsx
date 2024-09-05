@@ -79,7 +79,6 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     }
 
 
-
     const Post_Like_alert = (post_id: any) => {
         Alert.alert(
             "좋아요!!",
@@ -90,13 +89,111 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     onPress: () => console.log("취소 클릭"),
                     style: "cancel"
                 },
-                { text: "확인", onPress: async () => await like_num_up(post_id) }
+                { text: "확인", onPress: async () => {
+                    await like_num_up(post_id);
+                    await put_user_post_like();
+                }}
             ]
         );
     };
 
+    
+    //포스트 좋아요 취소하기
+    const like_num_down = async (post_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/post_like_down`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: post_id,
+                    user_id: userdata.user_pk
+                })
+            })
+            const result = await response.json();
+            await DeatilPost(); //좋이요 누르면 바로 반영
+        } catch (error) {
+            console.error('포스트 좋아요 누르기 실패', error);
+        }
+    }
 
+    const Post_Cancel_Like_alert = (post_id: any) => {
+        Alert.alert(
+            "좋아요 취소!!",
+            "좋아요를 취소하시겠습니까??",
+            [
+                {
+                    text: "취소",
+                    onPress: async () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                {
+                    text: "확인", onPress: async () => {
+                        await like_num_down(post_id);
+                        await cancel_post_like(post_id);
+                    }
+                }
+            ]
+        );
+    };
 
+        //좋아요 테이블에서 해당 유저 삭제
+        const cancel_post_like = async (post_id: any) => {
+            try {
+                const response = await fetch(`${config.serverUrl}/cancel_post_like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userdata.user_pk,
+                        post_id: post_id
+                    })
+                })
+                await response.json();
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        //좋아요 중복 제거
+        const is_user_post_like = async () => {
+            try {
+                const response = await fetch(`${config.serverUrl}/is_user_post_like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userdata.user_pk,
+                        post_id: postDetailInfo?.post_id
+                    })
+                })
+                const result = await response.json();
+                return result.isLiked;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        //좋아요 테이블에 유저 번호 넣음
+        const put_user_post_like = async () => {
+            try {
+                const response = await fetch(`${config.serverUrl}/put_user_post_like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userdata.user_pk,
+                        post_id: postDetailInfo?.post_id
+                    })
+                })
+            } catch (error) {
+                console.error(error);
+            }
+        }
 
     const handleContentSizeChange = (e: any) => {
         const maxlineHeight = 112;
@@ -148,7 +245,15 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
                     {postDetailInfo?.contents}
                 </Text>
                 <View style={styles.postslikeandlook}>
-                    <TouchableOpacity onPress={() => Post_Like_alert(postDetailInfo?.post_id)}>
+                    <TouchableOpacity onPress={async () => {
+                        const is_post_like: boolean = await is_user_post_like();
+                        if (is_post_like) {
+                            Post_Like_alert(postDetailInfo?.post_id)
+                        } else {
+                            Post_Cancel_Like_alert(postDetailInfo?.post_id)
+                        }}
+                        }
+                        >
                         <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
                     </TouchableOpacity>
                     <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> {postDetailInfo?.like}</Text>

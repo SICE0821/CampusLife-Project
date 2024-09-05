@@ -131,7 +131,26 @@ const { getGeneralPosts,
   AttendanceCheck,
   RegistorEvent,
   addGoodEventAram,
+  addLectureInfo,
+  GetLectureInfo,
   setUserSendtype,
+  addCommentLikeAram,
+  get_recomment_post_pk,
+  addRecommentLikeAram,
+  put_user_comment_like,
+  is_user_comment_like,
+  put_user_recomment_like,
+  is_user_recomment_like,
+  get_post_info,
+  update_post,
+  editcomment,
+  editrecomment,
+  post_like_down,
+  cancel_post_like,
+  comment_like_num_down,
+  cancel_comment_like,
+  recomment_like_num_down,
+  cancel_recomment_like
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -713,7 +732,6 @@ app.post('/getlecture', async (req, res) => {
   if (!studentId) {
     return res.status(400).json({ error: 'student_id is required' });
   }
-
   try {
     const rows = await getLectureList(studentId);
     const processedData = rows.map(item => ({
@@ -724,12 +742,12 @@ app.post('/getlecture', async (req, res) => {
       lecture_room: item.lecture_room,
       lecture_time: item.lecture_time,
       week: item.week,
+      lecture_have_week : item.lecture_have_week,
       division: item.division,
       nonattendance: item.nonattendance,
       attendance: item.attendance,
       tardy: item.tardy,
       absent: item.absent,
-      weeknum: item.weeknum,
       lecture_grade: item.lecture_grade,
       lecture_semester: item.lecture_semester,
       lecture_credit: item.lecture_credit,
@@ -1072,11 +1090,41 @@ app.post('/post_like_up', async (req, res) => {
   }
 });
 
+app.post('/post_like_down', async (req, res) => {
+  try {
+    const { post_id } = req.body; //1번 body에서 값 추출
+    const result = await post_like_down(post_id);
+
+    if (result === true) {
+      console.log("[PostDetailScreen or NoticePostDetailScreen] : 포스터 좋아요 취소 누르기 성공");
+      res.status(200).send({ message: "포스터 좋아요 취소누르기 성공" });
+    }
+  } catch (error) {
+    console.log("[PostDetailScreen or NoticePostDetailScreen] : 포스터 좋아요 취소 누르기 실패");
+    res.status(500).send({ message: "서버 오류" });
+  }
+});
+
 
 app.post('/comment_like_up', async (req, res) => {
   try {
     const { comment_id } = req.body; //1번 body에서 값 추출
     const result = await comment_like_up(comment_id);
+
+    if (result === true) {
+      console.log("[PostDetailScreen] : 댓글 좋아요 누르기 성공");
+      res.status(200).send({ message: "댓글 좋아요 누르기 성공" });
+    }
+  } catch (error) {
+    console.log("[PostDetailScreen] : 댓글 좋아요 누르기 실패");
+    res.status(500).send({ message: "서버 오류" });
+  }
+});
+
+app.post('/comment_like_num_down', async (req, res) => {
+  try {
+    const { comment_id } = req.body; //1번 body에서 값 추출
+    const result = await comment_like_num_down(comment_id);
 
     if (result === true) {
       console.log("[PostDetailScreen] : 댓글 좋아요 누르기 성공");
@@ -1103,6 +1151,22 @@ app.post('/recomment_like_up', async (req, res) => {
   }
 });
 
+app.post('/recomment_like_num_down', async (req, res) => {
+  try {
+    const { recomment_id } = req.body; //1번 body에서 값 추출
+    const result = await recomment_like_num_down(recomment_id);
+
+    if (result === true) {
+      console.log("[PostDetailScreen] : 대댓글 좋아요 내리기 성공");
+      res.status(200).send({ message: "대댓글 좋아요 내리기 성공" });
+    }
+  } catch (error) {
+    console.log("[PostDetailScreen] : 대댓글 좋아요 내리기 실패");
+    res.status(500).send({ message: "서버 오류" });
+  }
+});
+
+//게시물 쓰기
 app.post('/write_post', async (req, res) => {
   try {
     const { user_id, department_check, inform_check, title, contents } = req.body;
@@ -1116,6 +1180,24 @@ app.post('/write_post', async (req, res) => {
     }
   } catch (error) {
     console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 작성 실패");
+    res.json({ success: false, error: error.message });
+  }
+});
+
+//게시물 수정
+app.post('/update_post', async (req, res) => {
+  try {
+    const { post_id, department_check, inform_check, title, contents } = req.body;
+    const postId = await update_post(post_id, department_check, inform_check, title, contents);
+
+    if (postId) {
+      console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 수정 성공");
+      res.status(200).json({ postId });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (error) {
+    console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 수정 실패");
     res.json({ success: false, error: error.message });
   }
 });
@@ -1361,11 +1443,18 @@ app.post('/get_aram_data', async (req, res) => {
       report_comment_title: item.report_comment_title,
       good_event_id: item.good_event_id,
       good_event_name: item.good_event_name,
+      comment_post_id: item.comment_post_id,
+      comment_contents: item.comment_contents,
+      comment_comment_id : item.comment_comment_id,
+      recomment_recomment_id : item.recomment_recomment_id,
+      recomment_comment_id : item.recomment_comment_id,
+      recomment_contents : item.recomment_contents
     }));
     console.log("[AlarmDialogScreen] : 해당 유저의 모든 알람 데이터 가져오기 성공");
     res.json(processedData);
   } catch (error) {
     console.log("[AlarmDialogScreen] : 해당 유저의 모든 알람 데이터 가져오기 실패");
+    console.log(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -1521,6 +1610,38 @@ app.post('/addLikeAram', async (req, res) => {
     }
   } catch (error) {
     console.log("[PostDetailScreen] : 포스터를 좋아요 알람 보내기 실패");
+  }
+});
+
+app.post('/addCommentLikeAram', async (req, res) => {
+  try {
+    const { user_id, target_id } = req.body;
+    const result = await addCommentLikeAram(user_id, target_id);
+    if (result == true) {
+      console.log("[PostDetailScreen] : 댓글 좋아요 알람 보내기 성공");
+      res.json(result);
+    } else if (result == false) {
+      console.log("알람 안보냄");
+      res.json(result);
+    }
+  } catch (error) {
+    console.log("[PostDetailScreen] : 댓글 좋아요 알람 보내기 실패");
+  }
+});
+
+app.post('/addRecommentLikeAram', async (req, res) => {
+  try {
+    const { user_id, target_id } = req.body;
+    const result = await addRecommentLikeAram(user_id, target_id);
+    if (result == true) {
+      console.log("[PostDetailScreen] : 대댓글 좋아요 알람 보내기 성공");
+      res.json(result);
+    } else if (result == false) {
+      console.log("알람 안보냄");
+      res.json(result);
+    }
+  } catch (error) {
+    console.log("[PostDetailScreen] : 대댓글 좋아요 알람 보내기 실패");
   }
 });
 
@@ -1863,7 +1984,7 @@ app.post('/deleteMyaram', async (req, res) => {
 })
 
 
-//일단 유저가 좋아요를 눌렀는지확인
+//유저가 좋아요를 눌렀는지확인
 app.post('/is_user_post_like', async (req, res) => {
   try {
     const { user_id, post_id } = req.body;
@@ -1875,14 +1996,64 @@ app.post('/is_user_post_like', async (req, res) => {
   }
 });
 
+//유저가 댓글 좋아요를 눌렀는지확인
+app.post('/is_user_comment_like', async (req, res) => {
+  try {
+    const { user_id, comment_id } = req.body;
+    const result = await is_user_comment_like(user_id, comment_id);
+    console.log("[PostDetailScreen] : 댓글 좋아요 중복 방지 성공");
+    res.json({ isLiked: result });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 댓글 좋아요 중복 방지 실패");
+  }
+});
+
+//유저가 대댓글 좋아요를 눌렀는지확인
+app.post('/is_user_recomment_like', async (req, res) => {
+  try {
+    const { user_id, recomment_id } = req.body;
+    const result = await is_user_recomment_like(user_id, recomment_id);
+    console.log("[PostDetailScreen] : 대댓글 좋아요 중복 방지 성공");
+    res.json({ isLiked: result });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 대댓글 좋아요 중복 방지 실패");
+  }
+});
+
 app.post('/put_user_post_like', async (req, res) => {
   const { user_id, post_id } = req.body;
   try {
     await put_user_post_like(user_id, post_id);
-    console.log("[PostDetailScreen] : 해당 유저의 좋아요 기록 저장 성공");
+    console.log("[PostDetailScreen or NoticePostDetailScreen] : 해당 유저의 좋아요 기록 저장 성공");
     res.status(200).json({ message: '좋아요 기록이 성공적으로 저장되었습니다.' })
   } catch (error) {
-    console.log("[PostDetailScreen] : 해당 유저의 좋아요 기록 저장 실패");
+    console.log("[PostDetailScreen or NoticePostDetailScreen] : 해당 유저의 좋아요 기록 저장 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//해당 유저의 댓글 좋아요 기록을 저장
+app.post('/put_user_comment_like', async (req, res) => {
+  const { user_id, comment_id } = req.body;
+  try {
+    await put_user_comment_like(user_id, comment_id);
+    console.log("[PostDetailScreen] : 해당 유저의 댓글 좋아요 기록 저장 성공");
+    res.status(200).json({ message: '댓글 좋아요 기록이 성공적으로 저장되었습니다.' })
+  } catch (error) {
+    console.log("[PostDetailScreen] : 해당 유저의 댓글 좋아요 기록 저장 실패" + error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//해당 유저의 대댓글 좋아요 기록을 저장
+app.post('/put_user_recomment_like', async (req, res) => {
+  const { user_id, recomment_id } = req.body;
+  try {
+    await put_user_recomment_like(user_id, recomment_id);
+    console.log("[PostDetailScreen] : 해당 유저의 대댓글 좋아요 기록 저장 성공");
+    res.status(200).json({ message: '댓글 좋아요 기록이 성공적으로 저장되었습니다.' })
+  } catch (error) {
+    console.log("[PostDetailScreen] : 해당 유저의 대댓글 좋아요 기록 저장 실패" + error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -2170,6 +2341,7 @@ app.post('/RegistorEventVotesEdit', async (req, res) => {
 //이벤트 테이블에 연결되어있는 투표 테이블에 행삽입
 app.post('/RegistorEventVotesRegistor', async (req, res) => {
   const { event_id, votes } = req.body;
+  console.log(votes);
   try {
     await RegistorEventVotesAdmin(event_id, votes);
     console.log("[RegisterEvent] : 이벤트 등록[3] (이벤트 투표) 성공");
@@ -2258,9 +2430,9 @@ app.post('/GetEditEventVote', async (req, res) => {
     const rows = await GetEditEventVote(event_id);
     const processedData = rows.map(item => ({
       event_id: item.event_id,
-      vote_name: item.vote_name,
+      text: item.vote_name,
       vote_count: item.vote_count,
-      vote_index: item.vote_index,
+      id: item.vote_index,
     }));
     console.log("[ModifyEvent] : 편집할 이벤트 정보[2] (표 내용) 가져오기 성공");
     res.json(processedData);
@@ -2486,15 +2658,137 @@ app.post('/AttendanceCheck', async (req, res) => {
   }
 });
 
-app.post('/setUserSendtype', async (req, res) => {
-  const { user_send_event } = req.body;
+app.post('/addLectureInfo', async (req, res) => {
+  const { student_id, lecture_id, weeknum, classnum, attendance_Info } = req.body;
+
   try {
-    await setUserSendtype(user_send_event);
-    console.log("[ParticipantEvnet] : 해당 이벤트 유저의 상태값 변경 성공");
+    const success = await addLectureInfo(student_id, lecture_id, weeknum, classnum, attendance_Info);
+    if (success) {
+      res.json({ message: 'Data added successfully', receivedData: { student_id, lecture_id, weeknum, classnum, attendance_Info } });
+    } else {
+      res.status(500).json({ message: 'Failed to add data' });
+    }
+  } catch (error) {
+    console.error('Error while adding lecture info:', error);
+    res.status(500).json({ message: 'An error occurred while adding lecture info', error: error.message });
+  }
+});
+
+app.post('/GetLectureInfo', async (req, res) => {
+  const { student_id, lecture_id } = req.body;
+  try {
+    const rows = await GetLectureInfo(student_id, lecture_id);
+    const processedData = rows.map(item => ({
+      weeknum : item.weeknum,
+      classnum: item.classnum,
+      attendance_Info : item.attendance_Info
+    }));
+    res.json(processedData);
+    //console.log("성공적으로 데이터 보냄");
+  } catch (error) {
+    console.error('API Error:', error);  // API 에러 로그
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+app.post('/get_recomment_post_pk', async (req, res) => {
+  const { comment_id } = req.body;
+  try {
+    const rows = await get_recomment_post_pk(comment_id);
+    const post_id = rows[0].post_id;
+    console.log("[AlarmDialogScreen] : 해당 대댓글의 포스터 pk 가져오기 성공");
+    res.json(post_id);
+  } catch (error) {
+    console.log("[AlarmDialogScreen] : 해당 대댓글의 포스터 pk 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//포스터 수정하기 위해 일단 포스터 정보 가져오기
+app.post('/get_post_info', async (req, res) => {
+  const { post_id } = req.body;
+  try {
+    const rows = await get_post_info(post_id);
+    const processedData = {
+      post_id : rows[0].post_id,
+      user_id : rows[0].user_id,
+      department_check : rows[0].department_check,
+      inform_check : rows[0].inform_check,
+      title : rows[0].title,
+      contents : rows[0].contents
+    };
+    console.log("[CheckReportPost] : 포스터 수정 정보 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[CheckReportPost] : 포스터 수정 정보 가져오기 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error', message: error.message });
+  }
+});
+
+//댓글 수정
+app.post('/editcomment', async (req, res) => {
+  try {
+    const { comment_pk, contents } = req.body;
+    await editcomment(comment_pk, contents);
+    console.log("[PostDetailScreen] : 댓글 수정 성공");
     res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
   } catch (error) {
-    console.log("[ParticipantEvnet] : 해당 이벤트 유저의 상태값 변경 성공");
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.log("[PostDetailScreen] : 댓글 수정 실패");
+    res.json({ success: false, error: error.message });
+  }
+});
+
+//대댓글 수정
+app.post('/editrecomment', async (req, res) => {
+  try {
+    const { recomment_pk, contents } = req.body;
+    await editrecomment(recomment_pk, contents);
+    console.log("[PostDetailScreen] : 대댓글 수정 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 대댓글 수정 실패");
+    res.json({ success: false, error: error.message });
+  }
+});
+
+//좋아요 취소
+app.post('/cancel_post_like', async (req, res) => {
+  try {
+    const { user_id, post_id } = req.body;
+    await cancel_post_like(user_id, post_id);
+    console.log("[PostDetailScreen] : 포스터 좋아요 목록에서 삭제 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 포스터 좋아요 목록에서 삭제 실패");
+    res.json({ success: false, error: error.message });
+  }
+});
+
+//댓글 좋아요 취소
+app.post('/cancel_comment_like', async (req, res) => {
+  try {
+    const { user_id, comment_id } = req.body;
+    await cancel_comment_like(user_id, comment_id);
+    console.log("[PostDetailScreen] : 포스터 댓글 좋아요 목록에서 삭제 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 포스터 댓글 좋아요 목록에서 삭제 실패");
+    res.json({ success: false, error: error.message });
+  }
+});
+
+//댓글 좋아요 취소
+app.post('/cancel_recomment_like', async (req, res) => {
+  try {
+    const { user_id, recomment_id } = req.body;
+    await cancel_recomment_like(user_id, recomment_id);
+    console.log("[PostDetailScreen] : 포스터 대댓글 좋아요 목록에서 삭제 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 포스터 대댓글 좋아요 목록에서 삭제 실패");
+    res.json({ success: false, error: error.message });
   }
 });
 
