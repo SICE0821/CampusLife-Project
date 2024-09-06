@@ -86,6 +86,22 @@ const AttendanceCheckEventScreen = ({route} : any) => {
     }
   }
 
+  const AddAppAttendancePointHistory = async (date : string) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AddAppAttendancePointHistory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          today : date
+        })
+      });
+    } catch (error) {
+    }
+  }
+
 
   const markedDates: { [date: string]: { marked: boolean; selected?: boolean } } = selectedDates.reduce((acc: { [date: string]: { marked: boolean; selected?: boolean } }, date: string) => {
     acc[date] = { marked: true, selected: true };
@@ -101,6 +117,7 @@ const AttendanceCheckEventScreen = ({route} : any) => {
     } else {
       setAttendanceChecked(true);
       await addAppAttendanceDate(today);
+      await AddAppAttendancePointHistory(today);
       await user_update_point();
       Alert.alert(
         "앱 출석체크 성공!!",
