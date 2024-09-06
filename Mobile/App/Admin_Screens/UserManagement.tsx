@@ -122,7 +122,11 @@ const UserManagement = ({ route }: any) => {
 
   // 각 사용자의 설정 아이콘을 클릭하여 선택된 사용자 상태를 업데이트합니다.
   const setSettingUser = (user: any) => {
-    setSelectedUser(user);
+    if (selectedUser && selectedUser.user_id === user.user_id) {
+      setSelectedUser(null); // 이미 선택된 사용자를 다시 누르면 드롭다운 닫기
+    } else {
+      setSelectedUser(user); // 새로운 사용자를 선택하면 드롭다운 열기
+    }
   };
 
   /** 경고 주기 기능 */
@@ -514,14 +518,22 @@ const styles = StyleSheet.create({
   userInfoBox: {
     backgroundColor: 'white',
     width: width * 0.95,
-    height: 100,
+    height: 127,
     flexDirection: 'row',
     padding: 5,
     marginVertical: 10,
     borderRadius: 10,
     elevation: 5,
+    zIndex : 1,
+    position: 'relative',
   },
   imageArea: {
+    justifyContent: 'center', // 세로 중앙 정렬
+    alignItems: 'flex-start',  // 왼쪽 정렬
+    marginRight: 5,           // 이미지와 텍스트 사이 간격
+  },
+
+  image: {
     backgroundColor: '#666666',
     width: 90,
     height: 90,
@@ -529,11 +541,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#999999',
     overflow: 'hidden'
-  },
-  image: {
-    flex: 1,
-    width: '100%',
-    resizeMode: 'cover',
   },
   userInfoArea: {
     flex: 1,
@@ -586,12 +593,13 @@ const styles = StyleSheet.create({
   dropdown: {
     width: 110,
     position: 'absolute',
-    right: 10,
-    top: 10,
+    right: 22,
+    top: 40,
     backgroundColor: 'white',
     elevation: 5,
     borderRadius: 10,
     paddingHorizontal: 10,
+    zIndex : 1000,
   },
   dropdownItem: {
     paddingVertical: 5,

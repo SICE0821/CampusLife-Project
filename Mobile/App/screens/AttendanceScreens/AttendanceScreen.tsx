@@ -320,7 +320,7 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
             }
   
             await updateAttendanceStatus(selectedLecture);
-            AttendanceCheck();
+            await AttendanceCheck();
           }
         }],
         { cancelable: false }
@@ -329,11 +329,18 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
   }, [scannedCode, LectureData]);
 
   useEffect(() => {
-    if (isModalOpen && selectedLecture) {
-      setLastScannedWeek(0);
-      get_lecture_Info();
-    }
-  }, [isModalOpen, selectedLecture]);
+    const fetchDataAsync = async () => {
+        try {
+          if (isModalOpen && selectedLecture) {
+            setLastScannedWeek(0);
+            await get_lecture_Info();
+          } 
+        } catch (error) {
+            console.error('Error fetching data:', error); 
+        }
+    };
+    fetchDataAsync(); 
+}, [isModalOpen, selectedLecture]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

@@ -66,6 +66,7 @@ const SchoolInfoScreen = () => {
       const response = await fetch(`${config.serverUrl}/getSchoolBuildingInfo`);
       if (!response.ok) throw new Error('서버 응답 실패');
       const data = await response.json();
+      console.log(data);
       setSchoolBuildingData(data);
     } catch (error) {
       //console.error('학교 건물 정보를 가져오는 중 오류 발생:', error);
