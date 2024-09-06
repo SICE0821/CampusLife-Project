@@ -35,6 +35,7 @@ import { MainTabNavigator } from './BottomTabNavigator'
 import { AdminTabNavigator } from './BottomTabNavigator';
 import { TopbTabNavigator, NoticeTopbTabNavigator } from './TopTabNavigator'
 import AdminMainScreen from '../Admin_Screens/AdminMain';
+import SchoolInfoChangeScreen from '../Admin_Screens/SchoolInfoChange';
 import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPostsScreen'
 import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen';
 import MyPostScreen from '../screens/CommunityScreens/MyPostScreen';
@@ -427,13 +428,31 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
+                        <TouchableOpacity onPress={() => navigation.navigate("SchoolInfoChangeScreen")}>
+                            <IconF style={{ marginRight: 10 }} name="edit" size={30} color="white" />
                         </TouchableOpacity>
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '학교 정보',
+                }}
+            />
+            <AdminMainStack.Screen
+                name="SchoolInfoChangeScreen"
+                component={SchoolInfoChangeScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    /*headerRight: () => (
+                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
+                            <IconF style={{ marginRight: 10 }} name="edit" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),*/
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '학교 편집',
                 }}
             />
             <AdminMainStack.Screen
