@@ -1295,28 +1295,6 @@ async function update_post(post_id, department_check, inform_check, title, conte
     }
 }
 
-//학과 게시판에서 전체 게시글을 가져오는 쿼리
-async function searchPost(search_text) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " +
-            "FROM post " +
-            "LEFT JOIN user ON post.user_id = user.user_id " +
-            "LEFT JOIN student ON user.student_id = student.student_id " +
-            "WHERE post.contents LIKE ? OR post.title LIKE ? " +
-            "ORDER BY post.date DESC;",
-            [`%${search_text}%`, `%${search_text}%`]
-        );
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.release();
-    }
-}
-
 async function view_count_up(post_id) {
     let conn;
     try {
@@ -1424,7 +1402,7 @@ async function searchPost(search_text) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title " +
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.department_check, post.inform_check, student.name, user.title AS user_title " +
             "FROM post " +
             "LEFT JOIN user ON post.user_id = user.user_id " +
             "LEFT JOIN student ON user.student_id = student.student_id " +
@@ -3216,6 +3194,116 @@ async function cancel_recomment_like(user_id, recomment_id) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
+async function getHistoryData(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM point_history WHERE user_id = ? ORDER BY point_time DESC`
+        );
+        const row = await conn.query(query, [user_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddEventPointHistory(point_num, content, user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (1, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [point_num, "[이벤트 당첨] " + content, user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddAppAttendancePointHistory(user_id, today) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (1, 10, ?, ?);`
+        );
+        const rows = await conn.query(query, ["[앱 출석체크] " + today + " 정기 출석",user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddFriendPointHistory(user_id, friendName) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (1, 100, ?, ?);`
+        );
+        const rows = await conn.query(query, ["[친구 코드] " +friendName+ "님에게 친구코드 발송", user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddBuyProductPointHistory(user_id, product, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (0, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [point, "[상품 사기] " +product+ " 구매 완료", user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddAdminPointHistory(user_id, point, status) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (?, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [status, point, "[관리자] 관리자에 의해 포인트 변경됨", user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+
+
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -3367,5 +3455,11 @@ module.exports = {
     recomment_like_num_down,
     cancel_recomment_like,
     addLectureInfo,
-    GetLectureInfo
+    GetLectureInfo,
+    getHistoryData,
+    AddEventPointHistory,
+    AddFriendPointHistory,
+    AddAppAttendancePointHistory,
+    AddBuyProductPointHistory,
+    AddAdminPointHistory
 };

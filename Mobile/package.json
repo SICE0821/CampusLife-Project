@@ -14,7 +14,7 @@
     "@kichiyaki/react-native-barcode-generator": "^0.6.7",
     "@mj-studio/react-native-naver-map": "^1.5.9",
     "@react-native-clipboard/clipboard": "^1.14.1",
-    "@react-native-community/datetimepicker": "^8.0.1",
+    "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-community/viewpager": "^5.0.11",
     "@react-native-firebase/app": "^19.0.0",
@@ -55,6 +55,7 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-modal": "^13.0.1",
     "react-native-modal-datetime-picker": "^17.1.0",
+    "react-native-modal-selector": "^2.1.2",
     "react-native-modalbox": "^2.0.2",
     "react-native-pager-view": "^6.4.1",
     "react-native-paper": "^5.12.3",
@@ -70,7 +71,8 @@
     "react-native-timetable": "^1.0.6",
     "react-native-vector-icons": "^10.0.3",
     "react-native-vision-camera": "^3.9.2",
-    "react-native-webview": "^13.8.2"
+    "react-native-webview": "^13.8.2",
+    "react-native-wheel-time-picker": "^0.4.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -260,3 +260,11 @@ export type Edit_Post_Info = {
   inform_check : boolean
 }
 
+export type TimeTableLecture = {
+  credit: number;
+  professor_name: string;
+  lecture_name: string;
+  lecture_room: string;
+  lecture_time: string;
+}
+
