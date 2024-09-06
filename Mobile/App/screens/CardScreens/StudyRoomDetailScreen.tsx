@@ -149,14 +149,16 @@ const StudyRoomDetailScreen = ({ route }: any) => {
                 </View>
               </View>
               {new Date(room.study_room_date) > currentDate && (
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => confirmDelete(userdata.student_pk, room.study_room_name, room.study_room_date, room.study_room_time)}
-                >
-                  <Text style={{ fontSize: 18, color: 'black' }}>취소하기</Text>
-                </TouchableOpacity>
+                <>
+                  <View style={{ borderWidth: 0.5, borderColor: "grey", marginTop: 10 }}></View>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => confirmDelete(userdata.student_pk, room.study_room_name, room.study_room_date, room.study_room_time)}
+                  >
+                    <Text style={{ fontSize: 18, color: 'black' }}>취소하기</Text>
+                  </TouchableOpacity>
+                </>
               )}
-              <View style={{ borderWidth: 0.5, borderColor: "grey", marginTop: 10, }}></View>
             </View>
           ))}
         </View>
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 15,
     borderRadius: 7,
     paddingVertical: 8,
     backgroundColor: '#b3b4ae',
