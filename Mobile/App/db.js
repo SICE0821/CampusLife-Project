@@ -3301,6 +3301,22 @@ async function AddAdminPointHistory(user_id, point, status) {
     }
 }
 
+async function getTimeTableData(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM timetable WHERE user_id = ?`
+        );
+        const row = await conn.query(query, [user_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
 
 
 
@@ -3461,5 +3477,6 @@ module.exports = {
     AddFriendPointHistory,
     AddAppAttendancePointHistory,
     AddBuyProductPointHistory,
-    AddAdminPointHistory
+    AddAdminPointHistory,
+    getTimeTableData
 };

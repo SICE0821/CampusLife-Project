@@ -156,7 +156,8 @@ const { getGeneralPosts,
   AddFriendPointHistory,
   AddAppAttendancePointHistory,
   AddBuyProductPointHistory,
-  AddAdminPointHistory
+  AddAdminPointHistory,
+  getTimeTableData
 
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
@@ -2902,6 +2903,28 @@ app.post('/setUserSendtype', async (req, res) => {
   } catch (error) {
     console.log("[ParticipantEvent] : 유저 이벤트 당첨 기록 실패");
     console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/getTimeTableData', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    const rows = await getTimeTableData(user_id);
+    const processedData = rows.map(item => ({
+      professor_name : item.professor_name,
+      lecture_name: item.lecture_name,
+      lecture_room : item.lecture_room,
+      lecture_time : item.lecture_time,
+      week: item.week,
+      lecture_grade: item.lecture_grade,
+      lecture_semester: item.lecture_semester
+    }));
+    console.log("[TimetableScreen] : 시간표 데이터 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 데이터 가져오기 실패");
+    console.error('API Error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

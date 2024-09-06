@@ -5,6 +5,8 @@ import { UserData, TimeTableLecture } from '../types/type';
 import ModalSelector from 'react-native-modal-selector';
 import ModalBox from 'react-native-modalbox';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import config from '../config';
+import { useFocusEffect} from '@react-navigation/native';
 
 // 타입 정의
 type Course = {
@@ -24,7 +26,18 @@ const data = [
   { key: 3, label: '수요일' },
   { key: 4, label: '목요일' },
   { key: 5, label: '금요일' },
+];
 
+const grade_data = [
+  { key: 1, label: '1학년' },
+  { key: 2, label: '2학년' },
+  { key: 3, label: '3학년' },
+  { key: 4, label: '4학년' },
+];
+
+const semseter_data = [
+  { key: 1, label: '1학기' },
+  { key: 2, label: '2학기' },
 ];
 
 
@@ -94,7 +107,7 @@ const getRandomColor = (): string => {
 
 
 const formatTime = (time: string): string => {
-  // 시간과 분을 추출
+  
   const [hourString, minuteString] = time.split(':');
   const hour = parseInt(hourString);
   const minute = parseInt(minuteString);
@@ -106,9 +119,9 @@ const formatTime = (time: string): string => {
   }
 
   // 시간과 분을 기반으로 새로운 시간을 생성
-  const newHour = hour < 10 ? `0${hour}` : `${hour}`;
+  const newHour = hour < 10 ? `${hour}` : `${hour}`;
   const newTime = `${newHour}:00`; // 항상 분을 00으로 설정
-
+  //console.log(newTime);
   return newTime;
 };
 
@@ -122,13 +135,47 @@ const App = ({ route }: any) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [lectureName, setLectureName] = useState(''); //강의 이름
   const [professorName, setProfessorName] = useState(''); //교수 이름
-  const [spaceName, setSpaceName] = useState(''); //교수 이름
+  const [spaceName, setSpaceName] = useState(''); //강의실 이름
   const [credit, setCredit] = useState(''); //학점
   const [day, setDay] = useState(''); //요일 드롭다운 메뉴
+  const [grade, setGrade] = useState(''); //학년 드롭다운 메뉴
+  const [semseter, setSemester] = useState(''); //학기 드롭다운 메뉴
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDatePickerVisible2, setDatePickerVisibility2] = useState(false);
   const [selectedTime, setSelectedTime] = useState('시작 시간 선택'); //수업시작 시간
   const [selectedTime2, setSelectedTime2] = useState('종료 시간 선택'); //수업종료 시간
+
+  useFocusEffect(
+    React.useCallback(() => {
+        const fetchData = async () => {
+            try {
+               await getTimeTableData();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [])
+);
+
+  const getTimeTableData = async () => {
+    try {
+        const response = await fetch(`${config.serverUrl}/getTimeTableData`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id : userData.user_pk
+            })
+        })
+        const result = await response.json();
+        //addLecture(result);
+        return result
+    } catch (error) {
+        console.error(error);
+    }
+}
 
   const days = ['월요일', '화요일', '수요일', '목요일', '금요일'];
   const times = Array.from({ length: 10 }, (_, i) => `${i + 9}:00`);
@@ -153,19 +200,28 @@ const App = ({ route }: any) => {
     setDatePickerVisibility(false);
   };
   const hideDatePicker2 = () => {
-    setDatePickerVisibility(false);
+    setDatePickerVisibility2(false);
   };
 
   const handleConfirm = (time: any) => {
-    // 선택된 시간을 처리하는 로직
-    const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+    
+    if (formattedTime.startsWith("0")) {
+      formattedTime = formattedTime.substring(1);
+    }
+    formattedTime = formattedTime.replace(":", " : ");
+    
     setSelectedTime(formattedTime);
     hideDatePicker();
   };
 
   const handleConfirm2 = (time: any) => {
-    // 선택된 시간을 처리하는 로직
-    const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    if (formattedTime.startsWith("0")) {
+      formattedTime = formattedTime.substring(1); 
+    }
+    formattedTime = formattedTime.replace(":", " : ");
     setSelectedTime2(formattedTime);
     hideDatePicker2();
   };
@@ -173,6 +229,7 @@ const App = ({ route }: any) => {
 
   //여기서 userLecture에 값을 변화 시킬때마다 테이블을 다시 랜더링 해줄거야
   useEffect(() => {
+    console.log(userLecture);
     // 새로운 timetableData 객체 생성
     const newTimetableData: TimetableData = {};
     // userLecture 배열을 순회하여 데이터 정제
@@ -197,6 +254,7 @@ const App = ({ route }: any) => {
       });
     });
 
+
     // 새로 생성된 timetableData를 상태로 저장
     setTimetableData(newTimetableData);
   }, [userLecture]); // userLecture가 변경될 때마다 실행
@@ -204,7 +262,7 @@ const App = ({ route }: any) => {
 
 
   //이 함수로 새로운 배열을 집어 넣을거야
-  const addLecture = (newLecture: any) => {
+  const addLecture = (newLecture: TimeTableLecture) => {
     setUserLecture((prevLectures) => [...prevLectures, newLecture]);
   };
 
@@ -267,6 +325,55 @@ const App = ({ route }: any) => {
         onClosed={closeModal}
       >
         <View style={styles.modalContent}>
+          <View style={{ height: "5%" }}></View>
+          <View style={styles.grade_semester_container}>
+            <ModalSelector
+              data={grade_data}
+              initValue="학년 선택"
+              onChange={(option) => setGrade(option.label)}
+              style={styles.grade_Modal}
+              initValueTextStyle={{
+                color: 'gray',
+              }}
+              selectedItemTextStyle={{
+                color: 'black',
+                fontSize: 18,
+                fontWeight: 'bold',
+              }}
+              selectStyle={{
+                backgroundColor: '#f5f5f5',
+                borderRadius: 8,
+              }}
+              optionTextStyle={{
+                color: '#000',
+                fontSize: 16,
+              }}
+            >
+            </ModalSelector>
+            <ModalSelector
+              data={semseter_data}
+              initValue="학기 선택"
+              onChange={(option) => setSemester(option.label)} // 항목 선택 시 상태 업데이트
+              style={styles.semester_Modal}
+              initValueTextStyle={{
+                color: 'gray',
+              }}
+              selectedItemTextStyle={{
+                color: 'black',
+                fontSize: 18,
+                fontWeight: 'bold',
+              }}
+              selectStyle={{
+                backgroundColor: '#f5f5f5',
+                borderRadius: 8,
+              }}
+              optionTextStyle={{
+                color: '#000',
+                fontSize: 16,
+              }}
+            >
+            </ModalSelector>
+          </View>
           <View style={{ height: "5%" }}></View>
           <View style={styles.lecture_room_container}>
             <TextInput
@@ -344,7 +451,7 @@ const App = ({ route }: any) => {
               is24Hour={true}
             />
           </View>
-          <View style={styles.container2}>
+          <View style={styles.lecture_room_container}>
             <View style={{ width: "50%" }}>
               <TextInput
                 style={styles.input2}
@@ -354,20 +461,34 @@ const App = ({ route }: any) => {
                 onChangeText={setSpaceName}
               />
             </View>
-            <View style ={{width : "50%"}}>
-            <TextInput
-                style={styles.input2}
-                placeholder="과목 학점(숫자만) :"
-                placeholderTextColor={'gray'}
-                value={credit}
-                onChangeText={setCredit}
-              />
-            </View>
           </View>
-          <View style = {styles.completeSection}>
-              <TouchableOpacity style = {styles.completeButton}>
-                <Text style = {styles.completebuttonFont}>등록</Text>
-              </TouchableOpacity>
+          <View style={styles.completeSection}>
+            <TouchableOpacity
+              style={styles.completeButton}
+              onPress={() => {
+                //lecture_grade랑 lecture_semester는 유저 정보에서 따와야겠네. 아니면 직접 입력하던가 입력도 괜찮아 보이긴하네.
+                //근데 입력으로 하면 시간으로 시간표를 나누는게 아니라.. credit으로 시간표를 나누니깐 시작시간과 종료시간을 빼서 credit 값에
+                //넣어주자. 그러면 시간에 따라 시간표를 만들겠지
+                const hour1 = parseInt(selectedTime.split(' : ')[0], 10);
+                const hour2 = parseInt(selectedTime2.split(' : ')[0], 10);
+                const Intcredit = hour2 - hour1;
+                const fulltime = selectedTime + ' ~ ' + selectedTime2 //lecture_time
+                const Intgrade = parseInt(grade.replace(/\D/g, ""), 10); // grade
+                const Intsemseter = parseInt(semseter.replace(/\D/g, ""), 10); // semester
+                //const Intcredit = parseInt(credit);
+                addLecture({
+                  lecture_grade: Intgrade,
+                  lecture_semester: Intsemseter,
+                  lecture_name: lectureName,
+                  lecture_room: spaceName,
+                  lecture_time: fulltime,
+                  professor_name: professorName,
+                  credit : Intcredit,
+                  week: day
+                })
+              }}>
+              <Text style={styles.completebuttonFont}>등록</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ModalBox>
@@ -464,7 +585,7 @@ const styles = StyleSheet.create({
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: '50%',
+    height: '60%',
   },
   modalContent: {
     flex: 1,
@@ -474,7 +595,7 @@ const styles = StyleSheet.create({
     padding: 20
   },
   lecture_room_container: {
-    height: '15%',
+    height: '10%',
     borderBottomWidth: 1
   },
 
@@ -492,7 +613,6 @@ const styles = StyleSheet.create({
     width: '90%',
     color: 'black', // 입력 텍스트 색상
     fontSize: 18,
-    borderBottomWidth : 1
   },
   day_time_container: {
     height: '15%',
@@ -501,7 +621,7 @@ const styles = StyleSheet.create({
   day_Modal: {
     borderRadius: 10,
     width: '20%',
-    height: '75%',
+    height: '64%',
     borderWidth: 2,
     borderColor: 'grey'
   },
@@ -523,25 +643,46 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   completeSection: {
-    height : "20%",
+    height: "20%",
     //backgroundColor : 'red',
-    justifyContent : 'center',
-    alignItems : 'center'
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   completeButton: {
-    width : "30%",
-    height : "50%",
-    justifyContent : 'center',
-    alignItems : 'center',
-    backgroundColor : "#F27400",
-    borderRadius : 10,
-    marginTop : 40
+    width: "30%",
+    height: "50%",
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: "#F27400",
+    borderRadius: 10,
+    marginTop: 40
   },
-  completebuttonFont : {
-    fontSize : 16,
-    color : 'white',
-    fontWeight : 'bold'
-  }
+  completebuttonFont: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: 'bold'
+  },
+  grade_semester_container: {
+    height: '12%',
+    flexDirection: 'row'
+  },
+
+  grade_Modal: {
+    borderRadius: 10,
+    width: '20%',
+    height: '76%',
+    borderWidth: 2,
+    borderColor: 'grey'
+  },
+
+  semester_Modal: {
+    borderRadius: 10,
+    width: '20%',
+    height: '76%',
+    borderWidth: 2,
+    borderColor: 'grey',
+    marginLeft : 20
+  },
 });
 
 export default App;
