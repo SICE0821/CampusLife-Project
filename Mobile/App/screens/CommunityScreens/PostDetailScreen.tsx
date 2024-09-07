@@ -32,6 +32,7 @@ type ReportCommentUser = {
 
 
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
+    console.log("you are in PostDetailScreen")
     const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);
@@ -41,10 +42,15 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [userReport, setUserReport] = useState<ReportUser[]>([]);
     const [usercommentReport, setUsercommentReport] = useState<ReportCommentUser[]>([]);
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
+    const [IsEditComment, setIsEditComment] = useState(0);
     const [commentspk, setCommentspk]: any = useState();
+    const [editcommentpk, setEditcommentpk]: any = useState();
+    const [editrecommentpk, setEditrecommentpk]: any = useState();
+    const [ispushlike, Setispushlike]: any = useState();
     const [showOptions, setShowOptions] = useState(false);
     const [activeCommentId, setActiveCommentId] = useState<number | null>(null);
     const inputRef = useRef<TextInput>(null);
+
     const [postImages, setpostImages] = useState<any[]>(eventImages);
     const [showModal, setShowModal] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
@@ -58,6 +64,17 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     };
 
     const onFocusName = useCallback(() => {
+        //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
+        inputRef.current?.focus();
+    }, []);
+
+    const onFocusEditComment = useCallback((comment_info: any) => {
+        setcommenttext(comment_info.content);
+        inputRef.current?.focus();
+    }, []);
+
+    const onFocusEditReComment = useCallback((recomment_info: any) => {
+        setcommenttext(recomment_info.content);
         inputRef.current?.focus();
     }, []);
 
@@ -107,6 +124,103 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     }
 
+    //댓글 좋아요 중복 방치
+    const is_user_comment_like = async (comment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/is_user_comment_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,
+                    comment_id: comment_id
+                })
+            })
+            const result = await response.json();
+            return result.isLiked;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    //대댓글 좋아요 중복 방치
+    const is_user_recomment_like = async (recomment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/is_user_recomment_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,
+                    recomment_id: recomment_id
+                })
+            })
+            const result = await response.json();
+            return result.isLiked;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    //좋아요 테이블에서 해당 유저 삭제
+    const cancel_post_like = async (post_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/cancel_post_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,
+                    post_id: post_id
+                })
+            })
+            await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    //댓글 좋아요 테이블에서 해당 유저 삭제
+    const cancel_recomment_like = async (recomment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/cancel_recomment_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,
+                    recomment_id: recomment_id
+                })
+            })
+            await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    //댓글 좋아요 테이블에서 해당 유저 삭제
+    const cancel_comment_like = async (comment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/cancel_comment_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,
+                    comment_id: comment_id
+                })
+            })
+            await response.json();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     //좋아요 테이블에 유저 번호 넣음
     const put_user_post_like = async () => {
         try {
@@ -125,6 +239,41 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     }
 
+    //댓글 좋아요 기록을 저장
+    const put_user_comment_like = async (comment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/put_user_comment_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,//해당 유저의 pk
+                    comment_id: comment_id //해당 댓글의 pk
+                })
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    //대댓글 좋아요 기록을 저장
+    const put_user_recomment_like = async (recomment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/put_user_recomment_like`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userdata.user_pk,//해당 유저의 pk
+                    recomment_id: recomment_id //해당 대댓글의 pk
+                })
+            })
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     //포스터에 대한 정보.
     const DeatilPost = async () => {
@@ -193,6 +342,46 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             await CommentList();
         } catch (error) {
             console.error('댓글 쓰기 실패!', error);
+        }
+    }
+
+    //댓글수정
+    const editcomment = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/editcomment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    comment_pk: editcommentpk,
+                    contents: commenttext
+                })
+            });
+            await response.json();
+            await CommentList();
+        } catch (error) {
+            console.error('댓글 수정 실패!', error);
+        }
+    }
+
+    //댓글수정
+    const editrecomment = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/editrecomment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    recomment_pk: editrecommentpk,
+                    contents: commenttext
+                })
+            });
+            await response.json();
+            await CommentList();
+        } catch (error) {
+            console.error('대댓글 수정 실패!', error);
         }
     }
 
@@ -283,6 +472,42 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     }
 
+    //대댓글 좋아요 누르면 해당 대댓글 쓴 사람한테 알람
+    const addRecommentLikeAram = async (comment_id: any, user_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/addRecommentLikeAram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user_id, //이거, 대댓글 쓴 사람 PK 넣어줘야됨
+                    target_id: comment_id, //이거 recomment PK 넣어줘야됨
+                })
+            });;
+        } catch (error) {
+            console.error('알람 전송 실패', error);
+        }
+    }
+
+    //댓글 좋아요 누르면 해당 댓글 쓴 사람한테 알람
+    const addCommentLikeAram = async (comment_id: any, user_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/addCommentLikeAram`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: user_id, //이거, 댓글 쓴 사람 PK 넣어줘야됨
+                    target_id: comment_id, //이거 comment PK 넣어줘야됨
+                })
+            });;
+        } catch (error) {
+            console.error('알람 전송 실패', error);
+        }
+    }
+
     //대댓글 달기
     const writerecomment = async () => {
         try {
@@ -342,6 +567,26 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     }
 
+    //포스트 좋아요 취소하기
+    const like_num_down = async (post_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/post_like_down`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: post_id,
+                    user_id: userdata.user_pk
+                })
+            })
+            const result = await response.json();
+            await DeatilPost(); //좋이요 누르면 바로 반영
+        } catch (error) {
+            console.error('포스트 좋아요 누르기 실패', error);
+        }
+    }
+
     //댓글 좋아요 누르기
     const comment_like_num_up = async (comment_id: any) => {
         try {
@@ -362,7 +607,25 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     }
 
-    //댓글 좋아요 누르기
+    //댓글 좋아요 내리기
+    const comment_like_num_down = async (comment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/comment_like_num_down`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    comment_id: comment_id
+                })
+            })
+            await response.json();
+        } catch (error) {
+            console.error('댓글 좋아요 누르기 실패', error);
+        }
+    }
+
+    //대댓글 좋아요 누르기
     const recomment_like_num_up = async (recomment_id: any) => {
         try {
             const response = await fetch(`${config.serverUrl}/recomment_like_up`, {
@@ -375,12 +638,29 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 })
             })
             const result = await response.json();
-            await CommentList();
-            //console.log("대댓글 좋아요 누르기 성공!")
         } catch (error) {
             console.error('대댓글 좋아요 누르기 실패', error);
         }
     }
+
+    //대댓글 좋아요 수 내리기
+    const recomment_like_num_down = async (recomment_id: any) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/recomment_like_num_down`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    recomment_id: recomment_id
+                })
+            })
+            const result = await response.json();
+        } catch (error) {
+            console.error('대댓글 좋아요 누르기 실패', error);
+        }
+    }
+
 
     const put_user_report = async () => {
         try {
@@ -553,6 +833,34 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     };
 
+    const EditCommentAlert = () => {
+        Alert.alert(
+            "댓글 수정",
+            "정말로 댓글을 수정하시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                { text: "확인", onPress: async () => { await editcomment(); } }
+            ],
+        );
+    };
+
+    const EditreCommentAlert = () => {
+        Alert.alert(
+            "대댓글 수정",
+            "정말로 대댓글을 수정하시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                { text: "확인", onPress: async () => { await editrecomment(); } }
+            ],
+        );
+    };
+
 
     const ReportUserduplicate = async () => {
         const isDuplicateReport = userReport.some((report) =>
@@ -641,7 +949,28 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         );
     };
 
-    const comment_Like_alert = (comment_id: any) => {
+    const Post_Cancel_Like_alert = (post_id: any) => {
+        Alert.alert(
+            "좋아요 취소!!",
+            "좋아요를 취소하시겠습니까??",
+            [
+                {
+                    text: "취소",
+                    onPress: async () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                {
+                    text: "확인", onPress: async () => {
+                        await like_num_down(post_id);
+                        await cancel_post_like(post_id);
+                    }
+                }
+            ]
+        );
+    };
+
+
+    const comment_Like_alert = (comment_id: any, user_pk: any) => {
         Alert.alert(
             "댓글 좋아요!!",
             "댓글에 좋아요를 누르시겠습니까?",
@@ -651,13 +980,41 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     onPress: () => console.log("취소 클릭"),
                     style: "cancel"
                 },
-                { text: "확인", onPress: async () => await comment_like_num_up(comment_id) }
+                {
+                    text: "확인", onPress: async () => {
+                        await comment_like_num_up(comment_id);
+                        await put_user_comment_like(comment_id);
+                        await addCommentLikeAram(comment_id, user_pk);
+                        await CommentList();
+                    }
+                }
+            ]
+        );
+    };
+
+    const Comment_Cancel_Like_alert = (comment_id: any, user_pk: any) => {
+        Alert.alert(
+            "댓글 좋아요 취소!!",
+            "댓글 좋아요를 취소하시겠습니까??",
+            [
+                {
+                    text: "취소",
+                    onPress: async () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                {
+                    text: "확인", onPress: async () => {
+                        await comment_like_num_down(comment_id);
+                        await cancel_comment_like(comment_id);
+                        await CommentList();
+                    }
+                }
             ]
         );
     };
 
 
-    const recomment_Like_alert = (recomment_id: any) => {
+    const recomment_Like_alert = (recomment_id: any, user_pk: any) => {
         Alert.alert(
             "대댓글 좋아요!!",
             "대댓글에 좋아요를 누르시겠습니까?",
@@ -667,10 +1024,100 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     onPress: () => console.log("취소 클릭"),
                     style: "cancel"
                 },
-                { text: "확인", onPress: async () => await recomment_like_num_up(recomment_id) }
+                {
+                    text: "확인", onPress: async () => {
+                        await recomment_like_num_up(recomment_id);
+                        await put_user_recomment_like(recomment_id);
+                        await addRecommentLikeAram(recomment_id, user_pk);
+                        await CommentList();
+
+                    }
+                }
             ]
         );
     };
+
+    const recomment_Like_Cancel_alert = (recomment_id: any, user_pk: any) => {
+        Alert.alert(
+            "대댓글 좋아요 취소!!",
+            "대댓글에 좋아요를 취소하시겠습니까?",
+            [
+                {
+                    text: "취소",
+                    onPress: () => console.log("취소 클릭"),
+                    style: "cancel"
+                },
+                {
+                    text: "확인", onPress: async () => {
+                        await recomment_like_num_down(recomment_id);
+                        await cancel_recomment_like(recomment_id);
+                        await CommentList();
+                    }
+                }
+            ]
+        );
+    };
+
+    const NoyourPostAlert = () => {
+        Alert.alert(
+            "본인 게시물만 수정할 수 있습니다.",
+            "게시물 수정은 본인이 작성한 게시물만 할 수 있습니다.",
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                { text: "확인" }
+            ],
+        );
+    };
+
+    const NoyourCommentAlert = (comment_id: any) => {
+        Alert.alert(
+            "댓글 수정 불가",
+            "본인이 작성한 댓글만 수정 할 수 있습니다.",
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                { text: "확인", onPress: () => { toggleOptions2(comment_id); } }
+            ],
+        );
+    };
+
+    const NoyourreCommentAlert = (recomment_id: any) => {
+        Alert.alert(
+            "대댓글 수정 불가",
+            "본인이 작성한 대댓글만 수정 할 수 있습니다.",
+            [
+                {
+                    text: "취소",
+                    style: "cancel"
+                },
+                { text: "확인", onPress: () => { toggleOptions2(recomment_id); } }
+            ],
+        );
+    };
+
+    //우선 게시글 수정화면에 본래 post정보를 뿌려주기 위해 포스터 데이터를 가져오자
+    const get_post_info = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/get_post_info`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: postDetailInfo?.post_id
+                })
+            });
+            const post_info = await response.json();
+            return post_info
+        } catch (error) {
+            console.error(error);
+        }
+    }
     /*
     const loadCommentsWithRecomments = async () => {
         try {
@@ -690,7 +1137,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
       };
       */
 
-    const handleContentSizeChange = (e: any) => {
+      const handleContentSizeChange = (e: any) => {
         const maxlineHeight = 112;
         const currentlineHeight = e.nativeEvent.contentSize.height;
 
@@ -704,16 +1151,21 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     };
 
     const writeComment = async () => {
-        if (IsCommentorRecomment == 0) { //댓글작성
+        if (IsCommentorRecomment == 0 && IsEditComment == 0) { //댓글작성
             await writecomment();
             await addCommentAram();
 
-        } else if (IsCommentorRecomment == 1) { //대댓글 작성
+        } else if (IsCommentorRecomment == 1 && IsEditComment == 0) { //대댓글 작성
             await writerecomment();
             await addCommentAram();
+
+        } else if (IsCommentorRecomment == 0 && IsEditComment == 1) { //댓글 수정
+            EditCommentAlert();
+        } else if (IsCommentorRecomment == 1 && IsEditComment == 1) { //대댓글 수정
+            EditreCommentAlert();
         }
         setcommenttext('');
-        Keyboard.dismiss(); // 키보드 숨기기
+        Keyboard.dismiss();
     };
 
 
@@ -761,7 +1213,15 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 
                     {showOptions && ( // 상단 옵션
                         <View style={styles.optionBox}>
-                            <TouchableOpacity onPress={() => console.log("수정 기능 x")}>
+                            <TouchableOpacity onPress={async () => {
+                            if (userdata.user_pk === postDetailInfo?.user_id) {
+                                const post_edit_info = await get_post_info();
+                                navigation.navigate("EditPostScreen", { userdata, post_edit_info })
+                            } else {
+                                NoyourPostAlert();
+                                toggleOptions();
+                            }
+                        }}>
                                 <Text style={styles.optionText}>수정</Text>
                             </TouchableOpacity>
                             <View style={styles.optionLine}></View>
@@ -803,8 +1263,16 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     </ScrollView>
                 </View>
                 <View style={styles.postState}>
-                    <TouchableOpacity onPress={() =>
-                        Post_Like_alert(postDetailInfo?.post_id)}>
+                <TouchableOpacity onPress={async () => {
+                        const is_post_like: boolean = await is_user_post_like();
+                        if (is_post_like) {
+                            Post_Like_alert(postDetailInfo?.post_id)
+                        } else {
+                            Post_Cancel_Like_alert(postDetailInfo?.post_id)
+                        }
+                    }
+
+                    }>
                         <IconB name="like1" size={24} color={'black'} />
                     </TouchableOpacity>
                     <Text style={{ color: 'black', fontSize: 20 }}> {postDetailInfo?.like}</Text>
@@ -839,8 +1307,16 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                             name={"comment"} />
                                     </TouchableOpacity>
                                     <TouchableOpacity
-                                        style={styles.commentOptionIcon}
-                                        onPress={() => comment_Like_alert(item.comment_id)}>
+                                            style={styles.commentOptionIcon}
+                                            onPress={async () => {
+                                                const is_comment_like: boolean = await is_user_comment_like(item.comment_id);
+                                                if (is_comment_like) {
+                                                    comment_Like_alert(item.comment_id, item.user_id);
+                                                } else {
+                                                    Comment_Cancel_Like_alert(item.comment_id, item.user_id);
+                                                }
+
+                                            }}>
                                         <IconD size={32} color="black" style={{ top: 1, left: 2 }}
                                             name={"like"} />
                                     </TouchableOpacity>
@@ -852,7 +1328,16 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                             </View>
                             {activeCommentId === item.comment_id && (
                                 <View style={styles.commentOption}>
-                                    <TouchableOpacity>
+                                    <TouchableOpacity onPress={() => {
+                                            if (userdata.user_pk == item.user_id) {
+                                                setIsEditComment(1);
+                                                toggleOptions2(item.comment_id);
+                                                setEditcommentpk(item.comment_id);
+                                                onFocusEditComment(item);
+                                            } else {
+                                                NoyourCommentAlert(item.comment_id);
+                                            }
+                                        }}>
                                         <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
                                     </TouchableOpacity>
                                     <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
@@ -904,9 +1389,16 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                             </View>
                                         </View>
                                         <View style={styles.recommentOptionBox}>
-                                            <TouchableOpacity
-                                                style={styles.commentOptionIcon}
-                                                onPress={() => recomment_Like_alert(subitem.recomment_id)}>
+                                        <TouchableOpacity
+                                                        style={styles.commentOptionIcon}
+                                                        onPress={async () => {
+                                                            const is_recomment_like: boolean = await is_user_recomment_like(subitem.recomment_id);
+                                                            if (is_recomment_like) {
+                                                                recomment_Like_alert(subitem.recomment_id, subitem.user_id)
+                                                            } else {
+                                                                recomment_Like_Cancel_alert(subitem.recomment_id, subitem.user_id)
+                                                            }
+                                                        }}>
                                                 <IconD size={32} color="black" name={"like"} style={{ top: 1, left: 2 }} />
                                             </TouchableOpacity>
                                             <TouchableOpacity style={styles.commentOptionIcon}>
@@ -924,7 +1416,17 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                     </View>
                                     {activeCommentId === subitem.recomment_id && (
                                         <View style={styles.recommentOption}>
-                                            <TouchableOpacity>
+                                            <TouchableOpacity onPress={() => {
+                                                    if (userdata.user_pk == subitem.user_id) {
+                                                        setIsEditComment(1);
+                                                        toggleOptions2(subitem.recomment_id);
+                                                        setIsCommentorRecomment(1);
+                                                        setEditrecommentpk(subitem.recomment_id);
+                                                        onFocusEditReComment(subitem);
+                                                    } else {
+                                                        NoyourreCommentAlert(subitem.recomment_id);
+                                                    }
+                                                }}>
                                                 <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
                                             </TouchableOpacity>
                                             <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
@@ -992,16 +1494,19 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 
             <View style={styles.writeCommentBox}>
                 <View style={[styles.inputtext, { height: inputheight }]}>
-                    <TextInput
+                <TextInput
                         ref={inputRef}
                         style={{ paddingLeft: 20, fontSize: 20, color: 'black' }}
                         onChangeText={handleInputChange}
-                        onBlur={() => setIsCommentorRecomment(0)}
+                        onBlur={() => {
+                            setIsCommentorRecomment(0);
+                            setIsEditComment(0);
+                        }}
                         onContentSizeChange={handleContentSizeChange}
                         value={commenttext}
                         multiline={true}
                         placeholder="댓글을 입력하세요."
-                        placeholderTextColor={'#5a5a5a'}
+                        placeholderTextColor={'gray'}
                     />
                 </View>
                 <TouchableOpacity

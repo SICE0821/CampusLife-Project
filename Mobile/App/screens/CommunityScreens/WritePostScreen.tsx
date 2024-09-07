@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
+import IconC from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 import { UserData } from '../../types/type'
@@ -32,7 +33,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   };
 
   useEffect(() => {
-    
+
     // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
     if (selectallposter === 1) {
       setpostfontoption("전체 게시판");
@@ -119,28 +120,20 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <View style={styles.postoption}>
-          <View style={styles.selectpost}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.selectfont}>{postfontoption}</Text>
-            </View>
-            <TouchableOpacity onPress={openModal} style={{ marginLeft: 180 }}>
-              <Text style={{ color: 'black' }}><IconB name="down" size={30} /></Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.selectpostcontainer}>
-          <View style={styles.selectpost}>
+        <TouchableOpacity onPress={openModal} style={styles.selectPostArea}>
+          <Text style={styles.selectPostText}>{postfontoption}</Text>
+          <IconB name="down" size={30} color={'black'} />
+        </TouchableOpacity>
+        <View style={styles.postTitleArea}>
             <TextInput
-              style={styles.selectfont}
+              style={styles.postTitleText}
               onChangeText={handletitleTextChange}
               value={titletext}
               placeholder="제목"
               placeholderTextColor={'gray'}
             />
-          </View>
         </View>
-        <View style={styles.writespace}>
+        <View style={styles.postContentArea}>
           <TextInput
             style={{ fontSize: 20, color: 'black' }}
             onChangeText={handlemainTextChange}
@@ -150,22 +143,27 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
             placeholderTextColor={'gray'}
           />
         </View>
+        <View style={styles.postImageArea}>
+          <TouchableOpacity style={{width: 40, height: 40, backgroundColor: 'white'}}>
+            <IconC name="image"/>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
       <ModalBox
         isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
-        style={styles.modal}
+        style={modalStyle.modal}
         position="bottom"
         swipeToClose={false}
         onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
       >
-        <View style={styles.modalContent}>
-          <TouchableOpacity style={styles.allposter} onPress={handleAllPosterPress}>
-            <Text style={[styles.noallposterfont, selectallposter == 1 && styles.yesallposterfont]}> 전체 게시판 </Text>
+        <View style={modalStyle.modalContent}>
+          <TouchableOpacity style={modalStyle.allposter} onPress={handleAllPosterPress}>
+            <Text style={[modalStyle.noallposterfont, selectallposter == 1 && modalStyle.yesallposterfont]}> 전체 게시판 </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.allposter} onPress={handleDepartmentPosterPress}>
-            <Text style={[styles.noallposterfont, selectdepartmentposter === 1 && styles.yesallposterfont]}> 학과 게시판 </Text>
+          <TouchableOpacity style={modalStyle.allposter} onPress={handleDepartmentPosterPress}>
+            <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}> 학과 게시판 </Text>
           </TouchableOpacity>
-          <View style={styles.writeButtom}>
+          <View style={modalStyle.writeButtom}>
             <View style={{ flex: 0.65, }}>
             </View>
             <TouchableOpacity onPress={closeModal} style={{ flex: 0.35, justifyContent: 'center', alignItems: "center", backgroundColor: '#9A9EFF' }}>
@@ -175,11 +173,11 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         </View>
       </ModalBox>
       <Modal isVisible={isModalVisible}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.title}>등록 확인</Text>
-          <Text style={styles.message}>글이 등록되었습니다.</Text>
-          <TouchableOpacity style={styles.confirmButton} onPress={goback}>
-            <Text style={styles.confirmButtonText}>확인</Text>
+        <View style={modalStyle.modalContainer}>
+          <Text style={modalStyle.title}>등록 확인</Text>
+          <Text style={modalStyle.message}>글이 등록되었습니다.</Text>
+          <TouchableOpacity style={modalStyle.confirmButton} onPress={goback}>
+            <Text style={modalStyle.confirmButtonText}>확인</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -189,39 +187,41 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1
+  },
+  selectPostArea: {
     flex: 1,
-    //backgroundColor : 'green'
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    paddingVertical: 10,
+    marginVertical: 20,
+    justifyContent: 'space-between',
+    borderBottomWidth: 2,
   },
-  postoption: {
-    height: 70,
-    //backgroundColor : 'red'
-  },
-
-  selectpostcontainer: {
-    height: 70,
-    //backgroundColor : 'blue'
-  },
-  selectpost: {
-    flex: 1,
-    margin: 10,
-    marginRight: 15,
-    marginLeft: 15,
-    //backgroundColor : 'yellow',
-    borderBottomWidth: 1,
-    alignItems: 'center',
-    flexDirection: 'row'
-  },
-  selectfont: {
-    //marginTop : 10,
-    fontSize: 20,
+  selectPostText: {
+    fontSize: 22,
     color: 'black',
-    //backgroundColor : 'yellow'
   },
-  writespace: {
-    margin: 15,
-    flex: 0.82,
-    //backgroundColor : 'blue'
+  postTitleArea: {
+    marginHorizontal: 20,
+    paddingVertical: 0,
+    marginVertical: 20,
+    borderBottomWidth: 2,
   },
+  postTitleText: {
+    fontSize: 22,
+    color: 'black',
+  },
+  postContentArea: {
+    marginHorizontal: 20,
+  },
+  postImageArea: {
+    backgroundColor: 'red'
+  }
+
+})
+
+const modalStyle = StyleSheet.create({
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginTop: 15,
   },
-  
+
   yesallposterfont: {
     fontSize: 25,
     marginTop: 15,
