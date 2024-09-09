@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
+import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, Image } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
+import IconCancel from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 import { UserData } from '../../types/type'
 import config from '../../config';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 const WritePostPage: React.FC = ({ navigation, route }: any) => {
   console.log("you are in WritePostPage")
@@ -18,6 +20,8 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const [titletext, settitleText] = useState('');
   const [maintext, setmainText] = useState('');
   const [userData, setUserData] = useState<UserData>(userdata);
+  const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
+  const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 선택된 이미지를 폼데이터에 저장
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -117,6 +121,41 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     }
   }
 
+  // 이미지 선택 함수
+  const handleImagePick = () => {
+    launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
+      if (response.assets) {
+        const newSelectedImage = [...selectedImages, ...response.assets];
+        setSelectedImages(newSelectedImage);
+        const formDataArray = newSelectedImage.map((image, index) => {
+          const formData = new FormData();
+          const fileNameWithoutExtension = image.fileName.split('.').slice(0, -1).join('.');
+          const newFileName = `${Date.now()}_${fileNameWithoutExtension}.png`;
+          formData.append('images', {
+            uri: image.uri,
+            type: image.type,
+            name: newFileName,
+            index: index,
+          });
+          return formData;
+        });
+        setSelectedFormImages(formDataArray);
+        //console.log(formDataArray);
+      } else if (response.errorCode) {
+        //console.log('Image picker error: ', response.errorMessage);
+      }
+    });
+  };
+
+  // 이미지 삭제 함수
+  const handleImageRemove = (index: number) => {
+    const updatedImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(updatedImages);
+
+    const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
+    setSelectedFormImages(updatedFormImages);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView>
@@ -125,13 +164,13 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           <IconB name="down" size={30} color={'black'} />
         </TouchableOpacity>
         <View style={styles.postTitleArea}>
-            <TextInput
-              style={styles.postTitleText}
-              onChangeText={handletitleTextChange}
-              value={titletext}
-              placeholder="제목"
-              placeholderTextColor={'gray'}
-            />
+          <TextInput
+            style={styles.postTitleText}
+            onChangeText={handletitleTextChange}
+            value={titletext}
+            placeholder="제목"
+            placeholderTextColor={'gray'}
+          />
         </View>
         <View style={styles.postContentArea}>
           <TextInput
@@ -143,12 +182,21 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
             placeholderTextColor={'gray'}
           />
         </View>
-        <View style={styles.postImageArea}>
-          <TouchableOpacity style={{width: 40, height: 40, backgroundColor: 'white'}}>
-            <IconC name="image"/>
-          </TouchableOpacity>
-        </View>
+        {selectedImages.map((image, index) => (
+          <View key={index} style={styles.fileInfo}>
+            <Image source={{ uri: image.uri }} style={styles.imagePreview} />
+            <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
+              <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+            </TouchableOpacity>
+          </View>
+        ))}
+
       </ScrollView>
+      <View style={styles.postImageArea}>
+        <TouchableOpacity onPress={handleImagePick} style={styles.postImageButton}>
+          <IconC name="image" size={35} color={'black'} />
+        </TouchableOpacity>
+      </View>
       <ModalBox
         isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
         style={modalStyle.modal}
@@ -214,11 +262,34 @@ const styles = StyleSheet.create({
   },
   postContentArea: {
     marginHorizontal: 20,
+    marginBottom: 20
   },
   postImageArea: {
-    backgroundColor: 'red'
-  }
-
+    width: '100%',
+    justifyContent: 'center'
+  },
+  postImageButton: {
+    margin: 10,
+    width: 50,
+    alignItems: 'center'
+  },
+  fileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  cancelButton: {
+    alignSelf: 'flex-start',
+    right: 15,
+    bottom: 10
+  },
+  imagePreview: {
+    width: '70%',
+    height: 300,
+    resizeMode: 'cover',
+    backgroundColor: '#eeeeee'
+  },
 })
 
 const modalStyle = StyleSheet.create({
