@@ -25,6 +25,13 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const content = "이 곳에 글을 입력해주세요!" +
+    "\n\n\n" +
+    "캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다. 위반 시 게시물이 삭제되고 서비스 이용이 일정 기간 제한될 수 있습니다." +
+    "\n\n정치·사회 관련 행위 금지\n\n국가기관, 정치 관련 단체, 언론, 시민단체에 대한 언급 혹은 이와 관련한 행위" +
+    "\n정책·외교 또는 정치·정파에 대한 의견, 주장 및 이념, 가치관을 드러내는 행위\n성별, 종교, 인종, 출신, 지역, 직업, 이념 등 사회적 이슈에 대한 언급 혹은 이와 관련한 행위" +
+    "\n위와 같은 내용으로 유추될 수 있는 비유, 은어 사용 행위\n영리 여부와 관계 없이 사업체·기관·단체·개인에게 직간접적으로 영향을 줄 수 있는 게시물 작성 행위\n불법촬영물 유통 금지\n불법촬영물등을 게재할 경우 전기통신사업법에 따라 삭제 조치 및 서비스 이용이 영구적으로 제한될 수 있으며 관련 법률에 따라 처벌받을 수 있습니다." +
+    "\n\n그 밖의 규칙 위반\n타인의 권리를 침해하거나 불쾌감을 주는 행위\n범죄, 불법 행위 등 법령을 위반하는 행위\n욕설, 비하, 차별, 혐오, 자살, 폭력 관련 내용을 포함한 게시물 작성 행위\n음란물, 성적 수치심을 유발하는 행위\n스포일러, 공포, 속임, 놀라게 하는 행위"
   useFocusEffect(
     React.useCallback(() => {
       changeHeaderRightContent();
@@ -174,11 +181,11 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         </View>
         <View style={styles.postContentArea}>
           <TextInput
-            style={{ fontSize: 20, color: 'black' }}
+            style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
             onChangeText={handlemainTextChange}
             value={maintext}
             multiline={true}
-            placeholder="이 곳에 글을 입력해주세요!"
+            placeholder={content}
             placeholderTextColor={'gray'}
           />
         </View>
