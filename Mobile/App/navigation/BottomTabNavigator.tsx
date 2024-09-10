@@ -145,6 +145,24 @@ export const AdminTabNavigator = ({ route }: any) => {
         },
         tabBarActiveTintColor: 'black',
       }}>
+        
+      <Tab.Screen
+        name="AdminMainScreenStackNavigator"
+        component={AdminMainScreenStackNavigator}
+        options={{
+          title: '홈',
+          headerShown: false,
+
+          tabBarIcon: ({ color, size }) => (
+            <IconC name="house" size={size} color={color} />
+          ),
+          tabBarLabel: () => (
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>홈</Text>
+          )
+        }}
+        initialParams={{ userdata , LectureData}}
+      />
+      
       <Tab.Screen
         name="AdminStackNavigator"
         component={AdminEventStackNavigator}
@@ -178,23 +196,6 @@ export const AdminTabNavigator = ({ route }: any) => {
           )
         }}
         initialParams={{ userdata, LectureData }}
-      />
-
-      <Tab.Screen
-        name="AdminMainScreenStackNavigator"
-        component={AdminMainScreenStackNavigator}
-        options={{
-          title: '홈',
-          headerShown: false,
-
-          tabBarIcon: ({ color, size }) => (
-            <IconC name="house" size={size} color={color} />
-          ),
-          tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>홈</Text>
-          )
-        }}
-        initialParams={{ userdata , LectureData}}
       />
 
       <Tab.Screen

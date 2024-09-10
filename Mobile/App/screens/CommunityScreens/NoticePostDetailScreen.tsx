@@ -11,7 +11,7 @@ import { UserData } from '../../types/type'
 import config from '../../config';
 
 
-const PostDetailScreen: React.FC = ({ route }: any) => {
+const PostDetailScreen: React.FC = ({ route,navigation }: any) => {
     console.log("you are in NoticePostDetailScreen")
     const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
@@ -22,6 +22,7 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
     const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
     const [commentspk, setCommentspk]: any = useState();
+    const [showOptions, setShowOptions] = useState(false);
     const inputRef = useRef<TextInput>(null);
 
     useFocusEffect(
@@ -208,166 +209,360 @@ const PostDetailScreen: React.FC = ({ route }: any) => {
         setcommenttext(inputText);
     };
 
-    return (
-        <View style={styles.container}>
-            <ScrollView>
-                <View style={{ height: 15 }}></View>
-                <View style={styles.headersection}>
-                    <View style={styles.headercontainer}>
-                        <View style={styles.profilepicturecontainer}>
-                            <View style={styles.profilepicturebox}>
-                                <Image
-                                    source={{ uri: `${config.photoUrl}/${postDetailInfo?.writer_propile}.png` }}
-                                    style={{ width: 60, height: 60, borderRadius: 12, justifyContent: 'center', alignItems: 'center' }}
-                                />
-                            </View>
-                        </View>
-                        <View style={styles.profileinfocontainer}>
-                            <View style={{ flex: 0.6, justifyContent: 'center', }}>
-                                <Text style={{ fontSize: 17, color: 'black', fontWeight: 'bold', marginTop: 13, }}>{postDetailInfo?.post_writer}({postDetailInfo?.writer_department})</Text>
-                            </View>
-                            <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 9, }}>
-                                <Text style={{ fontSize: 17, color: 'black' }}>{postDetailInfo?.write_date}</Text>
-                            </View>
-                        </View>
-                        <TouchableOpacity style={styles.listcontainer} onPress = {() => console.log("공지사항 리스트 기능 x")}>
-                            <Text><IconA size={35} color="black" name={"dots-three-vertical"} /></Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                <View style={{ height: 0.5, backgroundColor: 'black', marginLeft: 20, marginRight: 20, marginTop: 10 }}></View>
-                <View style={styles.titlecontainer}>
-                    <Text style={{ fontSize: 20, marginLeft: 16, color: 'black', fontWeight: 'bold' }}>
-                        {postDetailInfo?.title}
-                    </Text>
-                </View>
-                <Text style={{ fontSize: 18, color: 'black', marginLeft: 16, marginRight: 20, }}>
-                    {postDetailInfo?.contents}
-                </Text>
-                <View style={styles.postslikeandlook}>
-                    <TouchableOpacity onPress={async () => {
-                        const is_post_like: boolean = await is_user_post_like();
-                        if (is_post_like) {
-                            Post_Like_alert(postDetailInfo?.post_id)
-                        } else {
-                            Post_Cancel_Like_alert(postDetailInfo?.post_id)
-                        }}
-                        }
-                        >
-                        <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}> <IconB name="like1" size={24} /></Text>
-                    </TouchableOpacity>
-                    <Text style={{ color: 'black', fontSize: 20, marginTop: 7, }}> {postDetailInfo?.like}</Text>
-                    <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}><IconB name="eyeo" size={24} /></Text>
-                    <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7, }}>{postDetailInfo?.view}</Text>
-                </View>
+    const toggleOptions = () => {
+        setShowOptions(!showOptions);
+    };
+
+    const get_post_info = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/get_post_info`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: postDetailInfo?.post_id
+                })
+            });
+            const post_info = await response.json();
+            return post_info
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const NoyourPostAlert = () => {
+        Alert.alert(
+            "본인 게시물만 수정할 수 있습니다.",
+            "게시물 수정은 본인이 작성한 게시물만 할 수 있습니다.",
+            [
                 {
+                    text: "취소",
+                    style: "cancel"
+                },
+                { text: "확인" }
+            ],
+        );
+    };
 
-                    comments.map(item => (
-                        <View key={item.comment_id} style={styles.comentcontainer}>
-                            <View style={styles.comentTopsection}>
-                                <View style={styles.infobox}>
-                                    <View style={styles.picturebox}>
-                                        <View style={styles.picture}>
-                                            <Image
-                                                source={{ uri: `http://10.0.2.2:3000/${item?.user_profile}.png` }}
-                                                style={{ width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center' }}
-                                            />
-                                        </View>
-                                    </View>
-                                    <View style={styles.infotextbox}>
-                                        <Text style={{ fontSize: 17, color: 'black', fontWeight: "bold", }}>{item.student_name}</Text>
-                                        <Text style={{ fontSize: 15, color: 'black' }}>{item.department_name}</Text>
-                                    </View>
-                                </View>
-                                <View style={styles.listbox}>
-                                    <View style={styles.ComentLikeListBox}>
-                                        <TouchableOpacity
-                                            style={styles.comentbox}
-                                            onPress={() => {
-                                                setIsCommentorRecomment(1);
-                                                setCommentspk(item.comment_id);
-                                            }}>
-                                            <Text><IconD size={27} color="black" name={"comment"} /></Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity 
-                                            style={styles.likebox}
-                                           >
-                                            <Text><IconD size={29} color="black" name={"like"} /></Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.reallistbox}>
-                                            <Text><IconA size={19} color="black" name={"dots-three-vertical"} /></Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                            </View>
-                            <Text style={{ fontSize: 19, color: 'black', marginLeft: 24, marginRight: 20, }}>
-                                {item.content}
-                            </Text>
-                            <View style={styles.dataandlike}>
-                                <Text style={{ marginTop: 3, marginLeft: 24, fontSize: 15 }}>
-                                    {item.date}
-                                </Text>
-                                <Text style={{ marginTop: 2 }}><IconD size={27} color="black" name={"like"} /></Text>
-                                <Text style={{ fontSize: 15, marginTop: 2, }}>
-                                    {item.like}
-                                </Text>
-                            </View>
-                            {item.recomments.map(subitem => (
-                                <View key={subitem.recomment_id} style={styles.subcommentbox}>
-                                    <View style={styles.enterspace}>
-                                        <Text style={{ color: 'black' }}> <IconC name="corner-down-right" size={30} /></Text>
-                                    </View>
-                                    <View style={styles.maincontent}>
-                                        <View style={styles.comentTopsection}>
-                                            <View style={styles.infobox2}>
-                                                <View style={styles.picturebox}>
-                                                    <View style={styles.picture}>
-                                                        <Image
-                                                            source={{ uri: `http://10.0.2.2:3000/${item?.user_profile}` }}
-                                                            style={{ width: 40, height: 40, borderRadius: 8, justifyContent: 'center', alignItems: 'center', borderWidth: 1 }}
-                                                        />
-                                                    </View>
-                                                </View>
-                                                <View style={styles.infotextbox}>
-                                                    <Text style={{ fontSize: 17, color: 'black', marginLeft: 5, fontWeight: 'bold' }}>{subitem.student_name}</Text>
-                                                    <Text style={{ fontSize: 15, color: 'black', marginLeft: 5 }}>{subitem.department_name}</Text>
-                                                </View>
-                                            </View>
-                                            <View style={styles.listbox2}>
-                                                <View style={styles.LikeListBox2}>
-                                                    <TouchableOpacity 
-                                                        style={styles.likebox2}
-                                                        >
-                                                        <Text><IconD size={29} color="black" name={"like"} /></Text>
-                                                    </TouchableOpacity>
-                                                    <TouchableOpacity style={styles.reallistbox2}>
-                                                        <Text><IconA size={19} color="black" name={"dots-three-vertical"} /></Text>
-                                                    </TouchableOpacity>
-                                                </View>
-                                            </View>
-                                        </View>
-                                        <Text style={{ fontSize: 19, color: 'black', marginLeft: 20, marginRight: 20, }}>
-                                            {subitem.content}
-                                        </Text>
-                                        <View style={styles.dataandlike}>
-                                            <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 15 }}>
-                                                {subitem.date}
-                                            </Text>
-                                            <Text style={{ marginTop: 2 }}><IconD size={30} color="black" name={"like"} /></Text>
-                                            <Text style={{ fontSize: 15, marginTop: 2, }}>
-                                                {subitem.like}
-                                            </Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            ))}
-                        </View>
+    const deletePost = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/deletepost`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    post_id: postDetailInfo?.post_id,
+                }),
+            });
 
-                    ))}
-            </ScrollView>
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const result = await response.json();
+            //console.log('게시글 삭제 완료:', result);
+
+            // 게시글 삭제가 성공하면 알림창을 띄우고 확인 버튼을 눌렀을 때 navigation.goBack()을 호출합니다.
+            Alert.alert(
+                '알림',
+                '게시글이 삭제되었습니다.',
+                [
+                    {
+                        text: '확인',
+                        onPress: () => navigation.goBack(),
+                    },
+                ],
+                { cancelable: false }
+            );
+        } catch (error) {
+            console.error('게시글 삭제 실패:', error);
+            Alert.alert('오류', '게시글 삭제에 실패했습니다.');
+        }
+    };
+
+    return (
+  <View style={styles.container}>
+    <ScrollView>
+      <View style={{ height: 15 }}></View>
+      <View style={styles.headersection}>
+        <View style={styles.headercontainer}>
+          <View style={styles.profilepicturecontainer}>
+            <View style={styles.profilepicturebox}>
+              <Image
+                source={{
+                  uri: `${config.photoUrl}/${postDetailInfo?.writer_propile}.png`,
+                }}
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 12,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              />
+            </View>
+          </View>
+          <View style={styles.profileinfocontainer}>
+            <View style={{ flex: 0.6, justifyContent: 'center' }}>
+              <Text
+                style={{
+                  fontSize: 17,
+                  color: 'black',
+                  fontWeight: 'bold',
+                  marginTop: 13,
+                }}>
+                {postDetailInfo?.post_writer}(
+                {postDetailInfo?.writer_department})
+              </Text>
+            </View>
+            <View style={{ flex: 0.4, justifyContent: 'center', marginBottom: 9 }}>
+              <Text style={{ fontSize: 17, color: 'black' }}>
+                {postDetailInfo?.write_date}
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.listcontainer} onPress={toggleOptions}>
+            <Text>
+              <IconA size={35} color="black" name={'dots-three-vertical'} />
+            </Text>
+          </TouchableOpacity>
+          {showOptions && (
+            <View style={styles.optionBox}>
+              <TouchableOpacity
+                onPress={async () => {
+                  if (userdata.user_pk === postDetailInfo?.user_id) {
+                    const post_edit_info = await get_post_info();
+                    navigation.navigate('EditPostScreen', {
+                      userdata,
+                      post_edit_info,
+                    });
+                  } else {
+                    NoyourPostAlert();
+                    toggleOptions();
+                  }
+                }}>
+                <Text style={styles.optionText}>수정</Text>
+              </TouchableOpacity>
+              {(userdata?.title === '학교' ||
+                postDetailInfo?.post_writer === userdata?.name) && (
+                <>
+                  <View style={styles.optionLine}></View>
+                  <TouchableOpacity onPress={deletePost}>
+                    <Text style={styles.optionText}>삭제</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          )}
         </View>
-    );
-};
+      </View>
+      <View
+        style={{
+          height: 0.5,
+          backgroundColor: 'black',
+          marginLeft: 20,
+          marginRight: 20,
+          marginTop: 10,
+        }}></View>
+      <View style={styles.titlecontainer}>
+        <Text
+          style={{
+            fontSize: 20,
+            marginLeft: 16,
+            color: 'black',
+            fontWeight: 'bold',
+          }}>
+          {postDetailInfo?.title}
+        </Text>
+      </View>
+      <Text
+        style={{
+          fontSize: 18,
+          color: 'black',
+          marginLeft: 16,
+          marginRight: 20,
+        }}>
+        {postDetailInfo?.contents}
+      </Text>
+      <View style={styles.postslikeandlook}>
+        <TouchableOpacity
+          onPress={async () => {
+            const is_post_like: boolean = await is_user_post_like();
+            if (is_post_like) {
+              Post_Like_alert(postDetailInfo?.post_id);
+            } else {
+              Post_Cancel_Like_alert(postDetailInfo?.post_id);
+            }
+          }}>
+          <Text style={{ color: 'black', marginLeft: 10, marginTop: 6 }}>
+            {' '}
+            <IconB name="like1" size={24} />
+          </Text>
+        </TouchableOpacity>
+        <Text style={{ color: 'black', fontSize: 20, marginTop: 7 }}>
+          {' '}
+          {postDetailInfo?.like}
+        </Text>
+        <Text style={{ color: 'black', marginTop: 9, marginLeft: 5 }}>
+          <IconB name="eyeo" size={24} />
+        </Text>
+        <Text style={{ color: 'black', fontSize: 20, marginLeft: 3, marginTop: 7 }}>
+          {postDetailInfo?.view}
+        </Text>
+      </View>
+      {comments.map((item) => (
+        <View key={item.comment_id} style={styles.comentcontainer}>
+          <View style={styles.comentTopsection}>
+            <View style={styles.infobox}>
+              <View style={styles.picturebox}>
+                <View style={styles.picture}>
+                  <Image
+                    source={{ uri: `http://10.0.2.2:3000/${item?.user_profile}.png` }}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 8,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  />
+                </View>
+              </View>
+              <View style={styles.infotextbox}>
+                <Text style={{ fontSize: 17, color: 'black', fontWeight: 'bold' }}>
+                  {item.student_name}
+                </Text>
+                <Text style={{ fontSize: 15, color: 'black' }}>
+                  {item.department_name}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.listbox}>
+              <View style={styles.ComentLikeListBox}>
+                <TouchableOpacity
+                  style={styles.comentbox}
+                  onPress={() => {
+                    setIsCommentorRecomment(1);
+                    setCommentspk(item.comment_id);
+                  }}>
+                  <Text>
+                    <IconD size={27} color="black" name={'comment'} />
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.likebox}>
+                  <Text>
+                    <IconD size={29} color="black" name={'like'} />
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.reallistbox}>
+                  <Text>
+                    <IconA size={19} color="black" name={'dots-three-vertical'} />
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+          <Text
+            style={{ fontSize: 19, color: 'black', marginLeft: 24, marginRight: 20 }}>
+            {item.content}
+          </Text>
+          <View style={styles.dataandlike}>
+            <Text style={{ marginTop: 3, marginLeft: 24, fontSize: 15 }}>
+              {item.date}
+            </Text>
+            <Text style={{ marginTop: 2 }}>
+              <IconD size={27} color="black" name={'like'} />
+            </Text>
+            <Text style={{ fontSize: 15, marginTop: 2 }}>{item.like}</Text>
+          </View>
+          {item.recomments.map((subitem) => (
+            <View key={subitem.recomment_id} style={styles.subcommentbox}>
+              <View style={styles.enterspace}>
+                <Text style={{ color: 'black' }}>
+                  {' '}
+                  <IconC name="corner-down-right" size={30} />
+                </Text>
+              </View>
+              <View style={styles.maincontent}>
+                <View style={styles.comentTopsection}>
+                  <View style={styles.infobox2}>
+                    <View style={styles.picturebox}>
+                      <View style={styles.picture}>
+                        <Image
+                          source={{
+                            uri: `http://10.0.2.2:3000/${item?.user_profile}`,
+                          }}
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 8,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderWidth: 1,
+                          }}
+                        />
+                      </View>
+                    </View>
+                    <View style={styles.infotextbox}>
+                      <Text
+                        style={{
+                          fontSize: 17,
+                          color: 'black',
+                          marginLeft: 5,
+                          fontWeight: 'bold',
+                        }}>
+                        {subitem.student_name}
+                      </Text>
+                      <Text
+                        style={{ fontSize: 15, color: 'black', marginLeft: 5 }}>
+                        {subitem.department_name}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.listbox2}>
+                    <View style={styles.LikeListBox2}>
+                      <TouchableOpacity style={styles.likebox2}>
+                        <Text>
+                          <IconD size={29} color="black" name={'like'} />
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.reallistbox2}>
+                        <Text>
+                          <IconA size={19} color="black" name={'dots-three-vertical'} />
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+                <Text
+                  style={{
+                    fontSize: 19,
+                    color: 'black',
+                    marginLeft: 20,
+                    marginRight: 20,
+                  }}>
+                  {subitem.content}
+                </Text>
+                <View style={styles.dataandlike}>
+                  <Text style={{ marginTop: 3, marginLeft: 20, fontSize: 15 }}>
+                    {subitem.date}
+                  </Text>
+                  <Text style={{ marginTop: 2 }}>
+                    <IconD size={30} color="black" name={'like'} />
+                  </Text>
+                  <Text style={{ fontSize: 15, marginTop: 2 }}>{subitem.like}</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      ))}
+    </ScrollView>
+  </View>
+)};
+
 
 const styles = StyleSheet.create({
     container: {
@@ -587,6 +782,41 @@ const styles = StyleSheet.create({
         flex: 0.75,
         //backgroundColor : "red",
         flexDirection: 'row',
+    },
+    optionBox: {
+        position: 'absolute',
+        top: 70,
+        right: 20,
+        width: 120,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 5,
+        zIndex: 999
+    },
+
+    optionText: {
+        fontSize: 15,
+        fontWeight: "bold",
+        color: "black",
+        paddingLeft: 10
+    },
+
+    optionLine: {
+        width: 100,
+        height: 0.4,
+        backgroundColor: 'black',
+        marginRight: 20,
+        marginTop: 10,
+        marginBottom: 10
     },
 })
 
