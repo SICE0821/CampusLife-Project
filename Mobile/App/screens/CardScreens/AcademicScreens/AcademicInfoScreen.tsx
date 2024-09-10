@@ -1,12 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Dimensions, ScrollView } from 'react-native';
+import { Text, View, StyleSheet, Dimensions, ScrollView, Image } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import ProgressCircle from 'react-native-progress-circle';
 import { Table, Row } from "react-native-table-component";
 import { BarChart } from "react-native-chart-kit";
 import { UserData, Lecture } from '../../../types/type';
+import LottieView from 'lottie-react-native';
+import IconH from 'react-native-vector-icons/FontAwesome';
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
+
+const HorizontalBarGraph = () => {
+    const goalGPA = 4.5;
+    const currentGPA = 1;
+
+    const goalPercentage = (goalGPA / 4.5) * 100;
+    const currentPercentage = (currentGPA / 4.5) * 100;
+
+    const adjustedPercentage = -10 + (currentPercentage * 0.9);
+    return (
+        <View style={styles.TargetGradeArea}>
+            <LottieView
+                source={require('../../../assets/Animation - 1725893333150.json')}
+                autoPlay
+                onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
+                loop
+                style={[styles.animation, { left: `${adjustedPercentage}%` }]}
+            />
+            <View style={styles.graphArea}>
+                <View style={styles.graphContainer}>
+                    <View style={[styles.bar, { width: `${currentPercentage}%`, backgroundColor: '#2196f3' }]}>
+                        <Text style={styles.barText}>현재 학점: {currentGPA}</Text>
+                    </View>
+                </View>
+                <View style={styles.graphContainer}>
+                    <View style={[styles.bar, { width: `${goalPercentage}%`, backgroundColor: '#4caf50' }]}>
+                        <Text style={styles.barText}>목표 학점: {goalGPA}</Text>
+                    </View>
+                </View>
+            </View>
+        </View>
+    );
+};
 
 const AcademicInfoScreen = ({ route }: any) => {
     const { userdata, LectureData } = route.params;
@@ -14,6 +49,7 @@ const AcademicInfoScreen = ({ route }: any) => {
     const [userLecture, setUserLecture] = useState<Lecture[]>(LectureData);
     const [selectedYear, setSelectedYear] = useState<number>(1);
     const [selectedSemester, setSelectedSemester] = useState<number>(1);
+
 
     const [circleData, setCircleData] = useState({
         circle1Data: 0,
@@ -92,6 +128,68 @@ const AcademicInfoScreen = ({ route }: any) => {
     return (
         <View style={styles.container}>
             <ScrollView>
+                <View style={styles.BadgeTextArea}>
+                    <Text style={styles.BadgeTextFont}>달성기록</Text>
+                    <IconH style={styles.BadgeIcon} name="trophy" size={30} />
+                </View>
+                <ScrollView horizontal={true} style={styles.BadgeArea}>
+                    <View style={styles.OneBadgeArea}>
+                        <Image
+                            source={require('../../../assets/뱃지.png')}
+                            resizeMode="contain"
+                            style={{ width: '65%', height: '65%' }}
+                        />
+                        <Text style={{ color: 'black' }}>우등상</Text>
+                    </View>
+                    <View style={styles.OneBadgeArea}>
+                        <Image
+                            source={require('../../../assets/뱃지2.png')}
+                            resizeMode="contain"
+                            style={{ width: '65%', height: '65%' }}
+                        />
+                        <Text style={{ color: 'black' }}>수강상</Text>
+                    </View>
+                    <View style={styles.OneBadgeArea}>
+                        <Image
+                            source={require('../../../assets/뱃지3.png')}
+                            resizeMode="contain"
+                            style={{ width: '65%', height: '65%' }}
+                        />
+                        <Text style={{ color: 'black' }}>성장상</Text>
+                    </View>
+                    <View style={styles.OneBadgeArea}>
+                        <Image
+                            source={require('../../../assets/뱃지4.png')}
+                            resizeMode="contain"
+                            style={{ width: '65%', height: '65%' }}
+                        />
+                        <Text style={{ color: 'black' }}>노력상</Text>
+                    </View>
+                    <View style={styles.OneBadgeArea}>
+                        <Image
+                            source={require('../../../assets/뱃지5.png')}
+                            resizeMode="contain"
+                            style={{ width: '65%', height: '65%' }}
+                        />
+                        <Text style={{ color: 'black' }}>출석상</Text>
+                    </View>
+                    <View style={styles.OneBadgeArea}>
+                        <Image
+                            source={require('../../../assets/뱃지6.png')}
+                            resizeMode="contain"
+                            style={{ width: '65%', height: '65%' }}
+                        />
+                        <Text style={{ color: 'black' }}>소통상</Text>
+                    </View>
+                    <View style={styles.OneBadgeArea}>
+                        <Image
+                            source={require('../../../assets/뱃지7.png')}
+                            resizeMode="contain"
+                            style={{ width: '65%', height: '65%' }}
+                        />
+                        <Text style={{ color: 'black' }}>최고상</Text>
+                    </View>
+                </ScrollView>
                 <View style={styles.circleArea}>
                     {[...Array(Math.ceil(circleConfigs.length / 3))].map((_, rowIndex) => (
                         <View style={styles.circleRow} key={rowIndex}>
@@ -112,6 +210,12 @@ const AcademicInfoScreen = ({ route }: any) => {
                             ))}
                         </View>
                     ))}
+                    <View style={styles.BadgeTextArea2}>
+                        <Text style={styles.BadgeTextFont}>목표학점</Text>
+                        <IconH style={styles.BadgeIcon} name="trophy" size={30} />
+                    </View>
+
+                    <HorizontalBarGraph />
                 </View>
 
                 <ScrollView style={styles.chartArea} horizontal={true}>
@@ -120,12 +224,12 @@ const AcademicInfoScreen = ({ route }: any) => {
                             labels: ["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"],
                             datasets: [{ data: gradesData }],
                         }}
-                        
-                        width={width*1.2}
+
+                        width={width * 1.2}
                         height={220}
                         yAxisLabel=''
                         yAxisSuffix=''
-                        
+
                         showValuesOnTopOfBars={true}
                         withHorizontalLabels={true}
                         chartConfig={{
@@ -188,9 +292,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
     },
     circleArea: {
-        marginVertical: 10,
+        marginTop: 50,
         width: '90%',
         alignSelf: 'center',
+        //backgroundColor: 'red'
     },
     circleRow: {
         flexDirection: 'row',
@@ -208,6 +313,7 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     chartArea: {
+        height: height - 550,
         marginBottom: 15,
         borderWidth: 1,
     },
@@ -215,13 +321,13 @@ const styles = StyleSheet.create({
         overflow: 'visible',
         borderColor: 'black',
     },
-    pickerArea:{
+    pickerArea: {
         flexDirection: 'row',
         justifyContent: 'center',
         marginBottom: 10
     },
-    picker:{
-        width: width*0.45,
+    picker: {
+        width: width * 0.45,
         backgroundColor: '#dddddd',
         marginHorizontal: 5,
         color: 'black',
@@ -256,6 +362,91 @@ const styles = StyleSheet.create({
         marginTop: 20,
         color: 'gray',
     },
+    BadgeArea: {
+        height: '10%',
+        padding: 10,
+        borderBottomWidth: 1
+    },
+    OneBadgeArea: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: width - 410,
+        //backgroundColor: 'blue'
+    },
+    BadgeTextFont: {
+        fontSize: 18,
+        color: 'black',
+        fontWeight: '500'
+    },
+    BadgeIcon: {
+        marginLeft: 10,
+        color: '#F29F05'
+    },
+    BadgeTextArea: {
+        height: "4%",
+        width: '30%',
+        marginTop: 20,
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginLeft: 24,
+        borderRadius: 10,
+        flexDirection: 'row',
+        borderColor: '#F29F05'
+        //backgroundColor: 'blue'
+    },
+
+    BadgeTextArea2: {
+        height: "10%",
+        width: '33%',
+        marginLeft : 2,
+        marginTop: 20,
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        flexDirection: 'row',
+        borderColor: '#F29F05'
+        //backgroundColor: 'blue'
+    },
+    TargetGradeArea: {
+        height: height - 800,
+        //backgroundColor: 'blue'
+    },
+    animation: {
+        width: 150,
+        height: 150,
+        //backgroundColor: 'red',
+        //position: 'relative', // 상대적인 위치 설정
+        //zIndex: 1, // 기본적으로 낮은 zIndex 설정
+    },
+    label: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    graphContainer: {
+        height: 30,
+        backgroundColor: '#e0e0e0',
+        borderRadius: 5,
+        marginBottom: 20,
+        overflow: 'hidden',
+        justifyContent: 'center',
+    },
+    bar: {
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
+        flexDirection: 'row'
+    },
+    barText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    graphArea: {
+        flex: 1,
+        bottom: 20
+    }
 });
 
 export default AcademicInfoScreen;

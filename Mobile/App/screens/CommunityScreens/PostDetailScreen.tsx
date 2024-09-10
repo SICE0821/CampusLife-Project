@@ -39,7 +39,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [userdata, setUserData] = useState<UserData>(userData);
     const [comments, setComments] = useState<CommentsWithRecomments[]>([]);
     const [userReport, setUserReport] = useState<ReportUser[]>([]);
-    const [usercommentReport, setUsercommentReport] = useState<ReportCommentUser[]>([]);
+    const [usercommentRe1port, setUsercommentReport] = useState<ReportCommentUser[]>([]);
     const [IsCommentorRecomment, setIsCommentorRecomment] = useState(0);
     const [commentspk, setCommentspk]: any = useState();
     const [showOptions, setShowOptions] = useState(false);
@@ -568,7 +568,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 
     const ReportUserduplicate2 = async (comment_id: number) => {
 
-        const isDuplicateReport = usercommentReport.some((report) =>
+        const isDuplicateReport = usercommentRe1port.some((report) =>
             userdata.name === report.report_comment_name && comment_id === report.comment_id
         );
         if (isDuplicateReport) {

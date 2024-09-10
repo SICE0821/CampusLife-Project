@@ -3301,6 +3301,60 @@ async function AddAdminPointHistory(user_id, point, status) {
     }
 }
 
+async function getTimeTableData(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM timetable WHERE user_id = ?`
+        );
+        const row = await conn.query(query, [user_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function insertTimeTable(user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO timetable 
+            (user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+//상품 삭제하기
+async function deleteTimetable(user_id, lecture_name, lecture_room, week) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `DELETE FROM timetable 
+        WHERE 
+        user_id = ? AND 
+        lecture_name = ? AND
+        lecture_room = ? AND
+        week = ?`
+        const result = await conn.query(query, [user_id, lecture_name, lecture_room, week]);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 
 
@@ -3461,5 +3515,8 @@ module.exports = {
     AddFriendPointHistory,
     AddAppAttendancePointHistory,
     AddBuyProductPointHistory,
-    AddAdminPointHistory
+    AddAdminPointHistory,
+    getTimeTableData,
+    insertTimeTable,
+    deleteTimetable
 };
