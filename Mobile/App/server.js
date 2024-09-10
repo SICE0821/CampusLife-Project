@@ -188,7 +188,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.120',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -2663,7 +2663,7 @@ app.post('/AttendanceCheck', async (req, res) => {
   const { user_id, event_point } = req.body;
   try {
     await AttendanceCheck(user_id, event_point);
-    console.log("성공적으로 데이터 보냄");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });

@@ -175,8 +175,40 @@ export const LoginScreenStackNavigator = () => {
     return (
         <LoginStack.Navigator>
             <LoginStack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-            <LoginStack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
-            <LoginStack.Screen name="SearchScreen" component={SearchScreen} options={{ headerShown: false }} />
+            <LoginStack.Screen
+                name="RegisterScreen"
+                component={RegisterScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '회원가입',
+                })}
+            />
+            <LoginStack.Screen 
+                name="SearchScreen"
+                component={SearchScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '아이디/비밀번호 찾기',
+                })}
+            />
         </LoginStack.Navigator>
     )
 }

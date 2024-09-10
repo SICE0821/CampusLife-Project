@@ -318,20 +318,17 @@ const AdminMain = ({ navigation, route }: any) => {
                   <Text style={styles.userName}>{userData.name}</Text>
                   <Text style={styles.userInfo}>관리자/{userData.name}</Text>
                 </View>
-                <View style={styles.pointArea}>
-                  <IconI style={styles.pointIcon} name="users" size={30} />
-                  <Text style={styles.userPoint}>유저 관리</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("ManagementUserScreen")}>
-                    <IconB name={"caretright"} size={20} style={styles.pointNavigationIcon} />
-                  </TouchableOpacity>
-                </View>
               </View>
             </View>
             <View style={styles.profileBoxBottom}>
-              <TouchableOpacity style={styles.tabButton} onPress={StudentInfo}>
-                <IconB style={styles.tabIcon} name="idcard" size={30} />
-                <Text style={styles.tabText}>정보변경</Text>
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("ManagementUserScreen")}>
+                <IconI style={styles.tabIcon} name="users" size={30} />
+                <Text style={styles.tabText}>유저 관리</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AdminStackNavigator")}>
+                <IconD style={styles.tabIcon} name="shopping-cart" size={28} />
+                <Text style={styles.tabText}>물품 등록</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AlarmDialogScreen")}>
@@ -344,9 +341,9 @@ const AdminMain = ({ navigation, route }: any) => {
                 <Text style={styles.tabText}>학교정보</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AdminStackNavigator")}>
-                <IconD style={styles.tabIcon} name="shopping-cart" size={28} />
-                <Text style={styles.tabText}>물품 등록</Text>
+              <TouchableOpacity style={styles.tabButton} onPress={StudentInfo}>
+                <IconB style={styles.tabIcon} name="idcard" size={30} />
+                <Text style={styles.tabText}>정보변경</Text>
               </TouchableOpacity>
 
             </View>
@@ -755,7 +752,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   tabButton: { // 버튼
-    width: '25%',
+    width: '20%',
     height: '100%',
     alignItems: 'center',
     justifyContent: 'center'
