@@ -145,6 +145,7 @@ export const AdminTabNavigator = ({ route }: any) => {
         },
         tabBarActiveTintColor: 'black',
       }}>
+        
       <Tab.Screen
         name="AdminMainScreenStackNavigator"
         component={AdminMainScreenStackNavigator}
@@ -161,37 +162,7 @@ export const AdminTabNavigator = ({ route }: any) => {
         }}
         initialParams={{ userdata , LectureData}}
       />
-      <Tab.Screen
-        name="CommunityScreenStackNavigator"
-        component={CommunityScreenStackNavigator}
-        options={{
-          headerShown: false,
-          //tabBarStyle : {display : 'none'},
-          tabBarIcon: ({ color, size }) => (
-            <IconA name="chat" size={30} color={color} />
-          ),
-          tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>커뮤니티</Text>
-          )
-        }}
-        initialParams={{ userdata }}
-      />
       
-      <Tab.Screen
-        name="NoticeScreenStackNavigator"
-        component={NoticeScreenStackNavigator}
-        options={{
-          headerShown: false,
-          //tabBarStyle : {display : 'none'},
-          tabBarIcon: ({ color, size }) => (
-            <IconA name="megaphone" size={30} color={color} />
-          ),
-          tabBarLabel: () => (
-            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>공지사항</Text>
-          )
-        }}
-        initialParams={{ userdata }}
-      />
       <Tab.Screen
         name="AdminStackNavigator"
         component={AdminEventStackNavigator}
@@ -226,6 +197,39 @@ export const AdminTabNavigator = ({ route }: any) => {
         }}
         initialParams={{ userdata, LectureData }}
       />
+
+      <Tab.Screen
+        name="NoticeScreenStackNavigator"
+        component={NoticeScreenStackNavigator}
+        options={{
+          headerShown: false,
+          //tabBarStyle : {display : 'none'},
+          tabBarIcon: ({ color, size }) => (
+            <IconA name="megaphone" size={30} color={color} />
+          ),
+          tabBarLabel: () => (
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>공지사항 관리</Text>
+          )
+        }}
+        initialParams={{ userdata }}
+      />
+
+      <Tab.Screen
+        name="CommunityScreenStackNavigator"
+        component={CommunityScreenStackNavigator}
+        options={{
+          headerShown: false,
+          //tabBarStyle : {display : 'none'},
+          tabBarIcon: ({ color, size }) => (
+            <IconA name="chat" size={30} color={color} />
+          ),
+          tabBarLabel: () => (
+            <Text style={{ fontSize: 13, marginBottom: 5, color: 'gray' }}>커뮤니티 관리</Text>
+          )
+        }}
+        initialParams={{ userdata }}
+      />
+      
     </Tab.Navigator>
   );
 }
