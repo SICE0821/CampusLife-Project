@@ -157,7 +157,9 @@ const { getGeneralPosts,
   AddAppAttendancePointHistory,
   AddBuyProductPointHistory,
   AddAdminPointHistory,
-  getTimeTableData
+  getTimeTableData,
+  insertTimeTable,
+  deleteTimetable
 
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
@@ -2918,13 +2920,42 @@ app.post('/getTimeTableData', async (req, res) => {
       lecture_time : item.lecture_time,
       week: item.week,
       lecture_grade: item.lecture_grade,
-      lecture_semester: item.lecture_semester
+      lecture_semester: item.lecture_semester,
+      credit : item.credit
     }));
     console.log("[TimetableScreen] : 시간표 데이터 가져오기 성공");
     res.json(processedData);
   } catch (error) {
     console.log("[TimetableScreen] : 시간표 데이터 가져오기 실패");
     console.error('API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/insertTimeTable', async (req, res) => {
+  const { user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week} = req.body;
+  try {
+    await insertTimeTable(user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week);
+    console.log("[TimetableScreen] : 시간표 추가 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 추가 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/deleteTimetable', async (req, res) => {
+  const { user_id, lecture_name, lecture_room, week} = req.body;
+  try {
+    await deleteTimetable(user_id, lecture_name, lecture_room, week);
+    console.log("[TimetableScreen] : 시간표 삭제 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 삭제 실패");
+    console.log(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });

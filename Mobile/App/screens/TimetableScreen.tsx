@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Button } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Button, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { UserData, TimeTableLecture } from '../types/type';
 import ModalSelector from 'react-native-modal-selector';
 import ModalBox from 'react-native-modalbox';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import config from '../config';
-import { useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 
 // 타입 정의
 type Course = {
@@ -49,12 +49,14 @@ const TimetableHeader = ({ days }: { days: string[] }) => (
   <View style={[styles.row, styles.headerRow]}>
     <View style={styles.timeColumn}></View>
     {days.map((day, index) => (
-      <View key={index} style={styles.cell}>
+      <TouchableOpacity key={index} style={styles.cell} >
         <Text style={styles.headerText}>{day}</Text>
-      </View>
+      </TouchableOpacity>
     ))}
   </View>
 );
+
+
 
 const TimetableCell = ({ course, professor, room, color }: Course) => (
   <View style={[styles.cell, { backgroundColor: color }]}>
@@ -64,27 +66,7 @@ const TimetableCell = ({ course, professor, room, color }: Course) => (
   </View>
 );
 
-const TimetableRow = ({ time, courses, days }: { time: string; courses: Course[]; days: string[] }) => (
-  //시간 표시 부분
-  <View style={styles.row}>
-    <View style={styles.timeColumn}>
-      <Text style={{ color: 'gray' }}>{time}</Text>
-    </View>
-    {days.map((day, index) => {
-      const course = courses.find(course => course.day === day && course.time === time);
-      if (course) {
-        const duration = course.duration;
-        return (
-          <View key={index} style={[styles.datacell, { height: 60 * duration }]}>
-            <TimetableCell {...course} />
-          </View>
-        );
-      } else {
-        return <View key={index} style={styles.cell}></View>;
-      }
-    })}
-  </View>
-);
+
 
 const originalColors = ['#7469B6', '#AD88C6', '#E1AFD1', '#FFE6E6', '#FFF9D0', '#CAF4FF', '#A0DEFF', '#5AB2FF', '#40A578', '#9DDE8B'];
 let usedColors: string[] = [];
@@ -107,7 +89,7 @@ const getRandomColor = (): string => {
 
 
 const formatTime = (time: string): string => {
-  
+
   const [hourString, minuteString] = time.split(':');
   const hour = parseInt(hourString);
   const minute = parseInt(minuteString);
@@ -147,35 +129,129 @@ const App = ({ route }: any) => {
 
   useFocusEffect(
     React.useCallback(() => {
-        const fetchData = async () => {
-            try {
-               await getTimeTableData();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchData();
+      const fetchData = async () => {
+        try {
+          getTimeTableData();
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
     }, [])
-);
+  );
 
+  const TimetableRow = ({ time, courses, days }: { time: string; courses: Course[]; days: string[] }) => (
+    //시간 표시 부분
+    <View style={styles.row}>
+      <View style={styles.timeColumn}>
+        <Text style={{ color: 'gray' }}>{time}</Text>
+      </View>
+      {days.map((day, index) => {
+        const course = courses.find(course => course.day === day && course.time === time);
+        if (course) {
+          const duration = course.duration;
+          return (
+            <TouchableOpacity key={index} style={[styles.datacell, { height: 60 * duration }]} 
+            onPress = {() => {
+              DeleteTimetable(course.course, course.room, course.day);
+            }}>
+              <TimetableCell {...course} />
+            </TouchableOpacity>
+          );
+        } else {
+          return <View key={index} style={styles.cell}></View>;
+        }
+      })}
+    </View>
+  );
+
+  const checkOverlap = (
+    newHour1: number, 
+    newHour2: number, 
+    newDay: string, 
+    newGrade: number, 
+    newSemester: number
+  ) => {
+    // 기존에 저장된 강의와 비교
+    for (const lecture of userLecture) {
+      const [startTime, endTime] = lecture.lecture_time.split(' ~ ').map(time => parseInt(time.split(':')[0], 10));
+      
+      // 학년, 학기, 요일이 같은지 확인
+      if (lecture.lecture_grade === newGrade && lecture.lecture_semester === newSemester && lecture.week === newDay) {
+        // 시간이 겹치는지 확인 (기존 강의와 새 강의의 시간이 겹치는지)
+        if ((newHour1 < endTime && newHour2 > startTime) || (newHour1 === startTime && newHour2 === endTime)) {
+          return true; // 시간이 겹침
+        }
+      }
+    }
+    return false; // 시간이 겹치지 않음
+  };
+
+  
   const getTimeTableData = async () => {
     try {
-        const response = await fetch(`${config.serverUrl}/getTimeTableData`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                user_id : userData.user_pk
-            })
+      const response = await fetch(`${config.serverUrl}/getTimeTableData`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userData.user_pk
         })
-        const result = await response.json();
-        //addLecture(result);
-        return result
+      })
+      const result = await response.json();
+      setUserLecture(result);
+      return result
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-}
+  }
+
+  const insertTimeTable = async (newLecture: TimeTableLecture) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/insertTimeTable`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userData.user_pk,
+          lecture_grade: newLecture.lecture_grade,
+          lecture_semester: newLecture.lecture_semester,
+          lecture_name: newLecture.lecture_name,
+          lecture_room: newLecture.lecture_room,
+          lecture_time: newLecture.lecture_time,
+          professor_name: newLecture.professor_name,
+          credit: newLecture.credit,
+          week: newLecture.week
+        })
+      })
+      await response.json();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const deleteTimetable = async (course: string, room : string, day : string) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/deleteTimetable`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id: userData.user_pk,
+          lecture_name: course,
+          lecture_room: room,
+          week: day
+        })
+      })
+      await response.json();
+      await getTimeTableData();
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   const days = ['월요일', '화요일', '수요일', '목요일', '금요일'];
   const times = Array.from({ length: 10 }, (_, i) => `${i + 9}:00`);
@@ -205,12 +281,12 @@ const App = ({ route }: any) => {
 
   const handleConfirm = (time: any) => {
     let formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-    
+
     if (formattedTime.startsWith("0")) {
       formattedTime = formattedTime.substring(1);
     }
     formattedTime = formattedTime.replace(":", " : ");
-    
+
     setSelectedTime(formattedTime);
     hideDatePicker();
   };
@@ -219,7 +295,7 @@ const App = ({ route }: any) => {
     let formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
     if (formattedTime.startsWith("0")) {
-      formattedTime = formattedTime.substring(1); 
+      formattedTime = formattedTime.substring(1);
     }
     formattedTime = formattedTime.replace(":", " : ");
     setSelectedTime2(formattedTime);
@@ -229,7 +305,6 @@ const App = ({ route }: any) => {
 
   //여기서 userLecture에 값을 변화 시킬때마다 테이블을 다시 랜더링 해줄거야
   useEffect(() => {
-    console.log(userLecture);
     // 새로운 timetableData 객체 생성
     const newTimetableData: TimetableData = {};
     // userLecture 배열을 순회하여 데이터 정제
@@ -259,11 +334,64 @@ const App = ({ route }: any) => {
     setTimetableData(newTimetableData);
   }, [userLecture]); // userLecture가 변경될 때마다 실행
 
+  const CompleteAddTimeTable = () => {
+    Alert.alert(
+      "시간표 추가 성공",
+      "시간표를 성공적으로 추가하셨습니다!!",
+      [
+        {
+          text: "취소",
+          style: "cancel"
+        },
+        { text: "확인" }
+      ],
+    );
+  };
 
+  const mistackTimetable = () => {
+    Alert.alert(
+      "시간표 추가 실패",
+      "시간대 설정이 잘못되었거나 중복되었습니다. \n올바른 시간대 설정을 해주세요",
+      [
+        {
+          text: "취소",
+          style: "cancel"
+        },
+        { text: "확인" }
+      ],
+    );
+  };
+
+  const DeleteTimetable = (course: string, room : string, day : string) => {
+    Alert.alert(
+      "정말로 시간표를 삭제하시겠습니까?",
+      "이 시간대의 시간표를 정말로 삭제하시겠습니까?",
+      [
+        {
+          text: "취소",
+          style: "cancel",
+        },
+        { 
+          text: "확인", 
+          onPress: async () => {
+            await deleteTimetable(course, room, day);
+          }
+        }
+      ]
+    );
+  };
 
   //이 함수로 새로운 배열을 집어 넣을거야
-  const addLecture = (newLecture: TimeTableLecture) => {
+  const addLecture = async (newLecture: TimeTableLecture) => {
     setUserLecture((prevLectures) => [...prevLectures, newLecture]);
+    await insertTimeTable(newLecture);
+    CompleteAddTimeTable();
+    setLectureName("");
+    setProfessorName("");
+    setSpaceName("");
+    setSelectedTime("시작 시간 선택");
+    setSelectedTime2("종료 시간 선택");
+    closeModal();
   };
 
 
@@ -476,16 +604,29 @@ const App = ({ route }: any) => {
                 const Intgrade = parseInt(grade.replace(/\D/g, ""), 10); // grade
                 const Intsemseter = parseInt(semseter.replace(/\D/g, ""), 10); // semester
                 //const Intcredit = parseInt(credit);
-                addLecture({
-                  lecture_grade: Intgrade,
-                  lecture_semester: Intsemseter,
-                  lecture_name: lectureName,
-                  lecture_room: spaceName,
-                  lecture_time: fulltime,
-                  professor_name: professorName,
-                  credit : Intcredit,
-                  week: day
-                })
+
+                if (hour1 < 9 || hour1 > 18 || hour2 < 9 || hour2 > 18) {
+                  mistackTimetable();
+                } else {
+                  if(hour2 - hour1 >= 0) {
+                    if (checkOverlap(hour1, hour2, day, Intgrade, Intsemseter)) {
+                      mistackTimetable(); // 시간이 겹치면 오류
+                    } else {
+                      addLecture({
+                        lecture_grade: Intgrade,
+                        lecture_semester: Intsemseter,
+                        lecture_name: lectureName,
+                        lecture_room: spaceName,
+                        lecture_time: fulltime,
+                        professor_name: professorName,
+                        credit: Intcredit,
+                        week: day
+                      });
+                    }
+                  }else {
+                    mistackTimetable();
+                  }
+                }
               }}>
               <Text style={styles.completebuttonFont}>등록</Text>
             </TouchableOpacity>
@@ -681,7 +822,7 @@ const styles = StyleSheet.create({
     height: '76%',
     borderWidth: 2,
     borderColor: 'grey',
-    marginLeft : 20
+    marginLeft: 20
   },
 });
 
