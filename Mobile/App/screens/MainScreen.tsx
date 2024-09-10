@@ -337,7 +337,14 @@ const MainPage = ({ navigation, route }: any) => {
               </TouchableOpacity>
               <View style={styles.userInfoNPointArea}>
                 <View style={styles.userInfoArea}>
-                  <Text style={styles.userName}>{userData.name}</Text>
+                  <View style ={{flexDirection : 'row'}}>
+                    <Text style={styles.userName}>{userData.name}</Text>
+                    <TouchableOpacity 
+                    style = {styles.pointcheckBox}
+                    onPress ={() => {navigation.navigate("PointHistoryScreen")}}>
+                      <Text style = {styles.pointcheckFont}>내 포인트 이력</Text>
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.userInfo}>{Userdepartment}/{userData.grade}학년</Text>
                 </View>
                 <View style={styles.pointArea}>
@@ -931,6 +938,21 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 17,
   },
+  pointcheckBox : {
+    backgroundColor : '#A8D5BA',
+    width : '50%',
+    height : 30, //이거 %쓰면 아예 달라져 버려서 일단 보류
+    marginLeft : 60,
+    justifyContent : 'center',
+    alignItems : 'center',
+    borderRadius : 10,
+    elevation : 5
+  },
+  pointcheckFont : {
+    fontSize : 16,
+    fontWeight : 'bold',
+    color : 'black'
+  }
 });
 
 export default MainPage;

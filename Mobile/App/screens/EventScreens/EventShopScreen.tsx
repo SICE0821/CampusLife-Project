@@ -188,7 +188,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
             await update_object_state(SelectItem?.object_id);
             await insert_user_have_object();
             await user_buy_action();
-  
+            await AddBuyProductPointHistory(SelectItem?.name, SelectItem?.price);
             // 추가 알림창 띄우기
             Alert.alert(
               "알림",
@@ -201,6 +201,24 @@ const EventShopScreen = ({ navigation, route }: any) => {
       ]
     );
   };
+
+  const AddBuyProductPointHistory = async (item : any, point : any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AddBuyProductPointHistory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          product : item,
+          point : point
+        })
+      });
+    } catch (error) {
+    }
+  }
+
   const closeModal = () => {
     setIsModalOpen(false);
   };

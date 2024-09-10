@@ -292,6 +292,36 @@ const UserManagement = ({ route }: any) => {
     }
   };
 
+  const pointCalculator = (before : number, after : any) => {
+    if(before > after) {
+      return 0
+    }else if(before < after) {
+      return 1
+    }
+  }
+
+  const AddAdminPointHistory = async () => {
+    const status = pointCalculator(selectedUser.point, newPoints);
+    if(newPoints) {
+      const point = Math.abs(selectedUser.point - newPoints);
+      try {
+        const response = await fetch(`${config.serverUrl}/AddAdminPointHistory`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id : selectedUser.user_id,
+            point : point,
+            status : status,
+  
+          })
+        });
+      } catch (error) {
+      }
+    }
+  }
+
   /** 선택된 유저 포인트 변경 서버 업데이트 */
   const handlePointsModify = async () => {
     if (selectedUser && newPoints !== undefined) {
@@ -306,9 +336,7 @@ const UserManagement = ({ route }: any) => {
             point: newPoints,
           }),
         });
-
         await response.json();
-
         const updatedUserData = userData.map(user =>
           user.user_id === selectedUser.user_id ? { ...user, point: newPoints } : user
         );
@@ -481,7 +509,10 @@ const UserManagement = ({ route }: any) => {
               />
             </View>
             <View style={styles.modalButtonContainer}>
-              <TouchableOpacity style={styles.modalButton} onPress={handlePointsModify}>
+              <TouchableOpacity style={styles.modalButton} onPress={async () => {
+                await AddAdminPointHistory();
+                await handlePointsModify();
+                }}>
                 <Text style={styles.modalButtonText}>확인</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalButton} onPress={closePointsModal}>

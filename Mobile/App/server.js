@@ -150,7 +150,17 @@ const { getGeneralPosts,
   comment_like_num_down,
   cancel_comment_like,
   recomment_like_num_down,
-  cancel_recomment_like
+  cancel_recomment_like,
+  getHistoryData,
+  AddEventPointHistory,
+  AddFriendPointHistory,
+  AddAppAttendancePointHistory,
+  AddBuyProductPointHistory,
+  AddAdminPointHistory,
+  getTimeTableData,
+  insertTimeTable,
+  deleteTimetable
+
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -1217,7 +1227,9 @@ app.post('/search_post', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      user_title: item.user_title
+      user_title: item.user_title,
+      department_check : item.department_check,
+      inform_check : item.inform_check
     }));
     console.log("[SearchPostScreen] : 찾는 게시물 정보 가져오기 성공");
     res.json(processedData);
@@ -2507,10 +2519,10 @@ app.post('/GetUserEventPhoto', async (req, res) => {
       user_id: item.user_id,
       event_photo: item.event_photo,
     }));
-    console.log("[ParticipantEvnet] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
+    console.log("[ParticipantEvent] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
     res.json(processedData);
   } catch (error) {
-    console.log("[ParticipantEvnet] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
+    console.log("[ParticipantEvent] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -2789,6 +2801,162 @@ app.post('/cancel_recomment_like', async (req, res) => {
   } catch (error) {
     console.log("[PostDetailScreen] : 포스터 대댓글 좋아요 목록에서 삭제 실패");
     res.json({ success: false, error: error.message });
+  }
+});
+
+//유저 포인트 기록 가져오기
+app.post('/getHistoryData', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    const rows = await getHistoryData(user_id);
+    const processedData = rows.map(item => ({
+      history_id : item.history_id,
+      point_status :item.point_status,
+      point_num : item.point_num,
+      point_time : formatDate2(item.point_time),
+      content : item.content,
+      user_id : item.user_id
+    }));
+    console.log("[PointHistoryScreen] : 유저 포인트 기록 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[PointHistoryScreen] : 유저 포인트 기록 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddEventPointHistory', async (req, res) => {
+  const { point_num, content, user_id } = req.body;
+  try {
+    await AddEventPointHistory(point_num, content, user_id);
+    console.log("[ParticipantEvent] : 유저 포인트 적립 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[ParticipantEvent] : 유저 포인트 적립 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddFriendPointHistory', async (req, res) => {
+  const { user_id, friendName } = req.body;
+  try {
+    await AddFriendPointHistory(user_id, friendName);
+    console.log("[FriendCodeEventScreen] : 유저 포인트 적립 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[FriendCodeEventScreen] : 유저 포인트 적립 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddAppAttendancePointHistory', async (req, res) => {
+  const { user_id, today } = req.body;
+  try {
+    await AddAppAttendancePointHistory(user_id, today);
+    console.log("[AttendanceCheckEventScreen] : 유저 포인트 적립 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[AttendanceCheckEventScreen] : 유저 포인트 적립 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddBuyProductPointHistory', async (req, res) => {
+  const { user_id, product, point } = req.body;
+  try {
+    await AddBuyProductPointHistory(user_id, product, point);
+    console.log("[EventShopScreen] : 유저 포인트 사용 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[EventShopScreen] : 유저 포인트 사용 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddAdminPointHistory', async (req, res) => {
+  const { user_id, point, status } = req.body;
+  try {
+    await AddAdminPointHistory(user_id, point, status);
+    console.log("[UserManagement] : 유저 포인트 사용 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[UserManagement] : 유저 포인트 사용 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/setUserSendtype', async (req, res) => {
+  const { user_send_event } = req.body;
+  try {
+    await setUserSendtype(user_send_event);
+    console.log("[ParticipantEvent] : 유저 이벤트 당첨 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[ParticipantEvent] : 유저 이벤트 당첨 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/getTimeTableData', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    const rows = await getTimeTableData(user_id);
+    const processedData = rows.map(item => ({
+      professor_name : item.professor_name,
+      lecture_name: item.lecture_name,
+      lecture_room : item.lecture_room,
+      lecture_time : item.lecture_time,
+      week: item.week,
+      lecture_grade: item.lecture_grade,
+      lecture_semester: item.lecture_semester,
+      credit : item.credit
+    }));
+    console.log("[TimetableScreen] : 시간표 데이터 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 데이터 가져오기 실패");
+    console.error('API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/insertTimeTable', async (req, res) => {
+  const { user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week} = req.body;
+  try {
+    await insertTimeTable(user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week);
+    console.log("[TimetableScreen] : 시간표 추가 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 추가 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/deleteTimetable', async (req, res) => {
+  const { user_id, lecture_name, lecture_room, week} = req.body;
+  try {
+    await deleteTimetable(user_id, lecture_name, lecture_room, week);
+    console.log("[TimetableScreen] : 시간표 삭제 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 삭제 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

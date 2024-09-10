@@ -122,6 +122,8 @@ const FriendCodeEventScreen = ({ route }: any) => {
 
       const aram_data = await response.json();
       await addFriendCodeAram(aram_data.friend_code, aram_data.friend_code_id, aram_data.my_name);
+      await AddFriendPointHistory(aram_data.friend_code);
+
     } catch (error: any) {
       if (error.name === 'AbortError') {
         //console.error('요청이 타임아웃되었습니다');
@@ -130,6 +132,22 @@ const FriendCodeEventScreen = ({ route }: any) => {
       }
     }
   };
+
+  const AddFriendPointHistory = async (friendName : string) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AddFriendPointHistory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          friendName : friendName
+        })
+      });
+    } catch (error) {
+    }
+  }
 
   const user_update_point = async () => {
 
@@ -207,6 +225,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
       } else if (check_end_send.success == "성공") {
         await last_friendCode_Info();
         await user_update_point();
+        
         userData.point = userData.point + 100;
         return result = "성공";
       } else if (check_end_send.success == "코드없음") {

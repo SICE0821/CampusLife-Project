@@ -81,12 +81,33 @@ const ParticipantEvent = ({ route }: any) => {
         })
       });
     } catch (error) {
-      console.error('알람 전송 실패', error);
     }
   }
 
 
-  const handlePrizeUser = (user_id: number, event_point: number, evnet_id : number, user_send_event : number) => {
+  const AddEventPointHistory = async (user_id : any, content : any, point_num : any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AddEventPointHistory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          point_num : point_num,
+          content : content,
+          user_id : user_id
+        })
+      });
+    } catch (error) {
+      console.error('알람 전송 실패', error);
+    }
+  }
+
+    
+
+
+  const handlePrizeUser = (user_id: number, event_point: number, evnet_id : number, user_send_event : number, event : any) => {
+    const event_name = get_event_name(event);
     Alert.alert(
       "이벤트 당첨!",
       "해당 유저에게 포인트를 부여하시겠습니까??",
@@ -98,6 +119,7 @@ const ParticipantEvent = ({ route }: any) => {
                 good_404();
                 await addGoodEventAram(user_id, evnet_id);
                 await AdminSendPoint(user_id, event_point);
+                await AddEventPointHistory(user_id, event_name, event_point);
                 await setUserSendtype(user_send_event);
                 await GetUserSendEvent();
             } catch (error) {
@@ -232,6 +254,11 @@ const ParticipantEvent = ({ route }: any) => {
     return name.length > 20 ? name.substring(0, 20) + '...' : name;
   };
 
+  const get_event_name = (event : any) => {
+    return eventList.find(item => item.event_id === event.event_id)?.name
+  }
+
+
   const filteredEvents = userSendEventData.filter(event => event.event_id === selectedEventId);
 
   return (
@@ -283,7 +310,7 @@ const ParticipantEvent = ({ route }: any) => {
             key={index}
             style={styles.eventBox}
             onLongPress={() => {
-              handlePrizeUser(event.user_id, event.event_point, event.event_id, event.user_send_event);
+              handlePrizeUser(event.user_id, event.event_point, event.event_id, event.user_send_event, event);
             }}>
             <View style={styles.topInfoArea}>
               <Text style={styles.eventName}>{eventList.find(item => item.event_id === event.event_id)?.name}</Text>
