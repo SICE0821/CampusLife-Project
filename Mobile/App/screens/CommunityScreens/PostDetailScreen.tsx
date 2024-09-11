@@ -5,18 +5,17 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import IconD from 'react-native-vector-icons/EvilIcons';
 import IconC from 'react-native-vector-icons/Feather';
 import { useFocusEffect } from '@react-navigation/native';
-import { PostDeatilData, CommentsWithRecomments } from "../../types/type"
+import { PostDeatilData, CommentsWithRecomments, PostPhoto } from "../../types/type"
 import { UserData } from '../../types/type'
 import config from '../../config';
 
 const width = Dimensions.get("window").width;
 
 const eventImages = [
-    //require('../../assets/001.png'),
-    // require('../../assets/002.png'),
-     require('../../assets/부천대.png'),
-    // require('../../assets/wjdtkdghk.jpg'),
-    // Add more images here up to a maximum of 10
+    require('../../assets/001.png'),
+    require('../../assets/002.png'),
+    require('../../assets/부천대.png'),
+    require('../../assets/wjdtkdghk.jpg'),
 ];
 
 type ReportUser = {
@@ -33,7 +32,7 @@ type ReportCommentUser = {
 
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     console.log("you are in PostDetailScreen")
-    const { item, userData } = route.params;
+    const { item, userData} = route.params;
     const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>();
@@ -51,7 +50,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [activeCommentId, setActiveCommentId] = useState<number | null>(null);
     const inputRef = useRef<TextInput>(null);
 
-    const [postImages, setpostImages] = useState<any[]>(eventImages);
+    const [postImages, setpostImages] = useState<PostPhoto[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
 
@@ -95,6 +94,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 try {
                     await DeatilPost();
                     await CommentList();
+                    await DetailPostPhoto();
                     setUserData(userdata);
                 } catch (error) {
                     console.error('Error fetching data:', error);
@@ -293,6 +293,26 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             console.error('유저 학과 이름 가져오기 실패:', error);
         }
     }
+
+        //포스터 사진 가져오기
+        const DetailPostPhoto = async () => {
+            try {
+                const response = await fetch(`${config.serverUrl}/DetailPostPhoto`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        post_id: item.post_id
+                    })
+                })
+                const DetailPostPhoto = await response.json();
+                setpostImages(DetailPostPhoto);
+                console.log(DetailPostPhoto);
+            } catch (error) {
+                console.error('유저 학과 이름 가져오기 실패:', error);
+            }
+        }
 
     //댓글 리스트 가져오기
     const CommentList = async () => {
@@ -1216,7 +1236,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                             <TouchableOpacity onPress={async () => {
                             if (userdata.user_pk === postDetailInfo?.user_id) {
                                 const post_edit_info = await get_post_info();
-                                navigation.navigate("EditPostScreen", { userdata, post_edit_info })
+                                navigation.navigate("EditPostScreen", { userdata, post_edit_info, postImages})
                             } else {
                                 NoyourPostAlert();
                                 toggleOptions();
@@ -1255,7 +1275,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                             <TouchableOpacity key={index} onPress={() => openImageModal(index)}
                             style={postImages.length === 1 ? styles.previewImageFullArea : null}>
                                 <Image
-                                    source={image}
+                                    source={{ uri: `${config.photoUrl}/${image.post_photo}.png` }}
                                     style={postImages.length === 1 ? styles.previewImageFullWidth : styles.previewImage}
                                 />
                             </TouchableOpacity>
@@ -1484,7 +1504,8 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                             )}
                             showsHorizontalScrollIndicator={false}
                             renderItem={({ item }) => (
-                                <Image source={item} style={styles.fullImage} />
+                                <Image source={{ uri: `${config.photoUrl}/${item.post_photo}.png` }} 
+                                       style={styles.fullImage} />
                             )}
                             keyExtractor={(_, index) => index.toString()}
                         />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Text, View, Button, StyleSheet, TouchableOpacity, TextInput, ScrollView, Alert, Image } from 'react-native';
+import { Text, View, Button, StyleSheet, Dimensions, TouchableOpacity, TextInput, ScrollView, Alert, Image } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
 import IconCancel from 'react-native-vector-icons/AntDesign';
@@ -9,6 +9,27 @@ import ModalBox from 'react-native-modalbox';
 import { UserData } from '../../types/type'
 import config from '../../config';
 import { launchImageLibrary } from 'react-native-image-picker';
+import LottieView from 'lottie-react-native';
+
+const { width, height } = Dimensions.get('window');
+
+const EmptyMainText = () => {
+  const content =
+    "\n\n\n" +
+    "캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다. 위반 시 게시물이 삭제되고 서비스 이용이 일정 기간 제한될 수 있습니다." +
+    "\n\n정치·사회 관련 행위 금지\n\n국가기관, 정치 관련 단체, 언론, 시민단체에 대한 언급 혹은 이와 관련한 행위" +
+    "\n정책·외교 또는 정치·정파에 대한 의견, 주장 및 이념, 가치관을 드러내는 행위\n성별, 종교, 인종, 출신, 지역, 직업, 이념 등 사회적 이슈에 대한 언급 혹은 이와 관련한 행위" +
+    "\n위와 같은 내용으로 유추될 수 있는 비유, 은어 사용 행위\n영리 여부와 관계 없이 사업체·기관·단체·개인에게 직간접적으로 영향을 줄 수 있는 게시물 작성 행위\n불법촬영물 유통 금지\n불법촬영물등을 게재할 경우 전기통신사업법에 따라 삭제 조치 및 서비스 이용이 영구적으로 제한될 수 있으며 관련 법률에 따라 처벌받을 수 있습니다." +
+    "\n\n그 밖의 규칙 위반\n타인의 권리를 침해하거나 불쾌감을 주는 행위\n범죄, 불법 행위 등 법령을 위반하는 행위\n욕설, 비하, 차별, 혐오, 자살, 폭력 관련 내용을 포함한 게시물 작성 행위\n음란물, 성적 수치심을 유발하는 행위\n스포일러, 공포, 속임, 놀라게 하는 행위"
+
+  return (
+    <View style={{ padding: 6 }}>
+      <Text>
+        {content}
+      </Text>
+    </View>
+  );
+};
 
 const WritePostPage: React.FC = ({ navigation, route }: any) => {
   console.log("you are in WritePostPage")
@@ -25,19 +46,14 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  const content = "이 곳에 글을 입력해주세요!" +
-    "\n\n\n" +
-    "캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다. 위반 시 게시물이 삭제되고 서비스 이용이 일정 기간 제한될 수 있습니다." +
-    "\n\n정치·사회 관련 행위 금지\n\n국가기관, 정치 관련 단체, 언론, 시민단체에 대한 언급 혹은 이와 관련한 행위" +
-    "\n정책·외교 또는 정치·정파에 대한 의견, 주장 및 이념, 가치관을 드러내는 행위\n성별, 종교, 인종, 출신, 지역, 직업, 이념 등 사회적 이슈에 대한 언급 혹은 이와 관련한 행위" +
-    "\n위와 같은 내용으로 유추될 수 있는 비유, 은어 사용 행위\n영리 여부와 관계 없이 사업체·기관·단체·개인에게 직간접적으로 영향을 줄 수 있는 게시물 작성 행위\n불법촬영물 유통 금지\n불법촬영물등을 게재할 경우 전기통신사업법에 따라 삭제 조치 및 서비스 이용이 영구적으로 제한될 수 있으며 관련 법률에 따라 처벌받을 수 있습니다." +
-    "\n\n그 밖의 규칙 위반\n타인의 권리를 침해하거나 불쾌감을 주는 행위\n범죄, 불법 행위 등 법령을 위반하는 행위\n욕설, 비하, 차별, 혐오, 자살, 폭력 관련 내용을 포함한 게시물 작성 행위\n음란물, 성적 수치심을 유발하는 행위\n스포일러, 공포, 속임, 놀라게 하는 행위"
+  // 이미지 등록 후 강제로 리렌더링을 유도하는 함수 추가
+  const forceUpdate = React.useReducer(() => ({}), {})[1];
+
   useFocusEffect(
     React.useCallback(() => {
       changeHeaderRightContent();
-    }, [selectdepartmentposter, titletext, maintext])
+    }, [selectdepartmentposter, titletext, maintext, selectedFormImages])
   );
-
 
   const goback = () => {
     navigation.goBack();
@@ -84,8 +100,12 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const changeHeaderRightContent = () => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => {
-          write_post();
+        <TouchableOpacity onPress={async () => {
+          const post_id = await write_post();
+          const post_id_int = parseInt(post_id.postId);
+          const imageGroup = await uploadImages();
+          await RegistorPostPhoto(post_id_int, imageGroup); //포스트 사진 등록
+          ok_go();
         }}>
           <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
             <Text style={{ color: 'white', fontSize: 17, fontWeight: "bold" }}>완료</Text>
@@ -105,6 +125,26 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     );
   };
 
+  //사진 등록 함수 프로시저 사용할거임
+  const RegistorPostPhoto = async (post_id: number, post_photo: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/RegistorPostPhoto`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          post_id: post_id,
+          post_photo: post_photo
+        }),
+      })
+      await response.json();
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  }
+
   const write_post = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/write_post`, {
@@ -120,8 +160,8 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           contents: maintext,
         })
       });
-      await response.json();
-      ok_go();
+      const post_id = await response.json();
+      return(post_id);
 
     } catch (error) {
       console.error('게시글 쓰기 실패!', error);
@@ -147,12 +187,37 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           return formData;
         });
         setSelectedFormImages(formDataArray);
-        //console.log(formDataArray);
+        forceUpdate();
       } else if (response.errorCode) {
         //console.log('Image picker error: ', response.errorMessage);
       }
     });
   };
+
+    // 이미지 업로드 함수
+    const uploadImages = async () => {
+      try {
+        const uploadedImageDatas = [];
+        for (const formData of selectedFormImages) {
+          const response = await fetch(`${config.serverUrl}/uploadImages`, {
+            method: 'POST',
+            body: formData,
+          });
+          const imageData = await response.json();
+          uploadedImageDatas.push(imageData.fileNames[0]);
+          if (response.ok) {
+            //console.log('Image uploaded successfully');
+          } else {
+            //console.error('Image upload failed');
+          }
+        }
+        //console.log(uploadedImageDatas);
+        return uploadedImageDatas;
+      } catch (error) {
+        console.error('Error uploading images: ', error);
+      }
+    };
+  
 
   // 이미지 삭제 함수
   const handleImageRemove = (index: number) => {
@@ -185,19 +250,39 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
             onChangeText={handlemainTextChange}
             value={maintext}
             multiline={true}
-            placeholder={content}
+            placeholder={"이곳에 글을 입력해 주세요!"}
             placeholderTextColor={'gray'}
           />
+          {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
         </View>
-        {selectedImages.map((image, index) => (
-          <View key={index} style={styles.fileInfo}>
-            <Image source={{ uri: image.uri }} style={styles.imagePreview} />
-            <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
-              <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
-            </TouchableOpacity>
-          </View>
-        ))}
+        {selectedImages.length > 0 && (
+          <View style={styles.photoArea}>
+            <ScrollView style={styles.photoScrollViewArea} horizontal={true}>
+              {selectedImages.map((image, index) => (
+                <View key={index} style={styles.fileInfo}>
+                  <Image
+                    source={{ uri: image.uri }}
+                    resizeMode="contain"
+                    style={styles.imagePreview} />
+                  <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
+                    <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+                  </TouchableOpacity>
 
+                  {/* 마지막 인덱스가 아닐 때만 LottieView를 렌더링 */}
+                  {index !== selectedImages.length - 1 && (
+                    <LottieView
+                      source={require('../../assets/Animation - 1725980201082.json')}
+                      autoPlay
+                      onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
+                      loop
+                      style={{ width: width - 440, height: height - 910, right: width - 455, top: height - 830 }}
+                    />
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
       </ScrollView>
       <View style={styles.postImageArea}>
         <TouchableOpacity onPress={handleImagePick} style={styles.postImageButton}>
@@ -242,7 +327,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   selectPostArea: {
     flex: 1,
@@ -281,22 +366,39 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   fileInfo: {
+    width: width - 79,
+    height: height - 980,
+    padding: 40,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
+    //backgroundColor: 'blue'
   },
   cancelButton: {
-    alignSelf: 'flex-start',
-    right: 15,
-    bottom: 10
+    alignSelf: 'flex-end',
+    bottom: height - 647,
+    left: width - 492
   },
   imagePreview: {
-    width: '70%',
-    height: 300,
+    width: "100%",
+    height: "100%",
     resizeMode: 'cover',
     backgroundColor: '#eeeeee'
   },
+  photoArea: {
+    width: "100%",
+    height: height - 549,
+    justifyContent: 'center',
+    alignItems: 'center',
+    //backgroundColor : 'red'
+  },
+
+  photoScrollViewArea: {
+    width: "85%",
+    height: "100%",
+    //backgroundColor : 'red',
+    borderWidth: 3,
+    borderColor: "#CCCCCC",
+    borderRadius: 20
+  }
 })
 
 const modalStyle = StyleSheet.create({
@@ -375,9 +477,7 @@ const modalStyle = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-
-
+  }
 })
 
 export default WritePostPage;

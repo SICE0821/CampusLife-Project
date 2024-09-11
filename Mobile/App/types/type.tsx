@@ -251,6 +251,11 @@ export type VoteDataItem = {
   results: number[];
 }
 
+export type PostPhoto = {
+  post_id: number;
+  post_photo: string;
+}
+
 export type Edit_Post_Info = {
   post_id : number,
   user_id : number,

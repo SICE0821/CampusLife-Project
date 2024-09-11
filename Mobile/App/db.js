@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '127.0.0.1',
+    host: '14.6.152.120',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -962,6 +962,23 @@ async function get_post_detail(post_id) {
     }
 }
 
+async function DetailPostPhoto(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT * FROM post_photo WHERE post_id = ?    
+        `;
+        const rows = await conn.query(query, [post_id]);
+        return rows;
+
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //댓글 리스트 가져오기
 async function getComment(post_ida) {
     let conn;
@@ -1261,11 +1278,26 @@ async function write_post(user_id, department_check, inform_check, title, conten
         const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
         VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
         const result = await conn.query(query, [user_id, department_check, inform_check, title, contents]);
-        const postId = result.insertId.toString(); // Retrieve the inserted post's ID
+        const postId = result.insertId.toString();
         return postId;
     } catch (err) {
         console.error(err);
         return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//사진 등록 프로시저 작성 하고 넣어둘건데 일단 어떻게 만들었는지 보자
+async function RegistorPostPhoto(post_id, post_photo) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const photosJson = JSON.stringify(post_photo);
+        const query = `CALL RegisterPostPhoto(?, ?)`;
+        await conn.query(query, [post_id, photosJson]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
@@ -2786,6 +2818,21 @@ async function DeleteEvent(event_id) {
     }
 }
 
+async function DeletePostPhoto(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `DELETE FROM post_photo WHERE post_id = ?`
+            , [post_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
 //유저의 이벤트 목록 가져오기
 async function GetUserSendEvent(campus_id) {
     let conn;
@@ -3355,6 +3402,41 @@ async function deleteTimetable(user_id, lecture_name, lecture_room, week) {
     }
 }
 
+//유저 목표 학점 가져오기
+async function get_GoalGPA(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `SELECT goal_gpa FROM user WHERE user_id = ?`
+        const result = await conn.query(query, [user_id]);
+        return result
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function change_GoalGPA(user_id, goal_gpa) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `
+            UPDATE user 
+            SET 
+                goal_gpa = ?
+            WHERE user_id = ?
+        `;
+        const result = await conn.query(query, [goal_gpa, user_id]);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
 
 
 
@@ -3489,7 +3571,6 @@ module.exports = {
     reportCommentAram,
     AttendanceCheck,
     addGoodEventAram,
-    RegistorEvent,
     setUserSendtype,
     addCommentLikeAram,
     get_recomment_post_pk,
@@ -3518,5 +3599,10 @@ module.exports = {
     AddAdminPointHistory,
     getTimeTableData,
     insertTimeTable,
-    deleteTimetable
+    deleteTimetable,
+    get_GoalGPA,
+    change_GoalGPA,
+    RegistorPostPhoto,
+    DetailPostPhoto,
+    DeletePostPhoto
 };
