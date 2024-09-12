@@ -567,7 +567,7 @@ const PostDetailScreen: React.FC = ({ route,navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        //backgroundColor : "red",
+        backgroundColor : "white",
     },
     headersection: {
         height: 75,

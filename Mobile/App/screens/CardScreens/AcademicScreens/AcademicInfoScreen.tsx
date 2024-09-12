@@ -137,7 +137,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>우등상</Text>
                     </View>
@@ -145,7 +145,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지2.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>수강상</Text>
                     </View>
@@ -153,7 +153,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지3.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>성장상</Text>
                     </View>
@@ -161,7 +161,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지4.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>노력상</Text>
                     </View>
@@ -169,7 +169,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지5.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>출석상</Text>
                     </View>
@@ -177,7 +177,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지6.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>소통상</Text>
                     </View>
@@ -185,7 +185,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지7.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>최고상</Text>
                     </View>
@@ -210,11 +210,12 @@ const AcademicInfoScreen = ({ route }: any) => {
                             ))}
                         </View>
                     ))}
+                </View>
+                <View style={styles.BadgeArea2}>
                     <View style={styles.BadgeTextArea2}>
                         <Text style={styles.BadgeTextFont}>목표학점</Text>
                         <IconH style={styles.BadgeIcon} name="trophy" size={30} />
                     </View>
-
                     <HorizontalBarGraph />
                 </View>
 
@@ -364,13 +365,13 @@ const styles = StyleSheet.create({
     },
     BadgeArea: {
         height: '10%',
-        padding: 10,
-        borderBottomWidth: 1
+        margin: 10,
+        borderBottomWidth: 1,
     },
     OneBadgeArea: {
         justifyContent: 'center',
         alignItems: 'center',
-        width: width - 410,
+        marginHorizontal: 10
         //backgroundColor: 'blue'
     },
     BadgeTextFont: {
@@ -392,14 +393,18 @@ const styles = StyleSheet.create({
         marginLeft: 24,
         borderRadius: 10,
         flexDirection: 'row',
-        borderColor: '#F29F05'
+        borderColor: '#F29F05',
         //backgroundColor: 'blue'
+    },
+    BadgeArea2: {
+        marginHorizontal: 20,
+        height: 300
     },
 
     BadgeTextArea2: {
         height: "10%",
         width: '33%',
-        marginLeft : 2,
+        marginLeft: 2,
         marginTop: 20,
         borderWidth: 1,
         justifyContent: 'center',
@@ -410,7 +415,6 @@ const styles = StyleSheet.create({
         //backgroundColor: 'blue'
     },
     TargetGradeArea: {
-        height: height - 800,
         //backgroundColor: 'blue'
     },
     animation: {
@@ -444,8 +448,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     graphArea: {
-        flex: 1,
-        bottom: 20
     }
 });
 
