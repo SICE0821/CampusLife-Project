@@ -307,33 +307,45 @@ app.post('/post', async (req, res) => {
 //아이디와 비밀번호를 받고 유저 pk값을 가져온다.
 app.post('/get_user_data', async (req, res) => {
   const { user_id, user_pass } = req.body;
-  const rows = await getuserpk(user_id, user_pass);
+  try {
+    // 데이터베이스에서 유저 정보 조회
+    const rows = await getuserpk(user_id, user_pass);
 
-  const userData = {
-    user_pk: rows[0].user_id,
-    student_pk: rows[0].student_id,
-    friend_code: rows[0].friend_code,
-    admin_check: rows[0].admin_check,
-    profile_photo: rows[0].profilePhoto,
-    id: rows[0].id,
-    name: rows[0].name,
-    campus_pk: rows[0].campus_id,
-    department_pk: rows[0].department_id,
-    email: rows[0].email,
-    grade: rows[0].grade,
-    birth: formatDate(rows[0].birth),
-    point: rows[0].point,
-    currentstatus: rows[0].currentstatus,
-    student_semester: rows[0].student_semester,
-    college: rows[0].college,
-    title: rows[0].title,
-    report_confirm: rows[0].report_confirm,
-  };
-  console.log("[LoginScreen -> MainScreen] : 학생 정보 가져오기 성공");
-  res.json(userData);
-})
+    // 조회된 결과가 없는 경우
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
+    // 유저 데이터를 가공하여 전송
+    const userData = {
+      user_pk: rows[0].user_id,
+      student_pk: rows[0].student_id,
+      friend_code: rows[0].friend_code,
+      admin_check: rows[0].admin_check,
+      profile_photo: rows[0].profilePhoto,
+      id: rows[0].id,
+      name: rows[0].name,
+      campus_pk: rows[0].campus_id,
+      department_pk: rows[0].department_id,
+      email: rows[0].email,
+      grade: rows[0].grade,
+      birth: formatDate(rows[0].birth),
+      point: rows[0].point,
+      currentstatus: rows[0].currentstatus,
+      student_semester: rows[0].student_semester,
+      college: rows[0].college,
+      title: rows[0].title,
+      report_confirm: rows[0].report_confirm,
+    };
 
+    res.json(userData);
+
+  } catch (error) {
+    // 오류 발생 시 처리
+    console.error('학생 정보 가져오기 오류:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //해당 학교의 이벤트 상품 싹 가져오기
 app.post('/get_items', async (req, res) => {
