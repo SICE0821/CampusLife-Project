@@ -9,6 +9,7 @@ import AttendanceScreen from '../screens/AttendanceScreens/AttendanceScreen';
 import TimetableScreen from '../screens/TimetableScreen';
 import WritePostScreen from '../screens/CommunityScreens/WritePostScreen';
 import LoginScreen from '../screens/LoginScreens/LoginScreen';
+import TosScreen from '../screens/LoginScreens/TosScreen';
 import RegisterScreen from '../screens/LoginScreens/RegisterScreen';
 import SearchScreen from '../screens/LoginScreens/SearchScreen';
 import { AcademicTopTabNavigator } from '../navigation/TopTabNavigator';
@@ -174,6 +175,23 @@ export const LoginScreenStackNavigator = () => {
     return (
         <LoginStack.Navigator>
             <LoginStack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+            <LoginStack.Screen
+                name="TosScreen"
+                component={TosScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '이용약관',
+                })}
+            />
             <LoginStack.Screen
                 name="RegisterScreen"
                 component={RegisterScreen}

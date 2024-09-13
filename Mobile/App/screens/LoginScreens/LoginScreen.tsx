@@ -37,7 +37,7 @@ function LoginScreen({ navigation }: any) {
       //console.log(userdata);
       return(userdata)
     } catch (error) {
-      console.error('유저 정보 가져오기 실패:', error);
+      Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
     }
   }
 
@@ -66,6 +66,7 @@ function LoginScreen({ navigation }: any) {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
       }
     } catch (error) {
+      Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
     }
   };
 
@@ -88,24 +89,6 @@ function LoginScreen({ navigation }: any) {
     }
   }
 
-  const fetchLectureDataInfo = async (userData : UserData) => {
-    try {
-      const response = await fetch(`${config.serverUrl}/getLectureInfo`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          student_pk : userData.student_pk
-        })
-      })
-      const data = await response.json();
-      const Data = data.data; //키값을 치면 값을 json에서 추출할 수 있다.
-      return Data;
-    } catch (error) {
-      console.error('과목 가져오기 실패:', error);
-    }
-  }
 
   useFocusEffect(
     React.useCallback(() => {
@@ -182,7 +165,7 @@ function LoginScreen({ navigation }: any) {
         <Text style={styles.loginlinkText}>아이디, 비밀번호 찾기</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
+      <TouchableOpacity onPress={() => navigation.navigate("TosScreen")}>
         <Text style={styles.loginlinkText}>앱을 처음 이용하시나요? 클릭하세요!</Text>
       </TouchableOpacity>
 
