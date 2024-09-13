@@ -41,6 +41,7 @@ import NoticeSchoolPostsScreen from '../screens/CommunityScreens/NoticeSchoolPos
 import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen';
 import MyPostScreen from '../screens/CommunityScreens/MyPostScreen';
 import { RegisterItemStackNavigator } from '../Admin_Screens/Navigation/AdminStackNavigator';
+import PointHistoryScreen from '../screens/PointHistoryScreen';
 
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -391,6 +392,19 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
+                }} />
+
+            <MainStack.Screen
+                name="PointHistoryScreen"
+                component={PointHistoryScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '포인트 이력',
                 }} />
         </MainStack.Navigator>
     );

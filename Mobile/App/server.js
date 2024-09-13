@@ -150,7 +150,21 @@ const { getGeneralPosts,
   comment_like_num_down,
   cancel_comment_like,
   recomment_like_num_down,
-  cancel_recomment_like
+  cancel_recomment_like,
+  getHistoryData,
+  AddEventPointHistory,
+  AddFriendPointHistory,
+  AddAppAttendancePointHistory,
+  AddBuyProductPointHistory,
+  AddAdminPointHistory,
+  getTimeTableData,
+  insertTimeTable,
+  deleteTimetable,
+  get_GoalGPA,
+  change_GoalGPA,
+  RegistorPostPhoto,
+  DetailPostPhoto,
+  DeletePostPhoto
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -754,7 +768,7 @@ app.post('/getlecture', async (req, res) => {
       lecture_room: item.lecture_room,
       lecture_time: item.lecture_time,
       week: item.week,
-      lecture_have_week : item.lecture_have_week,
+      lecture_have_week: item.lecture_have_week,
       division: item.division,
       nonattendance: item.nonattendance,
       attendance: item.attendance,
@@ -1196,6 +1210,19 @@ app.post('/write_post', async (req, res) => {
   }
 });
 
+//게시물 사진 등록
+app.post('/RegistorPostPhoto', async (req, res) => {
+  const { post_id, post_photo } = req.body;
+  try {
+    await RegistorPostPhoto(post_id, post_photo);
+    console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 사진등록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 사진등록 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 //게시물 수정
 app.post('/update_post', async (req, res) => {
   try {
@@ -1229,7 +1256,9 @@ app.post('/search_post', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      user_title: item.user_title
+      user_title: item.user_title,
+      department_check: item.department_check,
+      inform_check: item.inform_check
     }));
     console.log("[SearchPostScreen] : 찾는 게시물 정보 가져오기 성공");
     res.json(processedData);
@@ -1301,6 +1330,24 @@ app.post('/get_post_detail', async (req, res) => {
     console.log("[PostDetailScreen or NoticePostDetailScreen] : 자세한 포스터 내용 가져오기 실패");
   }
 });
+
+//유저가 보유하고있는 쿠폰 목록
+app.post('/DetailPostPhoto', async (req, res) => {
+  const { post_id } = req.body;
+  try {
+    const rows = await DetailPostPhoto(post_id);
+    const processedData = rows.map(item => ({
+      post_id : item.post_id,
+      post_photo : item.post_photo
+    }));
+    console.log("[PostDetailScreen or NoticePostDetailScreen] : 자세한 포스터 내용 사진 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[PostDetailScreen or NoticePostDetailScreen] : 자세한 포스터 내용 사진 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 app.post('/update_object', async (req, res) => {
   try {
@@ -1457,10 +1504,10 @@ app.post('/get_aram_data', async (req, res) => {
       good_event_name: item.good_event_name,
       comment_post_id: item.comment_post_id,
       comment_contents: item.comment_contents,
-      comment_comment_id : item.comment_comment_id,
-      recomment_recomment_id : item.recomment_recomment_id,
-      recomment_comment_id : item.recomment_comment_id,
-      recomment_contents : item.recomment_contents
+      comment_comment_id: item.comment_comment_id,
+      recomment_recomment_id: item.recomment_recomment_id,
+      recomment_comment_id: item.recomment_comment_id,
+      recomment_contents: item.recomment_contents
     }));
     console.log("[AlarmDialogScreen] : 해당 유저의 모든 알람 데이터 가져오기 성공");
     res.json(processedData);
@@ -2186,7 +2233,7 @@ app.post('/RegistorItemImage', upload.single('images'), (req, res) => {
     res.json({ fileName: baseName }); // 확장자를 제거한 파일 이름을 JSON 형식으로 클라이언트로 반환
   } catch {
     console.log("[RegisterProduct or ModifyProduct] : 상품 이미지 등록 실패")
-    res.status(500).json({ message: '서버가 잘 마무리되지않았습니다.'});
+    res.status(500).json({ message: '서버가 잘 마무리되지않았습니다.' });
   }
 });
 
@@ -2484,6 +2531,19 @@ app.post('/DeleteEvent', async (req, res) => {
   }
 });
 
+//해당 포스터 사진 초기화
+app.post('/DeletePostPhoto', async (req, res) => {
+  const { post_id } = req.body;
+  try {
+    await DeletePostPhoto(post_id);
+    console.log("[EditPostScreen] : 기존 포스터 사진 목록 초기화 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[EditPostScreen] : 기존 포스터 사진 목록 초기화 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 //유저의 이벤트 목록 가져오기
 app.post('/GetUserSendEvent', async (req, res) => {
   const { campus_id } = req.body;
@@ -2519,10 +2579,10 @@ app.post('/GetUserEventPhoto', async (req, res) => {
       user_id: item.user_id,
       event_photo: item.event_photo,
     }));
-    console.log("[ParticipantEvnet] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
+    console.log("[ParticipantEvent] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
     res.json(processedData);
   } catch (error) {
-    console.log("[ParticipantEvnet] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
+    console.log("[ParticipantEvent] : 유저가 보낸 이벤트 목록[2] 가져오기 성공 (이벤트 사진)");
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -2691,9 +2751,9 @@ app.post('/GetLectureInfo', async (req, res) => {
   try {
     const rows = await GetLectureInfo(student_id, lecture_id);
     const processedData = rows.map(item => ({
-      weeknum : item.weeknum,
+      weeknum: item.weeknum,
       classnum: item.classnum,
-      attendance_Info : item.attendance_Info
+      attendance_Info: item.attendance_Info
     }));
     res.json(processedData);
     //console.log("성공적으로 데이터 보냄");
@@ -2723,12 +2783,12 @@ app.post('/get_post_info', async (req, res) => {
   try {
     const rows = await get_post_info(post_id);
     const processedData = {
-      post_id : rows[0].post_id,
-      user_id : rows[0].user_id,
-      department_check : rows[0].department_check,
-      inform_check : rows[0].inform_check,
-      title : rows[0].title,
-      contents : rows[0].contents
+      post_id: rows[0].post_id,
+      user_id: rows[0].user_id,
+      department_check: rows[0].department_check,
+      inform_check: rows[0].inform_check,
+      title: rows[0].title,
+      contents: rows[0].contents
     };
     console.log("[CheckReportPost] : 포스터 수정 정보 가져오기 성공");
     res.json(processedData);
@@ -2803,6 +2863,186 @@ app.post('/cancel_recomment_like', async (req, res) => {
     res.json({ success: false, error: error.message });
   }
 });
+
+//유저 포인트 기록 가져오기
+app.post('/getHistoryData', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    const rows = await getHistoryData(user_id);
+    const processedData = rows.map(item => ({
+      history_id: item.history_id,
+      point_status: item.point_status,
+      point_num: item.point_num,
+      point_time: formatDate2(item.point_time),
+      content: item.content,
+      user_id: item.user_id
+    }));
+    console.log("[PointHistoryScreen] : 유저 포인트 기록 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[PointHistoryScreen] : 유저 포인트 기록 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddEventPointHistory', async (req, res) => {
+  const { point_num, content, user_id } = req.body;
+  try {
+    await AddEventPointHistory(point_num, content, user_id);
+    console.log("[ParticipantEvent] : 유저 포인트 적립 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[ParticipantEvent] : 유저 포인트 적립 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddFriendPointHistory', async (req, res) => {
+  const { user_id, friendName } = req.body;
+  try {
+    await AddFriendPointHistory(user_id, friendName);
+    console.log("[FriendCodeEventScreen] : 유저 포인트 적립 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[FriendCodeEventScreen] : 유저 포인트 적립 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddAppAttendancePointHistory', async (req, res) => {
+  const { user_id, today } = req.body;
+  try {
+    await AddAppAttendancePointHistory(user_id, today);
+    console.log("[AttendanceCheckEventScreen] : 유저 포인트 적립 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[AttendanceCheckEventScreen] : 유저 포인트 적립 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddBuyProductPointHistory', async (req, res) => {
+  const { user_id, product, point } = req.body;
+  try {
+    await AddBuyProductPointHistory(user_id, product, point);
+    console.log("[EventShopScreen] : 유저 포인트 사용 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[EventShopScreen] : 유저 포인트 사용 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/AddAdminPointHistory', async (req, res) => {
+  const { user_id, point, status } = req.body;
+  try {
+    await AddAdminPointHistory(user_id, point, status);
+    console.log("[UserManagement] : 유저 포인트 사용 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[UserManagement] : 유저 포인트 사용 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/setUserSendtype', async (req, res) => {
+  const { user_send_event } = req.body;
+  try {
+    await setUserSendtype(user_send_event);
+    console.log("[ParticipantEvent] : 유저 이벤트 당첨 기록 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[ParticipantEvent] : 유저 이벤트 당첨 기록 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/getTimeTableData', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    const rows = await getTimeTableData(user_id);
+    const processedData = rows.map(item => ({
+      professor_name: item.professor_name,
+      lecture_name: item.lecture_name,
+      lecture_room: item.lecture_room,
+      lecture_time: item.lecture_time,
+      week: item.week,
+      lecture_grade: item.lecture_grade,
+      lecture_semester: item.lecture_semester,
+      credit: item.credit
+    }));
+    console.log("[TimetableScreen] : 시간표 데이터 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 데이터 가져오기 실패");
+    console.error('API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/insertTimeTable', async (req, res) => {
+  const { user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week } = req.body;
+  try {
+    await insertTimeTable(user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week);
+    console.log("[TimetableScreen] : 시간표 추가 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 추가 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/deleteTimetable', async (req, res) => {
+  const { user_id, lecture_name, lecture_room, week } = req.body;
+  try {
+    await deleteTimetable(user_id, lecture_name, lecture_room, week);
+    console.log("[TimetableScreen] : 시간표 삭제 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+
+  } catch (error) {
+    console.log("[TimetableScreen] : 시간표 삭제 실패");
+    console.log(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/get_GoalGPA', async (req, res) => {
+  const { user_id } = req.body;
+  const rows = await get_GoalGPA(user_id);
+
+  const goal_GPA = {
+    goal_gpa: rows[0].goal_gpa,
+  };
+  console.log("[AcademiclnfoScreen] : 목표 평점(학점) 가져오기 성공");
+  res.json(goal_GPA);
+})
+
+app.post('/change_GoalGPA', async (req, res) => {
+  const { user_id, goal_gpa } = req.body;
+  try {
+    await change_GoalGPA(user_id, goal_gpa);
+    console.log("[AcademiclnfoScreen] : 목표 평점(학점) 변경 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch {
+    res.status(500).json({ message: '서버가 잘 마무리되지않았습니다.'});
+  }
+
+})
+
 
 //서버 시작
 app.listen(PORT, () => {

@@ -251,6 +251,11 @@ export type VoteDataItem = {
   results: number[];
 }
 
+export type PostPhoto = {
+  post_id: number;
+  post_photo: string;
+}
+
 export type Edit_Post_Info = {
   post_id : number,
   user_id : number,
@@ -259,4 +264,17 @@ export type Edit_Post_Info = {
   department_check : boolean,
   inform_check : boolean
 }
+
+export type TimeTableLecture = 
+    {
+    professor_name: string;
+    lecture_name: string;
+    lecture_room: string;
+    lecture_time: string;
+    week : string;
+    lecture_grade : number,
+    lecture_semester : number
+    credit : number
+  }
+
 

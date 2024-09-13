@@ -962,6 +962,23 @@ async function get_post_detail(post_id) {
     }
 }
 
+async function DetailPostPhoto(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+            SELECT * FROM post_photo WHERE post_id = ?    
+        `;
+        const rows = await conn.query(query, [post_id]);
+        return rows;
+
+    } catch (err) {
+        console.error('Error inserting data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 //댓글 리스트 가져오기
 async function getComment(post_ida) {
     let conn;
@@ -1261,11 +1278,26 @@ async function write_post(user_id, department_check, inform_check, title, conten
         const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
         VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
         const result = await conn.query(query, [user_id, department_check, inform_check, title, contents]);
-        const postId = result.insertId.toString(); // Retrieve the inserted post's ID
+        const postId = result.insertId.toString();
         return postId;
     } catch (err) {
         console.error(err);
         return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//사진 등록 프로시저 작성 하고 넣어둘건데 일단 어떻게 만들었는지 보자
+async function RegistorPostPhoto(post_id, post_photo) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const photosJson = JSON.stringify(post_photo);
+        const query = `CALL RegisterPostPhoto(?, ?)`;
+        await conn.query(query, [post_id, photosJson]);
+    } catch (err) {
+        console.error('Error inserting data:', err);
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
@@ -1292,28 +1324,6 @@ async function update_post(post_id, department_check, inform_check, title, conte
         return false;
     } finally {
         if (conn) conn.release(); // 연결 해제
-    }
-}
-
-//학과 게시판에서 전체 게시글을 가져오는 쿼리
-async function searchPost(search_text) {
-    let conn;
-    try {
-        conn = await pool.getConnection();
-        const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.admin_check " +
-            "FROM post " +
-            "LEFT JOIN user ON post.user_id = user.user_id " +
-            "LEFT JOIN student ON user.student_id = student.student_id " +
-            "WHERE post.contents LIKE ? OR post.title LIKE ? " +
-            "ORDER BY post.date DESC;",
-            [`%${search_text}%`, `%${search_text}%`]
-        );
-        return rows;
-    } catch (err) {
-        throw err;
-    } finally {
-        if (conn) conn.release();
     }
 }
 
@@ -1424,7 +1434,7 @@ async function searchPost(search_text) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title " +
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.department_check, post.inform_check, student.name, user.title AS user_title " +
             "FROM post " +
             "LEFT JOIN user ON post.user_id = user.user_id " +
             "LEFT JOIN student ON user.student_id = student.student_id " +
@@ -2808,6 +2818,21 @@ async function DeleteEvent(event_id) {
     }
 }
 
+async function DeletePostPhoto(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `DELETE FROM post_photo WHERE post_id = ?`
+            , [post_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
 //유저의 이벤트 목록 가져오기
 async function GetUserSendEvent(campus_id) {
     let conn;
@@ -3216,6 +3241,205 @@ async function cancel_recomment_like(user_id, recomment_id) {
         if (conn) conn.release(); // 연결 해제
     }
 }
+
+async function getHistoryData(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM point_history WHERE user_id = ? ORDER BY point_time DESC`
+        );
+        const row = await conn.query(query, [user_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddEventPointHistory(point_num, content, user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (1, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [point_num, "[이벤트 당첨] " + content, user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddAppAttendancePointHistory(user_id, today) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (1, 10, ?, ?);`
+        );
+        const rows = await conn.query(query, ["[앱 출석체크] " + today + " 정기 출석",user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddFriendPointHistory(user_id, friendName) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (1, 100, ?, ?);`
+        );
+        const rows = await conn.query(query, ["[친구 코드] " +friendName+ "님에게 친구코드 발송", user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddBuyProductPointHistory(user_id, product, point) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (0, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [point, "[상품 사기] " +product+ " 구매 완료", user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function AddAdminPointHistory(user_id, point, status) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO point_history 
+            (point_status, point_num, content, user_id) 
+            VALUES (?, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [status, point, "[관리자] 관리자에 의해 포인트 변경됨", user_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function getTimeTableData(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `SELECT * FROM timetable WHERE user_id = ?`
+        );
+        const row = await conn.query(query, [user_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+async function insertTimeTable(user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `INSERT INTO timetable 
+            (user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+        );
+        const rows = await conn.query(query, [user_id, lecture_grade, lecture_semester, lecture_name, lecture_room, lecture_time, professor_name, credit, week]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+//상품 삭제하기
+async function deleteTimetable(user_id, lecture_name, lecture_room, week) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `DELETE FROM timetable 
+        WHERE 
+        user_id = ? AND 
+        lecture_name = ? AND
+        lecture_room = ? AND
+        week = ?`
+        const result = await conn.query(query, [user_id, lecture_name, lecture_room, week]);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//유저 목표 학점 가져오기
+async function get_GoalGPA(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `SELECT goal_gpa FROM user WHERE user_id = ?`
+        const result = await conn.query(query, [user_id]);
+        return result
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function change_GoalGPA(user_id, goal_gpa) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `
+            UPDATE user 
+            SET 
+                goal_gpa = ?
+            WHERE user_id = ?
+        `;
+        const result = await conn.query(query, [goal_gpa, user_id]);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
+
+
+
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
     getGeneralPosts,
@@ -3347,7 +3571,6 @@ module.exports = {
     reportCommentAram,
     AttendanceCheck,
     addGoodEventAram,
-    RegistorEvent,
     setUserSendtype,
     addCommentLikeAram,
     get_recomment_post_pk,
@@ -3367,5 +3590,19 @@ module.exports = {
     recomment_like_num_down,
     cancel_recomment_like,
     addLectureInfo,
-    GetLectureInfo
+    GetLectureInfo,
+    getHistoryData,
+    AddEventPointHistory,
+    AddFriendPointHistory,
+    AddAppAttendancePointHistory,
+    AddBuyProductPointHistory,
+    AddAdminPointHistory,
+    getTimeTableData,
+    insertTimeTable,
+    deleteTimetable,
+    get_GoalGPA,
+    change_GoalGPA,
+    RegistorPostPhoto,
+    DetailPostPhoto,
+    DeletePostPhoto
 };
