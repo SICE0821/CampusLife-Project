@@ -122,6 +122,7 @@ useFocusEffect(
           </View>
           <View style = {{height : '65%', justifyContent : 'center', alignItems : 'center'}}>
             <Barcode
+            maxWidth={width*0.9}
                 style = {{marginBottom : 20}}
                 value = {
                   (SelectItem ? SelectItem.code_num : 0).toString().replace(/(.{4})/g, '$1 ').toString()
