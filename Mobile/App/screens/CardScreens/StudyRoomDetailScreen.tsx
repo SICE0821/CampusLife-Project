@@ -40,7 +40,6 @@ const StudyRoomDetailScreen = ({ route }: any) => {
         })
       });
       const data = await response.json();
-      console.log(data);
       return data;
     } catch (error) {
       console.error('과목 가져오기 실패:', error);
@@ -67,8 +66,8 @@ const StudyRoomDetailScreen = ({ route }: any) => {
       }
 
       const result = await response.json();
-      console.log('스터디룸 삭제 성공:', result);
-      fetchAndGroupData();
+      //console.log('스터디룸 삭제 성공:', result);
+      await fetchAndGroupData();
     } catch (error) {
       console.error('스터디룸 삭제 실패:', error);
     }
@@ -97,10 +96,19 @@ const StudyRoomDetailScreen = ({ route }: any) => {
     const groupedData = groupByDate(data);
     setGroupedStudyRoomInfo(groupedData);
   };
-
+  
   useEffect(() => {
-    fetchAndGroupData();
-  }, []);
+    const fetchDataAsync = async () => {
+        try {
+          fetchAndGroupData();
+        } catch (error) {
+            console.error('Error fetching data:', error); 
+        }
+    };
+    fetchDataAsync(); 
+}, []);
+
+
 
   const groupByDate = (data: StudyRoomInfo[]): GroupedStudyRoomInfo => {
     const groupedData = data.reduce((acc: GroupedStudyRoomInfo, item: StudyRoomInfo) => {
@@ -141,14 +149,16 @@ const StudyRoomDetailScreen = ({ route }: any) => {
                 </View>
               </View>
               {new Date(room.study_room_date) > currentDate && (
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => confirmDelete(userdata.student_pk, room.study_room_name, room.study_room_date, room.study_room_time)}
-                >
-                  <Text style={{ fontSize: 18, color: 'black' }}>취소하기</Text>
-                </TouchableOpacity>
+                <>
+                  <View style={{ borderWidth: 0.5, borderColor: "grey", marginTop: 10 }}></View>
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => confirmDelete(userdata.student_pk, room.study_room_name, room.study_room_date, room.study_room_time)}
+                  >
+                    <Text style={{ fontSize: 18, color: 'black' }}>취소하기</Text>
+                  </TouchableOpacity>
+                </>
               )}
-              <View style={{ borderWidth: 0.5, borderColor: "grey", marginTop: 10, }}></View>
             </View>
           ))}
         </View>
@@ -215,7 +225,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 15,
     borderRadius: 7,
     paddingVertical: 8,
     backgroundColor: '#b3b4ae',

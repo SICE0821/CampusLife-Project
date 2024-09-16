@@ -1,0 +1,237 @@
+p {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.container {
+  display: flex;
+  flex: 1;
+  min-width: 1200px;
+  flex-direction: column;
+}
+
+.head {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 120px;
+}
+
+.headText {
+  background-color: orange;
+  min-width: 1200px;
+  height: 100%;
+}
+
+.headTextArea {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-left: 15px;
+  justify-content: center;
+}
+
+.lectureName {
+  color: white;
+  font-size: 20pt;
+  font-weight: bold;
+}
+
+.lectureInfo {
+  color: white;
+  font-size: 14pt;
+  font-weight: bold;
+}
+
+.body {
+  display: flex;
+  flex-direction: row;
+}
+
+.side {
+  background-color: white;
+  width: 360px;
+  min-width: 0px;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  min-width: 1200px;
+}
+
+.class {
+  display: flex;
+  flex-direction: column;
+  flex: 0.4;
+}
+
+.classBox {
+  background-color: aquamarine;
+  width: 100%;
+  border: 1px black solid;
+}
+
+.week {
+  display: flex;
+  flex-direction: row;
+  background-color: lightgray;
+  width: 100%;
+  height: 100px;
+  padding-inline: 10px;
+}
+
+.weekBox {
+  display: flex;
+  flex-direction: column;
+  width: 45%;
+  height: 100%;
+  text-align: start;
+  justify-content: center;
+}
+
+.weekText {
+  font-size: 18pt;
+  font-weight: bold;
+}
+
+.attendace {
+  text-align: left;
+}
+
+.classStudent {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  height: 100%;
+  text-align: center;
+  justify-content: center;
+}
+
+.studentNum {
+  font-size: 16pt;
+  font-weight: bold;
+}
+
+.attendaceCheck {
+  font-weight: bold;
+}
+
+.qr {
+  margin: auto;
+  height: 100%;
+}
+
+.qr:hover {
+  color: gray;
+}
+
+.detailClassBox {
+  background-color: white;
+  width: 100%;
+  height: 80px;
+}
+
+.detailClassText {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.classNum {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+  height: 100%;
+  justify-content: center;
+  font-size: 16pt;
+  font-weight: bold;
+  margin-left: 20px;
+}
+
+.classTime {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+  font-size: 16pt;
+  font-weight: bold;
+}
+
+.student {
+  flex: 0.6;
+  border: 1px black solid;
+  background-color: white;
+}
+
+.attendaceFind {
+  background-color: gray;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 80px;
+}
+
+.attendaceFindText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 30pt;
+  font-weight: bold;
+  margin-left: 20px;
+}
+
+.search{
+  height: 100%;
+  margin-right: 20px;
+}
+
+.studentInfoBox {
+  display: flex;
+  flex-direction: column;
+}
+
+.studentInfo {
+  display: flex;
+  flex-direction: row;
+  background-color: white;
+  width: 100%;
+  height: 100px;
+}
+
+.studentText {
+  display: flex;
+  flex-direction: column;
+  width: 85%;
+  height: 100%;
+  margin-left: 20px;
+  justify-content: center;
+}
+
+.studentInfoText {
+  font-size: 22pt;
+  font-weight: bold;
+}
+
+.studentDepartment {
+  font-size: 14pt;
+  font-weight: bold;
+}
+
+.attendaceBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+}
+
+.attendaceCheckBox {
+  background-color: aqua;
+  width: 80px;
+  height: 80px;
+  border: 1px black solid;
+}

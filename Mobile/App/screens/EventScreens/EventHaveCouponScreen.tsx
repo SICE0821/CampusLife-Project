@@ -1,5 +1,5 @@
 import React, { useState, } from 'react';
-import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, Dimensions } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import IconD from 'react-native-vector-icons/FontAwesome6';
 import IconC from 'react-native-vector-icons/FontAwesome';
@@ -8,7 +8,7 @@ import ModalBox from 'react-native-modalbox';
 import Barcode from '@kichiyaki/react-native-barcode-generator';
 import { UserData, UserHaveCouponData } from '../../types/type'
 import config from '../../config';
-
+const width = Dimensions.get("window").width;
 
 const EventHaveCouponScreen = ({ route }: any) => {
   const { userdata } = route.params;
@@ -19,11 +19,18 @@ const EventHaveCouponScreen = ({ route }: any) => {
   const [SelectItem, SetSelectItem] = useState<UserHaveCouponData>();
 
 
-  useFocusEffect(
-    React.useCallback(() => {
-        setUserData(userdata);
-        getUserHaveCoupon();
-    }, [])
+useFocusEffect(
+  React.useCallback(() => {
+      const fetchData = async () => {
+          try {
+            setUserData(userdata);
+            await getUserHaveCoupon();
+          } catch (error) {
+              console.error('Error fetching data:', error);
+          }
+      };
+      fetchData();
+  }, [])
 );
 
   const openmodal = (selectItem: UserHaveCouponData) => {
@@ -71,14 +78,14 @@ const EventHaveCouponScreen = ({ route }: any) => {
         <View style={{ height: '100%', width: '50%', padding: 5 }}>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ width: '50%' }}>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginTop: 20 }}>[ {item.name} ]</Text>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: 'black', marginTop: 20 }} numberOfLines={1} ellipsizeMode='tail'>[ {item.name} ]</Text>
             </View>
             <View>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ED9E2B', marginTop: 20 }}>[ {item.price}P ]</Text>
+              <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#ED9E2B', marginTop: 20 }} numberOfLines={1} ellipsizeMode='tail'>[ {item.price}P ]</Text>
             </View>
           </View>
-          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.explain}</Text>
-          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }}>{item.using_time}</Text>
+          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }} numberOfLines={1} ellipsizeMode='tail'>{item.explain}</Text>
+          <Text style={{ marginTop: 5, fontSize: 16, color: 'black' }} numberOfLines={1} ellipsizeMode='tail'>{item.using_time}</Text>
         </View>
         <View style={{ width: '20%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <View style={{ width: '90%', height: '95%', backgroundColor: '#F7B02E', justifyContent: 'center', alignItems: 'center' }}>
@@ -115,7 +122,7 @@ const EventHaveCouponScreen = ({ route }: any) => {
           </View>
           <View style = {{height : '65%', justifyContent : 'center', alignItems : 'center'}}>
             <Barcode
-                style = {{marginBottom : 20,}}
+                style = {{marginBottom : 20}}
                 value = {
                   (SelectItem ? SelectItem.code_num : 0).toString().replace(/(.{4})/g, '$1 ').toString()
                 }

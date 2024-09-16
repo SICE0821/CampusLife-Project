@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { useFocusEffect} from '@react-navigation/native';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { useFocusEffect,  } from '@react-navigation/native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, TouchableWithoutFeedback, ScrollView,  } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import IconD from 'react-native-vector-icons/AntDesign';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
 import { UserData } from '../../types/type'
 import config from '../../config';
+//import { Picker } from '@react-native-picker/picker';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 type PostData = {
     post_id: number,
@@ -16,16 +18,42 @@ type PostData = {
     view: number,
     like: number,
     name: string,
-    admin_check: boolean
+    user_title: string,
+    department_check : boolean,
+    inform_check : boolean
 }
+const trueZero:PostData[] = [];
+const falseZero:PostData[] = []
+const trueTrue:PostData[] = []; 
+const trueFalse:PostData[] = []; 
+const falseTrue:PostData[] = []; 
+const falseFalse:PostData[] = []; 
 
 const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
-    const {  userdata } = route.params;
+    console.log("you are in SearchPostScreen")
+    const { userdata } = route.params;
     const [searchtext, setsearchtext] = useState('');
-    const [communityData, setCommunityData] = useState<PostData[]>([]);
+    const [generalCommunityData, setgeneralCommunityData] = useState<PostData[]>([]);
+    const [departmentCommunityData, setDepartmentCommunityPost] = useState<PostData[]>([]);
+    const [schoolNoticeData, setSchoolNoticeData] = useState<PostData[]>([]);
+    const [departmentNoticeData, setDepartmentNoticeData] = useState<PostData[]>([]);
+    const [allPostData, setAllPostData] = useState<PostData[]>([]); 
     const [userData, setUserData] = useState<UserData>(userdata);
 
-    console.log(communityData);
+    const [open, setOpen] = useState(false);
+    const [open2, setOpen2] = useState(false);
+    const [value, setValue] = useState('전체');
+    const [value2, setValue2] = useState('전체');
+    const [items, setItems] = useState([
+        { label: '전체', value: '전체' },
+        { label: '커뮤니티', value: '커뮤니티' },
+        { label: '공지사항', value: '공지사항' }
+    ]);
+    const [items2, setItems2] = useState([
+        { label: '전체', value: '전체' },
+        { label: '학교', value: '학교' },
+        { label: '학과', value: '학과' }
+    ]);
 
     const handlesearchTextChange = (inputText: string) => {
         setsearchtext(inputText);
@@ -43,15 +71,50 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                 })
             })
             const result = await response.json();
-            console.log("포스트 View 올리기 성공!")
+            //console.log("포스트 View 올리기 성공!")
         } catch (error) {
             console.error('포스트 View 올리기 누르기 실패', error);
         }
     }
 
+    const FilterData = () => {
+        if(value == "전체" && value2 == "전체") {
+            return allPostData
+        }else if(value == "커뮤니티" && value2 == "학교") {
+            return generalCommunityData
+        }else if (value == "커뮤니티" && value2 == "학과") {
+            return departmentCommunityData
+        }else if (value == "공지사항" && value2 == "학교") {
+            return schoolNoticeData
+        }else if (value == "공지사항" && value2 == "학과") {
+            return departmentNoticeData
+        }
+    }
+
+    useEffect(() => {
+        if (value2 == "전체") {
+            setValue("전체");
+            setItems([
+                {label: '전체', value: '전체' },
+              ]);
+        }else if(value2 == "학교") {
+            setValue("커뮤니티");
+            setItems([
+                {label: '커뮤니티', value: '커뮤니티'},
+                {label: '공지사항', value: '공지사항'}
+              ]);
+        }else if(value2 == "학과") {
+            setValue("커뮤니티");
+            setItems([
+                {label: '커뮤니티', value: '커뮤니티'},
+                {label: '공지사항', value: '공지사항'}
+              ]);
+        }
+      }, [value2]);
+
     const getGeneralposts = async () => {
         try {
-            console.log('Search text:', searchtext);
+            //console.log('Search text:', searchtext);
             const response = await fetch(`${config.serverUrl}/search_post`, {
                 method: 'POST',
                 headers: {
@@ -61,31 +124,40 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                     search_text: searchtext
                 }),
             });
-    
+
             // Check if response is ok (status code 200-299)
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-    
-            const postsdata = await response.json();
-            //console.log(postsdata);
-            setCommunityData(postsdata);
+
+            const postsdata:PostData[] = await response.json();
+            postsdata.forEach(item=> {
+                if (item.department_check && item.inform_check) {
+                  trueTrue.push(item); //학과 공지사항
+                } else if (item.department_check && !item.inform_check) {
+                  trueFalse.push(item); //학과 게시판
+                } else if (!item.department_check && item.inform_check) {
+                  falseTrue.push(item);  //학교 공지사항
+                } else {
+                  falseFalse.push(item); //전체 게시판
+                }
+              });
+              setDepartmentNoticeData(trueTrue);
+              setDepartmentCommunityPost(trueFalse);
+              setAllPostData(postsdata);
+              setSchoolNoticeData(falseTrue);
+              setgeneralCommunityData(falseFalse);
             // setCommunityData(postsdata);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
     };
 
-    useFocusEffect(
-        React.useCallback(() => {
-            //getGeneralposts();
-        }, [])
-    );
-
     const renderItem = ({ item, index }: { item: PostData, index: number }) => (
         <TouchableWithoutFeedback onPress={async () => {
-                await view_count_up(item.post_id);
-                navigation.navigate("PostDetailScreen", { item, userData })}}>
+            await view_count_up(item.post_id);
+            navigation.navigate("PostDetailScreen", { item, userData })
+        }}>
             <View style={styles.writeboxcontainer}>
                 <View style={styles.writetitle}>
                     <View style={styles.titlebox}>
@@ -98,7 +170,19 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                 </View>
                 <View style={styles.wirterandtime}>
                     <View style={styles.writerbox}>
-                        <Text style={{ fontSize: 13, marginLeft: 10, color: item.admin_check === true ? 'red' : 'black' }}>{item.name}</Text>
+                        <Text
+                            style={{
+                                fontSize: 13,
+                                marginLeft: 10,
+                                color:
+                                    item.user_title === "학교" ? 'red' :
+                                        item.user_title === "반장" ? 'green' :
+                                            item.user_title === "학우회장" ? 'blue' :
+                                                'black'
+                            }}
+                        >
+                            {item.name}
+                        </Text>
                         <Text> | {item.date}</Text>
                     </View>
                     <View style={styles.likenum}>
@@ -110,10 +194,13 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
         </TouchableWithoutFeedback>
     );
 
+    //console.log(communityData);
+
     return (
         <View style={styles.container}>
             <View style={styles.emptyspace1}></View>
             <View style={styles.headercontainer}>
+
                 <View style={styles.searchcontainer}>
                     <View style={styles.picturebox}>
                         <IconD name="search1" size={22} color="#979797" />
@@ -125,7 +212,9 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                             value={searchtext}
                             placeholder="글 제목, 내용"
                             placeholderTextColor={'gray'}
-                            onSubmitEditing={() => getGeneralposts()}
+                            onSubmitEditing={async () => {
+                                await getGeneralposts()
+                            }}
                         />
                     </View>
                 </View>
@@ -137,16 +226,52 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
                     </TouchableOpacity>
                 </View>
             </View>
-            {communityData.length === 0 ? (
-                <View style ={styles.nosearchView}>
+            <View style={styles.listcontainer}>
+                <View>
+                    <DropDownPicker
+                        open={open}
+                        value={value2}
+                        items={items2}
+                        setOpen={setOpen}
+                        setValue={setValue2}
+                        setItems={setItems2}
+                        containerStyle={{ width: 130, backgroundColor : 'white', zIndex: 1000 }}
+                        dropDownContainerStyle={styles.dropdown}
+                        style={styles.dropdownStyle}
+                        labelStyle={styles.labelStyle}
+                        placeholderStyle={styles.placeholderStyle}
+                    />
+                </View>
+                <View style={{marginLeft: 10 , backgroundColor : 'red'}}>
+                    <DropDownPicker
+                        open={open2}
+                        value={value}
+                        items={items}
+                        setOpen={setOpen2}
+                        setValue={setValue}
+                        setItems={setItems}
+                        containerStyle={{ width: 130, backgroundColor : 'white', zIndex: 1000 }}
+                        dropDownContainerStyle={styles.dropdown}
+                        style={styles.dropdownStyle}
+                        labelStyle={styles.labelStyle}
+                        placeholder="Select an option"
+                        placeholderStyle={styles.placeholderStyle}
+                    />
+                </View>
+            </View>
+            {allPostData.length === 0 ? (
+                <View style={styles.nosearchView}>
                     <IconD name="search1" size={100} color="#979797" />
-                    <Text style = {{fontSize : 20, marginTop : 10, fontWeight : 'bold'}}>게시판의 글을 검색해보세요</Text>
+                    <Text style={{ fontSize: 20, marginTop: 10, fontWeight: 'bold' }}>게시판의 글을 검색해보세요</Text>
                 </View>
             ) : (
+                <View>
                 <FlatList
-                    data={communityData}
+                    data={FilterData()}
                     renderItem={renderItem}
+                    style={{ zIndex: -1 }}
                 />
+                </View>
             )}
         </View>
     );
@@ -163,11 +288,9 @@ const styles = StyleSheet.create({
     },
     headercontainer: {
         height: 50,
-        //backgroundColor: 'red',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom : 10
     },
     searchcontainer: {
         height: 40,
@@ -274,13 +397,47 @@ const styles = StyleSheet.create({
         height: 20,
         backgroundColor: 'red',
     },
-    
-    nosearchView : {
-        height : 400,
-        //backgroundColor : 'yellow',
-        alignItems : 'center',
-        justifyContent : 'center',
-    }
+
+    nosearchView: {
+        height: 400,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    listcontainer: {
+        height: 60,
+        flexDirection: 'row',  // 가로로 배치
+        alignItems: 'center',  // 수직 정렬
+        padding: 10,
+    },
+    dropdownStyle: {
+        backgroundColor: 'white',  // 선택된 옵션의 배경색
+        borderColor: '#cccccc',  // 기본 테두리 색상
+        borderRadius: 10,  // 모서리를 둥글게
+        height: 50,  // 높이 설정
+        paddingHorizontal: 10,  // 텍스트와 테두리 사이 간격
+        borderWidth :2
+      },
+      labelStyle: {
+        fontSize: 14,  // 폰트 크기 설정
+        color: 'black',  // 글자 색상
+        fontWeight : 'bold'
+      },
+      arrowIcon: {
+        tintColor: '#888',  // 화살표 색상
+      },
+      dropdown: {
+        backgroundColor: '#ffffff',  // 드롭다운 리스트의 배경색
+        borderColor: '#cccccc',  // 테두리 색상
+        borderRadius: 10,  // 모서리 둥글게
+        borderLeftWidth : 2,
+        borderRightWidth : 2,
+        borderBottomWidth : 2
+      },
+      placeholderStyle: {
+        fontSize: 14,  // 플레이스홀더 폰트 크기
+        color: 'black',  // 플레이스홀더 색상
+      },
 }
 )
 

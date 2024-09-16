@@ -13,13 +13,21 @@ const AttendanceCheckEventScreen = ({route} : any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const [attendanceChecked, setAttendanceChecked] = useState(false);
   const [selectedDates, setSelectedDates] : any = useState([]);
-  //console.log(userdata);
-  useFocusEffect(
-    React.useCallback(() => {
-        setUserData(userdata);
-        getAppAttendanceDate();
-    }, [])
-);
+
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const fetchData = async () => {
+                try {
+                  setUserData(userdata);
+                  await getAppAttendanceDate();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
+        }, [])
+    );
 
   const getAppAttendanceDate = async () => {
     try {
@@ -33,7 +41,6 @@ const AttendanceCheckEventScreen = ({route} : any) => {
         }),
       })
       const AppAttendanceDate = await response.json();
-      //console.log(AppAttendanceDate);
       const checkdate = AppAttendanceDate.map((item : any) => item.date);
       setSelectedDates(checkdate);
     } catch (error) {
@@ -54,7 +61,6 @@ const AttendanceCheckEventScreen = ({route} : any) => {
           date : today
         }),
       })
-      await getAppAttendanceDate();
     } catch (error) {
       console.error(error);
     } finally {
@@ -63,7 +69,7 @@ const AttendanceCheckEventScreen = ({route} : any) => {
 
   const user_update_point = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/user_update_point_2`, {
+      const response = await fetch(`${config.serverUrl}/user_update_point2`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,10 +79,26 @@ const AttendanceCheckEventScreen = ({route} : any) => {
           point : 10
         })
       })
-      console.log("포인트 올리기 성공")
+      //console.log("포인트 올리기 성공")
       userData.point = userData.point + 10
     } catch (error) {
       console.error('포인트 올리기 실패', error);
+    }
+  }
+
+  const AddAppAttendancePointHistory = async (date : string) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AddAppAttendancePointHistory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          today : date
+        })
+      });
+    } catch (error) {
     }
   }
 
@@ -88,14 +110,15 @@ const AttendanceCheckEventScreen = ({route} : any) => {
 
   const handleAttendanceCheck = async () => {
     const today = new Date().toISOString().split('T')[0];
-    console.log(today);
+    //console.log(today);
 
     if (selectedDates.includes(today)) {
       Alert.alert('이미 출석체크를 하셨습니다.');
     } else {
       setAttendanceChecked(true);
-      addAppAttendanceDate(today);
-      user_update_point();
+      await addAppAttendanceDate(today);
+      await AddAppAttendancePointHistory(today);
+      await user_update_point();
       Alert.alert(
         "앱 출석체크 성공!!",
         "앱 출석체크 성공!! 10포인트가 적립되었습니다.",
@@ -156,7 +179,7 @@ const AttendanceCheckEvent = require('../../assets/AttendanceCheckEvent.jpg');
       />
       <TouchableOpacity onPress={async () => {
         handleAttendanceCheck();
-        getAppAttendanceDate();}}>
+        await getAppAttendanceDate();}}>
         <View style={styles.buttonArea}>
           <Text style={styles.buttonText}>출석체크</Text>
         </View>

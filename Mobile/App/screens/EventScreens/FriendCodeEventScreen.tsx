@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dimensions, View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid, Image, Alert } from 'react-native';
+import { Dimensions, View, Text, StyleSheet, TextInput, TouchableOpacity, ToastAndroid, Image, Alert, RefreshControl } from 'react-native';
 import Icon from 'react-native-vector-icons/Octicons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { UserData, UserHaveCouponData } from '../../types/type'
@@ -9,22 +9,28 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 const width = Dimensions.get("window").width;
 const friendsinvitepng = require('../../assets/friend3.png');
-const registerFriend = 3
+const registerFriend = 3;
 
 const FriendCodeEventScreen = ({ route }: any) => {
   const { userdata } = route.params;
   const [friendCode, setFriendCode] = useState('');
   const [userData, setUserData] = useState<UserData>(userdata);
   const [userInviteNum, setuserInviteNum]: any = useState([]);
-  const [aram_user_pk, set_aram_user_pk]: any = useState();
-  const [last_friendcode_Info, set_friendcode_Info]: any = useState();
+  const [refreshing, setRefreshing] = useState(false); // 새로고침 상태 추가
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      get_invite_num();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await get_invite_num();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  );
+);
 
   const duplication = () => {
     Alert.alert(
@@ -85,18 +91,18 @@ const FriendCodeEventScreen = ({ route }: any) => {
       const invite = await response.json();
 
       setuserInviteNum(invite);
-      //console.log(invite);
     } catch (error) {
       console.error(error);
     } finally {
+      setRefreshing(false); // 새로고침 완료 시 refreshing 상태 변경
     }
-  }
+  };
 
   const last_friendCode_Info = async () => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 후에 요청 중단
-  
+
       const response = await fetch(`${config.serverUrl}/last_friendCode_Info`, {
         method: 'POST',
         headers: {
@@ -107,20 +113,18 @@ const FriendCodeEventScreen = ({ route }: any) => {
         }),
         signal: controller.signal, // signal 옵션 추가
       });
-  
+
       clearTimeout(timeoutId); // 요청이 완료되면 타임아웃 클리어
-  
+
       if (!response.ok) {
         throw new Error('서버 응답 오류');
       }
-  
+
       const aram_data = await response.json();
-      console.log(aram_data.friend_code);
-      console.log(aram_data.friend_code_id);
-      console.log(aram_data.my_name);
-      
       await addFriendCodeAram(aram_data.friend_code, aram_data.friend_code_id, aram_data.my_name);
-    } catch (error : any) {
+      await AddFriendPointHistory(aram_data.friend_code);
+
+    } catch (error: any) {
       if (error.name === 'AbortError') {
         //console.error('요청이 타임아웃되었습니다');
       } else {
@@ -128,6 +132,22 @@ const FriendCodeEventScreen = ({ route }: any) => {
       }
     }
   };
+
+  const AddFriendPointHistory = async (friendName : string) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AddFriendPointHistory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          friendName : friendName
+        })
+      });
+    } catch (error) {
+    }
+  }
 
   const user_update_point = async () => {
 
@@ -144,18 +164,18 @@ const FriendCodeEventScreen = ({ route }: any) => {
           point: 100
         })
       })
-      console.log("포인트 올리기 성공")
+      //console.log("포인트 올리기 성공")
       clearTimeout(timeoutId);
     } catch (error) {
       console.error('포인트 올리기 실패', error);
     }
-  }
+  };
 
-  const addFriendCodeAram = async (friend_code : any, friend_code_id : any, my_name : any) => {
+  const addFriendCodeAram = async (friend_code: any, friend_code_id: any, my_name: any) => {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000); // 2초 후에 요청 중단
-  
+
       const response = await fetch(`${config.serverUrl}/addFriendCodeAram`, {
         method: 'POST',
         headers: {
@@ -168,13 +188,13 @@ const FriendCodeEventScreen = ({ route }: any) => {
         }),
         signal: controller.signal, // signal 옵션 추가
       });
-  
+
       clearTimeout(timeoutId); // 요청이 완료되면 타임아웃 클리어
       if (!response.ok) {
         throw new Error('서버 응답 오류');
       }
-      console.log("알림전송!");
-    } catch (error : any) {
+      //console.log("알림전송!");
+    } catch (error: any) {
       if (error.name === 'AbortError') {
         //console.error('요청이 타임아웃되었습니다');
       } else {
@@ -184,7 +204,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
   };
 
   const check_end_send = async () => {
-    let result = ""
+    let result = "";
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -198,34 +218,35 @@ const FriendCodeEventScreen = ({ route }: any) => {
           friend_code: friendCode,
           user_name: userData.name
         }),
-      })
+      });
       const check_end_send = await response.json();
       if (check_end_send.success == "중복코드") {
-        return result = "중복"
+        return result = "중복";
       } else if (check_end_send.success == "성공") {
-        last_friendCode_Info();
-        user_update_point();
-        userData.point = userData.point + 100
-        return result = "성공"
+        await last_friendCode_Info();
+        await user_update_point();
+        
+        userData.point = userData.point + 100;
+        return result = "성공";
       } else if (check_end_send.success == "코드없음") {
-        return result = "코드X"
+        return result = "코드X";
       }
       clearTimeout(timeoutId);
     } catch (error) {
       console.error(error);
     } finally {
     }
-  }
+  };
 
   const copyToClipboard = () => {
     Clipboard.setString(userData.friend_code);
     ToastAndroid.show('친구 코드가 클립보드에 복사되었습니다.', ToastAndroid.SHORT);
-  }
+  };
 
   const pasteFromClipboard = async () => {
     const clipboardContent = await Clipboard.getString();
     setFriendCode(clipboardContent);
-  }
+  };
 
   const registerFriendCode = async () => {
     if (userData.friend_code == friendCode) {
@@ -239,47 +260,63 @@ const FriendCodeEventScreen = ({ route }: any) => {
       } else if (result == '코드X') {
         no_code();
       } else {
-        console.log("???????????")
+        //console.log("???????????")
       }
     }
-  }
+    console.log("함수 마무리 성공");
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true); // 새로고침 시작
+    await get_invite_num(); // 데이터 다시 불러오기 (또는 원하는 다른 작업 수행)
+  };
 
   return (
     <View style={styles.container}>
-      <ScrollView>
-      <View style={styles.topArea}>
-        <View style={styles.circleArea}>
-          <View style={styles.imageArea}>
-            <Image style={styles.image} source={friendsinvitepng} />
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
+        <View style={styles.topArea}>
+          <View style={styles.circleArea}>
+            <View style={styles.imageArea}>
+              <Image style={styles.image} source={friendsinvitepng} />
+            </View>
+            <Text style={styles.circleText}>초대 된 친구</Text>
+            <Text style={styles.circleNum}>{userInviteNum.length}</Text>
           </View>
-          <Text style={styles.circleText}>초대 된 친구</Text>
-          <Text style={styles.circleNum}>{userInviteNum.length}</Text>
+          <TouchableOpacity onPress={copyToClipboard}>
+            <View style={styles.mycodeArea}>
+              <Text style={styles.mycodeText}>초대코드 </Text>
+              <Text style={styles.mycode}>[ {userData.friend_code} ]</Text>
+              <Text style={styles.mycodeText}> 복사하기</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={copyToClipboard}>
-          <View style={styles.mycodeArea}>
-            <Text style={styles.mycodeText}>초대코드 </Text>
-            <Text style={styles.mycode}>[ {userData.friend_code} ]</Text>
-            <Text style={styles.mycodeText}> 복사하기</Text>
+        <View style={styles.infoTextArea}>
+          <Text style={styles.infoText}>친구를 초대하여 100P 지급!</Text>
+        </View>
+        <View style={styles.inputcode}>
+          <TextInput
+            style={styles.input}
+            onChangeText={setFriendCode}
+            value={friendCode}
+            placeholder="친구 코드 입력"
+            placeholderTextColor={'gray'}
+          />
+          <TouchableOpacity onPress={pasteFromClipboard}>
+            <Icon name="paste" size={36} color={'black'} />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={registerFriendCode} style={{ marginTop: 10, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={styles.register}>
+            <Text style={styles.registerText}>등록하기</Text>
           </View>
         </TouchableOpacity>
-      </View>
-      <View style={styles.inputcode}>
-        <TextInput
-          style={styles.input}
-          onChangeText={setFriendCode}
-          value={friendCode}
-          placeholder="친구 코드 입력"
-          placeholderTextColor={'gray'}
-        />
-        <TouchableOpacity onPress={pasteFromClipboard}>
-          <Icon name="paste" size={36} color={'black'} />
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity onPress={registerFriendCode} style = {{marginTop : 10,justifyContent : 'center', alignItems : 'center'}}>
-        <View style={styles.register}>
-          <Text style={styles.registerText}>등록하기</Text>
-        </View>
-      </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -292,7 +329,8 @@ const styles = StyleSheet.create({
   },
   topArea: {
     borderBottomWidth: 1,
-    marginVertical: 60
+    marginTop: 60,
+    marginBottom: 30
   },
   circleArea: {
     alignItems: 'center',
@@ -355,6 +393,15 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold'
   },
+  infoTextArea: {
+    width: '90%',
+    alignSelf: 'center',
+    alignItems: 'center'
+  },
+  infoText: {
+    color: 'gray',
+    fontSize: 16
+  },
   inputcode: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -380,9 +427,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: 'lightblue',
-    justifyContent : 'center',
-    alignItems : 'center',
-    width : width - 300
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: width - 300
   },
   registerText: {
     color: 'black',

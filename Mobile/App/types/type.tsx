@@ -27,6 +27,8 @@ export type UserData = {
   id: string,
   student_semester : number, 
   college : number,
+  title : string,
+  report_confirm : number, 
 }
 
 export type PostDeatilData = {
@@ -77,7 +79,8 @@ export type UserHaveCouponData = {
   using_time : string,
   buy_date : string,
   using_check : boolean,
-  using_date : boolean
+  using_date : boolean,
+  count : number,
 }
 
 export type CommentsWithRecomments = {
@@ -117,12 +120,16 @@ export type Lecture = {
   attendance: number;
   tardy: number;
   absent: number;
-  weeknum: number;
+  weeknum : number;
+  lecture_have_week : number;
   lecture_grade : number;
   lecture_semester : number;
   lecture_credit : number;
   lecture_grades : string;
   session_duration: number;
+  today_lecture_state : boolean;
+  //주차
+  //차시
 }
 
 export type aramData = {
@@ -146,6 +153,18 @@ export type aramData = {
   new_event_name : string,
   friend_code_id : number,
   friend_code_my_name : string,
+  report_post_id : number,
+  report_post_title : string,
+  report_comment_id : number,
+  report_comment_title : string,
+  good_event_id : number,
+  good_event_name : string,
+  comment_post_id : number,
+  comment_contents : string,
+  comment_comment_id : number,
+  recomment_recomment_id : number,
+  recomment_comment_id : number,
+  recomment_contents : string
 }
 
 export type EventData = {
@@ -156,11 +175,106 @@ export type EventData = {
   get_point : number,
   info : string,
   simple_info : string,
-  event_photo : string,
   start_date : string,
   close_date : string,
-  is_event_close : boolean
-  photo_list: {
-    photo_data : string
+  is_event_close : boolean,
+  event_photo : {
+    event_id : number,
+    event_photo : string,
   }[];
 }
+
+export type AdminEventList = {
+  event_id : number,
+  name : string,
+  info : string,
+  campus_id : number,
+  event_photo : string,
+  start_date : string,
+  close_date  : string
+};
+
+export type EditEventInfo = {
+  event_id : number,
+  campus_id : number,
+  name : string,
+  get_point : number,
+  info : string,
+  simple_info : string,
+  start_date : string,
+  close_date : string,
+}
+
+export type EditEventVote = {
+  id : number,
+  text : string,
+}
+
+export type UserSendEventWithPhoto = {
+  user_send_event : number,
+  user_id : number,
+  event_id : number,
+  time : string,
+  content : string,
+  campus_id : number,
+  user_login_id : number,
+  user_name : string,
+  event_point : number,
+  good_event : number,
+  photodata: {
+    event_id : number,
+    user_id : number,
+    event_photo : string,
+  }[];
+}
+
+export type UserSendEventPhotoData = {
+  event_id : number,
+  user_id : number,
+  event_photo : string,
+}
+
+export type VoteEvnetData = {
+  event_id : number,
+  vote_count : number,
+  vote_index : number,
+  vote_name : string,
+}
+
+export type VoteInfoItem = {
+  id: number;
+  votes: string[];
+}
+
+export type VoteDataItem = {
+  id: number;
+  results: number[];
+}
+
+export type PostPhoto = {
+  post_id: number;
+  post_photo: string;
+}
+
+export type Edit_Post_Info = {
+  post_id : number,
+  user_id : number,
+  title : string,
+  contents : string,
+  department_check : boolean,
+  inform_check : boolean
+}
+
+export type TimeTableLecture = 
+    {
+    professor_name: string;
+    lecture_name: string;
+    lecture_room: string;
+    lecture_time: string;
+    week : string;
+    lecture_grade : number,
+    lecture_semester : number
+    credit : number
+  }
+
+

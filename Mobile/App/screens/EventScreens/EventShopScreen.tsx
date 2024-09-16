@@ -18,13 +18,21 @@ const EventShopScreen = ({ navigation, route }: any) => {
   const [userData, setUserData] = useState<UserData>(userdata);
   const [items, setItemData]: any = useState([]);
   const [SelectItem, SetSelectItem] = useState<ShopItemData | undefined>(undefined);
+  const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
-      setUserData(userdata);
-      getItems();
+        const fetchData = async () => {
+            try {
+              setUserData(userdata);
+              await getItems();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
     }, [])
-  )
+);
 
   const groupData = (data: any) => {
     const groupedData = [];
@@ -77,7 +85,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       groupData(items);
       //console.log(items);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
+      console.error(error);
     }
   }
 
@@ -96,7 +104,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       const item = await response.json();
       SetSelectItem(item);
     } catch (error) {
-      console.error('유저 학과 이름 가져오기 실패:', error);
+      console.error(error);
     }
   }
 
@@ -114,7 +122,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
       })
       const result = await response.json();
       await getItems();
-      console.log("상점 업데이트 성공")
+      //console.log("상점 업데이트 성공")
     } catch (error) {
       console.error('상점 업데이트 실패', error);
     }
@@ -133,7 +141,6 @@ const EventShopScreen = ({ navigation, route }: any) => {
           object_id : SelectItem?.object_id
         })
       });
-      console.log("상점 사기 성공");
       const value = await response.json();
 
     } catch (error) {
@@ -153,7 +160,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           price : SelectItem?.price
         })
       })
-      console.log("포인트 차감 성공")
+      //console.log("포인트 차감 성공")
       userData.point = userData.point - (SelectItem ? SelectItem.price : 0)
     } catch (error) {
       console.error('포인트 차감 실패', error);
@@ -177,17 +184,40 @@ const EventShopScreen = ({ navigation, route }: any) => {
       [
         {
           text: "확인",
-          onPress: () => {
-            update_object_state(SelectItem?.object_id);
-            insert_user_have_object();
-            user_buy_action();
-            console.log("상태변경 성공");
+          onPress: async () => {
+            await update_object_state(SelectItem?.object_id);
+            await insert_user_have_object();
+            await user_buy_action();
+            await AddBuyProductPointHistory(SelectItem?.name, SelectItem?.price);
+            // 추가 알림창 띄우기
+            Alert.alert(
+              "알림",
+              "상품 구매가 완료되었습니다.",
+              [{ text: "확인"}]
+            );
           }
         },
-        { text: "취소 " }
+        { text: "취소" }
       ]
     );
   };
+
+  const AddBuyProductPointHistory = async (item : any, point : any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/AddBuyProductPointHistory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user_id : userData.user_pk,
+          product : item,
+          point : point
+        })
+      });
+    } catch (error) {
+    }
+  }
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -198,6 +228,12 @@ const EventShopScreen = ({ navigation, route }: any) => {
     setIsModalOpen(true);
   };
 
+  const onRefresh = async () => {
+    setRefreshing(true); // 새로고침 시작
+    await getItems(); // 데이터 다시 불러오기 (또는 원하는 다른 작업 수행)
+    setRefreshing(false); // 새로고침 완료
+  };
+
 
   const renderItem = ({ item }: any) => (
     <View style={styles.itemrowcontainer}>
@@ -206,10 +242,10 @@ const EventShopScreen = ({ navigation, route }: any) => {
       }}>
         <View style={styles.square}>
           <View style={styles.picturebox}>
-            <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.firstImage_Num}.png` }} />
+            <Image style={{ flex: 1, width: '100%', borderTopLeftRadius: 20, borderTopRightRadius: 20, }} source={{ uri: `${config.photoUrl}/${item.firstImage_Num}.png` }} />
           </View>
           <View style={styles.iteminfo}>
-            <Text style={{ fontSize: 20, color: 'black', }}>{item.firstName}</Text>
+            <Text style={{ fontSize: 20, color: 'black', }} numberOfLines={1} ellipsizeMode='tail'>{item.firstName}</Text>
             <Text style={{ fontSize: 16, color: 'grey', }} numberOfLines={1} ellipsizeMode='tail'>
               {item.firstExplain}
             </Text>
@@ -233,10 +269,10 @@ const EventShopScreen = ({ navigation, route }: any) => {
         }}>
           <View style={styles.square}>
             <View style={styles.picturebox}>
-              <Image style={{ flex: 1, width: '100%', resizeMode: 'contain' }} source={{ uri: `${config.photoUrl}/${item.secondImage_Num}.png` }} />
+              <Image style={{ flex: 1, width: '100%', borderTopLeftRadius: 20, borderTopRightRadius: 20, }} source={{ uri: `${config.photoUrl}/${item.secondImage_Num}.png` }} />
             </View>
             <View style={styles.iteminfo}>
-              <Text style={{ fontSize: 20, color: 'black', }}>{item.secondName}</Text>
+              <Text style={{ fontSize: 20, color: 'black', }} numberOfLines={1} ellipsizeMode='tail'>{item.secondName}</Text>
               <Text style={{ fontSize: 16, color: 'grey', }} numberOfLines={1} ellipsizeMode='tail'>
                 {item.secondExplain}
               </Text>
@@ -270,7 +306,10 @@ const EventShopScreen = ({ navigation, route }: any) => {
       <FlatList
         data={items}
         renderItem={renderItem}
-        ListFooterComponent={renderEmptyItem} />
+        ListFooterComponent={renderEmptyItem}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+      />
       <ModalBox
         isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
         style={styles.modal}
@@ -285,6 +324,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           <View style={styles.itemInfo}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 15 }}>
               <View style={{
+                width : '60%'
               }}>
                 <Text style={{
                   fontSize: 30,
@@ -293,7 +333,8 @@ const EventShopScreen = ({ navigation, route }: any) => {
                 }}>{SelectItem?.name}</Text>
               </View>
               <View style={{
-                justifyContent: 'center'
+                justifyContent: 'center',
+                width : '40%'
               }}>
                 <Text style={{
                   fontSize: 16,
@@ -365,17 +406,17 @@ const styles = StyleSheet.create({
 
   },
   itemrowcontainer: {
+    width: '90%',
     height: 300,
     //backgroundColor : 'green',
     //marginTop: ,
     //marginBottom : 2,
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
+    alignSelf: 'center',
   },
   itemonebox: {
     height: '100%',
-    width: '45%',
+    width: '50%',
     //backgroundColor : 'red',
     padding: 10,
   },

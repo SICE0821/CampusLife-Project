@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef,  } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Dimensions, Text, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Table, Row, Rows } from "react-native-table-component";
 import { Picker } from '@react-native-picker/picker';
@@ -23,7 +24,7 @@ export type SchoolBuildingData = {
   longitude: string,
 };
 
-const info_data_head = ["층", "학과 홈페이지", "학과 사무실 전화번호"];
+const info_data_head = ["층", "학과", "학과 사무실 전화번호"];
 const widthArrs = [width * 0.2, width * 0.4, width * 0.4];
 const tableBorderColor = 'gray';
 
@@ -65,6 +66,7 @@ const SchoolInfoScreen = () => {
       const response = await fetch(`${config.serverUrl}/getSchoolBuildingInfo`);
       if (!response.ok) throw new Error('서버 응답 실패');
       const data = await response.json();
+      console.log(data);
       setSchoolBuildingData(data);
     } catch (error) {
       //console.error('학교 건물 정보를 가져오는 중 오류 발생:', error);
@@ -86,10 +88,20 @@ const SchoolInfoScreen = () => {
       ))
   );
 
-  useEffect(() => {
-    fetchSchoolData();
-    fetchSchoolBuildingData();
-  }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+        const fetchData = async () => {
+            try {
+              await fetchSchoolData();
+              await fetchSchoolBuildingData();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+        fetchData();
+    }, [])
+);
 
   useEffect(() => {
     const filtered = schoolBuildingData.filter(

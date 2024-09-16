@@ -21,17 +21,6 @@ function LoginScreen({ navigation }: any) {
   const [userData, setUserData] = useState<UserData>();
   const [lectureList, setLectureList] = useState<Lecture>();
  
-
-  const IsUser = () => {
-    if(userData?.admin_check == true) {
-      console.log(userData);
-      navigation.navigate('AdminTabNavigator', { userdata : userData});
-    }else {
-      console.log(userData);
-      navigation.navigate('MainTabNavigator', {userdata : userData});
-    }
-  }
-
   const get_user_data = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/get_user_data`, {
@@ -45,15 +34,15 @@ function LoginScreen({ navigation }: any) {
         })
       })
       const userdata = await response.json();
-      console.log(userdata);
+      //console.log(userdata);
       return(userdata)
     } catch (error) {
-      console.error('유저 정보 가져오기 실패:', error);
+      Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
     }
   }
 
 
-  const handleLogin = async (userdata : UserData, LectureData : Lecture) => {
+  const handleLogin = async (userdata : UserData, LectureData : Lecture ) => {
     try {
       const response = await fetch(`${config.serverUrl}/login`, {
         method: 'POST',
@@ -67,13 +56,17 @@ function LoginScreen({ navigation }: any) {
       });
       const data = await response.text();
       if (data === 'success') {
-        navigation.navigate('MainTabNavigator', {userdata : userdata, LectureData : LectureData});
+        if(userdata.admin_check === true ) {
+          navigation.navigate('AdminTabNavigator', { userdata : userdata, LectureData : LectureData });
+        }else if(userdata.admin_check === false) {
+          navigation.navigate('MainTabNavigator', {userdata : userdata, LectureData : LectureData});
+        }
+
       } else {
         Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
       }
     } catch (error) {
-      console.error('로그인 오류:', error);
-      Alert.alert('로그인 오류');
+      Alert.alert('아이디 또는 비밀번호가 일치하지 않습니다');
     }
   };
 
@@ -95,6 +88,7 @@ function LoginScreen({ navigation }: any) {
       console.error('과목 가져오기 실패:', error);
     }
   }
+
 
   useFocusEffect(
     React.useCallback(() => {
@@ -171,7 +165,7 @@ function LoginScreen({ navigation }: any) {
         <Text style={styles.loginlinkText}>아이디, 비밀번호 찾기</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => navigation.navigate("RegisterScreen")}>
+      <TouchableOpacity onPress={() => navigation.navigate("TosScreen")}>
         <Text style={styles.loginlinkText}>앱을 처음 이용하시나요? 클릭하세요!</Text>
       </TouchableOpacity>
 

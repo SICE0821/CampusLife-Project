@@ -7,8 +7,6 @@ import { UserData } from '../../types/type'
 import { Swipeable, GestureHandlerRootView, RectButton } from 'react-native-gesture-handler';
 import config from '../../config';
 
-
-
 type PostData = {
     post_id: number,
     title: string,
@@ -17,12 +15,10 @@ type PostData = {
     view: number,
     like: number,
     name: string,
-    admin_check: boolean
+    user_title: string
 }
 
-
 const renderEmptyItem = () => {
-
     return (
         <View style={{ height: 85 }}>
         </View>
@@ -31,6 +27,7 @@ const renderEmptyItem = () => {
 
 //화면.
 const MyPostScreen = ({ route, navigation }: any) => {
+    console.log("you are in MyPostScreen")
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
     const ref = useRef(null);
     const { userdata } = route.params;
@@ -76,9 +73,9 @@ const MyPostScreen = ({ route, navigation }: any) => {
             const result = await response.json();
 
             if (result.message === "북마크 추가 완료") {
-                console.log('북마크가 성공적으로 추가되었습니다.');
+                //console.log('북마크가 성공적으로 추가되었습니다.');
             }else {
-                console.log('알 수 없는 응답:', result);
+                //console.log('알 수 없는 응답:', result);
             }
         } catch (error : any) {
             if (error.name === 'AbortError') {
@@ -101,7 +98,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
                 })
             })
             const result = await response.json();
-            console.log("포스트 View 올리기 성공!")
+            //console.log("포스트 View 올리기 성공!")
         } catch (error) {
             console.error('포스트 View 올리기 누르기 실패', error);
         }
@@ -131,9 +128,9 @@ const MyPostScreen = ({ route, navigation }: any) => {
             const result = await response.json();
 
             if (result.message === "북마크 추가 완료") {
-                console.log('북마크가 성공적으로 추가되었습니다.');
+                //console.log('북마크가 성공적으로 추가되었습니다.');
             }else {
-                console.log('알 수 없는 응답:', result);
+                //console.log('알 수 없는 응답:', result);
             }
         } catch (error : any) {
             if (error.name === 'AbortError') {
@@ -260,9 +257,16 @@ const MyPostScreen = ({ route, navigation }: any) => {
 
     useFocusEffect(
         React.useCallback(() => {
-            getMyPostData();
-            setUserData(userdata);
-            AreYouHavePost();
+            const fetchData = async () => {
+                try {
+                    await getMyPostData();
+                    setUserData(userdata);
+                    await AreYouHavePost();
+                } catch (error) {
+                    console.error('Error fetching data:', error);
+                }
+            };
+            fetchData();
         }, [])
     );
 
@@ -277,7 +281,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
                     style: "cancel"
                 },
                 { text: "확인", onPress: async () => {
-                    deleteMyPostData(post_id)
+                    await deleteMyPostData(post_id)
                     delete_post_aram()} }
             ]
         );
@@ -298,9 +302,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable
                 ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}
-                onSwipeableWillOpen={() => console.log(index + " 스와이프 열림")}
-                onSwipeableWillClose={() => console.log(index + " 스와이프 닫힘")}>
+                renderRightActions={() => renderRightActions(item, index)}>
                 <TouchableWithoutFeedback onPress={async () => {
                         await view_count_up(item.post_id);
                         navigation.navigate("PostDetailScreen", { item, userData })}}
@@ -308,7 +310,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
                     <View style={styles.writeboxcontainer}>
                         <View style={styles.writetitle}>
                             <View style={styles.titlebox}>
-                                <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}>{item.title}</Text>
+                                <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}  numberOfLines={1} ellipsizeMode='tail'>{item.title}</Text>
                             </View>
                             <View style={styles.eyesnum}>
                                 <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
@@ -317,7 +319,19 @@ const MyPostScreen = ({ route, navigation }: any) => {
                         </View>
                         <View style={styles.wirterandtime}>
                             <View style={styles.writerbox}>
-                                <Text style={{ fontSize: 13, marginLeft: 10, color: item.admin_check === true ? 'red' : 'black' }}>{item.name}</Text>
+                            <Text
+                                    style={{
+                                        fontSize: 13,
+                                        marginLeft: 10,
+                                        color:
+                                            item.user_title === "학교" ? 'red' :
+                                            item.user_title === "반장" ? 'green' :
+                                            item.user_title === "학우회장" ? 'blue' :
+                                            'black'
+                                    }}
+                                >
+                                    {item.name}
+                                </Text>
                                 <Text> | {item.date}</Text>
                             </View>
                             <View style={styles.likenum}>
@@ -330,6 +344,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
             </Swipeable>
         </GestureHandlerRootView>
     );
+
 
     return (
         <View style={styles.container} ref={ref}>
@@ -384,17 +399,19 @@ const styles = StyleSheet.create({
         borderBottomColor: '#CCCCCC',
         //backgroundColor: 'red',
         height: 70,
+        paddingHorizontal: 10,
     },
 
     writetitle: {
-        flex: 0.6,
+        width: '100%',
+        height: '60%',
         flexDirection: 'row',
-        marginTop: 5,
         //backgroundColor : 'yellow'
     },
 
     wirterandtime: {
-        flex: 0.4,
+        width: '100%',
+        height: '40%',
         flexDirection: 'row'
         //backgroundColor : 'yellow'
     },
