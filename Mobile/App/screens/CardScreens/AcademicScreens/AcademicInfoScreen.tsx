@@ -229,7 +229,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>우등상</Text>
                     </View>
@@ -237,7 +237,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지2.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>수강상</Text>
                     </View>
@@ -245,7 +245,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지3.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>성장상</Text>
                     </View>
@@ -253,7 +253,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지4.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>노력상</Text>
                     </View>
@@ -261,7 +261,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지5.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>출석상</Text>
                     </View>
@@ -269,7 +269,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지6.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>소통상</Text>
                     </View>
@@ -277,7 +277,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Image
                             source={require('../../../assets/뱃지7.png')}
                             resizeMode="contain"
-                            style={{ width: '65%', height: '65%' }}
+                            style={{ width: 40, height: 40 }}
                         />
                         <Text style={{ color: 'black' }}>최고상</Text>
                     </View>
@@ -303,41 +303,13 @@ const AcademicInfoScreen = ({ route }: any) => {
                         </View>
                     ))}
                 </View>
-                <View style={styles.BadgeTextArea}>
-                    <Text style={styles.BadgeTextFont}>목표학점</Text>
-                    <IconH style={styles.BadgeIcon} name="trophy" size={30} />
-                </View>
-                <TouchableOpacity
-                    style={styles.ChangGoalgpaArea}
-                    onPress={() => toggleModal()}>
-                    <Text style={styles.ChangGoalgpaFont}>목표 학점 변경 하기</Text>
-                </TouchableOpacity>
-                <Modal
-                    isVisible={isModalVisible}
-                    animationIn="slideInUp"       
-                    animationOut="slideOutDown"   
-                    animationInTiming={500}        
-                    animationOutTiming={500}>
-                    <View style={styles.modalContent}>
-                        <Text style={{ padding: 5 }}>목표 학점 설정</Text>
-                        <TextInput
-                            style={styles.input}
-                            keyboardType="numeric" // 숫자 입력용 키보드
-                            value={changegoalGPA}
-                            onChangeText={handleNumberInput}
-                            placeholder="0"
-                        />
-                        <Button title="전송"
-                            onPress={async () => {
-                                await change_GoalGPA();
-                                await get_GoalGPA();
-                                ChangGoalGpaAlert();
-                                setChangegoalGPA('');
-                            }} />
+                <View style={styles.BadgeArea2}>
+                    <View style={styles.BadgeTextArea2}>
+                        <Text style={styles.BadgeTextFont}>목표학점</Text>
+                        <IconH style={styles.BadgeIcon} name="trophy" size={30} />
                     </View>
-                </Modal>
-
-                <HorizontalBarGraph currentGPA={circleConfigs[0].value} goalGPA={goalGPA} />
+                    <HorizontalBarGraph />
+                </View>
 
                 <ScrollView style={styles.chartArea} horizontal={true}>
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -486,13 +458,13 @@ const styles = StyleSheet.create({
     },
     BadgeArea: {
         height: '10%',
-        padding: 10,
-        borderBottomWidth: 1
+        margin: 10,
+        borderBottomWidth: 1,
     },
     OneBadgeArea: {
         justifyContent: 'center',
         alignItems: 'center',
-        width: width - 410,
+        marginHorizontal: 10
         //backgroundColor: 'blue'
     },
     BadgeTextFont: {
@@ -514,8 +486,12 @@ const styles = StyleSheet.create({
         marginLeft: 24,
         borderRadius: 10,
         flexDirection: 'row',
-        borderColor: '#F29F05'
+        borderColor: '#F29F05',
         //backgroundColor: 'blue'
+    },
+    BadgeArea2: {
+        marginHorizontal: 20,
+        height: 300
     },
 
     BadgeTextArea2: {
@@ -532,8 +508,6 @@ const styles = StyleSheet.create({
         //backgroundColor: 'blue'
     },
     TargetGradeArea: {
-        height: height - 700,
-        padding: 20
         //backgroundColor: 'blue'
     },
     animation: {
@@ -567,41 +541,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     graphArea: {
-        flex: 1,
-        bottom: 20
-    },
-    ChangGoalgpaArea: {
-        height: height - 920,
-        width: "40%",
-        backgroundColor: '#F29F05',
-        marginLeft: 20,
-        marginTop: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        borderRadius: 15,
-    },
-    ChangGoalgpaFont: {
-        fontSize: 17,
-        fontWeight: '900',
-        color: 'white'
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        padding: 20,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    input: {
-        height: 40,
-        width: '100%',
-        borderColor: 'gray',
-        borderWidth: 1,
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-
+    }
 });
 
 export default AcademicInfoScreen;

@@ -269,7 +269,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
 
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '정보변경',
+                    title: '정보조회/변경',
                 }}
             />
             <MainStack.Screen

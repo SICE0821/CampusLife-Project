@@ -11,7 +11,7 @@ import { UserData } from "../../types/type"
 import config from '../../config';
 
 const width = Dimensions.get('window').width;
-let content : any;
+let content: any;
 
 const StudentInfoScreen = ({ route, navigation }: any) => {
     const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
@@ -26,11 +26,11 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
     const [imageResponse, setImageResponse] = useState<ImagePickerResponse | null>(null);
     const [imageFormData, setImageFormData] = useState<FormData | null>(null);
     const [imageFileName, setImageFileName] = useState<string | null>(null);
-    
+
 
     const getPhotos = () => {
-        const options : any = {
-            mediaType : 'photo',
+        const options: any = {
+            mediaType: 'photo',
         };
         launchImageLibrary(options, (response) => {
             if (response.didCancel) {
@@ -117,10 +117,10 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             })
             const data = await response.json(); // 서버로부터의 응답을 JSON으로 파싱
             if (response.ok && userdata.title !== "학교") {
-                if(imageFormData) {
+                if (imageFormData) {
                     const imageFileName = await uploadImages(imageFormData);
                     //console.log(imageFileName);
-                    if(imageFileName) {
+                    if (imageFileName) {
                         userdata.profile_photo = imageFileName;
                         await UpdateImg(imageFileName); //학생게정
                     }
@@ -150,7 +150,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
         setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: null }));
     }
 
-    const UpdateImg = async (imageFileName : string | null) => {
+    const UpdateImg = async (imageFileName: string | null) => {
         try {
             const response = await fetch(`${config.serverUrl}/updateImg`, {
                 method: 'POST',
@@ -192,8 +192,8 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
         }
     };
     */
-    
-    
+
+
     const uploadImages = async (formData: FormData) => {
         try {
             const response = await fetch(`${config.serverUrl}/upload`, {
@@ -202,12 +202,12 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             });
             const imageName = await response.text(); // Assuming the server sends plain text
             return imageName;
-        } catch (error : any) {
+        } catch (error: any) {
             console.error('Image upload failed:', error);
             // Provide more details for debugging
         }
     };
-    
+
 
 
     const handleGradeSelect = (grade: number) => {
@@ -261,7 +261,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
     )
 
     if (imageResponse) {
-        if(imageResponse && imageResponse.assets) {
+        if (imageResponse && imageResponse.assets) {
             content = <Image source={{ uri: imageResponse.assets[0].uri }} style={styles.image} />;
         }
     } else if (userData.profile_photo) {
@@ -291,7 +291,6 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
 
     return (
-
         <View style={styles.container}>
             <ScrollView>
                 <View style={styles.profilePicture}>
@@ -302,151 +301,288 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                 </View>
 
                 <View style={styles.studentInfoArea}>
-                    <View style={styles.infoArea}>
-                        <Text style={styles.infoLabelText}>이름</Text>
-                        <View style={styles.infoBox}>
-                            <Text style={styles.infoText}>{userdata.name}</Text>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>학교</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}>{UserUniversity}</Text>
+                            </View>
                         </View>
                     </View>
-
-                    <View style={styles.infoArea}>
-                        <Text style={styles.infoLabelText}>생년월윌</Text>
-                        <View style={styles.infoBox}>
-                            <Text style={styles.infoText}>{userdata.birth}</Text>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>학과</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}>{Userdepartment}</Text>
+                            </View>
                         </View>
                     </View>
+                    {userdata.title !== '학교' && ( // 학교면 재학상태, 학년 안보임 졸업하면 학년 안보임
+                        <View>
+                            {userdata.currentstatus == "졸업" && (
 
-                    <View style={styles.infoArea}>
-                        <Text style={styles.infoLabelText}>EMAIL</Text>
-                        <View style={styles.infoBox}>
-                            <TextInput
-                                style={styles.infoInput}
-                                value={userdata.email}
-                                onChangeText={(text) => setUserData(prevuserdata => ({ ...prevuserdata, email: text }))}
-                            />
-                        </View>
-                        <IconA name='pen' size={20} color='black' style={{ position: 'absolute', right: 10 }} />
-                    </View>
-
-                    <View style={styles.infoArea}>
-                        <Text style={styles.infoLabelText}>학교 / 학과</Text>
-                        <View style={styles.infoBox}>
-                            <Text style={styles.infoText}>{UserUniversity} / {Userdepartment}</Text>
-                        </View>
-                    </View>
-
-                    {userdata.title !== '학교' && (  // 학교일 경우 아래 학년 및 재학상태 UI를 표시하지 않음
-                        <View style={styles.infoArea}>
-                            {userdata.currentstatus !== "졸업" && (
-                                <View style={styles.schoolInfoLabel}>
-                                    <Text style={styles.schoolInfoText}>학년</Text>
-                                    <View>
-                                        <Text style={styles.listBoxText}>{userdata.grade}학년</Text>
+                                <View style={styles.infoRow}>
+                                    <View style={styles.infoTitle}>
+                                        <Text style={styles.infoTitleText}>재학상태</Text>
+                                    </View>
+                                    <View style={styles.infoData}>
+                                        <View style={styles.infoDataTextArea}>
+                                            <Text style={styles.infoDataText}>{userdata.currentstatus}</Text>
+                                        </View>
                                     </View>
                                 </View>
                             )}
-                            {userdata.currentstatus !== "졸업" ? (
-                                <View style={styles.schoolInfoLabel}>
-                                    <Text style={styles.schoolInfoText}>재학상태</Text>
-                                    <View>
-                                        <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
-                                    </View>
-                                </View>
-                            ) : (
+                            {userdata.currentstatus !== "졸업" && (
                                 <View>
-                                    <View style={styles.schoolInfoLabel}>
-                                        <Text style={styles.schoolInfoText}>재학상태</Text>
-                                        <View>
-                                            <Text style={styles.listBoxText}>{userdata.currentstatus}</Text>
+                                    <View style={styles.infoRow}>
+                                        <View style={styles.infoTitle}>
+                                            <Text style={styles.infoTitleText}>학년</Text>
+                                        </View>
+                                        <View style={styles.infoData}>
+                                            <View style={styles.infoDataTextArea}>
+                                                <Text style={styles.infoDataText}>{userdata.grade}학년</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.infoRow}>
+                                        <View style={styles.infoTitle}>
+                                            <Text style={styles.infoTitleText}>재학상태</Text>
+                                        </View>
+                                        <View style={styles.infoData}>
+                                            <View style={styles.infoDataTextArea}>
+                                                <Text style={styles.infoDataText}>{userdata.currentstatus}</Text>
+                                            </View>
                                         </View>
                                     </View>
                                 </View>
                             )}
                         </View>
                     )}
-                    <View style={styles.infoArea}>
-                        <Text style={styles.infoLabelText}>아이디</Text>
-                        <View style={styles.infoBox}>
-                            <Text style={styles.infoText}>{userdata.id}</Text>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>학번</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}>2033053</Text>
+                            </View>
                         </View>
                     </View>
-
-
-                    <TouchableOpacity style={[styles.infoArea, { justifyContent: 'flex-start', width: '30%', }]} onPress={DeleteUser}>
-                        <Text style={styles.button}>회원 탈퇴</Text>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>생년월일</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}>{userdata.birth}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>성명(한글)</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}>{userdata.name}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>성명(영어)</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>아이디</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}>{userdata.id}</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>전화(집)</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>전화(H.P)</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>E-mail</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <TextInput 
+                                    style={styles.infoDataInput} 
+                                    value={userdata.email} 
+                                    onChangeText={(text) => setUserData(prevuserdata => ({ ...prevuserdata, email: text }))}
+                                />
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>우편주소</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>주소</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>상세주소</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>은행명</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>은행계좌</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.infoRow}>
+                        <View style={styles.infoTitle}>
+                            <Text style={styles.infoTitleText}>예금주</Text>
+                        </View>
+                        <View style={styles.infoData}>
+                            <View style={styles.infoDataTextArea}>
+                                <Text style={styles.infoDataText}></Text>
+                            </View>
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.biuttonArea}>
+                    <TouchableOpacity style={[styles.button, { borderBottomWidth: 1, borderColor: 'gray' }]} onPress={DeleteUser}>
+                        <Text style={styles.buttonText}>회원 탈퇴</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.infoArea, { justifyContent: 'flex-start', width: '30%', }]} onPress={Logout}>
-                        <Text style={{ color: 'red', fontSize: 20, fontWeight: "bold" }}>로그아웃</Text>
+                    <TouchableOpacity style={[styles.button, { borderTopWidth: 1, borderColor: 'gray' }]} onPress={Logout}>
+                        <Text style={styles.buttonText}>로그아웃</Text>
                     </TouchableOpacity>
                 </View>
-
             </ScrollView>
             <ModalBox
                 isOpen={isModalOpen}
-                style={styles.modal}
+                style={test.modal}
                 position="bottom"
                 swipeToClose={false}
                 onClosed={closegradeModal}
             >
-                <View style={styles.modalContent}>
+                <View style={test.modalContent}>
                     <TouchableOpacity
-                        style={[styles.gradeButton, selectedGrade === 1 && styles.selectedGrade]}
+                        style={[test.gradeButton, selectedGrade === 1 && test.selectedGrade]}
                         onPress={() => handleGradeSelect(1)}
                     >
-                        <Text style={[styles.gradeButtonText, selectedGrade === 1 && { color: "black" }]}>1학년</Text>
+                        <Text style={[test.gradeButtonText, selectedGrade === 1 && { color: "black" }]}>1학년</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.gradeButton, selectedGrade === 2 && styles.selectedGrade]}
+                        style={[test.gradeButton, selectedGrade === 2 && test.selectedGrade]}
                         onPress={() => handleGradeSelect(2)}
                     >
-                        <Text style={[styles.gradeButtonText, selectedGrade === 2 && { color: "black" }]}>2학년</Text>
+                        <Text style={[test.gradeButtonText, selectedGrade === 2 && { color: "black" }]}>2학년</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.gradeButton, selectedGrade === 3 && styles.selectedGrade]}
+                        style={[test.gradeButton, selectedGrade === 3 && test.selectedGrade]}
                         onPress={() => handleGradeSelect(3)}
                     >
-                        <Text style={[styles.gradeButtonText, selectedGrade === 3 && { color: "black" }]}>3학년</Text>
+                        <Text style={[test.gradeButtonText, selectedGrade === 3 && { color: "black" }]}>3학년</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={closegradeModal} style={styles.completeButton}>
+                    <TouchableOpacity onPress={closegradeModal} style={test.completeButton}>
                         <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
                     </TouchableOpacity>
                 </View>
             </ModalBox>
             <ModalBox
                 isOpen={isStatusModalOpen}
-                style={styles.modal}
+                style={test.modal}
                 position="bottom"
                 swipeToClose={false}
                 onClosed={closeStatusModal}
             >
-                <View style={styles.modalContent}>
+                <View style={test.modalContent}>
                     <TouchableOpacity
-                        style={[styles.gradeButton, selectedstatus === "졸업" && styles.selectedGrade]}
+                        style={[test.gradeButton, selectedstatus === "졸업" && test.selectedGrade]}
                         onPress={() => handlestatusSelect("졸업")}
                     >
-                        <Text style={[styles.gradeButtonText, selectedstatus === "졸업" && { color: "black" }]}>졸업</Text>
+                        <Text style={[test.gradeButtonText, selectedstatus === "졸업" && { color: "black" }]}>졸업</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.gradeButton, selectedstatus === "휴학중" && styles.selectedGrade]}
+                        style={[test.gradeButton, selectedstatus === "휴학중" && test.selectedGrade]}
                         onPress={() => handlestatusSelect("휴학중")}
                     >
-                        <Text style={[styles.gradeButtonText, selectedstatus === "휴학중" && { color: "black" }]}>휴학중</Text>
+                        <Text style={[test.gradeButtonText, selectedstatus === "휴학중" && { color: "black" }]}>휴학중</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.gradeButton, selectedstatus === "재학중" && styles.selectedGrade]}
+                        style={[test.gradeButton, selectedstatus === "재학중" && test.selectedGrade]}
                         onPress={() => handlestatusSelect("재학중")}
                     >
-                        <Text style={[styles.gradeButtonText, selectedstatus === "재학중" && { color: "black" }]}>재학중</Text>
+                        <Text style={[test.gradeButtonText, selectedstatus === "재학중" && { color: "black" }]}>재학중</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={closeStatusModal} style={styles.completeButton}>
+                    <TouchableOpacity onPress={closeStatusModal} style={test.completeButton}>
                         <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
                     </TouchableOpacity>
                 </View>
             </ModalBox>
             <ModalBox
                 isOpen={isCameraModalOpen}
-                style={styles.Cameramodal}
+                style={test.Cameramodal}
                 position="top"
                 swipeToClose={false}
                 onClosed={closeCameraModal}
@@ -463,12 +599,12 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                         <Text style={{ fontSize: 22, color: "blue", fontWeight: "bold" }}>기본 이미지 설정</Text>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.modalconfirmButton} onPress={closeCameraModal} >
+                <TouchableOpacity style={test.modalconfirmButton} onPress={closeCameraModal} >
                     <Text style={{ fontSize: 20, color: 'black', fontWeight: "bold" }}>닫기</Text>
                 </TouchableOpacity>
             </ModalBox>
             <TouchableOpacity style={styles.confirmButton} onPress={UpdateAccount}>
-                <Text style={{ fontSize: 20, color: 'black', fontWeight: "bold" }}>확인</Text>
+                <Text style={styles.confirmButtonText}>확인</Text>
             </TouchableOpacity>
         </View>
     );
@@ -478,8 +614,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
+        alignContent: 'center'
     },
     profilePicture: {
         marginTop: 10,
@@ -490,156 +625,115 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         position: 'relative',
     },
-    studentInfoArea: {
-        //backgroundColor: 'lightgray',
-        width: width * 0.95,
-        height: 500,
-        marginTop: 15,
-        //borderRadius: 20,
-        borderTopWidth: 2,
-        borderColor: 'gray'
+    cameraButton: {
+        position: 'absolute',
+        bottom: -5,
+        right: -5,
+        borderRadius: 16,
+        padding: 5,
+        zIndex: 1,
     },
-    infoArea: {
+    image: {
         width: '100%',
-        height: '12%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 10,
+        height: '100%',
+        borderRadius: 60,
+        backgroundColor: "#909090",
+        paddingLeft: 35,
+        paddingTop: 25
     },
-    infoLabelText: {
-        color: 'gray',
+    studentInfoArea: { // 학생 정보 영역
+        backgroundColor: 'white',
+        width: '90%',
+        alignSelf: 'center',
+        borderWidth: 1,
+        borderColor: 'gray',
+        marginVertical: 20
+    },
+    infoRow: { // 정보 행 영역
+        flexDirection: 'row',
+        alignSelf: 'center',
+        width: '100%',
+        height: 45,
+        borderWidth: 1,
+        borderColor: 'gray',
+    },
+    infoTitle: { // 제목 영역
+        width: '30%',
+        height: '100%',
+        borderRightWidth: 2,
+        borderColor: 'gray',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    infoTitleText: {
+        color: 'black',
+        fontSize: 18,
+        fontWeight: 'bold'
+    },
+    infoData: { // 정보 영역
+        width: '70%',
+        height: '100%',
+    },
+    infoDataTextArea: {
+        flex: 1,
+        margin: 2,
+        borderWidth: 2,
+        borderRadius: 3,
+        borderColor: 'gray',
+        justifyContent: 'center'
+    },
+    infoDataText: {
+        color: 'black',
         fontSize: 18,
         fontWeight: 'bold',
-        width: '30%'
+        marginLeft: 8
     },
-    infoBox: {
-        width: '70%',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        flexDirection: 'row',
-    },
-    infoText: {
-        color: "black",
-        fontSize: 20,
-        fontWeight: "bold",
-    },
-    infoInput: {
-        width: '95%',
+    infoDataInput: {
         color: 'black',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
-        position: 'absolute',
-        left: -5
+        marginLeft: 8,
+        padding: 4,
     },
-    schoolInfoLabel: {
-        width: '50%',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    schoolInfoText: {
-        color: "gray",
-        fontSize: 17,
-        fontWeight: "bold",
-        marginRight: 15
-    },
-    /*listBoxArea: {
-        flexDirection: "row",
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderColor: "black",
+    biuttonArea: {
+        width: '90%',
+        alignSelf: 'center',
         borderWidth: 2,
-        borderRadius: 15,
-        width: 120,
-        height: 45,
-        paddingHorizontal: 10
-    },*/
-    listBoxText: {
-        fontSize: 17,
-        fontWeight: "bold",
-        color: "black",
+        borderRadius: 2,
+        borderColor: 'gray',
+        marginVertical: 10
     },
-    listBoxIcon: {
-        color: 'black',
-    },
-    button: {
-        color: 'red',
-        fontSize: 20,
-        fontWeight: "bold",
-    },
-
-    containerBox: {
-        marginTop: 15,
-        borderTopWidth: 2,
-        borderLeftWidth: 2,
-        borderRightWidth: 2,
-        borderColor: "black",
-        width: 415,
-        height: 700,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        alignItems: 'center',
-        //backgroundColor : "black",
-    },
-    Textfont: {
-        fontSize: 17,
-        fontWeight: "bold",
-        color: "black",
-        marginTop: 10,
-        marginLeft: 9,
-    },
-    TextInput: {
-        borderColor: "black",
-        borderWidth: 2,
-        borderRadius: 15,
-        width: 400,
-        height: 50,
-
-    },
-    TextInput2: {
-        flexDirection: "row",
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderColor: "black",
-        borderWidth: 2,
-        borderRadius: 15,
-        width: 120,
-        height: 50,
-
-    },
-    TextInput3: {
-        borderColor: "black",
-        borderWidth: 2,
-        borderRadius: 15,
-        width: 400,
+    button: { // 버튼 (회원탈퇴, 로그아웃)
+        width: '100%',
         height: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 15,
     },
+    buttonText: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: 'red'
+    },
+    confirmButton: { // 확인 버튼
+        backgroundColor: '#9A9EFF',
+        width: 480,
+        height: 70,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    confirmButtonText: {
+        fontSize: 22, 
+        color: 'black', 
+        fontWeight: "bold"
+    }
+})
 
-    TextInput4: {
-        borderColor: "black",
-        borderWidth: 2,
-        borderRadius: 15,
-        width: 400,
-        height: 50,
-        fontSize: 17,
-        fontWeight: "bold",
-        color: "black",
-
-    },
-    grade: {
-        flexDirection: 'row',
-        marginTop: 10,
-        marginRight: 130,
-    },
+const test = StyleSheet.create({
     modal: { // 모달 창 css
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         height: 450,
     },
-
     modalContent: {
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
@@ -647,7 +741,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-
     gradeButton: {
         borderBottomWidth: 2,
         borderRadius: 15,
@@ -658,19 +751,16 @@ const styles = StyleSheet.create({
         marginTop: 35,
         borderColor: "#CCCCCC",
     },
-
     // 선택된 학년 버튼의 스타일
     selectedGrade: {
         borderColor: "black",
         color: "black",
     },
-
     gradeButtonText: {
         fontSize: 25,
         fontWeight: "bold",
         color: "#CCCCCC",
     },
-
     completeButton: {
         marginTop: 65,
         backgroundColor: '#9A9EFF',
@@ -693,7 +783,6 @@ const styles = StyleSheet.create({
         width: 320,
         marginTop: 300,
     },
-
     modalconfirmButton: {
         backgroundColor: '#9A9EFF',
         borderRadius: 20,
@@ -702,24 +791,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 30,
-    },
-
-    cameraButton: {
-        position: 'absolute',
-        bottom: -5,
-        right: -5,
-        borderRadius: 16,
-        padding: 5,
-        zIndex: 1,
-    },
-
-    image: {
-        width: '100%',
-        height: '100%',
-        borderRadius: 60,
-        backgroundColor: "#909090",
-        paddingLeft: 35,
-        paddingTop: 25
     },
 })
 
