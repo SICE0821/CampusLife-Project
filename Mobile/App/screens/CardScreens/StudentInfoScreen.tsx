@@ -604,7 +604,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                 </TouchableOpacity>
             </ModalBox>
             <TouchableOpacity style={styles.confirmButton} onPress={UpdateAccount}>
-                <Text style={{ fontSize: 20, color: 'black', fontWeight: "bold" }}>확인</Text>
+                <Text style={styles.confirmButtonText}>확인</Text>
             </TouchableOpacity>
         </View>
     );
@@ -703,7 +703,7 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         marginVertical: 10
     },
-    button: {
+    button: { // 버튼 (회원탈퇴, 로그아웃)
         width: '100%',
         height: 50,
         alignItems: 'center',
@@ -714,13 +714,18 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'red'
     },
-    confirmButton: {
+    confirmButton: { // 확인 버튼
         backgroundColor: '#9A9EFF',
         width: 480,
         height: 70,
         alignItems: 'center',
         justifyContent: 'center',
     },
+    confirmButtonText: {
+        fontSize: 22, 
+        color: 'black', 
+        fontWeight: "bold"
+    }
 })
 
 const test = StyleSheet.create({
