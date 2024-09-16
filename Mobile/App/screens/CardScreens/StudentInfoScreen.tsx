@@ -174,8 +174,8 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             clearTimeout(timeoutId);
             const imageName = await response.text();
             console.log(imageName);
-            setImageUrl(`http://10.0.2.2:3000/${imageName}`);
-            setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: imageName }));
+            setImageUrl(`http://10.0.2.2:3000/${imageName}`); //사진 변경
+            setUserData(prevuserdata => ({ ...prevuserdata, profile_photo: imageName })); //userData 변경
             if (response.ok) {
                 console.log('Images uploaded successfully');
             } else {
