@@ -1,23 +1,28 @@
 import React, { useState } from 'react';
-import { useAuth } from './AuthContext'; // Adjust path based on your context location
+import { useAuth } from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
 import logo from '../image/logo.png';
 
 function Login() {
-  const { login } = useAuth();
+  const { login  } = useAuth(); //로그인, 로그아웃 사용자 인증을 관리해주는 함수를 만들어주는 useaAuth
   const navigate = useNavigate();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [username, setUsername] = useState(''); //아이디
+  const [password, setPassword] = useState(''); //비밀번호
+  const [error, setError] = useState(''); //에러
 
+  //로그인 폼이 제출될 때 실행되는 비동기 함수
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); //원래 디폴트는 폼제출 후 새로고침인데 event.preventDefault(); 함수를 사용해서 새로고침을 막음
     try {
-      await login(username, password);
-      navigate('/');
+      const ProfessorInfo = await login(username, password);
+      if(ProfessorInfo) {
+        navigate('/' , { state: { ProfessorInfo } });
+      }else {
+        setError('Login failed. Please check your username and password.');
+      }
     } catch (err) {
-      setError('Login failed. Please check your username and password.');
+      console.log(err)
     }
   };
 
