@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { GluestackUIProvider } from "../components/ui/gluestack-ui-provider";
 import { StyleSheet, View, TouchableOpacity, Text} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import {RootStackNavigator} from './navigation/StackNavigator.tsx';
@@ -9,11 +10,11 @@ import SwipeableItem from '../MyTest/SwipeableItem.tsx'
 function App(): React.JSX.Element {
 
   return (
-     <NavigationContainer>
+    <GluestackUIProvider mode="light"><NavigationContainer>
         <RootStackNavigator>
 
         </RootStackNavigator>
-     </NavigationContainer>
+      </NavigationContainer></GluestackUIProvider>
   );
 }
 
