@@ -592,64 +592,18 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    //backgroundColor : "red",
-  },
-  writerPic: { // 작성자 프로필 사진
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    backgroundColor: 'gray'
-  },
-  previewImage: {
-    width: 100,
-    height: 100,
-    marginRight: 10,
-    borderRadius: 10,
-    resizeMode: 'contain',
-  },
-  imagePreviewContainer: {
-    flexDirection: 'row',
-  },
-  writer: {
-    flexDirection: 'row',
-  },
-  writerArea: { // 상단 작성자 영역
-    height: 100,
-    borderBottomWidth: 1,
-    borderRadius: 20,
-    borderColor: 'gray',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 35,
-    alignItems: 'center',
-    //backgroundColor: 'orange'
-  },
-  writerName: { // 작성자 이름
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: 'black'
-  },
-
-  writerInfo: { // 작성자 정보 영역
-    height: 60,
-    marginHorizontal: 10,
-    justifyContent: 'space-evenly',
-  },
-  headersection: {
-    height: 75,
-    //backgroundColor: 'blue'
-  },
-
-  previewImageFullArea: {
-    width: width - 60,
-    height: width - 60,
-  },
-  headercontainer: {
-    flex: 1,
-    //backgroundColor : 'red',
-    flexDirection: 'row',
+    container: {
+        flex: 1,
+        backgroundColor : "white",
+    },
+    headersection: {
+        height: 75,
+        //backgroundColor: 'blue'
+    },
+    headercontainer: {
+        flex: 1,
+        //backgroundColor : 'red',
+        flexDirection: 'row',
 
   },
 

@@ -337,7 +337,7 @@ const MainPage = ({ navigation, route }: any) => {
               </TouchableOpacity>
               <View style={styles.userInfoNPointArea}>
                 <View style={styles.userInfoArea}>
-                  <View style ={{flexDirection : 'row'}}>
+                  <View style ={{flexDirection : 'row', justifyContent : 'center', alignItems : 'center',}}>
                     <Text style={styles.userName}>{userData.name}</Text>
                     <TouchableOpacity 
                     style = {styles.pointcheckBox}
@@ -940,9 +940,9 @@ const styles = StyleSheet.create({
   },
   pointcheckBox : {
     backgroundColor : '#A8D5BA',
-    width : '50%',
+    width : 110,
     height : 30, //이거 %쓰면 아예 달라져 버려서 일단 보류
-    marginLeft : 60,
+    marginLeft : 10,
     justifyContent : 'center',
     alignItems : 'center',
     borderRadius : 10,

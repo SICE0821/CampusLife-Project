@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, FlatList } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import config from '../config';
-import { UserData, EventData } from '../types/type'
 
 export type UserPoint = {
   point : number,
@@ -99,7 +98,7 @@ const PointHistoryScreen = ({ route, navigation }: any) => {
         <Text style={styles.timeFont}>{item.point_time}</Text>
       </View>
       <View style={styles.itempointcontainer}>
-        <Text style={item.point_status === 1 ? styles.PostivepointFont : styles.NegativepointFont}>{item.point_num}P{item.point_status === 1 ? '+' : '-'}</Text>
+        <Text style={item.point_status === 1 ? styles.PostivepointFont : styles.NegativepointFont}>{item.point_status === 1 ? '+' : '-'}{item.point_num}P</Text>
         <Text style={styles.status}>{item.point_status === 1 ? '적립' : '사용'}</Text>
 
       </View>
@@ -173,8 +172,6 @@ const styles = StyleSheet.create({
   },
 
   PointBox: {
-    //backgroundColor: 'yellow',
-    height: '50%',
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
@@ -189,7 +186,8 @@ const styles = StyleSheet.create({
   PointPFont: {
     fontSize: 60,
     color: '#F27400',
-    marginLeft: 5
+    marginLeft: 5,
+    fontWeight: 'bold'
   },
 
   HistorySection: {
@@ -262,7 +260,7 @@ const styles = StyleSheet.create({
   },
 
   itemDescriptioncontainer: {
-    width: "65%",
+    width: "60%",
     //backgroundColor : 'red',
     paddingTop: 25,
     paddingLeft: 25,
@@ -280,7 +278,7 @@ const styles = StyleSheet.create({
     marginTop: 10
   },
   itempointcontainer: {
-    width: "35%",
+    width: "40%",
     //backgroundColor : 'red',
     paddingTop: 25,
     paddingRight: 25,

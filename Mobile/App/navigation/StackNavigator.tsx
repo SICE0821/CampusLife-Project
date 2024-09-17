@@ -42,6 +42,7 @@ import StudyRoomDetailScreen from '../screens/CardScreens/StudyRoomDetailScreen'
 import MyPostScreen from '../screens/CommunityScreens/MyPostScreen';
 import { RegisterItemStackNavigator } from '../Admin_Screens/Navigation/AdminStackNavigator';
 import PointHistoryScreen from '../screens/PointHistoryScreen';
+import type { IMPData } from 'iamport-react-native';
 
 
 import IconD from 'react-native-vector-icons/AntDesign';
@@ -62,6 +63,28 @@ const EventShopStack = createStackNavigator();
 const ReqularEventScreenStack = createStackNavigator();
 const AdminStack = createStackNavigator();
 const StudyRoomStack = createStackNavigator();
+
+export interface CertificationParams {
+    params: IMPData.CertificationData;
+    userCode: string;
+    tierCode?: string;
+  }
+  
+  export interface PaymentParams {
+    params: IMPData.PaymentData;
+    userCode: string;
+    tierCode?: string;
+  }
+
+export type RootStackParamList = {
+    Home: undefined;
+    Certification: CertificationParams | undefined;
+    CertificationTest: undefined;
+    CertificationResult: any;
+    Payment: PaymentParams | undefined;
+    PaymentTest: undefined;
+    PaymentResult: any;
+  };
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = (route: any) => {
@@ -269,7 +292,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
 
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '정보변경',
+                    title: '정보조회/변경',
                 }}
             />
             <MainStack.Screen

@@ -633,6 +633,7 @@ const App = ({ route }: any) => {
           </View>
         </View>
       </ModalBox>
+      <View style={{ height: 80 }}></View>
     </ScrollView>
   );
 };

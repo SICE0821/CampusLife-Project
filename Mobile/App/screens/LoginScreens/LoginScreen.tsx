@@ -134,7 +134,7 @@ function LoginScreen({ navigation }: any) {
           style={styles.Checkbox}
           size={25}
           fillColor="black"
-          unfillColor="#FFFFFF"
+          unfillColor="#FFFFFF" 
           text="아이디 저장"
           iconStyle={{ borderColor: "black" }}
           textStyle={{ fontFamily: "JosefinSans-Regular", textDecorationLine: "none", }}
