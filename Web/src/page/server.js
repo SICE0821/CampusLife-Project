@@ -17,7 +17,7 @@ const pool = mariadb.createPool({
     multipleStatements: true,
 })
 
-app.get('/test-connection', async (req, res) => {
+app.get('/ProfInfo', async (req, res) => {
     try {
         const conn = await pool.getConnection();
         const rows = await conn.query("SELECT 1 as test");
