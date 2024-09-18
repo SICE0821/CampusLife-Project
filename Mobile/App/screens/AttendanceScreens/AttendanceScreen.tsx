@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import { Alert, SafeAreaView, View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Alert, SafeAreaView, View, Text, TouchableOpacity, ScrollView, Dimensions, StyleSheet } from 'react-native';
 import ModalBox from 'react-native-modalbox';
 import IconA from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
@@ -15,7 +15,7 @@ type LectureData = {
 
 const width = Dimensions.get("window").width;
 
-const AttendanceScreen = ({navigation, route}: any) => {
+const AttendanceScreen = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,47 +66,47 @@ const AttendanceScreen = ({navigation, route}: any) => {
   const generateTimeRanges = (lectureTime: string) => {
     const [start, end] = formatTimeRange(lectureTime);
     const timeRanges = [];
-    
+
     let [currentHour, currentMinute] = start.split(':').map(Number);
     const [endHour, endMinute] = end.split(':').map(Number);
-  
+
     while (!(currentHour === endHour && currentMinute === endMinute)) {
       if (currentMinute % 10 !== 0) {
         currentMinute = Math.ceil(currentMinute / 10) * 10;
       }
-  
+
       const startHourStr = currentHour < 10 ? `0${currentHour}` : `${currentHour}`;
       const startMinuteStr = currentMinute < 10 ? `0${currentMinute}` : `${currentMinute}`;
-  
+
       let nextHour = currentHour;
       let nextMinute = currentMinute + 50;
-  
+
       if (nextMinute >= 60) {
         nextHour++;
         nextMinute -= 60;
       }
-  
+
       if (nextHour > endHour || (nextHour === endHour && nextMinute > endMinute)) {
         break;
       }
-  
+
       const nextHourStr = nextHour < 10 ? `0${nextHour}` : `${nextHour}`;
       const nextMinuteStr = nextMinute < 10 ? `0${nextMinute}` : `${nextMinute}`;
-  
+
       const nextTime = `${startHourStr}:${startMinuteStr} ~ ${nextHourStr}:${nextMinuteStr}`;
       timeRanges.push(nextTime);
-  
+
       currentHour = nextHour;
       currentMinute = nextMinute;
-  
+
       currentMinute += 10;
       if (currentMinute >= 60) {
         currentHour++;
         currentMinute -= 60;
       }
     }
-  
-    return [...timeRanges]; 
+
+    return [...timeRanges];
   };
 
   const updateAttendanceStatus = async (lecture: Lecture) => {
@@ -163,7 +163,7 @@ const AttendanceScreen = ({navigation, route}: any) => {
         });
         const data = await response.json();
       });
-  
+
       await Promise.all(promises);
     } catch (error) {
       console.log('출석 정보 업데이트 실패:', error);
@@ -237,34 +237,34 @@ const AttendanceScreen = ({navigation, route}: any) => {
       lecture.today_lecture_state = false;
     }
   };
-  
-const determineBoxColor = (weekIndex: number, classIndex: number) => {
-  const matchingData = lectureInfo.find(
-    data => data.weeknum === weekIndex + 1 && data.classnum === classIndex + 1
-  );
 
-  if (matchingData) {
-    switch (matchingData.attendance_Info) {
-      case "출결":
-        return "#4CAF50"; // 출결
-      case "미출결":
-        return "#909090"; // 미출결
-      case "지각":
-        return "#FF9100"; // 지각
-      case "결석":
-        return "#C7253E"; // 결석
-      default:
-        return "#909090"; // 기본값은 미출결 색상
+  const determineBoxColor = (weekIndex: number, classIndex: number) => {
+    const matchingData = lectureInfo.find(
+      data => data.weeknum === weekIndex + 1 && data.classnum === classIndex + 1
+    );
+
+    if (matchingData) {
+      switch (matchingData.attendance_Info) {
+        case "출결":
+          return "#4CAF50"; // 출결
+        case "미출결":
+          return "#909090"; // 미출결
+        case "지각":
+          return "#FF9100"; // 지각
+        case "결석":
+          return "#C7253E"; // 결석
+        default:
+          return "#909090"; // 기본값은 미출결 색상
+      }
     }
-  }
 
-  return "#909090"; // 매칭되는 데이터가 없을 경우 기본 색상
-};
+    return "#909090"; // 매칭되는 데이터가 없을 경우 기본 색상
+  };
 
   React.useEffect(() => {
     requestPermission();
   }, []);
-  
+
   React.useEffect(() => {
     if (isCameraButton) {
       navigation.navigate('FullScreenCamera');
@@ -289,18 +289,18 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
         }
       }
     };
-  
+
     loadLectureInfo();
   }, [selectedLecture]);
 
   useEffect(() => {
     const filteredLectures = filterLectures(LectureData);
     setLectureList(filteredLectures);
-    
+
     if (scannedCode && selectedLecture) {
       setLastScannedTime(new Date());
       setIsScanned(true);
-  
+
       Alert.alert(
         '출석 확인',
         '출석 확인 되었습니다!',
@@ -310,15 +310,15 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
             const currentWeekData = await get_lecture_Info();
             const lastRecordedWeek = currentWeekData.length > 0 ? Math.max(...currentWeekData.map((info: { weeknum: any; }) => info.weeknum)) : 0;
             const nextWeek = lastRecordedWeek + 1; // 다음 주차를 계산
-  
+
             if (nextWeek <= selectedLecture.lecture_have_week) { // 다음 주차가 최대 주차보다 적으면 출석 기록
               generateTimeRanges(selectedLecture.lecture_time).forEach(async (_, classIndex) => {
                 await insert_lecture_Info(nextWeek, classIndex + 1, "출결");
               });
-  
+
               setLastScannedWeek(nextWeek); // 마지막 주차 업데이트
             }
-  
+
             await updateAttendanceStatus(selectedLecture);
             await AttendanceCheck();
           }
@@ -330,17 +330,17 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
 
   useEffect(() => {
     const fetchDataAsync = async () => {
-        try {
-          if (isModalOpen && selectedLecture) {
-            setLastScannedWeek(0);
-            await get_lecture_Info();
-          } 
-        } catch (error) {
-            console.error('Error fetching data:', error); 
+      try {
+        if (isModalOpen && selectedLecture) {
+          setLastScannedWeek(0);
+          await get_lecture_Info();
         }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     };
-    fetchDataAsync(); 
-}, [isModalOpen, selectedLecture]);
+    fetchDataAsync();
+  }, [isModalOpen, selectedLecture]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -381,7 +381,7 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
               </View>
             )
           ))}
-          <View style={{height:100}}></View>
+          <View style={{ height: 100 }}></View>
         </View>
       </ScrollView>
       <ModalBox
@@ -399,7 +399,7 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
                   <Text style={styles.ListText2}>{selectedLecture?.lecture_name}</Text>
                 </View>
                 <View style={styles.Icon}>
-                  <TouchableOpacity onPress={() => openCamera(selectedLecture)} 
+                  <TouchableOpacity onPress={() => openCamera(selectedLecture)}
                     disabled={nowday !== selectedLecture?.week}>
                     <IconA name="camera" size={32} color={nowday === selectedLecture?.week ? "black" : "gray"} />
                   </TouchableOpacity>
@@ -437,6 +437,7 @@ const determineBoxColor = (weekIndex: number, classIndex: number) => {
             </View>
           </View>
         )}
+        <View style={{ height: 100 }}></View>
       </ModalBox>
     </SafeAreaView>
   );
@@ -451,14 +452,14 @@ const styles = StyleSheet.create({
   textContainer: { // 오늘의 출석, 날짜 텍스트 컨테이너
     alignSelf: 'center',
     justifyContent: 'center',
-    width: width*0.9,
+    width: width * 0.9,
     paddingHorizontal: 5,
     marginVertical: 30,
   },
-  textContainer2:{ // 출석 현황 텍스트 컨테이너
+  textContainer2: { // 출석 현황 텍스트 컨테이너
     alignSelf: 'center',
     justifyContent: 'center',
-    width: width*0.9,
+    width: width * 0.9,
     paddingHorizontal: 5,
     marginVertical: 15,
   },
@@ -466,12 +467,12 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 10,
-    color : 'black',
+    color: 'black',
   },
   title2: { // 출석 현황 텍스트 css
     fontSize: 25,
     fontWeight: 'bold',
-    color : 'black',
+    color: 'black',
   },
   date: { // 날짜 텍스트 css
     fontWeight: 'bold',
@@ -481,17 +482,17 @@ const styles = StyleSheet.create({
   buttonContainer: { // 오늘의 출석 버튼 컨테이너
     alignSelf: 'center',
     justifyContent: 'flex-start',
-    width: width*0.9
+    width: width * 0.9
   },
   buttonContainer2: { // 출석 현황 버튼 컨테이너
     alignSelf: 'center',
-    marginTop : 5,
+    marginTop: 5,
     justifyContent: 'flex-start',
-    width: width*0.9
+    width: width * 0.9
   },
   AttendanceList: { // 과목마다의 버튼 
     borderBottomWidth: 2,
-    marginBottom : 8,
+    marginBottom: 8,
     borderColor: 'black',
     width: '100%',
     padding: 5
@@ -503,8 +504,8 @@ const styles = StyleSheet.create({
   },
   ListText2: { // 버튼 누른 후 과목명 텍스트
     fontSize: 25,
-    marginLeft : 25,
-    color:'black',
+    marginLeft: 25,
+    color: 'black',
     fontWeight: 'bold'
   },
   ListArea: {
@@ -522,7 +523,7 @@ const styles = StyleSheet.create({
   ListInfo2: { // 버튼 누른 후 과목마다의 출석 텍스트
     fontSize: 15,
     marginLeft: 25,
-    marginTop : 5,
+    marginTop: 5,
     color: 'black'
   },
   modal: {
@@ -539,10 +540,10 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  modalContainer:{
-    flex : 1,
-    borderTopLeftRadius : 20,
-    borderTopRightRadius : 20,
+  modalContainer: {
+    flex: 1,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     //backgroundColor : 'black',
   },
   header: {
@@ -563,24 +564,24 @@ const styles = StyleSheet.create({
     height: 45,
     paddingLeft: 25,
   },
-  WeekContainer:{
-    flex : 0.8,
+  WeekContainer: {
+    flex: 0.8,
   },
-  View:{
-    flex : 0.91,
+  View: {
+    flex: 0.91,
   },
-  Attendance : {
-    flex : 0.9,
-    fontSize : 17,
-    fontWeight : 'bold',
-    color : 'black',
-    justifyContent : "center",
+  Attendance: {
+    flex: 0.9,
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: 'black',
+    justifyContent: "center",
   },
-  Box:{
-    flex : 0.1,
-    paddingRight : 12,
-    justifyContent : "center",
-    alignItems : "center",
+  Box: {
+    flex: 0.1,
+    paddingRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
   },
   Include: {
     flexDirection: 'row',
@@ -588,27 +589,27 @@ const styles = StyleSheet.create({
     flex: 0.13,
     backgroundColor: 'white', // 각 시간표 항목 배경색
   },
-  Include2:{
-    flexDirection : 'row',
-    
+  Include2: {
+    flexDirection: 'row',
+
   },
-  realBox:{
-    width : 25,
-    height : 25,
-    backgroundColor :'#909090',
-    margin : 10,
-    borderColor : 'black',
-    borderWidth : 1,
+  realBox: {
+    width: 25,
+    height: 25,
+    backgroundColor: '#909090',
+    margin: 10,
+    borderColor: 'black',
+    borderWidth: 1,
   },
-  timeText:{
-    fontSize: 17, 
-    fontWeight: 'bold', 
-    color: 'black', 
+  timeText: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: 'black',
     marginLeft: 28,
-    marginBottom : 5,
+    marginBottom: 5,
   },
-  Icon:{
-    marginRight : 20,
+  Icon: {
+    marginRight: 20,
   }
 });
 

@@ -19,7 +19,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation }) => {
         const validQRCode = codes.find(code => code.value && isValidQRCode(code.value));
         if (validQRCode) {
           setIsDelayActive(true);  // 인식 지연 상태 활성화
-          
+
           // 1초 지연을 준 후에 실제로 QR 코드 처리
           setTimeout(() => {
             setHasScanned(true);
@@ -27,7 +27,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation }) => {
             navigation.navigate('AttendanceScreen', { scannedCode: validQRCode.value });
             setIsDelayActive(false);  // 지연 상태 초기화
           }, 1500);  // 1000ms = 1초
-          
+
         } else {
           Alert.alert("허용되지 않은 QR 코드입니다.");
           navigation.goBack();
@@ -52,6 +52,21 @@ const FullScreenCamera: React.FC<any> = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1 }}>
+      <View style={{ backgroundColor: 'black', width: '100%', height: 40, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ width: '15%', alignItems: 'center',  }}></View>
+        <View style={{ width: '70%', alignItems: 'center',  }}>
+          <Text style={{ color: 'white', fontSize: 20 }}>출석체크</Text>
+        </View>
+        <TouchableOpacity
+          style={{ width: '15%', alignItems: 'center' }}
+          onPress={() => {
+            setIsCameraActive(false); // 카메라 비활성화
+            navigation.navigate('AttendanceScreen', { scannedCode: null });
+          }}
+        >
+          <Text style={{ color: 'white', fontSize: 20 }}>닫기</Text>
+        </TouchableOpacity>
+      </View>
       {isCameraActive && device && (
         <Camera
           style={{ flex: 1 }}
@@ -69,15 +84,6 @@ const FullScreenCamera: React.FC<any> = ({ navigation }) => {
         <View style={styles.scannerBox} />
       </View>
 
-      <TouchableOpacity
-        style={{ position: 'absolute', top: 20, right: 20 }}
-        onPress={() => {
-          setIsCameraActive(false); // 카메라 비활성화
-          navigation.navigate('AttendanceScreen', { scannedCode: null });
-        }}
-      >
-        <Text style={{ color: 'black', fontSize: 20 }}>닫기</Text>
-      </TouchableOpacity>
     </View>
   );
 };
