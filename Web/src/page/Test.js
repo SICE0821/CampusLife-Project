@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Test.module.css';
 import { BiQrScan } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import { useLocation } from 'react-router-dom';
 
+
 const weeksData = Array.from({ length: 15 }, (_, i) => ({
+
     week: `${i + 1}주차 (00월 00일)`,
     attendance: '출석: 0 지각: 0 결석: 0',
     classStatus: '강의상태: 미출결',
@@ -33,7 +35,7 @@ const studentsData = [
     { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
     { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
     { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    
+
     // Add more student data here
 ];
 
@@ -42,6 +44,12 @@ function Test() {
     const location = useLocation();
     const { selectLecture } = location.state || {};
     console.log(selectLecture); //이게 선택한 과목 정보
+    const [selected, setSelected] = useState({ weekIndex: 0, classIndex: 0 });
+
+    const handleButtonClick = (weekIndex, classIndex) => {
+        setSelected({ weekIndex, classIndex });
+    };
+
     const handleNavigateToQrCheck = () => {
         navigate('/qrcheck');
     };
@@ -52,9 +60,11 @@ function Test() {
                 <div className={styles.side}></div>
                 <div className={styles.headText}>
                     <div className={styles.headTextArea}>
-                        <p className={styles.lectureName}>강의명 : 강의이름1 (대면, 주간)</p>
-                        <p className={styles.lectureInfo}>강의 수강자 : 1학년 (002분반)</p>
-                        <p className={styles.lectureInfo}>강의실 : B608</p>
+                        <p className={styles.lectureName}>강의명 : {selectLecture.lecture_name}
+                            {selectLecture.lecture_room === "온라인수업" ? ' (온라인 수업)' : ' (대면, 주간)'}
+                        </p>
+                        <p className={styles.lectureInfo}>강의 수강자 : {selectLecture.lecture_grade}학년 [{selectLecture.section_class}]</p>
+                        <p className={styles.lectureInfo}>강의실 : {selectLecture.lecture_room}</p>
                     </div>
                 </div>
                 <div className={styles.side}></div>
@@ -63,8 +73,8 @@ function Test() {
                 <div className={styles.side}></div>
                 <div className={styles.content}>
                     <div className={styles.class}>
-                        {weeksData.map((week, index) => (
-                            <div key={index} className={styles.classBox}>
+                        {weeksData.map((week, weekIndex) => (
+                            <div key={weekIndex} className={styles.classBox}>
                                 <div className={styles.week}>
                                     <div className={styles.weekBox}>
                                         <p className={styles.weekText}>{week.week}</p>
@@ -76,8 +86,17 @@ function Test() {
                                     </div>
                                     <BiQrScan onClick={handleNavigateToQrCheck} size={80} className={styles.qr} />
                                 </div>
-                                {week.classTimes.map((classTime, idx) => (
-                                    <div key={idx} className={styles.detailClassBox}>
+                                {week.classTimes.map((classTime, classIndex) => (
+                                    <div
+                                        key={classIndex}
+                                        className={`${styles.detailClassBox} ${selected.weekIndex === weekIndex && selected.classIndex === classIndex ? styles.selected : ''}`}
+                                        onClick={() => {
+                                            console.log(`${weekIndex}주차 ${classIndex}번 누름`);
+                                            handleButtonClick(weekIndex, classIndex);
+                                        }}
+                                        role="button"
+                                        tabIndex={0}
+                                    >
                                         <div className={styles.detailClassText}>
                                             <p className={styles.classNum}>{classTime.split(' ')[0]}</p>
                                             <p className={styles.classTime}>{classTime}</p>

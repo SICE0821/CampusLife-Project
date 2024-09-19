@@ -131,6 +131,16 @@ p {
   background-color: white;
   width: 100%;
   height: 80px;
+  transition: background-color 0.3s ease; 
+  cursor: pointer;
+}
+
+.detailClassBox:hover {
+  background-color: #f0f0f0; /* 마우스를 올렸을 때 배경색 변경 */
+}
+
+.selected {
+  background-color: #ffebcd; /* 옅은 주황색 (BurlyWood) */
 }
 
 .detailClassText {

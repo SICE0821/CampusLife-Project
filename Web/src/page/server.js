@@ -101,7 +101,8 @@ app.post('/GetProfessorLecture', async (req, res) => {
             division : item.division,
             lecture_grade : item.lecture_grade,
             lecture_semester : item.lecture_semester,
-            lecture_have_week : item.lecture_have_week
+            lecture_have_week : item.lecture_have_week,
+            section_class : item.section_class
         }));
 
         console.log("교수 강의 과목 가져오기 성공");
