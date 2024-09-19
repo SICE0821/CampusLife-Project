@@ -144,7 +144,7 @@ const App = ({ route }: any) => {
     //시간 표시 부분
     <View style={styles.row}>
       <View style={styles.timeColumn}>
-        <Text style={{ color: 'gray' }}>{time}</Text>
+        <Text style={{ color: '#444444' }}>{time}</Text>
       </View>
       {days.map((day, index) => {
         const course = courses.find(course => course.day === day && course.time === time);
@@ -453,7 +453,7 @@ const App = ({ route }: any) => {
         onClosed={closeModal}
       >
         <View style={styles.modalContent}>
-          <View style={{ height: "5%" }}></View>
+          <View style={{ height: 15 }}></View>
           <View style={styles.grade_semester_container}>
             <ModalSelector
               data={grade_data}
@@ -462,6 +462,8 @@ const App = ({ route }: any) => {
               style={styles.grade_Modal}
               initValueTextStyle={{
                 color: 'gray',
+                fontSize: 18,
+                fontWeight: 'bold',
               }}
               selectedItemTextStyle={{
                 color: 'black',
@@ -485,6 +487,8 @@ const App = ({ route }: any) => {
               style={styles.semester_Modal}
               initValueTextStyle={{
                 color: 'gray',
+                fontSize: 18,
+                fontWeight: 'bold',
               }}
               selectedItemTextStyle={{
                 color: 'black',
@@ -514,7 +518,7 @@ const App = ({ route }: any) => {
               onChangeText={setLectureName}
             />
           </View>
-          <View style={{ height: "5%" }}></View>
+          <View style={{ height: 15 }}></View>
           <View style={styles.lecture_room_container}>
             <TextInput
               style={styles.input}
@@ -524,7 +528,7 @@ const App = ({ route }: any) => {
               onChangeText={setProfessorName}
             />
           </View>
-          <View style={{ height: "5%" }}></View>
+          <View style={{ height: 25 }}></View>
           <View style={styles.day_time_container}>
             <ModalSelector
               data={data}
@@ -533,6 +537,8 @@ const App = ({ route }: any) => {
               style={styles.day_Modal}
               initValueTextStyle={{
                 color: 'gray',
+                fontSize: 16,
+                fontWeight: 'bold',
               }}
               selectedItemTextStyle={{
                 color: 'black',
@@ -554,11 +560,9 @@ const App = ({ route }: any) => {
                 <TouchableOpacity onPress={() => { showDatePicker() }}>
                   <Text style={styles.before_time_Text}>{selectedTime}</Text>
                 </TouchableOpacity>
-                <View style={{ width: "3%" }}></View>
-                <Text style={{ marginTop: 10, fontSize: 20 }}>
+                <Text style={{ fontSize: 20 }}>
                   ~
                 </Text>
-                <View style={{ width: "3%" }}></View>
                 <TouchableOpacity onPress={() => { showDatePicker2() }}>
                   <Text style={styles.after_time_Text}>{selectedTime2}</Text>
                 </TouchableOpacity>
@@ -632,6 +636,7 @@ const App = ({ route }: any) => {
             </TouchableOpacity>
           </View>
         </View>
+        <View style={{height: 80}}></View>
       </ModalBox>
       <View style={{ height: 80 }}></View>
     </ScrollView>
@@ -660,6 +665,8 @@ const styles = StyleSheet.create({
   table: {
     flexDirection: 'column',
     flex: 1,
+    borderWidth: 1,
+    borderColor: 'gray'
   },
   row: {
     flexDirection: 'row',
@@ -689,7 +696,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontWeight: 'bold',
-    color: 'gray'
+    color: '#444444'
   },
   courseText: {
     fontSize: 12,
@@ -737,8 +744,8 @@ const styles = StyleSheet.create({
     padding: 20
   },
   lecture_room_container: {
-    height: '10%',
-    borderBottomWidth: 1
+    height: 50,
+    borderBottomWidth: 1,
   },
 
   container2: {
@@ -757,32 +764,31 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   day_time_container: {
-    height: '15%',
-    flexDirection: 'row'
+    height: 50,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   day_Modal: {
     borderRadius: 10,
-    width: '20%',
-    height: '64%',
+    width: 100,
+    height: 44,
     borderWidth: 2,
     borderColor: 'grey'
   },
   time_section: {
-    width: '100%',
-    height: '100%',
     //flexDirection: 'row',
-    // backgroundColor: 'green'
+    height: '100%',
+    justifyContent: 'center'
   },
   before_time_Text: {
     fontSize: 20,
     color: 'black',
-    marginTop: 10,
-    marginLeft: 10,
+    marginHorizontal: 10,
   },
   after_time_Text: {
     fontSize: 20,
     color: 'black',
-    marginTop: 10,
+    marginHorizontal: 10,
   },
   completeSection: {
     height: "20%",
@@ -805,22 +811,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   grade_semester_container: {
-    height: '12%',
-    flexDirection: 'row'
+    height: 50,
+    flexDirection: 'row',
   },
 
   grade_Modal: {
     borderRadius: 10,
-    width: '20%',
-    height: '76%',
+    width: 100,
+    height: 44,
     borderWidth: 2,
     borderColor: 'grey'
   },
 
   semester_Modal: {
     borderRadius: 10,
-    width: '20%',
-    height: '76%',
+    width: 100,
+    height: 44,
     borderWidth: 2,
     borderColor: 'grey',
     marginLeft: 20
