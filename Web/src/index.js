@@ -20,8 +20,4 @@ root.render(
 );
 
 // 웹 성능 측정
-<<<<<<< HEAD
 reportWebVitals();
-=======
-reportWebVitals();
->>>>>>> c94ef9109d88a8362753f4d5b03ef7ae1b572c1e
