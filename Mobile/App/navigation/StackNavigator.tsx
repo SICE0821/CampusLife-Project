@@ -185,6 +185,7 @@ export const RootStackNavigator = (route: any) => {
                     title: '공지사항',
                 })}
             />
+
             <RootStack.Screen name="SearchPostScreen"
                 component={SearchPostScreen}
                 options={{ headerShown: false }}>
@@ -292,7 +293,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
 
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '정보조회/변경',
+                    title: '정보변경',
                 }}
             />
             <MainStack.Screen

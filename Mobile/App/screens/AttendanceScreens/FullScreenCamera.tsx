@@ -9,7 +9,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation }) => {
   const device = useCameraDevice('back');
 
   const isValidQRCode = (code: string): boolean => {
-    return code.startsWith("myApp_");
+    return code.startsWith("CampusLife_");
   };
 
   const codeScanner = useCodeScanner({

@@ -95,7 +95,7 @@ function Main() {
   }
 
   const handleNavigateToTest = () => {
-    navigate('/test');
+    navigate('/test', { state: { ProfessorInfo } });
   };
 
   const lectures = {
