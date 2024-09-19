@@ -58,18 +58,22 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     navigation.goBack();
   };
 
-
   useEffect(() => {
-    
-    // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
-    if (selectallposter === 1) {
-      setpostfontoption("학교 공지사항");
-    } else if (selectdepartmentposter === 1) {
+    if (userData.title !== "일반학생" && userData.title !== "학교") {
+      setselectdepartmentposter(1); // Default to department notice
+      setselectapllposterOption(0);
       setpostfontoption("학과 공지사항");
     } else {
-      setpostfontoption("게시판을 정해주세요");
+      // Compare selectallposter and selectdepartmentposter to set postfontoption
+      if (selectallposter === 1) {
+        setpostfontoption("학교 공지사항");
+      } else if (selectdepartmentposter === 1) {
+        setpostfontoption("학과 공지사항");
+      } else {
+        setpostfontoption("게시판을 정해주세요");
+      }
     }
-  }, [selectallposter, selectdepartmentposter]);
+  }, [selectallposter, selectdepartmentposter, userData.title]);
 
   const openModal = () => {
     setIsModalOpen(true); // 모달을 열기 위해 상태를 true로 설정
@@ -279,11 +283,13 @@ const addDepartmentNoticeAram = async (value : number) => {
 
   return (
     <View style={styles.container}>
-    <ScrollView>
-      <TouchableOpacity onPress={openModal} style={styles.selectPostArea}>
-        <Text style={styles.selectPostText}>{postfontoption}</Text>
-        <IconB name="down" size={30} color={'black'} />
-      </TouchableOpacity>
+      <ScrollView>
+        <View style={styles.selectPostArea}>
+          <Text style={styles.selectPostText}>{postfontoption}</Text>
+          {userData.title === "학교" && (
+            <IconB name="down" onPress={openModal} size={30} color={'black'} />
+          )}
+        </View>
       <View style={styles.postTitleArea}>
         <TextInput
           style={styles.postTitleText}
@@ -344,22 +350,23 @@ const addDepartmentNoticeAram = async (value : number) => {
       position="bottom"
       swipeToClose={false}
       onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
-    >
-      <View style={modalStyle.modalContent}>
-        <TouchableOpacity style={modalStyle.allposter} onPress={handleAllPosterPress}>
-          <Text style={[modalStyle.noallposterfont, selectallposter == 1 && modalStyle.yesallposterfont]}> 전체 게시판 </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={modalStyle.allposter} onPress={handleDepartmentPosterPress}>
-          <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}> 학과 게시판 </Text>
-        </TouchableOpacity>
-        <View style={modalStyle.writeButtom}>
-          <View style={{ flex: 0.65, }}>
-          </View>
-          <TouchableOpacity onPress={closeModal} style={{ flex: 0.35, justifyContent: 'center', alignItems: "center", backgroundColor: '#9A9EFF' }}>
-            <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
+      >
+        <View style={modalStyle.modalContent}>
+          {userData.title === "학교" && (
+            <TouchableOpacity style={modalStyle.allposter} onPress={handleAllPosterPress}>
+              <Text style={[modalStyle.noallposterfont, selectallposter == 1 && modalStyle.yesallposterfont]}> 학교 공지사항 </Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={modalStyle.allposter} onPress={handleDepartmentPosterPress}>
+            <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}> 학과 공지사항 </Text>
           </TouchableOpacity>
+          <View style={modalStyle.writeButtom}>
+            <View style={{ flex: 0.65 }} />
+            <TouchableOpacity onPress={closeModal} style={{ flex: 0.35, justifyContent: 'center', alignItems: "center", backgroundColor: '#9A9EFF' }}>
+              <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
     </ModalBox>
     <Modal isVisible={isModalVisible}>
       <View style={modalStyle.modalContainer}>
