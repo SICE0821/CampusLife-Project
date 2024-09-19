@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Test.module.css';
 import { BiQrScan } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
+import { useLocation } from 'react-router-dom';
 
 const weeksData = Array.from({ length: 15 }, (_, i) => ({
     week: `${i + 1}주차 (00월 00일)`,
@@ -38,7 +39,9 @@ const studentsData = [
 
 function Test() {
     const navigate = useNavigate();
-
+    const location = useLocation();
+    const { selectLecture } = location.state || {};
+    console.log(selectLecture);
     const handleNavigateToQrCheck = () => {
         navigate('/qrcheck');
     };
