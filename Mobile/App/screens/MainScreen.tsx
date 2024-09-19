@@ -749,7 +749,7 @@ const styles = StyleSheet.create({
   },
   userInfoNPointArea: {
     flexDirection: 'column',
-    marginLeft: 40
+    marginLeft: 20
   },
   userInfoArea: {
     flexDirection: 'column',
@@ -915,7 +915,7 @@ const styles = StyleSheet.create({
   postLabelTextArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    maxWidth: '85%',
+    maxWidth: '75%',
   },
   postLabelText: {
     color: 'black',
@@ -940,7 +940,7 @@ const styles = StyleSheet.create({
   },
   pointcheckBox : {
     backgroundColor : '#A8D5BA',
-    width : 110,
+    width : 120,
     height : 30, //이거 %쓰면 아예 달라져 버려서 일단 보류
     marginLeft : 10,
     justifyContent : 'center',

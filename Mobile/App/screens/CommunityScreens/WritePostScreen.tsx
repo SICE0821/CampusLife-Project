@@ -24,7 +24,7 @@ const EmptyMainText = () => {
 
   return (
     <View style={{ padding: 6 }}>
-      <Text>
+      <Text style={{color: 'gray'}}>
         {content}
       </Text>
     </View>
@@ -257,7 +257,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         </View>
         {selectedImages.length > 0 && (
           <View style={styles.photoArea}>
-            <ScrollView style={styles.photoScrollViewArea} horizontal={true}>
+            <ScrollView style={styles.photoScrollViewArea} horizontal={true} showsHorizontalScrollIndicator={false}>
               {selectedImages.map((image, index) => (
                 <View key={index} style={styles.fileInfo}>
                   <Image
@@ -275,7 +275,18 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
                       autoPlay
                       onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
                       loop
-                      style={{ width: width - 440, height: height - 910, right: width - 455, top: height - 830 }}
+                      style={{ width: 50, right: 35, }}
+                    />
+                  )}
+
+                  {/* 마지막 인덱스가 아닐 때만 LottieView를 렌더링 */}
+                  {index !== selectedImages.length - 1 && (
+                    <LottieView
+                      source={require('../../assets/Animation - 1725980201082 copy.json')}
+                      autoPlay
+                      onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
+                      loop
+                      style={{ width: 50, right: 45, }}
                     />
                   )}
                 </View>
@@ -366,16 +377,16 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   fileInfo: {
-    width: width - 79,
+    width: width - 70,
     height: height - 980,
     padding: 40,
     flexDirection: 'row',
     //backgroundColor: 'blue'
   },
   cancelButton: {
-    alignSelf: 'flex-end',
-    bottom: height - 647,
-    left: width - 492
+    alignSelf: 'flex-start',
+    bottom: 10,
+    right: 10
   },
   imagePreview: {
     width: "100%",

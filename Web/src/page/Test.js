@@ -41,7 +41,7 @@ function Test() {
     const navigate = useNavigate();
     const location = useLocation();
     const { selectLecture } = location.state || {};
-    console.log(selectLecture);
+    console.log(selectLecture); //이게 선택한 과목 정보
     const handleNavigateToQrCheck = () => {
         navigate('/qrcheck');
     };
