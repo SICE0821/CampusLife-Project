@@ -15,7 +15,19 @@ const pool = mariadb.createPool({
     port: conf.port,
     database: conf.database,
     multipleStatements: true,
+    connectionLimit: 10, // 연결 풀 최대 크기
+    acquireTimeout: 10000, // 연결 시도 시간
+    connectTimeout: 10000 // 연결 타임아웃 시간
 });
+
+pool.getConnection()
+    .then(conn => {
+        console.log("MariaDB connection successful");
+        conn.release(); // 연결 반환
+    })
+    .catch(err => {
+        console.error("Error in MariaDB connection:", err);
+    });
 
 app.use(cors());
 app.use(express.json());
@@ -89,7 +101,8 @@ app.post('/GetProfessorLecture', async (req, res) => {
             division : item.division,
             lecture_grade : item.lecture_grade,
             lecture_semester : item.lecture_semester,
-            lecture_have_week : item.lecture_have_week
+            lecture_have_week : item.lecture_have_week,
+            section_class : item.section_class
         }));
 
         console.log("교수 강의 과목 가져오기 성공");

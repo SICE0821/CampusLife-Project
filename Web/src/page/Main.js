@@ -47,7 +47,8 @@ function Main() {
               division : lecture.division,
               lecture_grade : lecture.lecture_grade,
               lecture_semester : lecture.lecture_semester,
-              lecture_have_week : lecture.lecture_have_week
+              lecture_have_week : lecture.lecture_have_week,
+              section_class : lecture.section_class
             })),
           교양: professorLecture
             .filter((lecture) => lecture.division === '교양')
@@ -62,12 +63,13 @@ function Main() {
               division : lecture.division,
               lecture_grade : lecture.lecture_grade,
               lecture_semester : lecture.lecture_semester,
-              lecture_have_week : lecture.lecture_have_week
+              lecture_have_week : lecture.lecture_have_week,
+              section_class : lecture.section_class
             })),
         };
     
         // 상태 업데이트
-        console.log(formattedLectures);
+        //console.log(formattedLectures);
         setProfessorLectures(formattedLectures);
       } catch (error) {
         console.error('Error fetching professor lectures:', error);
@@ -94,8 +96,8 @@ function Main() {
     }
   }
 
-  const handleNavigateToTest = () => {
-    navigate('/test');
+  const handleNavigateToTest = (selectLecture) => {
+    navigate('/test', { state: { selectLecture } } );
   };
 
   const lectures = {
@@ -123,8 +125,12 @@ function Main() {
         <div className={styles.test}>
           <h1>{selectedCategory}과목</h1>
           <hr className={styles.hr} />
+          {/*여기서 해당 과목의 정보를 넘겨줄거임 test 페이지로 */}
           {professorLectures[selectedCategory].map((lecture, index) => (
-            <Pagebtn key={index} handleNavigateToTest={handleNavigateToTest} lecture={lecture} />
+            <Pagebtn key={index} handleNavigateToTest={ () => {
+              handleNavigateToTest(lecture)
+            }
+              } lecture={lecture} />
           ))}
         </div>
       </div>

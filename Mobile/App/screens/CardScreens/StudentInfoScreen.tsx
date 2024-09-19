@@ -210,6 +210,7 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
 
 
 
+
     const handleGradeSelect = (grade: number) => {
         setSelectedGrade(grade);
         setUserData(prevuserdata => ({ ...prevuserdata, grade }));
