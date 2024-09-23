@@ -251,13 +251,7 @@ const AcademicInfoScreen = ({ route }: any) => {
         Alert.alert(
             "목표 학점 설정",
             "목표 학점 설정 성공!!",
-            [
-                {
-                    text: "취소",
-                    style: "cancel"
-                },
-                { text: "확인", onPress: () => toggleModal() }
-            ],
+            [{ text: "확인", onPress: () => toggleModal() }]
         );
     };
 
@@ -498,29 +492,33 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Text style={styles.ChangGoalgpaFont}>목표 학점 변경 하기</Text>
                     </TouchableOpacity>
                     <Modal
-                        isVisible={isModalVisible}
-                        animationIn="slideInUp"
-                        animationOut="slideOutDown"
-                        animationInTiming={500}
-                        animationOutTiming={500}>
-                        <View style={styles.modalContent}>
-                            <Text style={{ padding: 5 }}>목표 학점 설정</Text>
-                            <TextInput
-                                style={styles.input}
-                                keyboardType="numeric" // 숫자 입력용 키보드
-                                value={changegoalGPA}
-                                onChangeText={handleNumberInput}
-                                placeholder="0"
-                            />
-                            <Button title="전송"
-                                onPress={async () => {
-                                    await change_GoalGPA();
-                                    await getGoalGPA();
-                                    ChangGoalGpaAlert();
-                                    setChangegoalGPA('');
-                                }} />
-                        </View>
-                    </Modal>
+                isVisible={isModalVisible}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                animationInTiming={500}
+                animationOutTiming={500}
+                backdropOpacity={0.6}
+            >
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>목표 학점 설정</Text>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType="numeric"
+                        value={changegoalGPA}
+                        onChangeText={handleNumberInput}
+                        placeholder="0 ~ 4.5"
+                        maxLength={4} // 소수점 포함하여 최대 4글자로 제한
+                    />
+                    <View style={styles.buttons}>
+                        <TouchableOpacity style={styles.submitButton} onPress={change_GoalGPA}>
+                            <Text style={styles.buttonText}>설정</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.cancelButton} onPress={toggleModal}>
+                            <Text style={styles.buttonText}>닫기</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
 
                 </View>
 
@@ -640,7 +638,7 @@ const styles = StyleSheet.create({
     },
     // 프로그레스 서클 영역 스타일
     progressCircleContainer: {
-        marginTop: 50,
+        marginTop: 20,
         width: '90%',
         alignSelf: 'center',
     },
@@ -707,19 +705,55 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     modalContent: {
-        backgroundColor: 'white',
+        backgroundColor: '#f9f9f9',
         padding: 20,
-        borderRadius: 10,
-        justifyContent: 'center',
+        borderRadius: 15,
         alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 15,
     },
     input: {
-        height: 40,
+        height: 45,
         width: '100%',
-        borderColor: 'gray',
+        borderColor: '#ccc',
         borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        fontSize: 16,
         marginBottom: 20,
         textAlign: 'center',
+        backgroundColor: '#fff',
+    },
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    submitButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    cancelButton: {
+        backgroundColor: '#f44336',
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     horizontalBarGraphContainer: {
         width: '100%',

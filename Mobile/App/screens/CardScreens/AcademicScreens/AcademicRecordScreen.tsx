@@ -22,7 +22,6 @@ const AcademicRecord = ({ route }: any) => {
         }
         setVisibleSemesters(semesters);
 
-        // 초기 선택 값 설정 (예를 들어 첫 번째 학기로 설정)
         if (semesters.length > 0) {
             setSelectedSemester(semesters[0]);
         }
@@ -52,10 +51,11 @@ const AcademicRecord = ({ route }: any) => {
 
     return (
         <View style={styles.container}>
+            {/* 학기 선택기 */}
             <Picker
                 selectedValue={selectedSemester}
-                style={{ alignSelf: 'flex-end', height: 50, width: 200, backgroundColor: '#dddddd', color: 'black', elevation: 5, shadowColor: 'black' }}
-                dropdownIconColor={'black'}
+                style={styles.picker}
+                dropdownIconColor={'white'}
                 onValueChange={(itemValue, itemIndex) => setSelectedSemester(itemValue)}
             >
                 {visibleSemesters.map((semester) => (
@@ -63,19 +63,20 @@ const AcademicRecord = ({ route }: any) => {
                 ))}
             </Picker>
 
+            {/* 학기별 강의 데이터 테이블 */}
             {selectedSemester && (
-                <View style={{width: width, height: 'auto', backgroundColor: 'white'}}>
+                <View style={styles.tableContainer}>
                     {semesterData[selectedSemester].length === 0 ? (
                         <Text style={styles.noDataText}>데이터가 없습니다.</Text>
                     ) : (
                         <ScrollView horizontal={true} alwaysBounceHorizontal={true}>
-                            <View style={styles.detail_credit_area}>
+                            <View style={styles.detailCreditArea}>
                                 <View style={styles.table}>
-                                    <Table borderStyle={{ borderWidth: 2, borderColor: 'black' }}>
+                                    <Table borderStyle={{ borderWidth: 1, borderColor: '#E0E0E0' }}>
                                         <Row
                                             data={["과목명", "구분", "담당교수", "학점", "수업시간", "강의실"]}
-                                            style={{ height: 30, backgroundColor: "#dddddd" }}
-                                            textStyle={{ textAlign: "center", fontWeight: "bold", color: 'black' }}
+                                            style={styles.tableHeader}
+                                            textStyle={styles.tableHeaderText}
                                             widthArr={[180, 60, 80, 60, 120, 70]}
                                         />
                                         <Rows
@@ -88,7 +89,7 @@ const AcademicRecord = ({ route }: any) => {
                                                 lecture.lecture_room
                                             ])}
                                             style={styles.tableRows}
-                                            textStyle={{ textAlign: "center", fontWeight: 'bold', color: 'black' }}
+                                            textStyle={styles.tableText}
                                             widthArr={[180, 60, 80, 60, 120, 70]}
                                         />
                                     </Table>
@@ -105,23 +106,69 @@ const AcademicRecord = ({ route }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#F5F5F5',
         paddingTop: 20,
+        paddingHorizontal: 15,
+    },
+    picker: {
+        height: 50,
+        width: 220,
+        backgroundColor: '#4CAF50',
+        color: 'white',
+        elevation: 5,
+        borderRadius: 10,
+        marginBottom: 20,
+        alignSelf: 'center',
+        fontSize: 18,
+        fontWeight: '600',
+    },
+    tableContainer: {
+        flex: 1,
+        backgroundColor: '#fff',
+        marginHorizontal: 10,
+        borderRadius: 10,
+        elevation: 3,
+        paddingBottom: 20,
     },
     noDataText: {
         textAlign: 'center',
         marginTop: 20,
         fontSize: 18,
         fontWeight: 'bold',
-        color: 'black'
+        color: 'gray',
     },
-    detail_credit_area: {},
+    detailCreditArea: {
+        marginHorizontal: 10,
+        marginBottom: 20,
+    },
     table: {
-        margin: 10,
+        marginTop: 10,
+        borderRadius: 10,
+    },
+    tableHeader: {
+        height: 40,
+        backgroundColor: '#4CAF50',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        borderBottomWidth: 2,
+        borderBottomColor: '#E0E0E0',
+    },
+    tableHeaderText: {
+        textAlign: "center",
+        fontWeight: "600",
+        color: 'white',
+        fontSize: 16,
     },
     tableRows: {
         height: 50,
-        backgroundColor: 'white'
+        backgroundColor: '#FAFAFA',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+    },
+    tableText: {
+        textAlign: "center",
+        fontWeight: '500',
+        color: '#333',
     },
 });
 
