@@ -105,7 +105,7 @@ function Test() {
 
     //QR 코드 화면으로 이동하기
     const handleNavigateToQrCheck = () => {
-        navigate('/qrcheck');
+        navigate('/qrcheck', { state: { selectLecture } });
     };
 
     //해당 과목을 듣는 전체 총 학생 수 가져오기
