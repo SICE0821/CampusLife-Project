@@ -6,8 +6,16 @@ import { FaSearch } from "react-icons/fa";
 import { useLocation } from 'react-router-dom';
 import config from './config'
 import Modal from 'react-modal';
+import Select from 'react-select';
 
 Modal.setAppElement('#root'); // 접근성을 위해 필요합니다.
+
+const options = [
+    { value: 'all', label: '전체' },
+    { value: 'attendance', label: '출석' },
+    { value: 'absent', label: '결석' },
+    { value: 'late', label: '지각' }
+];
 
 const studentsData = [
     { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
@@ -40,9 +48,22 @@ function Test() {
     const [studentAttendanceStates, setStudentAttendanceStates] = useState([]);
     const [totalStudentInfo, setTotalStudentInfo] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState(options[0]); //리스트 박스 값 저장
+    const [inputValue, setInputValue] = useState(''); //학생 이름 찾는 Text
 
     const openModal = () => setIsOpen(true);
     const closeModal = () => setIsOpen(false);
+
+    // 리스트 박스 핸들러
+    const handleChange = (option) => {
+        setSelectedOption(option);
+        console.log("Selected option:", option);
+    }
+
+    // 학생 이름 찾을 때 사용되는 함수
+    const handleInputChange = (event) => {
+        setInputValue(event.target.value);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -213,7 +234,6 @@ function Test() {
                                     </div>
                                     <div className={styles.classStudent}>
                                         <p className={styles.studentNum}>총 수강학생: {totalStudentNum}</p>
-
                                     </div>
                                     <BiQrScan onClick={handleNavigateToQrCheck} size={80} className={styles.qr} />
                                 </div>
@@ -240,8 +260,21 @@ function Test() {
                     <div className={styles.student}>
                         <div className={styles.attendaceFind}>
                             <p className={styles.attendaceFindText}>출석자현황</p>
+                            <input
+                                type="text"               
+                                value={inputValue}         
+                                onChange={handleInputChange} 
+                                placeholder="찾으시는 학생 이름을 입력해주세요" 
+                                style={{ width: '330px' }}  
+                            />
+                            <button className={styles.searchButton}>찾기</button>
                             <FaSearch size={50} className={styles.search} />
                         </div>
+                        <Select
+                            value={selectedOption}  
+                            onChange={handleChange}  
+                            options={options}  
+                        />
                         {(studentAttendanceStates.length > 0 ? studentAttendanceStates : totalStudentInfo).map((student, index) => (
                             <div key={index} className={styles.studentInfoBox}>
                                 <div className={styles.studentInfo}>
@@ -250,9 +283,10 @@ function Test() {
                                         <p className={styles.studentDepartment}>{student.department_name}</p>
                                     </div>
                                     <div className={styles.chagneAttendaceBox}>
-                                        <button className={styles.changeAttendaceButton} onClick={ () => {
+                                        <button className={styles.changeAttendaceButton} onClick={() => {
                                             openModal();
-                                            console.log("모달 열려라 얍 : " + isOpen)}}>
+                                            console.log("모달 열려라 얍 : " + isOpen)
+                                        }}>
                                             <p className={styles.changeAttendaceButtonText}>출석자 정보변경</p>
                                         </button >
                                         <Modal
@@ -261,27 +295,37 @@ function Test() {
                                             contentLabel="Example Modal"
                                             style={{
                                                 overlay: {
-                                                  backgroundColor: 'rgba(0, 0, 0, 0.5)',  // 모달 배경 반투명 처리
-                                                  zIndex: 1000,  // 다른 요소보다 위에 있도록 설정
+                                                    backgroundColor: 'rgba(0, 0, 0, 0.5)',  // 모달 배경 반투명 처리
+                                                    zIndex: 1000,  // 다른 요소보다 위에 있도록 설정
                                                 },
                                                 content: {
-                                                  top: '50%',
-                                                  left: '50%',
-                                                  right: 'auto',
-                                                  bottom: 'auto',
-                                                  marginRight: '-50%',
-                                                  transform: 'translate(-50%, -50%)',  // 화면 중앙에 배치
-                                                  width: '400px',  // 모달의 너비 설정
-                                                  height: '200px',  // 모달의 높이 설정
-                                                  borderRadius: '10px',  // 모달의 둥근 테두리 설정
-                                                  padding: '20px',  // 내부 여백
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    right: 'auto',
+                                                    bottom: 'auto',
+                                                    marginRight: '-50%',
+                                                    transform: 'translate(-50%, -50%)',  
+                                                    width: '220px',  
+                                                    height: '260px',  
+                                                    borderRadius: '10px',  
+                                                    padding: '10px',  
                                                 },
-                                              }}
+                                            }}
                                         >
-                                            <h2>모달 제목</h2>
-                                            <button onClick={closeModal}>닫기</button>
+                                            <div className={styles.modalheaderBox}>
+                                                <p className={styles.modalheaderText}>출석정보변경</p>
+                                                <button className={styles.ModalCancleButton} onClick={closeModal}>닫기</button>
+                                            </div>
+                                            <div className={styles.modalbuttonBox}>
+                                                <button className={styles.ModalButton} onClick={closeModal}>출결 처리</button>
+                                            </div>
+                                            <div className={styles.modalbuttonBox}>
+                                                <button className={styles.ModalButton} onClick={closeModal}>결석 처리</button>
+                                            </div>
+                                            <div className={styles.modalbuttonBox}>
+                                                <button className={styles.ModalButton} onClick={closeModal}>지각 처리</button>
+                                            </div>
                                         </Modal>
-
                                     </div>
                                     <div className={styles.attendaceBox}>
                                         <div className={`${styles.attendaceCheckBox} 
