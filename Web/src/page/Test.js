@@ -51,7 +51,7 @@ function Test() {
     };
 
     const handleNavigateToQrCheck = () => {
-        navigate('/qrcheck');
+        navigate('/qrcheck', { state: { selectLecture } });
     };
 
     return (
