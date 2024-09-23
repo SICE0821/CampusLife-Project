@@ -5,6 +5,9 @@ import { BiQrScan } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import { useLocation } from 'react-router-dom';
 import config from './config'
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root'); // 접근성을 위해 필요합니다.
 
 const studentsData = [
     { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
@@ -36,6 +39,10 @@ function Test() {
     const [totalStudentNum, setTotalStudentNum] = useState();
     const [studentAttendanceStates, setStudentAttendanceStates] = useState([]);
     const [totalStudentInfo, setTotalStudentInfo] = useState([]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const openModal = () => setIsOpen(true);
+    const closeModal = () => setIsOpen(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -242,11 +249,45 @@ function Test() {
                                         <p className={styles.studentInfoText}>({student.student_id}) {student.student_name}</p>
                                         <p className={styles.studentDepartment}>{student.department_name}</p>
                                     </div>
+                                    <div className={styles.chagneAttendaceBox}>
+                                        <button className={styles.changeAttendaceButton} onClick={ () => {
+                                            openModal();
+                                            console.log("모달 열려라 얍 : " + isOpen)}}>
+                                            <p className={styles.changeAttendaceButtonText}>출석자 정보변경</p>
+                                        </button >
+                                        <Modal
+                                            isOpen={isOpen}
+                                            onRequestClose={closeModal}
+                                            contentLabel="Example Modal"
+                                            style={{
+                                                overlay: {
+                                                  backgroundColor: 'rgba(0, 0, 0, 0.5)',  // 모달 배경 반투명 처리
+                                                  zIndex: 1000,  // 다른 요소보다 위에 있도록 설정
+                                                },
+                                                content: {
+                                                  top: '50%',
+                                                  left: '50%',
+                                                  right: 'auto',
+                                                  bottom: 'auto',
+                                                  marginRight: '-50%',
+                                                  transform: 'translate(-50%, -50%)',  // 화면 중앙에 배치
+                                                  width: '400px',  // 모달의 너비 설정
+                                                  height: '200px',  // 모달의 높이 설정
+                                                  borderRadius: '10px',  // 모달의 둥근 테두리 설정
+                                                  padding: '20px',  // 내부 여백
+                                                },
+                                              }}
+                                        >
+                                            <h2>모달 제목</h2>
+                                            <button onClick={closeModal}>닫기</button>
+                                        </Modal>
+
+                                    </div>
                                     <div className={styles.attendaceBox}>
                                         <div className={`${styles.attendaceCheckBox} 
                                                          ${student.attendance_Info === '출결' ? styles.present :
-                                                          student.attendance_Info === '결석' ? styles.absent :
-                                                          student.attendance_Info === '지각' ? styles.late : ''}`}>
+                                                student.attendance_Info === '결석' ? styles.absent :
+                                                    student.attendance_Info === '지각' ? styles.late : ''}`}>
                                         </div>
                                     </div>
                                 </div>
