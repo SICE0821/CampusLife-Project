@@ -4,19 +4,7 @@ import styles from './Test.module.css';
 import { BiQrScan } from "react-icons/bi";
 import { FaSearch } from "react-icons/fa";
 import { useLocation } from 'react-router-dom';
-
-
-const weeksData = Array.from({ length: 15 }, (_, i) => ({
-
-    week: `${i + 1}주차 (00월 00일)`,
-    attendance: '출석: 0 지각: 0 결석: 0',
-    classStatus: '강의상태: 미출결',
-    classTimes: [
-        '1교시 00월 00일 10:10 ~ 11:00',
-        '2교시 00월 00일 11:10 ~ 12:00',
-        '3교시 00월 00일 12:10 ~ 13:00'
-    ]
-}));
+import config from './config'
 
 const studentsData = [
     { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
@@ -44,15 +32,151 @@ function Test() {
     const location = useLocation();
     const { selectLecture } = location.state || {};
     console.log(selectLecture); //이게 선택한 과목 정보
-    const [selected, setSelected] = useState({ weekIndex: 0, classIndex: 0 });
+    const [selected, setSelected] = useState({ weekIndex: 0, classIndex: 0 }); //주차와 교시(차시)를 선택할때 사용하는 데이터
+    const [totalStudentNum, setTotalStudentNum] = useState();
+    const [studentAttendanceStates, setStudentAttendanceStates] = useState([]);
+    const [totalStudentInfo, setTotalStudentInfo] = useState([]);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                await GetTotalStudentNum();
+                await GetWeekClassStudentAttendanceStates(1, 1);
+                await GetTotalStudentInfo();
+
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchData();
+    }, []);
+
+
+
+    //주차 차시 색 변경 함수
     const handleButtonClick = (weekIndex, classIndex) => {
         setSelected({ weekIndex, classIndex });
+        GetWeekClassStudentAttendanceStates(weekIndex + 1, classIndex + 1);
     };
 
+    //해당과목 날짜 변환기
+    const formatDateWithOffset = (dateString, offsetDays) => {
+        const date = new Date(dateString);
+        date.setDate(date.getDate() + offsetDays);
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+
+        return `${month}월 ${day}일`;
+    };
+    //해당과목 시간 변환기
+    function splitTimeSlots(timeRange) {
+        const [startTime, endTime] = timeRange.replace(/\s/g, '').split('~');
+        const [startHour, startMinute] = startTime.split(':').map(Number);
+        const [endHour] = endTime.split(':').map(Number);
+        const timeSlots = [];
+
+        let currentHour = startHour;
+        let currentMinute = startMinute;
+
+        while (currentHour < endHour) {
+            const nextHour = currentHour + 1;
+            const nextMinute = 0;
+
+            timeSlots.push(`${String(currentHour).padStart(2, '0')}: ${String(currentMinute).padStart(2, '0')} ~ ${String(nextHour).padStart(2, '0')}: ${String(nextMinute).padStart(2, '0')}`);
+
+            currentHour++;
+        }
+
+        return timeSlots;
+    }
+
+    // 테스트
+    const input = "14 : 10 ~ 17 : 00";
+    const result = splitTimeSlots(input);
+    console.log(result);
+
+
+    //QR 코드 화면으로 이동하기
     const handleNavigateToQrCheck = () => {
         navigate('/qrcheck');
     };
+
+    //해당 과목을 듣는 전체 총 학생 수 가져오기
+    const GetTotalStudentNum = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/GetTotalStudentNum`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    lecture_id: selectLecture.lecture_id
+                })
+            })
+            const TotalStudentNum = await response.json();
+            setTotalStudentNum(TotalStudentNum.TotalstudentNum);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+
+    //해당 과목을 듣는 전체 총 학생 정보 가져오기
+    const GetTotalStudentInfo = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/GetTotalStudentInfo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    lecture_id: selectLecture.lecture_id
+                })
+            })
+            const TotalStudentInfo = await response.json();
+            console.log(TotalStudentInfo);
+            setTotalStudentInfo(TotalStudentInfo);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    //주차와 차시를 통한 학생들 출결 상태 가져오기
+    const GetWeekClassStudentAttendanceStates = async (weeknum, classnum) => {
+        try {
+            const response = await fetch(`${config.serverUrl}/GetWeekClassStudentAttendanceStates`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    lecture_id: selectLecture.lecture_id,
+                    weeknum: weeknum,
+                    classnum: classnum
+                })
+            })
+            const StudentAttendanceStates = await response.json();
+            console.log(StudentAttendanceStates);
+            setStudentAttendanceStates(StudentAttendanceStates);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const weeksData = Array.from({ length: selectLecture.lecture_have_week }, (_, i) => {
+        const Tiemslosts = splitTimeSlots(selectLecture.lecture_time);
+        const lecture_start_date = formatDateWithOffset(selectLecture.lecture_start_date, i * 7);
+        return {
+            week: `${i + 1}주차 (${lecture_start_date})`,
+            attendance: '출석: 0 지각: 0 결석: 0',
+            classStatus: '강의상태: 미출결',
+            classTimes: [
+                `1교시 ${lecture_start_date} ${Tiemslosts[0]}`,
+                `2교시 ${lecture_start_date} ${Tiemslosts[1]}`,
+                `3교시 ${lecture_start_date} ${Tiemslosts[2]}`
+            ]
+        };
+    });
 
     return (
         <div className={styles.container}>
@@ -81,8 +205,8 @@ function Test() {
                                         <p className={styles.attendace}>{week.attendance}</p>
                                     </div>
                                     <div className={styles.classStudent}>
-                                        <p className={styles.studentNum}>수강학생: 00</p>
-                                        <p className={styles.attendaceCheck}>{week.classStatus}</p>
+                                        <p className={styles.studentNum}>총 수강학생: {totalStudentNum}</p>
+
                                     </div>
                                     <BiQrScan onClick={handleNavigateToQrCheck} size={80} className={styles.qr} />
                                 </div>
@@ -111,15 +235,19 @@ function Test() {
                             <p className={styles.attendaceFindText}>출석자현황</p>
                             <FaSearch size={50} className={styles.search} />
                         </div>
-                        {studentsData.map((student, index) => (
+                        {(studentAttendanceStates.length > 0 ? studentAttendanceStates : totalStudentInfo).map((student, index) => (
                             <div key={index} className={styles.studentInfoBox}>
                                 <div className={styles.studentInfo}>
                                     <div className={styles.studentText}>
-                                        <p className={styles.studentInfoText}>({student.id}) {student.name}</p>
-                                        <p className={styles.studentDepartment}>{student.department}</p>
+                                        <p className={styles.studentInfoText}>({student.student_id}) {student.student_name}</p>
+                                        <p className={styles.studentDepartment}>{student.department_name}</p>
                                     </div>
                                     <div className={styles.attendaceBox}>
-                                        <div className={styles.attendaceCheckBox}></div>
+                                        <div className={`${styles.attendaceCheckBox} 
+                                                         ${student.attendance_Info === '출결' ? styles.present :
+                                                          student.attendance_Info === '결석' ? styles.absent :
+                                                          student.attendance_Info === '지각' ? styles.late : ''}`}>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -240,8 +240,20 @@ p {
 }
 
 .attendaceCheckBox {
-  background-color: aqua;
+  background-color: grey; /*값이 없을 때*/
   width: 80px;
   height: 80px;
   border: 1px black solid;
+}
+
+.attendaceCheckBox.present {
+  background-color: green; /* 출석 */
+}
+
+.attendaceCheckBox.late {
+  background-color: yellow; /* 지각 */
+}
+
+.attendaceCheckBox.absent {
+  background-color: red; /* 결석 */
 }

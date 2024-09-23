@@ -91,18 +91,19 @@ app.post('/GetProfessorLecture', async (req, res) => {
 
         // 교수 정보가 존재할 때
         const processedData = rows.map(item => ({
-            lecture_id : item.lecture_id,
-            professor_id : item.professor_id,
-            credit : item.credit,
-            lecture_name : item.lecture_name,
-            lecture_room : item.lecture_room,
-            lecture_time : item.lecture_time,
-            week : item.week,
-            division : item.division,
-            lecture_grade : item.lecture_grade,
-            lecture_semester : item.lecture_semester,
-            lecture_have_week : item.lecture_have_week,
-            section_class : item.section_class
+            lecture_id: item.lecture_id,
+            professor_id: item.professor_id,
+            credit: item.credit,
+            lecture_name: item.lecture_name,
+            lecture_room: item.lecture_room,
+            lecture_time: item.lecture_time,
+            week: item.week,
+            division: item.division,
+            lecture_grade: item.lecture_grade,
+            lecture_semester: item.lecture_semester,
+            lecture_have_week: item.lecture_have_week,
+            section_class: item.section_class,
+            lecture_start_date: item.lecture_start_date
         }));
 
         console.log("교수 강의 과목 가져오기 성공");
@@ -112,6 +113,124 @@ app.post('/GetProfessorLecture', async (req, res) => {
         res.status(500).json({ success: false, message: "연결 실패" });
     }
 });
+
+// 해당 과목을 듣는 전체 총 학생 수 가져오기
+app.post('/GetTotalStudentNum', async (req, res) => {
+    const { lecture_id } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query =
+            `SELECT 
+            COUNT(DISTINCT student_id) AS unique_student_count
+        FROM 
+            lecture_have_object
+        WHERE 
+            lecture_id = ?`;
+        const rows = await conn.query(query, [lecture_id]);
+        conn.release();
+
+        const processedData = rows.length > 0 ? {
+            TotalstudentNum: rows[0].unique_student_count.toString()
+        } : { TotalstudentNum: "0" };
+        console.log("해당 과목을 듣는 전체 총 학생 수 가져오기 성공");
+
+        res.json(processedData);
+    } catch (error) {
+        console.error("해당 과목을 듣는 전체 총 학생 수 가져오기 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+// 학생 출석 상태 가져오기
+app.post('/GetWeekClassStudentAttendanceStates', async (req, res) => {
+    const { lecture_id, weeknum, classnum } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query =
+            `
+            SELECT
+	            student.student_id,
+	            student.name AS student_name,
+	            department.name AS department_name,
+	            lecture_week_info.lecture_fk,
+	            lecture_week_info.weeknum,
+	            lecture_week_info.classnum,
+	            lecture_week_info.attendance_Info
+            FROM
+	            lecture_week_info
+            JOIN 
+	            student ON lecture_week_info.student_fk = student.student_id
+            JOIN
+	            department ON student.department_id = department.department_id
+            WHERE
+	            lecture_week_info.lecture_fk = ?
+            AND
+	            lecture_week_info.weeknum = ?
+            AND
+	            lecture_week_info.classnum = ?
+            `;
+        const rows = await conn.query(query, [lecture_id, weeknum, classnum]);
+        conn.release();
+
+        // 교수 정보가 존재할 때
+        const processedData = rows.map(item => ({
+            student_id : item.student_id,
+            student_name : item.student_name,
+            department_name : item.department_name,
+            lecture_id : item.lecture_fk,
+            weeknum : item.weeknum,
+            classnum : item.classnum,
+            attendance_Info : item.attendance_Info
+        }));
+
+        console.log("학생 출석 상태 가져오기 성공");
+        res.json(processedData);
+    } catch (error) {
+        console.error("학생 출석 상태 가져오기:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+// 해당 과목 듣는 학생 정보 가져오기
+app.post('/GetTotalStudentInfo', async (req, res) => {
+    const { lecture_id } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query =
+            `
+            SELECT
+	            student.student_id,
+	            student.name AS student_name,
+	            department.name AS department_name,
+	            lecture_have_object.lecture_id
+            FROM
+	            lecture_have_object
+            JOIN 
+	            student ON lecture_have_object.student_id = student.student_id
+            JOIN
+	            department ON student.department_id = department.department_id
+            WHERE
+	            lecture_have_object.lecture_id = ?
+            `;
+        const rows = await conn.query(query, [lecture_id]);
+        conn.release();
+
+        // 교수 정보가 존재할 때
+        const processedData = rows.map(item => ({
+            student_id : item.student_id,
+            student_name : item.student_name,
+            department_name : item.department_name,
+            lecture_id : item.lecture_fk,
+        }));
+
+        console.log("해당 과목 듣는 학생 정보 가져오기 성공");
+        res.json(processedData);
+    } catch (error) {
+        console.error("해당 과목 듣는 학생 정보 가져오기:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
