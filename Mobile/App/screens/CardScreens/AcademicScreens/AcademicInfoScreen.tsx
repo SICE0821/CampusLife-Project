@@ -8,6 +8,10 @@ import {
     Image,
     Animated,
     Easing,
+    TouchableOpacity,
+    Alert,
+    TextInput,
+    Button,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
@@ -17,35 +21,34 @@ import IconH from 'react-native-vector-icons/FontAwesome';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../../config';
 import Svg, { Circle } from 'react-native-svg';
+import Modal from 'react-native-modal';
 
 const { width } = Dimensions.get('window');
 
-// AnimatedCircle 생성
+// 원형 진행 표시 애니메이션을 위한 AnimatedCircle 컴포넌트 생성
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
-type HorizontalBarGraphProps = {
-    currentGPA: number;
-    goalGPA: number;
-};
+// 가로 막대 그래프 컴포넌트 - 현재 GPA와 목표 GPA를 시각화
+const HorizontalBarGraph = ({ currentGPA, goalGPA }: any) => {
+    const [graphWidth, setGraphWidth] = useState(0); // 그래프 너비를 저장하는 상태
+    const animationWidth = 150; // 애니메이션의 너비 설정
 
-// 전체 학점 평균과 목표 학점을 받아 가로 막대 그래프를 그리는 컴포넌트
-const HorizontalBarGraph = ({ currentGPA, goalGPA }: HorizontalBarGraphProps) => {
-    const [graphWidth, setGraphWidth] = useState(0); // 그래프의 실제 너비를 저장하는 상태
-    const animationWidth = 150; // 애니메이션의 너비
+    // 목표 학점을 백분율로 계산
+    const goalPercentage = (goalGPA / 4.5) * 100;
+    // 현재 학점을 백분율로 계산
+    const currentPercentage = (currentGPA / 4.5) * 100;
 
-    const goalPercentage = (goalGPA / 4.5) * 100; // 목표 학점을 백분율로 변환
-    const currentPercentage = (currentGPA / 4.5) * 100; // 현재 학점을 백분율로 변환
-
-    // 애니메이션의 위치를 계산
+    // 애니메이션 위치를 그래프 너비에 맞게 조정
     const adjustedPosition = graphWidth ? (currentPercentage / 100) * graphWidth - animationWidth / 2 : 0;
 
-    // 애니메이션 시작을 위한 상태 및 useEffect
+    // 애니메이션 시작 상태
     const [animationStarted, setAnimationStarted] = useState(false);
 
+    // 컴포넌트가 렌더링된 후 애니메이션 시작
     useEffect(() => {
         const timer = setTimeout(() => {
             setAnimationStarted(true);
-        }, 0); // 0.5초 후에 애니메이션 시작
+        }, 0);
         return () => clearTimeout(timer);
     }, []);
 
@@ -54,12 +57,12 @@ const HorizontalBarGraph = ({ currentGPA, goalGPA }: HorizontalBarGraphProps) =>
             style={styles.horizontalBarGraphContainer}
             onLayout={(event) => {
                 const { width } = event.nativeEvent.layout;
-                setGraphWidth(width); // 그래프의 실제 너비를 저장
+                setGraphWidth(width); // 그래프의 실제 너비 저장
             }}
         >
-            {/* 현재 학점 그래프 */}
+            {/* 현재 학점 표시 막대 */}
             <View style={styles.graphContainer}>
-                {/* 애니메이션을 현재 학점 바의 자식으로 이동 */}
+                {/* 애니메이션이 시작되면 Lottie 애니메이션을 표시 */}
                 {animationStarted && (
                     <LottieView
                         source={require('../../../assets/Animation - 1725893333150.json')}
@@ -75,6 +78,7 @@ const HorizontalBarGraph = ({ currentGPA, goalGPA }: HorizontalBarGraphProps) =>
                     />
                 )}
                 <View style={styles.graphBarBackground}>
+                    {/* 현재 학점을 그래프로 표시 */}
                     <View
                         style={[
                             styles.graphBarFill,
@@ -84,7 +88,8 @@ const HorizontalBarGraph = ({ currentGPA, goalGPA }: HorizontalBarGraphProps) =>
                     <Text style={styles.graphBarText}>현재 학점: {currentGPA.toFixed(2)}</Text>
                 </View>
             </View>
-            {/* 목표 학점 그래프 */}
+
+            {/* 목표 학점 표시 막대 */}
             <View style={styles.graphContainer}>
                 <View style={styles.graphBarBackground}>
                     <View
@@ -100,28 +105,29 @@ const HorizontalBarGraph = ({ currentGPA, goalGPA }: HorizontalBarGraphProps) =>
     );
 };
 
-// 커스텀 프로그레스 서클 컴포넌트
+// 원형 프로그레스 애니메이션 컴포넌트
 const AnimatedCircularProgress = ({ percent, label, value, maxValue }: any) => {
     const animatedValue = useRef(new Animated.Value(0)).current;
 
+    // 애니메이션을 시작하는 useEffect
     useEffect(() => {
         const timer = setTimeout(() => {
             animatedValue.setValue(0); // 애니메이션 초기화
             Animated.timing(animatedValue, {
-                toValue: percent,
-                duration: 2000, // 애니메이션 지속 시간 늘리기
+                toValue: percent, // 퍼센트 값을 목표로 애니메이션 진행
+                duration: 2000, // 애니메이션 시간 설정
                 easing: Easing.out(Easing.exp), // 이징 함수 적용
                 useNativeDriver: false,
             }).start();
-        }, 1000); // 2초 후에 애니메이션 시작
+        }, 1000); // 1초 후 애니메이션 시작
 
         return () => clearTimeout(timer);
     }, [percent]);
 
-    const circumference = 100 * Math.PI;
+    const circumference = 100 * Math.PI; // 원주 계산
     const strokeDashoffset = animatedValue.interpolate({
         inputRange: [0, 100],
-        outputRange: [circumference, 0],
+        outputRange: [circumference, 0], // 퍼센트에 따른 선의 길이 변화
     });
 
     return (
@@ -156,13 +162,16 @@ const AnimatedCircularProgress = ({ percent, label, value, maxValue }: any) => {
     );
 };
 
+// 학사 정보 화면 컴포넌트
 const AcademicInfoScreen = ({ route }: any) => {
     const { userdata, LectureData } = route.params;
-    const [userData] = useState<UserData>(userdata); // 사용자 데이터 상태
-    const [userLecture] = useState<Lecture[]>(LectureData); // 강의 데이터 상태
+    const [userData] = useState<UserData>(userdata); // 사용자 데이터를 상태로 관리
+    const [userLecture] = useState<Lecture[]>(LectureData); // 강의 데이터를 상태로 관리
     const [selectedYear, setSelectedYear] = useState<number>(1); // 선택된 학년
     const [selectedSemester, setSelectedSemester] = useState<number>(0); // 선택된 학기 (0: 1학기, 1: 2학기)
     const [goalGPA, setGoalGPA] = useState<number>(1); // 목표 학점
+    const [isModalVisible, setModalVisible] = useState(false); // 목표 학점 설정 모달의 가시성
+    const [changegoalGPA, setChangegoalGPA] = useState(''); // 목표 학점 변경 입력 상태
 
     // 목표 학점을 서버에서 가져오는 함수
     useFocusEffect(
@@ -178,6 +187,7 @@ const AcademicInfoScreen = ({ route }: any) => {
         }, [])
     );
 
+    // 서버에서 목표 학점을 가져오는 비동기 함수
     const getGoalGPA = async () => {
         try {
             const response = await fetch(`${config.serverUrl}/get_GoalGPA`, {
@@ -190,10 +200,64 @@ const AcademicInfoScreen = ({ route }: any) => {
                 }),
             });
             const result = await response.json();
-            setGoalGPA(result.goal_gpa); // 목표 학점 설정
+            setGoalGPA(result.goal_gpa); // 서버에서 가져온 목표 학점을 상태에 저장
         } catch (error) {
             console.error(error);
         }
+    };
+
+    // 목표 학점을 변경하는 비동기 함수
+    const change_GoalGPA = async () => {
+        try {
+            const parsedValue = convertToFloat();
+            // 0~4.5 범위 내에서만 설정 가능하게 제한
+            if (parsedValue >= 0 && parsedValue <= 4.5) {
+                const response = await fetch(`${config.serverUrl}/change_GoalGPA`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: userData.user_pk,
+                        goal_gpa: parsedValue // 입력된 값을 float으로 변환하여 전송
+                    })
+                });
+                await response.json();
+                ChangGoalGpaAlert(); // 성공 알림
+                setChangegoalGPA(''); // 입력 필드 초기화
+                getGoalGPA(); // 목표 학점 재갱신
+            } else {
+                Alert.alert('오류', '목표 학점은 0에서 4.5 사이여야 합니다.');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+
+    // 입력된 목표 학점을 float으로 변환하는 함수
+    const convertToFloat = () => {
+        const parsedValue = parseFloat(changegoalGPA);
+        return parsedValue;
+    };
+
+    // 모달 토글 함수
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+    };
+
+    // 목표 학점 설정 성공 시 경고창
+    const ChangGoalGpaAlert = () => {
+        Alert.alert(
+            "목표 학점 설정",
+            "목표 학점 설정 성공!!",
+            [{ text: "확인", onPress: () => toggleModal() }]
+        );
+    };
+
+    // 숫자 입력 처리 함수
+    const handleNumberInput = (value: string) => {
+        setChangegoalGPA(value);
     };
 
     // GPA 및 학점 데이터를 저장하는 상태
@@ -206,9 +270,9 @@ const AcademicInfoScreen = ({ route }: any) => {
         electiveCredits: 0,
     });
 
-    const gradesData = Array(9).fill(0); // 등급별 성적 카운트 배열 초기화
+    const gradesData = Array(9).fill(0); // 등급별 성적 카운트를 저장하는 배열
 
-    // 강의 데이터를 순회하며 등급별 성적 카운트
+    // 강의 데이터를 순회하여 등급별 성적 카운트
     userLecture.forEach((lecture) => {
         const gradeIndex = ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'].indexOf(
             lecture.lecture_grades
@@ -216,6 +280,7 @@ const AcademicInfoScreen = ({ route }: any) => {
         if (gradeIndex !== -1) gradesData[gradeIndex]++;
     });
 
+    // GPA 데이터를 계산하는 useEffect
     useEffect(() => {
         // 전체 학점 계산
         const totalCredits = userLecture.reduce(
@@ -225,7 +290,7 @@ const AcademicInfoScreen = ({ route }: any) => {
         // 전체 평점 계산
         const averageGPA = parseFloat((totalCredits / userLecture.length).toFixed(2));
 
-        // 전공 및 교양 강의 필터링
+        // 전공 및 교양 강의를 필터링
         const majorLectures = userLecture.filter((lecture) => lecture.division === '전공');
         const electiveLectures = userLecture.filter((lecture) => lecture.division === '교양');
 
@@ -308,6 +373,7 @@ const AcademicInfoScreen = ({ route }: any) => {
     // 애니메이션 값 설정
     const animatedValues = gradesData.map(() => new Animated.Value(0));
 
+    // 등급별 애니메이션 시작 useEffect
     useEffect(() => {
         const timer = setTimeout(() => {
             // 애니메이션 시작
@@ -319,28 +385,21 @@ const AcademicInfoScreen = ({ route }: any) => {
                 });
             });
             Animated.stagger(100, animations).start();
-        }, 1000); // 2초 후에 애니메이션 시작
+        }, 1000);
 
         return () => clearTimeout(timer);
     }, [gradesData]);
 
     // 등급별 색상 설정
     const gradeColors = [
-        '#4CAF50',
-        '#8BC34A',
-        '#CDDC39',
-        '#FFC107',
-        '#FF9800',
-        '#FF5722',
-        '#F44336',
-        '#E91E63',
-        '#9C27B0',
+        '#4CAF50', '#8BC34A', '#CDDC39', '#FFC107', '#FF9800', '#FF5722', '#F44336', '#E91E63', '#9C27B0',
     ];
 
     return (
         <View style={styles.container}>
             {/* 뱃지 영역 */}
             <ScrollView horizontal={true} style={styles.badgeContainer}>
+                {/* 개별 뱃지 */}
                 <View style={styles.badgeItem}>
                     <Image
                         source={require('../../../assets/뱃지.png')}
@@ -400,7 +459,7 @@ const AcademicInfoScreen = ({ route }: any) => {
             </ScrollView>
 
             <ScrollView>
-                {/* 프로그레스 서클 영역 */}
+                {/* 원형 프로그레스 표시 */}
                 <View style={styles.progressCircleContainer}>
                     {[...Array(Math.ceil(progressCircleConfigs.length / 3))].map(
                         (_, rowIndex) => (
@@ -427,11 +486,47 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <Text style={styles.goalGPATitleText}>목표학점</Text>
                         <IconH style={styles.goalGPAIcon} name="trophy" size={30} />
                     </View>
-                    <HorizontalBarGraph
-                        currentGPA={progressCircleConfigs[0].value}
-                        goalGPA={goalGPA}
+                    <TouchableOpacity
+                        style={styles.ChangGoalgpaArea}
+                        onPress={() => toggleModal()}>
+                        <Text style={styles.ChangGoalgpaFont}>목표 학점 변경 하기</Text>
+                    </TouchableOpacity>
+                    <Modal
+                isVisible={isModalVisible}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+                animationInTiming={500}
+                animationOutTiming={500}
+                backdropOpacity={0.6}
+            >
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>목표 학점 설정</Text>
+                    <TextInput
+                        style={styles.input}
+                        keyboardType="numeric"
+                        value={changegoalGPA}
+                        onChangeText={handleNumberInput}
+                        placeholder="0 ~ 4.5"
+                        maxLength={4} // 소수점 포함하여 최대 4글자로 제한
                     />
+                    <View style={styles.buttons}>
+                        <TouchableOpacity style={styles.submitButton} onPress={change_GoalGPA}>
+                            <Text style={styles.buttonText}>설정</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.cancelButton} onPress={toggleModal}>
+                            <Text style={styles.buttonText}>닫기</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
+            </Modal>
+
+                </View>
+
+                {/* 가로 막대 그래프 */}
+                <HorizontalBarGraph
+                    currentGPA={progressCircleConfigs[0].value}
+                    goalGPA={goalGPA}
+                />
 
                 {/* 등급별 성적 분포 그래프 */}
                 <Text style={styles.gradeDistributionTitle}>등급별 성적 분포</Text>
@@ -457,30 +552,36 @@ const AcademicInfoScreen = ({ route }: any) => {
 
                 {/* 학기 선택기 */}
                 <View style={styles.semesterPickerContainer}>
-                    <Picker
-                        selectedValue={selectedYear}
-                        style={styles.picker}
-                        onValueChange={(itemValue: number) => setSelectedYear(itemValue)}
-                    >
-                        {[...Array(userData.college)].map((_, index) => (
-                            <Picker.Item key={index} label={`${index + 1}학년`} value={index + 1} />
-                        ))}
-                    </Picker>
-                    <Picker
-                        selectedValue={selectedSemester}
-                        style={styles.picker}
-                        onValueChange={(itemValue: number) => setSelectedSemester(itemValue)}
-                    >
-                        {[1, 2].map((semester, index) => (
-                            <Picker.Item key={index} label={`${semester}학기`} value={semester - 1} />
-                        ))}
-                    </Picker>
+                    <View style={styles.pickerWrapper}>
+                        <IconH name="calendar" size={20} style={styles.pickerIcon} />
+                        <Picker
+                            selectedValue={selectedYear}
+                            style={styles.picker}
+                            onValueChange={(itemValue: number) => setSelectedYear(itemValue)}
+                        >
+                            {[...Array(userData.college)].map((_, index) => (
+                                <Picker.Item key={index} label={`${index + 1}학년`} value={index + 1} />
+                            ))}
+                        </Picker>
+                    </View>
+                    <View style={styles.pickerWrapper}>
+                        <IconH name="calendar-o" size={20} style={styles.pickerIcon} />
+                        <Picker
+                            selectedValue={selectedSemester}
+                            style={styles.picker}
+                            onValueChange={(itemValue: number) => setSelectedSemester(itemValue)}
+                        >
+                            {[1, 2].map((semester, index) => (
+                                <Picker.Item key={index} label={`${semester}학기`} value={semester - 1} />
+                            ))}
+                        </Picker>
+                    </View>
                 </View>
 
                 {/* 강의 목록 테이블 */}
                 {semesterData[selectedYear * 2 - 1 + selectedSemester].length > 0 ? (
                     <View style={styles.lectureTableContainer}>
-                        <Table borderStyle={{ borderWidth: 3, borderColor: 'gray' }}>
+                        <Table borderStyle={{ borderWidth: 1, borderColor: '#C0C0C0' }}>
                             <Row
                                 data={['과목명', '구분', '학점', '성적']}
                                 style={styles.lectureTableHeader}
@@ -497,7 +598,10 @@ const AcademicInfoScreen = ({ route }: any) => {
                                             lecture.lecture_credit,
                                             lecture.lecture_grades,
                                         ]}
-                                        style={styles.lectureTableRow}
+                                        style={[
+                                            styles.lectureTableRow,
+                                            index % 2 === 0 ? styles.evenRow : styles.oddRow
+                                        ]}
                                         textStyle={styles.lectureTableText}
                                         widthArr={[width * 0.65, width * 0.1, width * 0.1, width * 0.1]}
                                     />
@@ -534,7 +638,7 @@ const styles = StyleSheet.create({
     },
     // 프로그레스 서클 영역 스타일
     progressCircleContainer: {
-        marginTop: 50,
+        marginTop: 20,
         width: '90%',
         alignSelf: 'center',
     },
@@ -562,12 +666,13 @@ const styles = StyleSheet.create({
     },
     // 목표 학점 영역 스타일
     goalGPAContainer: {
+        flexDirection: 'row',
         marginHorizontal: 20,
+        justifyContent: 'space-around'
     },
     goalGPATitleContainer: {
         height: 50,
         width: '33%',
-        marginVertical: 10,
         borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
@@ -584,6 +689,71 @@ const styles = StyleSheet.create({
     goalGPAIcon: {
         marginLeft: 10,
         color: '#F29F05',
+    },
+    ChangGoalgpaArea: {
+        height: 50,
+        width: "40%",
+        backgroundColor: '#F29F05',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 5,
+        borderRadius: 15,
+    },
+    ChangGoalgpaFont: {
+        fontSize: 17,
+        fontWeight: '900',
+        color: 'white'
+    },
+    modalContent: {
+        backgroundColor: '#f9f9f9',
+        padding: 20,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 15,
+    },
+    input: {
+        height: 45,
+        width: '100%',
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        fontSize: 16,
+        marginBottom: 20,
+        textAlign: 'center',
+        backgroundColor: '#fff',
+    },
+    buttons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    submitButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    cancelButton: {
+        backgroundColor: '#f44336',
+        paddingVertical: 10,
+        paddingHorizontal: 30,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     horizontalBarGraphContainer: {
         width: '100%',
@@ -660,13 +830,26 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 10,
     },
-    picker: {
-        width: width * 0.45,
-        backgroundColor: '#dddddd',
+    pickerWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F0F0F0',
+        borderRadius: 10,
         marginHorizontal: 5,
-        color: 'black',
-        elevation: 5,
+        paddingHorizontal: 10,
+        elevation: 3, // 그림자 효과 추가
         shadowColor: 'black',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+    },
+    picker: {
+        width: width * 0.35, // 선택기 너비 조정
+        color: 'black',
+    },
+    pickerIcon: {
+        marginRight: 10,
+        color: '#333',
     },
     // 강의 테이블 스타일
     lectureTableContainer: {
@@ -675,21 +858,32 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
     },
     lectureTableHeader: {
-        height: 30,
-        backgroundColor: '#dddddd',
+        height: 40,
+        backgroundColor: '#4CAF50',
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
     },
     lectureTableHeaderText: {
         textAlign: 'center',
         fontWeight: 'bold',
-        color: 'gray',
+        color: 'white',
+        fontSize: 16,
     },
     lectureTableRow: {
         height: 50,
+        backgroundColor: '#f9f9f9',
+    },
+    evenRow: {
+        backgroundColor: '#f1f1f1',
+    },
+    oddRow: {
+        backgroundColor: '#ffffff',
     },
     lectureTableText: {
         textAlign: 'center',
-        fontWeight: 'bold',
-        color: 'black',
+        fontWeight: '500',
+        color: '#333',
+        fontSize: 14,
     },
     noLectureDataText: {
         textAlign: 'center',

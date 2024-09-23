@@ -224,7 +224,7 @@ const AttendanceScreen = ({ navigation, route }: any) => {
 
   const openCamera = (lecture: Lecture) => {
     const currentTime = new Date().getTime();
-    if (!lecture.today_lecture_state) {
+    if (scannedCode) {
       Alert.alert(
         '출석 처리됨',
         '이미 출석 처리가 완료되었습니다. 하루에 한 번만 출석할 수 있습니다.',
@@ -232,6 +232,8 @@ const AttendanceScreen = ({ navigation, route }: any) => {
         { cancelable: false }
       );
     } else {
+      navigation.navigate('FullScreenCamera', { selectedLecture: lecture });
+      closeModal();
       setIsScanned(false);
       setIsCameraButton(true);
       lecture.today_lecture_state = false;
@@ -265,12 +267,12 @@ const AttendanceScreen = ({ navigation, route }: any) => {
     requestPermission();
   }, []);
 
-  React.useEffect(() => {
+  /*React.useEffect(() => {
     if (isCameraButton) {
       navigation.navigate('FullScreenCamera');
       closeModal();
     }
-  }, [isCameraButton]);
+  }, [isCameraButton]);*/
 
   useEffect(() => {
     setScannedCode(route.params?.scannedCode);
