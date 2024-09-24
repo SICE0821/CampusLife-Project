@@ -136,11 +136,11 @@ p {
 }
 
 .detailClassBox:hover {
-  background-color: #f0f0f0; /* 마우스를 올렸을 때 배경색 변경 */
+  background-color: #f0f0f0; 
 }
 
 .selected {
-  background-color: #ffebcd; /* 옅은 주황색 (BurlyWood) */
+  background-color: #ffebcd; 
 }
 
 .detailClassText {
@@ -177,7 +177,8 @@ p {
 
 .attendaceFind {
   background-color: gray;
-
+  justify-content: center;
+  align-items: center;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -189,7 +190,8 @@ p {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-size: 30pt;
+  align-items: center;
+  font-size: 18pt;
   font-weight: bold;
   margin-left: 20px;
 }
@@ -197,6 +199,16 @@ p {
 .search{
   height: 100%;
   margin-right: 20px;
+}
+
+.searchButton {
+  padding: 10px 26px; 
+  font-size: 14px; 
+  background-color: #E18F21;
+}
+
+.searchButton:hover {
+  background-color: #d47f1a; 
 }
 
 .studentInfoBox {
@@ -271,23 +283,78 @@ p {
 }
 
 .attendaceCheckBox {
-  background-color: grey; /*값이 없을 때*/
+  background-color: grey; 
   width: 80px;
   height: 80px;
   border: 1px black solid;
 }
 
 .attendaceCheckBox.present {
-  background-color: green; /* 출석 */
+  background-color: green; 
 }
 
 .attendaceCheckBox.late {
-  background-color: yellow; /* 지각 */
+  background-color: yellow; 
 }
 
 .attendaceCheckBox.absent {
-  background-color: red; /* 결석 */
+  background-color: red; 
 }
+
+.modalheaderBox {
+  height: 30%;
+  width: 100%;
+  align-items: center;
+  display : flex;
+  justify-content: space-between;
+}
+.modalheaderText {
+  font-size: 13pt;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.modalbuttonBox {
+  height: 23%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ModalCancleButton {
+  padding: 5px 10px;
+  font-size: 14px; 
+  background-color: grey; 
+  color: white; 
+  border: none; 
+  cursor: pointer; 
+  margin-bottom: 20px;
+}
+
+.ModalCancleButton:hover {
+  background-color: darkgrey; 
+}
+
+
+.ModalButton {
+  padding: 12px 30px; 
+  font-size: 14px; 
+  background-color: #E18F21; 
+  color: white; 
+  border: none; 
+  cursor: pointer; 
+}
+
+.ModalButton:hover {
+  background-color: #d47f1a; 
+}
+
+
+
+
+
+
 
 
 
