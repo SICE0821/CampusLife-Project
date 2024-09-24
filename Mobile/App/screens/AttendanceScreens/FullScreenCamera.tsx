@@ -21,7 +21,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
     const currentTime = new Date();
 
     const timeDifference = Math.abs(currentTime.getTime() - qrTime.getTime());
-    const timeLimit = 5000; // 1초 허용
+    const timeLimit = 10000; // 1초 허용
 
     return timeDifference <= timeLimit;
   };
