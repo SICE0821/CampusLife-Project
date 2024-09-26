@@ -307,6 +307,11 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                 </View>
             </ScrollView>
 
+            {/* 확인 버튼 */}
+            <TouchableOpacity style={styles.confirmButton} onPress={updateAccount}>
+                <Text style={styles.confirmButtonText}>확인</Text>
+            </TouchableOpacity>
+
             {/* 카메라 모달 */}
             <ModalBox
                 isOpen={isCameraModalOpen}
@@ -325,11 +330,6 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                     </TouchableOpacity>
                 </View>
             </ModalBox>
-
-            {/* 확인 버튼 */}
-            <TouchableOpacity style={styles.confirmButton} onPress={updateAccount}>
-                <Text style={styles.confirmButtonText}>확인</Text>
-            </TouchableOpacity>
         </View>
     );
 };
@@ -384,6 +384,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         paddingVertical: 20,
+        paddingBottom: 80
     },
     profilePicture: {
         marginTop: 10,
@@ -512,6 +513,8 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 5,
         marginBottom: 20,
+        position: 'absolute',
+        bottom: 0,
     },
     confirmButtonText: {
         fontSize: 18,
