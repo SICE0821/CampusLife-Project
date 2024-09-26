@@ -1,342 +1,183 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity, Pressable, Animated, RefreshControl, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { Text, View, FlatList, TouchableWithoutFeedback, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
-import { UserData } from '../../types/type'
-import { Swipeable, GestureHandlerRootView, RectButton } from 'react-native-gesture-handler';
+import { UserData } from '../../types/type';
+import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import config from '../../config';
 
 type PostData = {
-    post_id: number,
-    title: string,
-    contents: string,
-    date: string,
-    view: number,
-    like: number,
-    name: string,
-    user_title: string
-}
+    post_id: number;
+    title: string;
+    contents: string;
+    date: string;
+    view: number;
+    like: number;
+    name: string;
+    user_title: string;
+};
 
-const renderEmptyItem = () => {
-    return (
-        <View style={{ height: 85 }}>
-        </View>
-    )
-}
+const renderEmptyItem = () => <View style={styles.footerSpacing} />;
 
-//화면.
 const MyPostScreen = ({ route, navigation }: any) => {
-    console.log("you are in MyPostScreen")
-    const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
-    const ref = useRef(null);
     const { userdata } = route.params;
     const [communityData, setCommunityData] = useState<PostData[]>([]);
     const [userData, setUserData] = useState<UserData>(userdata);
     const [userHavePost, setUserHavePost] = useState<any[]>([]);
-    const [isSwipeableOpen, setIsSwipeableOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-    const swipeableRef  = useRef<Swipeable>(null);
-    
-    const closebookmark = useCallback((index : any) => {
-        //nameInput ref객체가 가리키는 컴포넌트(이름 입력필드)를 포커스합니다.
-        swipeableRefs.current[index]?.close();
-    }, []);
+    const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
 
     const onRefresh = async () => {
         setRefreshing(true);
         await AreYouHavePost();
-        setTimeout(() => setRefreshing(false), 500); // 0.5초 후에 새로고침 완료
-      };
+        setTimeout(() => setRefreshing(false), 500);
+    };
 
-      const Addbookmark = async (user_pk : number, post_pk : number) => {
+    const closeBookmark = useCallback((index: number) => {
+        swipeableRefs.current[index]?.close();
+    }, []);
+
+    const viewCountUp = async (post_id: number) => {
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            await fetch(`${config.serverUrl}/view_count_up`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ post_id }),
+            });
+        } catch (error) {
+            console.error('조회수 증가 실패:', error);
+        }
+    };
+
+    const addBookmark = async (user_pk: number, post_pk: number) => {
+        try {
             const response = await fetch(`${config.serverUrl}/add_book_mark`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_id: user_pk,
-                    post_id: post_pk,
-                }),
-                signal: controller.signal
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user_pk, post_id: post_pk }),
             });
-            clearTimeout(timeoutId);
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
-            const result = await response.json();
-
-            if (result.message === "북마크 추가 완료") {
-                //console.log('북마크가 성공적으로 추가되었습니다.');
-            }else {
-                //console.log('알 수 없는 응답:', result);
-            }
-        } catch (error : any) {
-            if (error.name === 'AbortError') {
-                console.error('요청이 타임아웃되었습니다.');
-            } else {
-                console.error('북마크 추가 요청 실패:', error);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        } catch (error) {
+            console.error('북마크 추가 실패:', error);
         }
     };
 
-    const view_count_up = async (post_id: any) => {
+    const removeBookmark = async (user_pk: number, post_pk: number) => {
         try {
-            const response = await fetch(`${config.serverUrl}/view_count_up`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    post_id: post_id
-                })
-            })
-            const result = await response.json();
-            //console.log("포스트 View 올리기 성공!")
-        } catch (error) {
-            console.error('포스트 View 올리기 누르기 실패', error);
-        }
-    }
-
-    const RemoveBookmark = async (user_pk : number, post_pk : number) => {
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
             const response = await fetch(`${config.serverUrl}/delete_book_mark`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_id: user_pk,
-                    post_id: post_pk,
-                }),
-                signal: controller.signal
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: user_pk, post_id: post_pk }),
             });
-            clearTimeout(timeoutId);
-    
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-    
-            const result = await response.json();
-
-            if (result.message === "북마크 추가 완료") {
-                //console.log('북마크가 성공적으로 추가되었습니다.');
-            }else {
-                //console.log('알 수 없는 응답:', result);
-            }
-        } catch (error : any) {
-            if (error.name === 'AbortError') {
-                console.error('요청이 타임아웃되었습니다.');
-            } else {
-                console.error('북마크 추가 요청 실패:', error);
-            }
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        } catch (error) {
+            console.error('북마크 삭제 실패:', error);
         }
     };
 
-    const handleBookmark = async (item: PostData, index : number) => {
+    const handleBookmark = async (item: PostData, index: number) => {
         try {
-          if (userHavePost.some(posts => item.post_id === posts.post_id)) {
-            // 이미 북마크에 있는 경우, 북마크를 삭제합니다.
-            await RemoveBookmark(userData.user_pk, item.post_id);
-            await getMyPostData();
-            closebookmark(index);
-            // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
-            setUserHavePost((prev) => prev.filter(post => post.post_id !== item.post_id));
-          } else {
-            // 북마크에 없는 경우, 북마크를 추가합니다.
-            await Addbookmark(userData.user_pk, item.post_id);
-            // 서버 작업이 성공적으로 완료된 후, 상태를 업데이트합니다.
-            setUserHavePost((prev) => [...prev, item]);
-            closebookmark(index);
-          }
+            if (userHavePost.some(posts => item.post_id === posts.post_id)) {
+                await removeBookmark(userData.user_pk, item.post_id);
+                setUserHavePost(prev => prev.filter(post => post.post_id !== item.post_id));
+            } else {
+                await addBookmark(userData.user_pk, item.post_id);
+                setUserHavePost(prev => [...prev, item]);
+            }
+            closeBookmark(index);
         } catch (error) {
-          // 오류 처리
-          console.error("Bookmark 처리 실패:", error);
+            console.error('북마크 처리 실패:', error);
         }
-      };
+    };
 
-    const renderRightActions = (item: PostData, index : number) => {
-        return(
-        // 왼쪽으로 스와이프할 때 나타날 컴포넌트
-        <TouchableOpacity
-            onPress={() => handleBookmark(item, index)}
-            style={{
-                backgroundColor: '#FFDFC1',
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 70,
-            }}>
+    const renderRightActions = (item: PostData, index: number) => (
+        <TouchableOpacity onPress={() => handleBookmark(item, index)} style={styles.bookmarkButton}>
             {userHavePost.some(posts => item.post_id === posts.post_id) ? (
-                <Text style={{ color: '#F29F05' }}> <IconC name="bookmark" size={40} /></Text>
+                <Text style={styles.bookmarkedIcon}>
+                    <IconC name="bookmark" size={40} />
+                </Text>
             ) : (
-                <Text style={{ color: '#F29F05' }}> <IconC name="bookmark-o" size={40} /></Text>
+                <Text style={styles.bookmarkIcon}>
+                    <IconC name="bookmark-o" size={40} />
+                </Text>
             )}
         </TouchableOpacity>
-    )};
+    );
 
     const getMyPostData = async () => {
         try {
             const response = await fetch(`${config.serverUrl}/getMyPostData`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_id: userData.user_pk
-                }),
-            })
-            const postsdata = await response.json();
-            //console.log(postsdata);
-            setCommunityData(postsdata);
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userData.user_pk }),
+            });
+            const postsData = await response.json();
+            setCommunityData(postsData);
         } catch (error) {
-            console.error(error);
-        } finally {
+            console.error('게시물 가져오기 실패:', error);
         }
-    }
-
-    const deleteMyPostData = async (post_id : number) => {
-        try {
-            const response = await fetch(`${config.serverUrl}/deleteMyPostData`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    post_id: post_id
-                }),
-            })
-            const postsdata = await response.json();
-            await getMyPostData();
-        } catch (error) {
-            console.error(error);
-        } finally {
-        }
-    }
+    };
 
     const AreYouHavePost = async () => {
         try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
             const response = await fetch(`${config.serverUrl}/get_user_have_post`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user_id: userData.user_pk
-                }),
-                signal: controller.signal
-            })
-            const user_have_posts = await response.json();
-            //console.log('북마크 가져오기 성공:', user_have_posts);
-            setUserHavePost(user_have_posts);
-
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        } catch (error : any) {
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userData.user_pk }),
+            });
+            const userHavePosts = await response.json();
+            setUserHavePost(userHavePosts);
+        } catch (error) {
             console.error('북마크 가져오기 실패:', error);
-
-        if (error.name === 'AbortError') {
-            console.error('요청이 타임아웃되었습니다.');
-        } else {
-            console.error('기타 오류:', error);
         }
-        }
-    }
+    };
 
     useFocusEffect(
-        React.useCallback(() => {
-            const fetchData = async () => {
-                try {
-                    await getMyPostData();
-                    setUserData(userdata);
-                    await AreYouHavePost();
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-            };
-            fetchData();
+        useCallback(() => {
+            getMyPostData();
+            AreYouHavePost();
         }, [])
     );
 
-    const delete_post = (post_id : number) => {
-        Alert.alert(
-            "게시글 삭제",
-            "게시글을 정말로 삭제하시겠습니까??",
-            [
-                {
-                    text: "취소",
-                    onPress: () => console.log("취소 클릭"),
-                    style: "cancel"
-                },
-                { text: "확인", onPress: async () => {
-                    await deleteMyPostData(post_id)
-                    delete_post_aram()} }
-            ]
-        );
-    };
-
-    const delete_post_aram = () => {
-        Alert.alert(
-            "게시글 삭제 성공!",
-            "게시글을 성공적으로 삭제 하였습니다!",
-            [
-                { text: "확인" }
-            ]
-        );
-    };
-
-    
-    const renderItem = ({ item, index }: { item: PostData, index: number }) => (
+    const renderItem = ({ item, index }: { item: PostData; index: number }) => (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <Swipeable
-                ref={(instance) => (swipeableRefs.current[index] = instance)}
-                renderRightActions={() => renderRightActions(item, index)}>
-                <TouchableWithoutFeedback onPress={async () => {
-                        await view_count_up(item.post_id);
-                        navigation.navigate("PostDetailScreen", { item, userData })}}
-                        onLongPress={() => delete_post(item.post_id)}>
-                    <View style={styles.writeboxcontainer}>
-                        <View style={styles.writetitle}>
-                            <View style={styles.titlebox}>
-                                <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}  numberOfLines={1} ellipsizeMode='tail'>{item.title}</Text>
+            <Swipeable ref={instance => (swipeableRefs.current[index] = instance)} renderRightActions={() => renderRightActions(item, index)}>
+                <TouchableWithoutFeedback
+                    onPress={async () => {
+                        await viewCountUp(item.post_id);
+                        navigation.navigate('PostDetailScreen', { item, userData });
+                    }}>
+                    <View style={styles.postItem}>
+                        <View style={styles.postHeader}>
+                            <View style={styles.postTitleSection}>
+                                <Text style={styles.postTitle} numberOfLines={1}>{item.title}</Text>
                             </View>
-                            <View style={styles.eyesnum}>
-                                <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
-                                <Text style={{ color: 'black', marginLeft: 3 }}>{item.view}</Text>
+                            <View style={styles.viewCountSection}>
+                                <Text style={styles.viewIcon}>
+                                    <IconB name="eyeo" size={26} />
+                                </Text>
+                                <Text style={styles.viewCountText}>{item.view}</Text>
                             </View>
                         </View>
-                        <View style={styles.wirterandtime}>
-                            <View style={styles.writerbox}>
-                            <Text
-                                    style={{
-                                        fontSize: 13,
-                                        marginLeft: 10,
-                                        color:
-                                            item.user_title === "학교" ? 'red' :
-                                            item.user_title === "반장" ? 'green' :
-                                            item.user_title === "학우회장" ? 'blue' :
-                                            'black'
-                                    }}
-                                >
+                        <View style={styles.postFooter}>
+                            <View style={styles.authorSection}>
+                                <Text
+                                    style={[
+                                        styles.authorName,
+                                        item.user_title === '학교' && styles.schoolRole,
+                                        item.user_title === '반장' && styles.leaderRole,
+                                        item.user_title === '학우회장' && styles.presidentRole,
+                                    ]}>
                                     {item.name}
                                 </Text>
                                 <Text> | {item.date}</Text>
                             </View>
-                            <View style={styles.likenum}>
-                                <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
-                                <Text style={{ color: 'black', marginLeft: 7, marginBottom: 4 }}>{item.like}</Text>
+                            <View style={styles.likeCountSection}>
+                                <Text style={styles.likeIcon}>
+                                    <IconB name="like1" size={21} />
+                                </Text>
+                                <Text style={styles.likeCountText}>{item.like}</Text>
                             </View>
                         </View>
                     </View>
@@ -345,22 +186,13 @@ const MyPostScreen = ({ route, navigation }: any) => {
         </GestureHandlerRootView>
     );
 
-
     return (
-        <View style={styles.container} ref={ref}>
-            <View style = {{backgroundColor : 'white'}}></View>
+        <View style={styles.container}>
             <FlatList
-                style={styles.flatliststyle}
                 data={communityData}
                 renderItem={renderItem}
                 ListFooterComponent={renderEmptyItem}
-                refreshControl={
-                    <RefreshControl
-                      refreshing={refreshing}
-                      onRefresh={onRefresh}
-                    />
-                  }
-            //keyExtractor={(item) => item.id}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             />
         </View>
     );
@@ -371,81 +203,95 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'white',
     },
-    topnavigationborder: {
-        flex: 1,
-        //backgroundColor : "blue",
-        borderWidth: 2,
-        borderTopLeftRadius: 10,
-        borderTopRightRadius: 10,
-        marginTop: 57,
-    },
-
-    flatlisttopline: {
-        //backgroundColor : 'red',
-        //right : 118,
-        height: 60,
-        borderBottomWidth: 1,
-        borderBottomColor: '#CCCCCC'
-    },
-
-    flatliststyle: {
-        //marginTop : 40,
-        //backgroundColor : 'blue',
-    },
-
-    writeboxcontainer: {
-        //padding: 50, 
+    postItem: {
+        paddingHorizontal: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#CCCCCC',
-        //backgroundColor: 'red',
+        backgroundColor: 'white',
+        flex: 1,
         height: 70,
-        paddingHorizontal: 10,
     },
-
-    writetitle: {
-        width: '100%',
+    postHeader: {
+        flex: 1,
         height: '60%',
         flexDirection: 'row',
-        //backgroundColor : 'yellow'
     },
-
-    wirterandtime: {
+    postFooter: {
         width: '100%',
         height: '40%',
-        flexDirection: 'row'
-        //backgroundColor : 'yellow'
-    },
-
-    titlebox: {
-        flex: 0.85,
-        //backgroundColor : 'green'
-    },
-    eyesnum: {
-        flex: 0.15,
         flexDirection: 'row',
-        // backgroundColor : 'red',
-        alignItems: 'center',
+    },
+    postTitleSection: {
+        width: '87%',
         justifyContent: 'center',
+        paddingRight: 10,
     },
-    writerbox: {
-        flex: 0.85,
+    viewCountSection: {
+        width: '13%',
         flexDirection: 'row',
-        //backgroundColor : 'yellow',
-    },
-    likenum: {
-        flex: 0.15,
-        flexDirection: 'row',
-        //backgroundColor : 'red',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
     },
-    delete: {
-        width: 20,
-        height: 20,
-        backgroundColor: 'red',
-    }
-
-}
-)
+    authorSection: {
+        width: '87%',
+        flexDirection: 'row',
+    },
+    likeCountSection: {
+        width: '13%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        bottom: 5,
+        left: 2,
+        justifyContent: 'flex-start',
+    },
+    bookmarkButton: {
+        backgroundColor: '#FFDFC1',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 70,
+    },
+    bookmarkedIcon: {
+        color: '#F29F05',
+    },
+    bookmarkIcon: {
+        color: '#F29F05',
+    },
+    postTitle: {
+        fontSize: 19,
+        marginLeft: 10,
+        color: 'black',
+    },
+    viewIcon: {
+        color: '#F29F05',
+    },
+    viewCountText: {
+        color: 'black',
+        marginLeft: 4,
+    },
+    authorName: {
+        fontSize: 13,
+        marginLeft: 10,
+    },
+    schoolRole: {
+        color: 'red',
+    },
+    leaderRole: {
+        color: 'green',
+    },
+    presidentRole: {
+        color: 'blue',
+    },
+    footerSpacing: {
+        height: 85,
+    },
+    likeIcon: {
+        color: '#F29F05',
+    },
+    likeCountText: {
+        color: 'black',
+        marginLeft: 7,
+        top: 1
+    },
+});
 
 export default MyPostScreen;

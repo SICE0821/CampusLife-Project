@@ -204,12 +204,11 @@ const SchoolInfoScreen = () => {
                   longitude={parseFloat(building.longitude)}
                   onTap={() => toggleInfoDataVisibility(building.building_name)}
                   anchor={{ x: 0.3, y: 0.5 }}
-                  caption={{ text: building.building_name }}
+                  caption={{ text: building.building_name, textSize: 14, haloColor: 'white' }}
                   subCaption={{ text: building.campus_place }}
                   width={32}
                   height={32}
                 >
-                  {/* 원래 아이콘으로 복원: "location-dot" */}
                   <IconA name="location-dot" size={32} color="#4CAF50" />
                 </NaverMapMarkerOverlay>
               ))}
