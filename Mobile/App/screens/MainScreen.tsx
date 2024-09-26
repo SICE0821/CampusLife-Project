@@ -24,6 +24,7 @@ import IconF from 'react-native-vector-icons/Fontisto';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
 import IconI from 'react-native-vector-icons/FontAwesome5';
+import IconJ from 'react-native-vector-icons/MaterialIcons';
 
 // 디바이스 너비 가져오기
 const width = Dimensions.get('window').width;
@@ -507,7 +508,7 @@ const MainPage = ({ navigation, route }: any) => {
                     <Text 
                       style={styles.postLabelText}
                       numberOfLines={1}
-                      ellipsizeMode="tail"
+                      ellipsizeMode="clip"
                     >
                       {post.title}
                     </Text>
@@ -558,7 +559,7 @@ const MainPage = ({ navigation, route }: any) => {
                     <Text 
                       style={styles.postLabelText}
                       numberOfLines={1}
-                      ellipsizeMode="tail"
+                      ellipsizeMode="clip"
                     >
                       {post.title}
                     </Text>
@@ -624,9 +625,84 @@ const MainPage = ({ navigation, route }: any) => {
             </View>
           </View>
         </View>
+        <View style={styles.contestArea}>
+          <View style={styles.contestHeadArea}>
+            <View style={styles.contestHeadTextArea}>
+              <Text style={styles.contestHeadText}>공모전</Text>
+              <IconJ style={styles.contestHeadIcon} name="festival" size={27} />
+            </View>
+            <TouchableOpacity 
+              onPress={() => {
+                navigation.navigate('CommunityScreenStackNavigator', {
+                  screen: 'PostTopTabNavigator',
+                  params: { screen: '전체 게시판', params: { screen: 'HOT' } }
+                });
+              }}
+              style={styles.contestDetailArea}
+            >
+              <Text style={styles.contestDetailText}>더보기</Text>
+              <IconB style={styles.contestDetailIcon} name={"caretright"} size={17} />
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.contestBoxArea}>
+            <TouchableOpacity style={styles.contestBox}>
+              <View style={styles.contestImageArea}>
+                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
+              </View>
+              <View style={styles.contestTextArea}>
+                <View style={styles.contestTextTitleArea}>
+                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
+                </View>
+                <View style={styles.contestTextInfoArea}>
+                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.contestBox}>
+              <View style={styles.contestImageArea}>
+                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
+              </View>
+              <View style={styles.contestTextArea}>
+                <View style={styles.contestTextTitleArea}>
+                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
+                </View>
+                <View style={styles.contestTextInfoArea}>
+                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.contestBox}>
+              <View style={styles.contestImageArea}>
+                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
+              </View>
+              <View style={styles.contestTextArea}>
+                <View style={styles.contestTextTitleArea}>
+                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
+                </View>
+                <View style={styles.contestTextInfoArea}>
+                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.contestBox}>
+              <View style={styles.contestImageArea}>
+                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
+              </View>
+              <View style={styles.contestTextArea}>
+                <View style={styles.contestTextTitleArea}>
+                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
+                </View>
+                <View style={styles.contestTextInfoArea}>
+                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+            <View style={styles.contestRightArea}>
 
-        {/* 빈 공간 */}
-        <View style={styles.bottomSpace}></View>
+            </View>
+
+          </ScrollView>
+        </View>
       </ScrollView>
     </View>
   );
@@ -846,7 +922,7 @@ const styles = StyleSheet.create({
   },
   postBoxArea: {
     width: width * 0.9,
-    height: 300, // 게시물 박스 영역 높이
+    height: 250, // 게시물 박스 영역 높이
   },
   postBox: {
     backgroundColor: 'white',
@@ -855,6 +931,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     elevation: 5,
     padding: 10,
+    paddingHorizontal: 5
   },
   postLabelArea: {
     flex: 1,
@@ -868,7 +945,7 @@ const styles = StyleSheet.create({
   postLabelTextArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    maxWidth: '70%',
+    width: '70%',
   },
   postLabelText: {
     color: 'black',
@@ -891,10 +968,97 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 17,
   },
-  bottomSpace: {
-    height: 100,
-    backgroundColor: 'white',
+  contestArea: {
+    width: width,
+    marginVertical: 15,
+    alignItems: 'center',
   },
+  contestHeadArea: {
+    width: width * 0.85,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  contestHeadTextArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  contestHeadText: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  contestHeadIcon: {
+    color: "#FFC700",
+    marginHorizontal: 10,
+  },
+  contestDetailArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  contestDetailText: {
+    color: 'black',
+    fontSize: 17,
+    marginHorizontal: 5,
+  },
+  contestDetailIcon: {
+    color: 'black',
+  },
+  contestBoxArea: {
+    height: 300,
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+  },
+  contestBox: {
+    backgroundColor: 'white',
+    width: 150,
+    height: 200,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    elevation: 10,
+  },
+  contestImageArea: {
+    width: '100%',
+    height: '70%',
+    borderTopStartRadius: 10,
+    borderTopEndRadius: 10,
+  },
+  contestImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'repeat',
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+  },
+  contestTextArea: {
+    width: '100%',
+    height: '30%',
+    borderBottomStartRadius: 10,
+    borderBottomEndRadius: 10,
+  },
+
+  contestTextTitleArea: {
+    width: '95%',
+    height: '60%',
+    alignSelf: 'center',
+  },
+  contestTextTitle:{
+    color: 'black',
+    fontSize: 14,
+    fontWeight: 'bold'
+  },
+  contestTextInfoArea: {
+    width: '95%',
+    height: '40%',
+    alignSelf: 'center'
+  },
+  contestTextInfo: {
+    color: 'black',
+    fontSize: 12,
+  },
+  contestRightArea: { // 여백
+    width: 20,
+  }
 });
 
 export default MainPage;
