@@ -17,6 +17,7 @@ import EventShopScreen from '../screens/EventScreens/EventShopScreen'
 import EventHaveCouponScreen from '../screens/EventScreens/EventHaveCouponScreen';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import PostDetailScreen from '../screens/CommunityScreens/PostDetailScreen';
+import SchoolClubDetailScreen from '../screens/CommunityScreens/SchoolClubDetailScreen';
 import NoticePostDetailScreen from '../screens/CommunityScreens/NoticePostDetailScreen';
 import SearchPostScreen from '../screens/CommunityScreens/SerchPostScreen';
 import WritePostDetailScreen from '../screens/CommunityScreens/NoticeWritePostScreen';
@@ -30,6 +31,9 @@ import StudyRoomScreen from '../screens/CardScreens/StudyRoomScreen'
 import AlarmDialogScreen from '../screens/CardScreens/AlarmDialogScreen';
 import DeadlineEventScreen from '../screens/EventScreens/DeadlineEventScreen';
 import EditPostScreen from '../screens/CommunityScreens/EditPostScreen';
+import SchoolClubSignScreen from '../screens/CommunityScreens/SchoolClubSignScreen';
+import SchoolClubSignStateScreen from '../screens/CommunityScreens/SchoolClubSignStateScreen';
+import SchoolClubSignDetailScreen from '../screens/CommunityScreens/SchoolClubSignDetailScreen';
 import { UserData } from "../types/type";
 import { PostTopTabNavigator } from './TopTabNavigator';
 import { MainTabNavigator } from './BottomTabNavigator'
@@ -68,13 +72,13 @@ export interface CertificationParams {
     params: IMPData.CertificationData;
     userCode: string;
     tierCode?: string;
-  }
-  
-  export interface PaymentParams {
+}
+
+export interface PaymentParams {
     params: IMPData.PaymentData;
     userCode: string;
     tierCode?: string;
-  }
+}
 
 export type RootStackParamList = {
     Home: undefined;
@@ -84,7 +88,7 @@ export type RootStackParamList = {
     Payment: PaymentParams | undefined;
     PaymentTest: undefined;
     PaymentResult: any;
-  };
+};
 
 //모든 네비게이터 객체의 최상위 네비게이터
 export const RootStackNavigator = (route: any) => {
@@ -149,6 +153,79 @@ export const RootStackNavigator = (route: any) => {
                     title: '커뮤니티',
                 })}
             />
+
+            <RootStack.Screen
+                name="SchoolClubDetailScreen"
+                component={SchoolClubDetailScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '커뮤니티',
+                })}
+            />
+
+            <RootStack.Screen
+                name="SchoolClubSignScreen"
+                component={SchoolClubSignScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '커뮤니티',
+                })}
+            />
+
+            <RootStack.Screen
+                name="SchoolClubSignStateScreen"
+                component={SchoolClubSignStateScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '커뮤니티',
+                })}
+            />
+
+            <RootStack.Screen
+                name="SchoolClubSignDetailScreen"
+                component={SchoolClubSignDetailScreen}
+                options={({ navigation }: any) => ({
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '커뮤니티',
+                })}
+            />
+
 
             <RootStack.Screen
                 name="NoticePostDetailScreen"
@@ -234,7 +311,7 @@ export const LoginScreenStackNavigator = () => {
                     title: '회원가입',
                 })}
             />
-            <LoginStack.Screen 
+            <LoginStack.Screen
                 name="SearchScreen"
                 component={SearchScreen}
                 options={({ navigation }: any) => ({

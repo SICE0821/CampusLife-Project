@@ -278,6 +278,8 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
                 <TouchableWithoutFeedback onPress={async () => {
                     await view_count_up(item.post_id);
                     navigation.navigate("PostDetailScreen", { item, userData })
+                    console.log(item);
+                    console.log(userData);
                 }}>
                     <View style={styles.writeboxcontainer}>
                         <View style={styles.writetitle}>
