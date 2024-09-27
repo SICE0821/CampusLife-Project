@@ -235,6 +235,33 @@ async function getGeneralPosts(campus_id) {
     }
 }
 
+async function ClubPosts() {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.Club_check = 1 "
+            + "ORDER BY post.date DESC"
+        );
+        const rows = await conn.query(query, [campus_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
 //전체 게시판에서 전체 게시글을 가져오는 쿼리
 async function getMyPostData(user_id) {
     let conn;
@@ -3604,5 +3631,6 @@ module.exports = {
     change_GoalGPA,
     RegistorPostPhoto,
     DetailPostPhoto,
-    DeletePostPhoto
+    DeletePostPhoto,
+    ClubPosts
 };

@@ -1,33 +1,35 @@
-// import React, { useState, useRef, useCallback } from 'react';
-// import { useFocusEffect } from '@react-navigation/native';
-// import {
-//   Text,
-//   View,
-//   FlatList,
-//   TouchableWithoutFeedback,
-//   TouchableOpacity,
-//   RefreshControl,
-//   StyleSheet,
-//   Image,
-// } from 'react-native';
-// import IconB from 'react-native-vector-icons/AntDesign';
-// import IconC from 'react-native-vector-icons/FontAwesome';
-// import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+import React, { useState, useRef, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import {
+  Text,
+  View,
+  FlatList,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  RefreshControl,
+  StyleSheet,
+  Image,
+} from 'react-native';
+import IconB from 'react-native-vector-icons/AntDesign';
+import IconC from 'react-native-vector-icons/FontAwesome';
+import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+import config from '../../config';
 
-// // 게시물 데이터 타입 정의
-// type PostData = {
-//   post_id: number;
-//   title: string;
-//   contents: string;
-//   date: string;
-//   view: number;
-//   like: number;
-//   name: string;
-//   user_title: string;
-//   image: string; // 이미지 URL 추가
-// };
+// 게시물 데이터 타입 정의
+type PostData = {
+  post_id: number;
+  title: string;
+  contents: string;
+  date: string;
+  view: number;
+  like: number;
+  name: string;
+  user_title: string;
+  image: string; // 이미지 URL 추가
+  Club_check : number;
+};
 
-// // 샘플 데이터 정의
+// 샘플 데이터 정의
 // const sampleData: PostData[] = [
 //   {
 //     post_id: 885,
@@ -63,6 +65,474 @@
 //     image: '',
 //   },
 //   // 추가 샘플 데이터...
+// ];
+
+// 하단 공백 생성 함수 (하단바 영역 고려)
+const renderEmptyItem = () => {
+  return <View style={styles.footerSpacing} />;
+};
+
+const SchoolClubScreen = ({ route, navigation }: any) => {
+  // 컴포넌트 상태 및 초기화
+  const { userdata } = route.params;
+  const [clubData, setClubData] = useState<PostData[]>([]); // 동아리 게시물 목록 상태를 샘플 데이터로 초기화
+  const [userData, setUserData] = useState(userdata); // 유저 데이터 상태
+  const [userHavePost, setUserHavePost] = useState<PostData[]>([]); // 유저가 북마크한 게시물 목록 상태
+  const [refreshing, setRefreshing] = useState(false); // 새로고침 상태
+  const swipeableRefs = useRef<(Swipeable | null)[]>([]); // Swipeable 참조 배열
+
+  
+  const getClubPosts = async () => {
+    try {
+        const response = await fetch(`${config.serverUrl}/Clubpost`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        const postsData = await response.json();
+        setClubData(postsData); // 게시물 데이터 설정
+    } catch (error) {
+        console.error('동아리 게시물 가져오기 실패:', error);
+    }
+};
+
+  // 새로고침 핸들러
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // 실제로는 여기서 데이터를 다시 로드합니다.
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
+
+  // 북마크 닫기
+  const closeBookmark = useCallback((index: number) => {
+    swipeableRefs.current[index]?.close();
+  }, []);
+
+  // 조회수 증가 함수 (샘플 데이터에서는 기능하지 않음)
+  const viewCountUp = async (post_id: number) => {
+    // 실제로는 서버에 조회수 증가 요청을 보냅니다.
+    console.log(`조회수 증가: ${post_id}`);
+  };
+
+  // 북마크 추가 함수
+  const addBookmark = async (item: PostData) => {
+    setUserHavePost((prev) => [...prev, item]);
+  };
+
+  // 북마크 삭제 함수
+  const removeBookmark = async (post_id: number) => {
+    setUserHavePost((prev) => prev.filter((post) => post.post_id !== post_id));
+  };
+
+  // 북마크 처리 핸들러 (추가/삭제)
+  const handleBookmark = async (item: PostData, index: number) => {
+    // 이미 북마크된 게시물이면 삭제, 그렇지 않으면 추가
+    if (userHavePost.some((post) => post.post_id === item.post_id)) {
+      await removeBookmark(item.post_id);
+    } else {
+      await addBookmark(item);
+    }
+    closeBookmark(index); // Swipeable 닫기
+  };
+
+  // 북마크 UI 렌더링
+  const renderRightActions = (item: PostData, index: number) => (
+    <TouchableOpacity onPress={() => handleBookmark(item, index)} style={styles.bookmarkButton}>
+      {userHavePost.some((post) => post.post_id === item.post_id) ? (
+        <Text style={styles.bookmarkedIcon}>
+          <IconC name="bookmark" size={40} />
+        </Text>
+      ) : (
+        <Text style={styles.bookmarkIcon}>
+          <IconC name="bookmark-o" size={40} />
+        </Text>
+      )}
+    </TouchableOpacity>
+  );
+
+  // 화면에 초점을 맞출 때 데이터 로드 (샘플 데이터이므로 필요 없음)
+  useFocusEffect(
+    useCallback(() => {
+      const hasClubPosts = clubData.some(post => post.Club_check === 1);
+            if (hasClubPosts) {
+                getClubPosts(); // 동아리 게시물 로드
+            }
+    }, [])
+  );
+
+  // 게시물 리스트 아이템 렌더링 함수
+  const renderItem = ({ item, index }: { item: PostData; index: number }) => (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Swipeable
+        ref={(ref) => (swipeableRefs.current[index] = ref)}
+        renderRightActions={() => renderRightActions(item, index)}
+        onSwipeableWillOpen={() => console.log(`${index} 스와이프 열림`)}
+        onSwipeableWillClose={() => console.log(`${index} 스와이프 닫힘`)}>
+        <TouchableWithoutFeedback
+          onPress={async () => {
+            await viewCountUp(item.post_id);
+            navigation.navigate('SchoolClubDetailScreen', { item, userData });
+            console.log(item);
+            console.log(userData);
+          }}>
+          <View style={styles.postItem}>
+            {/* 이미지 추가 */}
+            <Image source={{ uri: item.image }} style={styles.postImage} />
+            <View style={styles.postContent}>
+              <View style={styles.postHeader}>
+                <Text style={styles.postTitle}>{item.title}</Text>
+              </View>
+              <View style={styles.postFooter}>
+                <View style={styles.authorSection}>
+                  <Text
+                    style={[
+                      styles.authorName,
+                      item.user_title === '학교' && styles.schoolRole,
+                      item.user_title === '반장' && styles.leaderRole,
+                      item.user_title === '학우회장' && styles.presidentRole,
+                    ]}>
+                    {item.name}
+                  </Text>
+                  <Text style={styles.dateText}> | {item.date}</Text>
+                </View>
+                <View style={styles.statsSection}>
+                  <View style={styles.statItem}>
+                    <IconB name="eyeo" size={16} color="#555" />
+                    <Text style={styles.statText}>{item.view}</Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <IconB name="like1" size={16} color="#F29F05" />
+                    <Text style={styles.statText}>{item.like}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Swipeable>
+    </GestureHandlerRootView>
+  );
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={clubData}
+        renderItem={renderItem}
+        ListFooterComponent={renderEmptyItem}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        keyExtractor={(item) => item.post_id.toString()}
+        contentContainerStyle={styles.listContent}
+      />
+    </View>
+  );
+};
+
+// 스타일 정의
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 80
+  },
+  listContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+  },
+  postItem: {
+    flexDirection: 'row',
+    marginVertical: 8,
+    backgroundColor: '#fafafa',
+    borderRadius: 10,
+    overflow: 'hidden',
+    elevation: 2,
+  },
+  postImage: {
+    width: 100,
+    height: 100,
+  },
+  postContent: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'space-between',
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  postTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  postFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  authorSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  authorName: {
+    fontSize: 14,
+    color: '#555',
+  },
+  dateText: {
+    fontSize: 12,
+    color: '#999',
+    marginLeft: 5,
+  },
+  statsSection: {
+    flexDirection: 'row',
+  },
+  statItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 15,
+  },
+  statText: {
+    marginLeft: 4,
+    fontSize: 12,
+    color: '#555',
+  },
+  schoolRole: {
+    color: 'red',
+  },
+  leaderRole: {
+    color: 'green',
+  },
+  presidentRole: {
+    color: 'blue',
+  },
+  footerSpacing: {
+    height: 85,
+  },
+  bookmarkButton: {
+    backgroundColor: '#FFDFC1',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 70,
+  },
+  bookmarkedIcon: {
+    color: '#F29F05',
+  },
+  bookmarkIcon: {
+    color: '#F29F05',
+  },
+});
+
+export default SchoolClubScreen;
+// 
+// import React, { useState, useRef, useCallback } from 'react';
+// import { useFocusEffect } from '@react-navigation/native';
+// import {
+//   Text,
+//   View,
+//   FlatList,
+//   TouchableWithoutFeedback,
+//   TouchableOpacity,
+//   RefreshControl,
+//   StyleSheet,
+// } from 'react-native';
+// import IconB from 'react-native-vector-icons/AntDesign';
+// import IconC from 'react-native-vector-icons/FontAwesome';
+// import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
+
+// // 게시물 데이터 타입 정의
+// type PostData = {
+//   post_id: number;
+//   title: string;
+//   contents: string;
+//   date: string;
+//   view: number;
+//   like: number;
+//   name: string;
+//   user_title: string;
+// };
+
+// // 샘플 데이터 정의
+// const sampleData: PostData[] = [
+//   {
+//     post_id: 885,
+//     title: '동아리 모집 안내',
+//     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
+//     date: '2024-06-23',
+//     view: 90,
+//     like: 30,
+//     name: '김동아',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 886,
+//     title: '사진 동아리 전시회 안내',
+//     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
+//     date: '2024-06-24',
+//     view: 150,
+//     like: 75,
+//     name: '이사진',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 887,
+//     title: '음악 동아리 공연 소식',
+//     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
+//     date: '2024-06-25',
+//     view: 200,
+//     like: 120,
+//     name: '박음악',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 885,
+//     title: '동아리 모집 안내',
+//     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
+//     date: '2024-06-23',
+//     view: 90,
+//     like: 30,
+//     name: '김동아',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 886,
+//     title: '사진 동아리 전시회 안내',
+//     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
+//     date: '2024-06-24',
+//     view: 150,
+//     like: 75,
+//     name: '이사진',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 887,
+//     title: '음악 동아리 공연 소식',
+//     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
+//     date: '2024-06-25',
+//     view: 200,
+//     like: 120,
+//     name: '박음악',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 885,
+//     title: '동아리 모집 안내',
+//     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
+//     date: '2024-06-23',
+//     view: 90,
+//     like: 30,
+//     name: '김동아',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 886,
+//     title: '사진 동아리 전시회 안내',
+//     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
+//     date: '2024-06-24',
+//     view: 150,
+//     like: 75,
+//     name: '이사진',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 887,
+//     title: '음악 동아리 공연 소식',
+//     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
+//     date: '2024-06-25',
+//     view: 200,
+//     like: 120,
+//     name: '박음악',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 885,
+//     title: '동아리 모집 안내',
+//     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
+//     date: '2024-06-23',
+//     view: 90,
+//     like: 30,
+//     name: '김동아',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 886,
+//     title: '사진 동아리 전시회 안내',
+//     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
+//     date: '2024-06-24',
+//     view: 150,
+//     like: 75,
+//     name: '이사진',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 887,
+//     title: '음악 동아리 공연 소식',
+//     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
+//     date: '2024-06-25',
+//     view: 200,
+//     like: 120,
+//     name: '박음악',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 885,
+//     title: '동아리 모집 안내',
+//     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
+//     date: '2024-06-23',
+//     view: 90,
+//     like: 30,
+//     name: '김동아',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 886,
+//     title: '사진 동아리 전시회 안내',
+//     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
+//     date: '2024-06-24',
+//     view: 150,
+//     like: 75,
+//     name: '이사진',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 887,
+//     title: '음악 동아리 공연 소식',
+//     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
+//     date: '2024-06-25',
+//     view: 200,
+//     like: 120,
+//     name: '박음악',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 885,
+//     title: '동아리 모집 안내',
+//     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
+//     date: '2024-06-23',
+//     view: 90,
+//     like: 30,
+//     name: '김동아',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 886,
+//     title: '사진 동아리 전시회 안내',
+//     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
+//     date: '2024-06-24',
+//     view: 150,
+//     like: 75,
+//     name: '이사진',
+//     user_title: '동아리장',
+//   },
+//   {
+//     post_id: 887,
+//     title: '음악 동아리 공연 소식',
+//     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
+//     date: '2024-06-25',
+//     view: 200,
+//     like: 120,
+//     name: '박음악',
+//     user_title: '동아리장',
+//   },
 // ];
 
 // // 하단 공백 생성 함수 (하단바 영역 고려)
@@ -158,35 +628,35 @@
 //             console.log(userData);
 //           }}>
 //           <View style={styles.postItem}>
-//             {/* 이미지 추가 */}
-//             <Image source={{ uri: item.image }} style={styles.postImage} />
-//             <View style={styles.postContent}>
-//               <View style={styles.postHeader}>
+//             <View style={styles.postHeader}>
+//               <View style={styles.postTitleSection}>
 //                 <Text style={styles.postTitle}>{item.title}</Text>
 //               </View>
-//               <View style={styles.postFooter}>
-//                 <View style={styles.authorSection}>
-//                   <Text
-//                     style={[
-//                       styles.authorName,
-//                       item.user_title === '학교' && styles.schoolRole,
-//                       item.user_title === '반장' && styles.leaderRole,
-//                       item.user_title === '학우회장' && styles.presidentRole,
-//                     ]}>
-//                     {item.name}
-//                   </Text>
-//                   <Text style={styles.dateText}> | {item.date}</Text>
-//                 </View>
-//                 <View style={styles.statsSection}>
-//                   <View style={styles.statItem}>
-//                     <IconB name="eyeo" size={16} color="#555" />
-//                     <Text style={styles.statText}>{item.view}</Text>
-//                   </View>
-//                   <View style={styles.statItem}>
-//                     <IconB name="like1" size={16} color="#F29F05" />
-//                     <Text style={styles.statText}>{item.like}</Text>
-//                   </View>
-//                 </View>
+//               <View style={styles.viewCountSection}>
+//                 <Text style={styles.viewIcon}>
+//                   <IconB name="eyeo" size={26} />
+//                 </Text>
+//                 <Text style={styles.viewCountText}>{item.view}</Text>
+//               </View>
+//             </View>
+//             <View style={styles.postFooter}>
+//               <View style={styles.authorSection}>
+//                 <Text
+//                   style={[
+//                     styles.authorName,
+//                     item.user_title === '학교' && styles.schoolRole,
+//                     item.user_title === '반장' && styles.leaderRole,
+//                     item.user_title === '학우회장' && styles.presidentRole,
+//                   ]}>
+//                   {item.name}
+//                 </Text>
+//                 <Text> | {item.date}</Text>
+//               </View>
+//               <View style={styles.likeCountSection}>
+//                 <Text style={styles.likeIcon}>
+//                   <IconB name="like1" size={21} />
+//                 </Text>
+//                 <Text style={styles.likeCountText}>{item.like}</Text>
 //               </View>
 //             </View>
 //           </View>
@@ -197,13 +667,13 @@
 
 //   return (
 //     <View style={styles.container}>
+//       <View style={styles.headerSpacing} />
 //       <FlatList
 //         data={clubData}
 //         renderItem={renderItem}
 //         ListFooterComponent={renderEmptyItem}
 //         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
 //         keyExtractor={(item) => item.post_id.toString()}
-//         contentContainerStyle={styles.listContent}
 //       />
 //     </View>
 //   );
@@ -213,81 +683,48 @@
 // const styles = StyleSheet.create({
 //   container: {
 //     flex: 1,
-//     backgroundColor: '#fff',
-//     paddingTop: 80
-//   },
-//   listContent: {
-//     paddingHorizontal: 10,
-//     paddingBottom: 20,
+//     backgroundColor: 'white',
 //   },
 //   postItem: {
-//     flexDirection: 'row',
-//     marginVertical: 8,
-//     backgroundColor: '#fafafa',
-//     borderRadius: 10,
-//     overflow: 'hidden',
-//     elevation: 2,
-//   },
-//   postImage: {
-//     width: 100,
-//     height: 100,
-//   },
-//   postContent: {
+//     paddingHorizontal: 10,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#CCCCCC',
+//     backgroundColor: 'white',
 //     flex: 1,
-//     padding: 10,
-//     justifyContent: 'space-between',
+//     height: 70,
 //   },
 //   postHeader: {
+//     flex: 1,
+//     height: '60%',
 //     flexDirection: 'row',
-//     alignItems: 'center',
-//   },
-//   postTitle: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     color: '#333',
 //   },
 //   postFooter: {
+//     width: '100%',
+//     height: '40%',
 //     flexDirection: 'row',
-//     justifyContent: 'space-between',
+//   },
+//   postTitleSection: {
+//     width: '87%',
+//     justifyContent: 'center',
+//     paddingRight: 10,
+//   },
+//   viewCountSection: {
+//     width: '13%',
+//     flexDirection: 'row',
 //     alignItems: 'center',
+//     justifyContent: 'flex-start',
 //   },
 //   authorSection: {
+//     width: '87%',
+//     flexDirection: 'row',
+//   },
+//   likeCountSection: {
+//     width: '13%',
 //     flexDirection: 'row',
 //     alignItems: 'center',
-//   },
-//   authorName: {
-//     fontSize: 14,
-//     color: '#555',
-//   },
-//   dateText: {
-//     fontSize: 12,
-//     color: '#999',
-//     marginLeft: 5,
-//   },
-//   statsSection: {
-//     flexDirection: 'row',
-//   },
-//   statItem: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginLeft: 15,
-//   },
-//   statText: {
-//     marginLeft: 4,
-//     fontSize: 12,
-//     color: '#555',
-//   },
-//   schoolRole: {
-//     color: 'red',
-//   },
-//   leaderRole: {
-//     color: 'green',
-//   },
-//   presidentRole: {
-//     color: 'blue',
-//   },
-//   footerSpacing: {
-//     height: 85,
+//     bottom: 5,
+//     left: 2,
+//     justifyContent: 'flex-start',
 //   },
 //   bookmarkButton: {
 //     backgroundColor: '#FFDFC1',
@@ -301,464 +738,46 @@
 //   bookmarkIcon: {
 //     color: '#F29F05',
 //   },
+//   postTitle: {
+//     fontSize: 19,
+//     marginLeft: 10,
+//     color: 'black',
+//   },
+//   viewIcon: {
+//     color: '#F29F05',
+//   },
+//   viewCountText: {
+//     color: 'black',
+//     marginLeft: 4,
+//   },
+//   authorName: {
+//     fontSize: 13,
+//     marginLeft: 10,
+//   },
+//   schoolRole: {
+//     color: 'red',
+//   },
+//   leaderRole: {
+//     color: 'green',
+//   },
+//   presidentRole: {
+//     color: 'blue',
+//   },
+//   headerSpacing: {
+//     height: 80,
+//     backgroundColor: 'white',
+//   },
+//   footerSpacing: {
+//     height: 85,
+//   },
+//   likeIcon: {
+//     color: '#F29F05',
+//   },
+//   likeCountText: {
+//     color: 'black',
+//     marginLeft: 7,
+//     top: 1,
+//   },
 // });
-
+// 
 // export default SchoolClubScreen;
-
-import React, { useState, useRef, useCallback } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import {
-  Text,
-  View,
-  FlatList,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  RefreshControl,
-  StyleSheet,
-} from 'react-native';
-import IconB from 'react-native-vector-icons/AntDesign';
-import IconC from 'react-native-vector-icons/FontAwesome';
-import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
-
-// 게시물 데이터 타입 정의
-type PostData = {
-  post_id: number;
-  title: string;
-  contents: string;
-  date: string;
-  view: number;
-  like: number;
-  name: string;
-  user_title: string;
-};
-
-// 샘플 데이터 정의
-const sampleData: PostData[] = [
-  {
-    post_id: 885,
-    title: '동아리 모집 안내',
-    contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
-    date: '2024-06-23',
-    view: 90,
-    like: 30,
-    name: '김동아',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 886,
-    title: '사진 동아리 전시회 안내',
-    contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
-    date: '2024-06-24',
-    view: 150,
-    like: 75,
-    name: '이사진',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 887,
-    title: '음악 동아리 공연 소식',
-    contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
-    date: '2024-06-25',
-    view: 200,
-    like: 120,
-    name: '박음악',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 885,
-    title: '동아리 모집 안내',
-    contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
-    date: '2024-06-23',
-    view: 90,
-    like: 30,
-    name: '김동아',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 886,
-    title: '사진 동아리 전시회 안내',
-    contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
-    date: '2024-06-24',
-    view: 150,
-    like: 75,
-    name: '이사진',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 887,
-    title: '음악 동아리 공연 소식',
-    contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
-    date: '2024-06-25',
-    view: 200,
-    like: 120,
-    name: '박음악',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 885,
-    title: '동아리 모집 안내',
-    contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
-    date: '2024-06-23',
-    view: 90,
-    like: 30,
-    name: '김동아',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 886,
-    title: '사진 동아리 전시회 안내',
-    contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
-    date: '2024-06-24',
-    view: 150,
-    like: 75,
-    name: '이사진',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 887,
-    title: '음악 동아리 공연 소식',
-    contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
-    date: '2024-06-25',
-    view: 200,
-    like: 120,
-    name: '박음악',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 885,
-    title: '동아리 모집 안내',
-    contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
-    date: '2024-06-23',
-    view: 90,
-    like: 30,
-    name: '김동아',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 886,
-    title: '사진 동아리 전시회 안내',
-    contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
-    date: '2024-06-24',
-    view: 150,
-    like: 75,
-    name: '이사진',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 887,
-    title: '음악 동아리 공연 소식',
-    contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
-    date: '2024-06-25',
-    view: 200,
-    like: 120,
-    name: '박음악',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 885,
-    title: '동아리 모집 안내',
-    contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
-    date: '2024-06-23',
-    view: 90,
-    like: 30,
-    name: '김동아',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 886,
-    title: '사진 동아리 전시회 안내',
-    contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
-    date: '2024-06-24',
-    view: 150,
-    like: 75,
-    name: '이사진',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 887,
-    title: '음악 동아리 공연 소식',
-    contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
-    date: '2024-06-25',
-    view: 200,
-    like: 120,
-    name: '박음악',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 885,
-    title: '동아리 모집 안내',
-    contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
-    date: '2024-06-23',
-    view: 90,
-    like: 30,
-    name: '김동아',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 886,
-    title: '사진 동아리 전시회 안내',
-    contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
-    date: '2024-06-24',
-    view: 150,
-    like: 75,
-    name: '이사진',
-    user_title: '동아리장',
-  },
-  {
-    post_id: 887,
-    title: '음악 동아리 공연 소식',
-    contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
-    date: '2024-06-25',
-    view: 200,
-    like: 120,
-    name: '박음악',
-    user_title: '동아리장',
-  },
-];
-
-// 하단 공백 생성 함수 (하단바 영역 고려)
-const renderEmptyItem = () => {
-  return <View style={styles.footerSpacing} />;
-};
-
-const SchoolClubScreen = ({ route, navigation }: any) => {
-  // 컴포넌트 상태 및 초기화
-  const { userdata } = route.params;
-  const [clubData, setClubData] = useState<PostData[]>(sampleData); // 동아리 게시물 목록 상태를 샘플 데이터로 초기화
-  const [userData, setUserData] = useState(userdata); // 유저 데이터 상태
-  const [userHavePost, setUserHavePost] = useState<PostData[]>([]); // 유저가 북마크한 게시물 목록 상태
-  const [refreshing, setRefreshing] = useState(false); // 새로고침 상태
-  const swipeableRefs = useRef<(Swipeable | null)[]>([]); // Swipeable 참조 배열
-
-  // 새로고침 핸들러
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // 실제로는 여기서 데이터를 다시 로드합니다.
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  };
-
-  // 북마크 닫기
-  const closeBookmark = useCallback((index: number) => {
-    swipeableRefs.current[index]?.close();
-  }, []);
-
-  // 조회수 증가 함수 (샘플 데이터에서는 기능하지 않음)
-  const viewCountUp = async (post_id: number) => {
-    // 실제로는 서버에 조회수 증가 요청을 보냅니다.
-    console.log(`조회수 증가: ${post_id}`);
-  };
-
-  // 북마크 추가 함수
-  const addBookmark = async (item: PostData) => {
-    setUserHavePost((prev) => [...prev, item]);
-  };
-
-  // 북마크 삭제 함수
-  const removeBookmark = async (post_id: number) => {
-    setUserHavePost((prev) => prev.filter((post) => post.post_id !== post_id));
-  };
-
-  // 북마크 처리 핸들러 (추가/삭제)
-  const handleBookmark = async (item: PostData, index: number) => {
-    // 이미 북마크된 게시물이면 삭제, 그렇지 않으면 추가
-    if (userHavePost.some((post) => post.post_id === item.post_id)) {
-      await removeBookmark(item.post_id);
-    } else {
-      await addBookmark(item);
-    }
-    closeBookmark(index); // Swipeable 닫기
-  };
-
-  // 북마크 UI 렌더링
-  const renderRightActions = (item: PostData, index: number) => (
-    <TouchableOpacity onPress={() => handleBookmark(item, index)} style={styles.bookmarkButton}>
-      {userHavePost.some((post) => post.post_id === item.post_id) ? (
-        <Text style={styles.bookmarkedIcon}>
-          <IconC name="bookmark" size={40} />
-        </Text>
-      ) : (
-        <Text style={styles.bookmarkIcon}>
-          <IconC name="bookmark-o" size={40} />
-        </Text>
-      )}
-    </TouchableOpacity>
-  );
-
-  // 화면에 초점을 맞출 때 데이터 로드 (샘플 데이터이므로 필요 없음)
-  useFocusEffect(
-    useCallback(() => {
-      // 실제로는 여기서 데이터를 로드합니다.
-    }, [])
-  );
-
-  // 게시물 리스트 아이템 렌더링 함수
-  const renderItem = ({ item, index }: { item: PostData; index: number }) => (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Swipeable
-        ref={(ref) => (swipeableRefs.current[index] = ref)}
-        renderRightActions={() => renderRightActions(item, index)}
-        onSwipeableWillOpen={() => console.log(`${index} 스와이프 열림`)}
-        onSwipeableWillClose={() => console.log(`${index} 스와이프 닫힘`)}>
-        <TouchableWithoutFeedback
-          onPress={async () => {
-            await viewCountUp(item.post_id);
-            navigation.navigate('SchoolClubDetailScreen', { item, userData });
-            console.log(item);
-            console.log(userData);
-          }}>
-          <View style={styles.postItem}>
-            <View style={styles.postHeader}>
-              <View style={styles.postTitleSection}>
-                <Text style={styles.postTitle}>{item.title}</Text>
-              </View>
-              <View style={styles.viewCountSection}>
-                <Text style={styles.viewIcon}>
-                  <IconB name="eyeo" size={26} />
-                </Text>
-                <Text style={styles.viewCountText}>{item.view}</Text>
-              </View>
-            </View>
-            <View style={styles.postFooter}>
-              <View style={styles.authorSection}>
-                <Text
-                  style={[
-                    styles.authorName,
-                    item.user_title === '학교' && styles.schoolRole,
-                    item.user_title === '반장' && styles.leaderRole,
-                    item.user_title === '학우회장' && styles.presidentRole,
-                  ]}>
-                  {item.name}
-                </Text>
-                <Text> | {item.date}</Text>
-              </View>
-              <View style={styles.likeCountSection}>
-                <Text style={styles.likeIcon}>
-                  <IconB name="like1" size={21} />
-                </Text>
-                <Text style={styles.likeCountText}>{item.like}</Text>
-              </View>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Swipeable>
-    </GestureHandlerRootView>
-  );
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.headerSpacing} />
-      <FlatList
-        data={clubData}
-        renderItem={renderItem}
-        ListFooterComponent={renderEmptyItem}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-        keyExtractor={(item) => item.post_id.toString()}
-      />
-    </View>
-  );
-};
-
-// 스타일 정의
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
-  postItem: {
-    paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCCCCC',
-    backgroundColor: 'white',
-    flex: 1,
-    height: 70,
-  },
-  postHeader: {
-    flex: 1,
-    height: '60%',
-    flexDirection: 'row',
-  },
-  postFooter: {
-    width: '100%',
-    height: '40%',
-    flexDirection: 'row',
-  },
-  postTitleSection: {
-    width: '87%',
-    justifyContent: 'center',
-    paddingRight: 10,
-  },
-  viewCountSection: {
-    width: '13%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  authorSection: {
-    width: '87%',
-    flexDirection: 'row',
-  },
-  likeCountSection: {
-    width: '13%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    bottom: 5,
-    left: 2,
-    justifyContent: 'flex-start',
-  },
-  bookmarkButton: {
-    backgroundColor: '#FFDFC1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 70,
-  },
-  bookmarkedIcon: {
-    color: '#F29F05',
-  },
-  bookmarkIcon: {
-    color: '#F29F05',
-  },
-  postTitle: {
-    fontSize: 19,
-    marginLeft: 10,
-    color: 'black',
-  },
-  viewIcon: {
-    color: '#F29F05',
-  },
-  viewCountText: {
-    color: 'black',
-    marginLeft: 4,
-  },
-  authorName: {
-    fontSize: 13,
-    marginLeft: 10,
-  },
-  schoolRole: {
-    color: 'red',
-  },
-  leaderRole: {
-    color: 'green',
-  },
-  presidentRole: {
-    color: 'blue',
-  },
-  headerSpacing: {
-    height: 80,
-    backgroundColor: 'white',
-  },
-  footerSpacing: {
-    height: 85,
-  },
-  likeIcon: {
-    color: '#F29F05',
-  },
-  likeCountText: {
-    color: 'black',
-    marginLeft: 7,
-    top: 1,
-  },
-});
-
-export default SchoolClubScreen;
