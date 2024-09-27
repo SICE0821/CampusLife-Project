@@ -174,13 +174,13 @@ app.post('/GetWeekClassStudentAttendanceStates', async (req, res) => {
 
         // 교수 정보가 존재할 때
         const processedData = rows.map(item => ({
-            student_id : item.student_id,
-            student_name : item.student_name,
-            department_name : item.department_name,
-            lecture_id : item.lecture_fk,
-            weeknum : item.weeknum,
-            classnum : item.classnum,
-            attendance_Info : item.attendance_Info
+            student_id: item.student_id,
+            student_name: item.student_name,
+            department_name: item.department_name,
+            lecture_id: item.lecture_fk,
+            weeknum: item.weeknum,
+            classnum: item.classnum,
+            attendance_Info: item.attendance_Info
         }));
 
         console.log("학생 출석 상태 가져오기 성공");
@@ -217,16 +217,46 @@ app.post('/GetTotalStudentInfo', async (req, res) => {
 
         // 교수 정보가 존재할 때
         const processedData = rows.map(item => ({
-            student_id : item.student_id,
-            student_name : item.student_name,
-            department_name : item.department_name,
-            lecture_id : item.lecture_fk,
+            student_id: item.student_id,
+            student_name: item.student_name,
+            department_name: item.department_name,
+            lecture_id: item.lecture_fk,
         }));
 
         console.log("해당 과목 듣는 학생 정보 가져오기 성공");
         res.json(processedData);
     } catch (error) {
         console.error("해당 과목 듣는 학생 정보 가져오기:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+// 해당 학생 출석정보 변경
+app.post('/ChangeStudentState', async (req, res) => {
+    const { student_id, lecture_id, weeknum, classnum, student_info } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query =
+            `
+            UPDATE 
+                lecture_week_info
+            SET 
+                attendance_Info = ?
+            WHERE 
+                student_fk = ?
+            AND
+                weeknum = ?
+            AND
+                lecture_fk = ?
+            AND
+                classnum = ?;
+            `;
+        await conn.query(query, [student_info, student_id, weeknum, lecture_id, classnum]);
+        conn.release();
+        console.log("해당 학생 출석정보 변경 성공");
+        res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+    } catch (error) {
+        console.error("해당 학생 출석정보 변경 실패:", error);
         res.status(500).json({ success: false, message: "연결 실패" });
     }
 });

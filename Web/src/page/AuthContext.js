@@ -15,32 +15,9 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 //useContext(Context객체) 를 사용해서 해당 Context의 value를 가져올 수 있다.
 
-const CheckProfessorInfo = async (username, password) => {
-  try {
-    const response = await fetch(`${config.serverUrl}/CheckProfessorInfo`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id : username,
-        pass : password
-      })
-    })
-
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.status} ${response.statusText}`);
-    }
-
-    const ProfessorData = await response.json();
-    return ProfessorData;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [professorData, setProfessorData] = useState();
   const login = async (username, password) => {
     try {
       const IsProfessorInfo = await CheckProfessorInfo(username, password);
@@ -59,12 +36,39 @@ export const AuthProvider = ({ children }) => {
       return false;
     }
   };
+
+
+  const CheckProfessorInfo = async (username, password) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/CheckProfessorInfo`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id : username,
+          pass : password
+        })
+      })
+  
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
+      }
+  
+      const ProfessorData = await response.json();
+      setProfessorData(ProfessorData.data[0]);
+      return ProfessorData;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const logout = () => {
     setIsLoggedIn(false);
   };
   //이 컴포넌트 생성 value로는 isLogedIn, login, logout 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, professorData, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
