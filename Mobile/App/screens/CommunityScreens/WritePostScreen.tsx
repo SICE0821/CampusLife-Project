@@ -30,6 +30,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열기/닫기 상태 관리
   const [selectallposter, setSelectAllPosterOption] = useState(0); // 전체 게시판 선택 여부
   const [selectdepartmentposter, setSelectDepartmentPoster] = useState(0); // 학과 게시판 선택 여부
+  const [selectclubposter, setSelectClubPoster] = useState(0); // 동아리 게시판 선택 여부
   const [postfontoption, setPostFontOption] = useState("게시판을 정해주세요"); // 게시판 선택 옵션
   const [titletext, setTitleText] = useState(''); // 게시물 제목 상태
   const [maintext, setMainText] = useState(''); // 게시물 내용 상태
@@ -55,15 +56,17 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
 
   // 전체 게시판 또는 학과 게시판 선택에 따라 게시판 텍스트 업데이트
   useEffect(() => {
+    // 게시판 선택에 따른 텍스트 업데이트
     if (selectallposter === 1) {
       setPostFontOption("전체 게시판");
     } else if (selectdepartmentposter === 1) {
       setPostFontOption("학과 게시판");
+    } else if (selectclubposter === 1) {
+      setPostFontOption("동아리 게시판");
     } else {
       setPostFontOption("게시판을 정해주세요");
     }
-  }, [selectallposter, selectdepartmentposter]);
-
+  }, [selectallposter, selectdepartmentposter, selectclubposter]);
   // 모달 열기
   const openModal = () => {
     setIsModalOpen(true);
@@ -74,16 +77,25 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     setIsModalOpen(false);
   };
 
-  // 전체 게시판 선택
-  const handleAllPosterPress = () => {
+   // 전체 게시판 선택
+   const handleAllPosterPress = () => {
     setSelectAllPosterOption(1);
     setSelectDepartmentPoster(0);
+    setSelectClubPoster(0); // 동아리 게시판 선택 해제
   };
 
   // 학과 게시판 선택
   const handleDepartmentPosterPress = () => {
     setSelectAllPosterOption(0);
     setSelectDepartmentPoster(1);
+    setSelectClubPoster(0); // 동아리 게시판 선택 해제
+  };
+
+  // 동아리 게시판 선택
+  const handleClubPosterPress = () => {
+    setSelectAllPosterOption(0);
+    setSelectDepartmentPoster(0);
+    setSelectClubPoster(1); // 동아리 게시판 선택
   };
 
   // 제목 텍스트 변경 핸들러
@@ -290,6 +302,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           <TouchableOpacity style={modalStyle.allposter} onPress={handleDepartmentPosterPress}>
             <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}>학과 게시판</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={modalStyle.allposter} onPress={handleClubPosterPress}>
+            <Text style={[modalStyle.noallposterfont, selectclubposter === 1 && modalStyle.yesallposterfont]}>동아리 게시판</Text>
+          </TouchableOpacity>
           <View style={modalStyle.writeButtom}>
             <TouchableOpacity onPress={closeModal} style={{ flex: 0.35, justifyContent: 'center', alignItems: "center", backgroundColor: '#9A9EFF' }}>
               <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
@@ -397,7 +412,7 @@ const modalStyle = StyleSheet.create({
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: 400,
+    height: 500,
   },
   modalContent: {
     flex: 1,

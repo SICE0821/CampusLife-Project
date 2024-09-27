@@ -38,6 +38,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [selectallposter, setselectapllposterOption] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
   const [selectdepartmentposter, setselectdepartmentposter] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
+  const [selectcontestposter, setSelectContestPoster] = useState(0);
   const [postfontoption, setpostfontoption] = useState("게시판을 정해주세요");
   const [titletext, settitleText] = useState('');
   const [maintext, setmainText] = useState('');
@@ -69,6 +70,8 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         setpostfontoption("학교 공지사항");
       } else if (selectdepartmentposter === 1) {
         setpostfontoption("학과 공지사항");
+      } else if (selectcontestposter === 1) {
+        setpostfontoption("공모전 게시판");
       } else {
         setpostfontoption("게시판을 정해주세요");
       }
@@ -86,11 +89,19 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const handleAllPosterPress = () => {
     setselectapllposterOption(1);
     setselectdepartmentposter(0);
+    setSelectContestPoster(0);
   };
 
   const handleDepartmentPosterPress = () => {
     setselectapllposterOption(0);
     setselectdepartmentposter(1);
+    setSelectContestPoster(0);
+  };
+
+  const handleContestPosterPress = () => {
+    setselectapllposterOption(0);
+    setselectdepartmentposter(0);
+    setSelectContestPoster(1); 
   };
 
   const handletitleTextChange = (inputText: string) => {
@@ -360,6 +371,9 @@ const addDepartmentNoticeAram = async (value : number) => {
           <TouchableOpacity style={modalStyle.allposter} onPress={handleDepartmentPosterPress}>
             <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}> 학과 공지사항 </Text>
           </TouchableOpacity>
+          <TouchableOpacity style={modalStyle.allposter} onPress={handleContestPosterPress}>
+            <Text style={[modalStyle.noallposterfont, selectcontestposter === 1 && modalStyle.yesallposterfont]}>공모전 게시판</Text>
+          </TouchableOpacity>
           <View style={modalStyle.writeButtom}>
             <View style={{ flex: 0.65 }} />
             <TouchableOpacity onPress={closeModal} style={{ flex: 0.35, justifyContent: 'center', alignItems: "center", backgroundColor: '#9A9EFF' }}>
@@ -581,7 +595,7 @@ const modalStyle = StyleSheet.create({
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: 400,
+    height: 500,
   },
   modalContent: {
     flex: 1,

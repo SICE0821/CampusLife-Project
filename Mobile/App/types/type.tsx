@@ -128,8 +128,7 @@ export type Lecture = {
   lecture_grades : string;
   session_duration: number;
   today_lecture_state : boolean;
-  //주차
-  //차시
+  isScanned?: boolean; // 과목별 출석 여부
 }
 
 export type aramData = {
