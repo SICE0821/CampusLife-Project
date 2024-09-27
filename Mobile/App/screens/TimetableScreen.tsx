@@ -111,7 +111,7 @@ const App = ({ route }: any) => {
   const [selectedGradeAndSemester, setSelectedGradeAndSemester] = useState('1학년 1학기');
   const { userdata, LectureData } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
-  const [userLecture, setUserLecture] = useState<TimeTableLecture[]>([]);
+  const [userLecture, setUserLecture] = useState<TimeTableLecture[]>(LectureData);
   const [semesters, setSemesters] = useState<string[]>([]);
   const [timetableData, setTimetableData] = useState<TimetableData>({});
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
@@ -120,12 +120,24 @@ const App = ({ route }: any) => {
   const [spaceName, setSpaceName] = useState(''); //강의실 이름
   const [credit, setCredit] = useState(''); //학점
   const [day, setDay] = useState(''); //요일 드롭다운 메뉴
-  const [grade, setGrade] = useState(''); //학년 드롭다운 메뉴
-  const [semseter, setSemester] = useState(''); //학기 드롭다운 메뉴
+  const [grade, setGrade] = useState(
+    userData.grade === 1 ? "1학년" : 
+    userData.grade === 2 ? "2학년" : 
+    userData.grade === 3 ? "3학년" : 
+    userData.grade === 4 ? "4학년" : 
+    ''
+  );
+  const [semester, setSemester] = useState(
+    userData.student_semester === 1 ? "1학기" : 
+    userData.student_semester === 2 ? "2학기" : 
+    ''
+  );
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDatePickerVisible2, setDatePickerVisibility2] = useState(false);
   const [selectedTime, setSelectedTime] = useState('시작 시간 선택'); //수업시작 시간
   const [selectedTime2, setSelectedTime2] = useState('종료 시간 선택'); //수업종료 시간
+
+  //console.log(LectureData);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -200,7 +212,8 @@ const App = ({ route }: any) => {
         })
       })
       const result = await response.json();
-      setUserLecture(result);
+      setUserLecture((prevLectures) => [...prevLectures, ...result]);
+
       return result
     } catch (error) {
       console.error(error);
@@ -232,7 +245,7 @@ const App = ({ route }: any) => {
     }
   }
 
-  const deleteTimetable = async (course: string, room : string, day : string) => {
+  const deleteTimetable = async (course: string, room: string, day: string) => {
     try {
       const response = await fetch(`${config.serverUrl}/deleteTimetable`, {
         method: 'POST',
@@ -243,18 +256,32 @@ const App = ({ route }: any) => {
           user_id: userData.user_pk,
           lecture_name: course,
           lecture_room: room,
-          week: day
-        })
-      })
+          week: day,
+        }),
+      });
+  
       await response.json();
-      await getTimeTableData();
+
+      //console.log(userLecture);
+  
+      // userLecture 상태에서 해당 강의를 제거
+      setUserLecture((prevLectures) =>
+        prevLectures.filter(
+          (lecture) =>
+            !(lecture.lecture_name === course && 
+              lecture.lecture_room === room && 
+              lecture.week === day && 
+              !lecture.hasOwnProperty('attendance')) // 'attendance' 속성이 없을 때만 삭제 가능
+        )
+      );
+  
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
-  const days = ['월요일', '화요일', '수요일', '목요일', '금요일'];
-  const times = Array.from({ length: 10 }, (_, i) => `${i + 9}:00`);
+  const days = ['월요일', '화요일', '수요일', '목요일', '금요일']; //월화수목금 헤더
+  const times = Array.from({ length: 10 }, (_, i) => `${i + 9}:00`); //시간 열
 
   const openModal = async () => {
     setIsModalOpen(true);
@@ -457,7 +484,13 @@ const App = ({ route }: any) => {
           <View style={styles.grade_semester_container}>
             <ModalSelector
               data={grade_data}
-              initValue="학년 선택"
+              initValue={
+                userData.grade === 1 ? "1학년" : 
+                userData.grade === 2 ? "2학년" : 
+                userData.grade === 3 ? "3학년" : 
+                userData.grade === 4 ? "4학년" : 
+                "학년 선택"
+              } // userData.grade에 따라 기본값 설정
               onChange={(option) => setGrade(option.label)}
               style={styles.grade_Modal}
               initValueTextStyle={{
@@ -482,7 +515,9 @@ const App = ({ route }: any) => {
             </ModalSelector>
             <ModalSelector
               data={semseter_data}
-              initValue="학기 선택"
+              initValue={
+                userData.student_semester === 1 ? "1학기" : userData.student_semester === 2 ? "2학기" : "학기 선택"
+              }
               onChange={(option) => setSemester(option.label)} // 항목 선택 시 상태 업데이트
               style={styles.semester_Modal}
               initValueTextStyle={{
@@ -510,7 +545,7 @@ const App = ({ route }: any) => {
           <View style={styles.lecture_room_container}>
             <TextInput
               style={styles.input}
-              placeholder="강의명"
+              placeholder="일정명"
               placeholderTextColor={'gray'}
               maxLength={800}
               multiline={true}
@@ -518,17 +553,8 @@ const App = ({ route }: any) => {
               onChangeText={setLectureName}
             />
           </View>
-          <View style={{ height: 15 }}></View>
-          <View style={styles.lecture_room_container}>
-            <TextInput
-              style={styles.input}
-              placeholder="교수명"
-              placeholderTextColor={'gray'}
-              value={professorName}
-              onChangeText={setProfessorName}
-            />
-          </View>
           <View style={{ height: 25 }}></View>
+          
           <View style={styles.day_time_container}>
             <ModalSelector
               data={data}
@@ -583,6 +609,7 @@ const App = ({ route }: any) => {
               is24Hour={true}
             />
           </View>
+          <View style={{ height: 25 }}></View>
           <View style={styles.lecture_room_container}>
             <View style={{ width: "50%" }}>
               <TextInput
@@ -606,7 +633,7 @@ const App = ({ route }: any) => {
                 const Intcredit = hour2 - hour1;
                 const fulltime = selectedTime + ' ~ ' + selectedTime2 //lecture_time
                 const Intgrade = parseInt(grade.replace(/\D/g, ""), 10); // grade
-                const Intsemseter = parseInt(semseter.replace(/\D/g, ""), 10); // semester
+                const Intsemseter = parseInt(semester.replace(/\D/g, ""), 10); // semester
                 //const Intcredit = parseInt(credit);
 
                 if (hour1 < 9 || hour1 > 18 || hour2 < 9 || hour2 > 18) {
