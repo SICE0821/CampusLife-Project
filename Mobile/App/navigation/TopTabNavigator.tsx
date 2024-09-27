@@ -9,6 +9,7 @@ import EventShopScreen from '../screens/EventScreens/EventShopScreen';
 import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
 import AcademicRecord from '../screens/CardScreens/AcademicScreens/AcademicRecordScreen';
+import SchoolClubScreen from '../screens/CommunityScreens/SchoolClubScreen';
 import { EventShopScreenStackNavigator} from '../navigation/StackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -343,7 +344,7 @@ export const TopbTabNavigator = ({ route, navigation }: any) => {
                     elevation: 5,
                     backgroundColor: 'white',
                     height: 50,
-                    width: 260,
+                    width: 370,
                     //borderBottomWidth : 1,
                     zIndex: 0,
                     //borderWidth : 1,
@@ -380,6 +381,18 @@ export const TopbTabNavigator = ({ route, navigation }: any) => {
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
+                }} />
+
+            <CommunityTopTab.Screen name="동아리"
+            initialParams={{ userdata }}
+                component={SchoolClubScreen}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                    tabBarItemStyle: {
+                        marginLeft: -14, // 원하는 만큼 왼쪽으로 이동 (값은 조정 가능)
+                      },
+                    
                 }} />
         </CommunityTopTab.Navigator>
     );

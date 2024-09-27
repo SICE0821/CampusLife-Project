@@ -1,131 +1,138 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Text, View, Button, StyleSheet, Dimensions, TouchableOpacity, TextInput, ScrollView, Alert, Image } from 'react-native';
+import { Text, View, TouchableOpacity, TextInput, FlatList, Alert, Image, Dimensions, StyleSheet, ScrollView } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
 import IconCancel from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
-import { UserData } from '../../types/type'
-import config from '../../config';
 import { launchImageLibrary } from 'react-native-image-picker';
 import LottieView from 'lottie-react-native';
+import config from '../../config'; // 서버 URL 설정 파일
+import { UserData } from '../../types/type'; // 사용자 데이터 타입 정의
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window'); // 화면의 너비와 높이 가져오기
 
+// 비어있는 상태에서 보여줄 안내 텍스트 컴포넌트
 const EmptyMainText = () => {
-  const content =
-    "\n\n\n" +
-    "캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다. 위반 시 게시물이 삭제되고 서비스 이용이 일정 기간 제한될 수 있습니다." +
-    "\n\n정치·사회 관련 행위 금지\n\n국가기관, 정치 관련 단체, 언론, 시민단체에 대한 언급 혹은 이와 관련한 행위" +
-    "\n정책·외교 또는 정치·정파에 대한 의견, 주장 및 이념, 가치관을 드러내는 행위\n성별, 종교, 인종, 출신, 지역, 직업, 이념 등 사회적 이슈에 대한 언급 혹은 이와 관련한 행위" +
-    "\n위와 같은 내용으로 유추될 수 있는 비유, 은어 사용 행위\n영리 여부와 관계 없이 사업체·기관·단체·개인에게 직간접적으로 영향을 줄 수 있는 게시물 작성 행위\n불법촬영물 유통 금지\n불법촬영물등을 게재할 경우 전기통신사업법에 따라 삭제 조치 및 서비스 이용이 영구적으로 제한될 수 있으며 관련 법률에 따라 처벌받을 수 있습니다." +
-    "\n\n그 밖의 규칙 위반\n타인의 권리를 침해하거나 불쾌감을 주는 행위\n범죄, 불법 행위 등 법령을 위반하는 행위\n욕설, 비하, 차별, 혐오, 자살, 폭력 관련 내용을 포함한 게시물 작성 행위\n음란물, 성적 수치심을 유발하는 행위\n스포일러, 공포, 속임, 놀라게 하는 행위"
+  const content = `\n\n\n캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다...`;
 
   return (
     <View style={{ padding: 6 }}>
-      <Text style={{color: 'gray'}}>
-        {content}
-      </Text>
+      <Text style={{ color: 'gray' }}>{content}</Text>
     </View>
   );
 };
 
+// 게시글 작성 페이지 컴포넌트
 const WritePostPage: React.FC = ({ navigation, route }: any) => {
-  console.log("you are in WritePostPage")
-  const { userdata } = route.params;
-  const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
-  const [selectallposter, setselectapllposterOption] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
-  const [selectdepartmentposter, setselectdepartmentposter] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
-  const [postfontoption, setpostfontoption] = useState("게시판을 정해주세요");
-  const [titletext, settitleText] = useState('');
-  const [maintext, setmainText] = useState('');
-  const [userData, setUserData] = useState<UserData>(userdata);
-  const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
-  const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 선택된 이미지를 폼데이터에 저장
+  const { userdata } = route.params; // 전달받은 사용자 데이터
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 열기/닫기 상태 관리
+  const [selectallposter, setSelectAllPosterOption] = useState(0); // 전체 게시판 선택 여부
+  const [selectdepartmentposter, setSelectDepartmentPoster] = useState(0); // 학과 게시판 선택 여부
+  const [selectclubposter, setSelectClubPoster] = useState(0); // 동아리 게시판 선택 여부
+  const [postfontoption, setPostFontOption] = useState("게시판을 정해주세요"); // 게시판 선택 옵션
+  const [titletext, setTitleText] = useState(''); // 게시물 제목 상태
+  const [maintext, setMainText] = useState(''); // 게시물 내용 상태
+  const [userData, setUserData] = useState<UserData>(userdata); // 사용자 데이터 상태
+  const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지 상태
+  const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 폼 데이터 형태의 이미지 상태
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false); // 모달 표시 여부 상태
 
-  // 이미지 등록 후 강제로 리렌더링을 유도하는 함수 추가
-  const forceUpdate = React.useReducer(() => ({}), {})[1];
+  const forceUpdate = React.useReducer(() => ({}), {})[1]; // 리렌더링 강제 함수
 
+  // 화면이 포커스될 때 헤더의 오른쪽 버튼을 업데이트하는 효과
   useFocusEffect(
     React.useCallback(() => {
       changeHeaderRightContent();
     }, [selectdepartmentposter, titletext, maintext, selectedFormImages])
   );
 
-  const goback = () => {
+  // 이전 화면으로 이동
+  const goBack = () => {
     navigation.goBack();
   };
 
+  // 전체 게시판 또는 학과 게시판 선택에 따라 게시판 텍스트 업데이트
   useEffect(() => {
-
-    // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
+    // 게시판 선택에 따른 텍스트 업데이트
     if (selectallposter === 1) {
-      setpostfontoption("전체 게시판");
+      setPostFontOption("전체 게시판");
     } else if (selectdepartmentposter === 1) {
-      setpostfontoption("학과 게시판");
+      setPostFontOption("학과 게시판");
+    } else if (selectclubposter === 1) {
+      setPostFontOption("동아리 게시판");
     } else {
-      setpostfontoption("게시판을 정해주세요");
+      setPostFontOption("게시판을 정해주세요");
     }
-  }, [selectallposter, selectdepartmentposter]);
-
+  }, [selectallposter, selectdepartmentposter, selectclubposter]);
+  // 모달 열기
   const openModal = () => {
-    setIsModalOpen(true); // 모달을 열기 위해 상태를 true로 설정
+    setIsModalOpen(true);
   };
 
+  // 모달 닫기
   const closeModal = () => {
-    setIsModalOpen(false); // 모달을 닫기 위해 상태를 false로 설정
+    setIsModalOpen(false);
   };
 
-  const handleAllPosterPress = () => {
-    setselectapllposterOption(1);
-    setselectdepartmentposter(0);
+   // 전체 게시판 선택
+   const handleAllPosterPress = () => {
+    setSelectAllPosterOption(1);
+    setSelectDepartmentPoster(0);
+    setSelectClubPoster(0); // 동아리 게시판 선택 해제
   };
 
+  // 학과 게시판 선택
   const handleDepartmentPosterPress = () => {
-    setselectapllposterOption(0);
-    setselectdepartmentposter(1);
+    setSelectAllPosterOption(0);
+    setSelectDepartmentPoster(1);
+    setSelectClubPoster(0); // 동아리 게시판 선택 해제
   };
 
-  const handletitleTextChange = (inputText: string) => {
-    settitleText(inputText);
+  // 동아리 게시판 선택
+  const handleClubPosterPress = () => {
+    setSelectAllPosterOption(0);
+    setSelectDepartmentPoster(0);
+    setSelectClubPoster(1); // 동아리 게시판 선택
   };
 
-  const handlemainTextChange = (inputText: string) => {
-    setmainText(inputText);
+  // 제목 텍스트 변경 핸들러
+  const handleTitleTextChange = (inputText: string) => {
+    setTitleText(inputText);
   };
 
+  // 본문 텍스트 변경 핸들러
+  const handleMainTextChange = (inputText: string) => {
+    setMainText(inputText);
+  };
+
+  // 헤더의 오른쪽 버튼 업데이트
   const changeHeaderRightContent = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={async () => {
-          const post_id = await write_post();
+          const post_id = await writePost(); // 게시물 작성 API 호출
           const post_id_int = parseInt(post_id.postId);
-          const imageGroup = await uploadImages();
-          await RegistorPostPhoto(post_id_int, imageGroup); //포스트 사진 등록
-          ok_go();
+          const imageGroup = await uploadImages(); // 이미지 업로드
+          await RegistorPostPhoto(post_id_int, imageGroup); // 게시물 사진 등록 API 호출
+          completePost(); // 완료 알림 후 이동
         }}>
-          <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
-            <Text style={{ color: 'white', fontSize: 17, fontWeight: "bold" }}>완료</Text>
+          <View style={styles.headerButton}>
+            <Text style={styles.headerButtonText}>완료</Text>
           </View>
         </TouchableOpacity>
       )
     });
   };
 
-  const ok_go = () => {
-    Alert.alert(
-      "게시물 작성",
-      "게시물 작성을 완료했습니다!",
-      [
-        { text: "확인", onPress: () => goback() }
-      ]
-    );
+  // 게시물 작성 완료 알림
+  const completePost = () => {
+    Alert.alert("게시물 작성", "게시물 작성을 완료했습니다!", [{ text: "확인", onPress: () => goBack() }]);
   };
 
-  //사진 등록 함수 프로시저 사용할거임
+  // 사진 등록 함수 (서버에 이미지 등록)
   const RegistorPostPhoto = async (post_id: number, post_photo: any) => {
     try {
       const response = await fetch(`${config.serverUrl}/RegistorPostPhoto`, {
@@ -137,38 +144,34 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           post_id: post_id,
           post_photo: post_photo
         }),
-      })
+      });
       await response.json();
     } catch (error) {
       console.error(error);
-    } finally {
     }
-  }
+  };
 
-  const write_post = async () => {
+  // 게시물 등록 API 호출
+  const writePost = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/write_post`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userData.user_pk,
           department_check: selectdepartmentposter,
           inform_check: 0,
           title: titletext,
           contents: maintext,
-        })
+        }),
       });
-      const post_id = await response.json();
-      return(post_id);
-
+      return await response.json();
     } catch (error) {
       console.error('게시글 쓰기 실패!', error);
     }
-  }
+  };
 
-  // 이미지 선택 함수
+  // 이미지 선택
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
       if (response.assets) {
@@ -178,156 +181,144 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           const formData = new FormData();
           const fileNameWithoutExtension = image.fileName.split('.').slice(0, -1).join('.');
           const newFileName = `${Date.now()}_${fileNameWithoutExtension}.png`;
-          formData.append('images', {
-            uri: image.uri,
-            type: image.type,
-            name: newFileName,
-            index: index,
-          });
+          formData.append('images', { uri: image.uri, type: image.type, name: newFileName, index: index });
           return formData;
         });
         setSelectedFormImages(formDataArray);
         forceUpdate();
-      } else if (response.errorCode) {
-        //console.log('Image picker error: ', response.errorMessage);
       }
     });
   };
 
-    // 이미지 업로드 함수
-    const uploadImages = async () => {
-      try {
-        const uploadedImageDatas = [];
-        for (const formData of selectedFormImages) {
-          const response = await fetch(`${config.serverUrl}/uploadImages`, {
-            method: 'POST',
-            body: formData,
-          });
-          const imageData = await response.json();
-          uploadedImageDatas.push(imageData.fileNames[0]);
-          if (response.ok) {
-            //console.log('Image uploaded successfully');
-          } else {
-            //console.error('Image upload failed');
-          }
-        }
-        //console.log(uploadedImageDatas);
-        return uploadedImageDatas;
-      } catch (error) {
-        console.error('Error uploading images: ', error);
+  // 이미지 업로드 API 호출
+  const uploadImages = async () => {
+    try {
+      const uploadedImageDatas = [];
+      for (const formData of selectedFormImages) {
+        const response = await fetch(`${config.serverUrl}/uploadImages`, { method: 'POST', body: formData });
+        const imageData = await response.json();
+        uploadedImageDatas.push(imageData.fileNames[0]);
       }
-    };
-  
+      return uploadedImageDatas;
+    } catch (error) {
+      console.error('Error uploading images: ', error);
+    }
+  };
 
-  // 이미지 삭제 함수
+  // 이미지 삭제
   const handleImageRemove = (index: number) => {
-    const updatedImages = selectedImages.filter((_, i) => i !== index);
-    setSelectedImages(updatedImages);
-
-    const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
-    setSelectedFormImages(updatedFormImages);
+    setSelectedImages(selectedImages.filter((_, i) => i !== index));
+    setSelectedFormImages(selectedFormImages.filter((_, i) => i !== index));
   };
 
   return (
     <View style={styles.container}>
       <ScrollView>
+        {/* 게시판 선택 영역 */}
         <TouchableOpacity onPress={openModal} style={styles.selectPostArea}>
           <Text style={styles.selectPostText}>{postfontoption}</Text>
           <IconB name="down" size={30} color={'black'} />
         </TouchableOpacity>
+
+        {/* 제목 입력 영역 */}
         <View style={styles.postTitleArea}>
           <TextInput
             style={styles.postTitleText}
-            onChangeText={handletitleTextChange}
+            onChangeText={handleTitleTextChange}
             value={titletext}
             placeholder="제목"
             placeholderTextColor={'gray'}
           />
         </View>
+
+        {/* 본문 입력 영역 */}
         <View style={styles.postContentArea}>
           <TextInput
             style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
-            onChangeText={handlemainTextChange}
+            onChangeText={handleMainTextChange}
             value={maintext}
             multiline={true}
-            placeholder={"이곳에 글을 입력해 주세요!"}
+            placeholder="이곳에 글을 입력해 주세요!"
             placeholderTextColor={'gray'}
           />
           {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
         </View>
+
+        {/* 이미지 미리보기 */}
         {selectedImages.length > 0 && (
           <View style={styles.photoArea}>
-            <ScrollView style={styles.photoScrollViewArea} horizontal={true} showsHorizontalScrollIndicator={false}>
-              {selectedImages.map((image, index) => (
+            <FlatList
+              data={selectedImages}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToAlignment="center" // 이미지 중앙 정렬
+              snapToInterval={width - 70} // 스냅 간격을 이미지 너비에 맞춤
+              decelerationRate="fast" // 스크롤 속도를 빠르게 하여 자연스럽게 멈춤
+              renderItem={({ item, index }) => (
                 <View key={index} style={styles.fileInfo}>
                   <Image
-                    source={{ uri: image.uri }}
+                    source={{ uri: item.uri }}
                     resizeMode="contain"
-                    style={styles.imagePreview} />
+                    style={styles.imagePreview}
+                  />
                   <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
-                    <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+                    <IconCancel name="closecircleo" size={22} color={'white'} />
                   </TouchableOpacity>
-
-                  {/* 마지막 인덱스가 아닐 때만 LottieView를 렌더링 */}
                   {index !== selectedImages.length - 1 && (
                     <LottieView
                       source={require('../../assets/Animation - 1725980201082.json')}
                       autoPlay
-                      onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
                       loop
-                      style={{ width: 50, right: 35, }}
-                    />
-                  )}
-
-                  {/* 마지막 인덱스가 아닐 때만 LottieView를 렌더링 */}
-                  {index !== selectedImages.length - 1 && (
-                    <LottieView
-                      source={require('../../assets/Animation - 1725980201082 copy.json')}
-                      autoPlay
-                      onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
-                      loop
-                      style={{ width: 50, right: 45, }}
+                      style={{ width: 50, right: 45 }}
                     />
                   )}
                 </View>
-              ))}
-            </ScrollView>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
           </View>
         )}
       </ScrollView>
+
+      {/* 이미지 선택 버튼 */}
       <View style={styles.postImageArea}>
         <TouchableOpacity onPress={handleImagePick} style={styles.postImageButton}>
           <IconC name="image" size={35} color={'black'} />
         </TouchableOpacity>
       </View>
+
+      {/* 게시판 선택 모달 */}
       <ModalBox
-        isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
+        isOpen={isModalOpen}
         style={modalStyle.modal}
         position="bottom"
         swipeToClose={false}
-        onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
+        onClosed={closeModal}
       >
         <View style={modalStyle.modalContent}>
           <TouchableOpacity style={modalStyle.allposter} onPress={handleAllPosterPress}>
-            <Text style={[modalStyle.noallposterfont, selectallposter == 1 && modalStyle.yesallposterfont]}> 전체 게시판 </Text>
+            <Text style={[modalStyle.noallposterfont, selectallposter == 1 && modalStyle.yesallposterfont]}>전체 게시판</Text>
           </TouchableOpacity>
           <TouchableOpacity style={modalStyle.allposter} onPress={handleDepartmentPosterPress}>
-            <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}> 학과 게시판 </Text>
+            <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}>학과 게시판</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={modalStyle.allposter} onPress={handleClubPosterPress}>
+            <Text style={[modalStyle.noallposterfont, selectclubposter === 1 && modalStyle.yesallposterfont]}>동아리 게시판</Text>
           </TouchableOpacity>
           <View style={modalStyle.writeButtom}>
-            <View style={{ flex: 0.65, }}>
-            </View>
             <TouchableOpacity onPress={closeModal} style={{ flex: 0.35, justifyContent: 'center', alignItems: "center", backgroundColor: '#9A9EFF' }}>
               <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ModalBox>
+
+      {/* 글 등록 확인 모달 */}
       <Modal isVisible={isModalVisible}>
         <View style={modalStyle.modalContainer}>
           <Text style={modalStyle.title}>등록 확인</Text>
           <Text style={modalStyle.message}>글이 등록되었습니다.</Text>
-          <TouchableOpacity style={modalStyle.confirmButton} onPress={goback}>
+          <TouchableOpacity style={modalStyle.confirmButton} onPress={goBack}>
             <Text style={modalStyle.confirmButtonText}>확인</Text>
           </TouchableOpacity>
         </View>
@@ -336,12 +327,12 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   );
 };
 
+// 스타일 정의
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   selectPostArea: {
-    flex: 1,
     flexDirection: 'row',
     marginHorizontal: 20,
     paddingVertical: 10,
@@ -365,58 +356,63 @@ const styles = StyleSheet.create({
   },
   postContentArea: {
     marginHorizontal: 20,
-    marginBottom: 20
+    marginBottom: 20,
   },
   postImageArea: {
     width: '100%',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   postImageButton: {
     margin: 10,
     width: 50,
-    alignItems: 'center'
+    alignItems: 'center',
   },
   fileInfo: {
     width: width - 70,
     height: height - 980,
     padding: 40,
     flexDirection: 'row',
-    //backgroundColor: 'blue'
   },
   cancelButton: {
     alignSelf: 'flex-start',
     bottom: 10,
-    right: 10
+    right: 10,
   },
   imagePreview: {
     width: "100%",
     height: "100%",
     resizeMode: 'cover',
-    backgroundColor: '#eeeeee'
+    backgroundColor: '#eeeeee',
   },
   photoArea: {
     width: "100%",
     height: height - 549,
     justifyContent: 'center',
     alignItems: 'center',
-    //backgroundColor : 'red'
   },
+  headerButton: {
+    flexDirection: 'row',
+    backgroundColor: '#B20000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 65,
+    height: 35,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  headerButtonText: {
+    color: 'white',
+    fontSize: 17,
+    fontWeight: 'bold',
+  },
+});
 
-  photoScrollViewArea: {
-    width: "85%",
-    height: "100%",
-    //backgroundColor : 'red',
-    borderWidth: 3,
-    borderColor: "#CCCCCC",
-    borderRadius: 20
-  }
-})
-
+// 모달 스타일 정의
 const modalStyle = StyleSheet.create({
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: 400,
+    height: 500,
   },
   modalContent: {
     flex: 1,
@@ -424,44 +420,35 @@ const modalStyle = StyleSheet.create({
     borderTopRightRadius: 20,
     backgroundColor: 'white',
   },
-
   allposter: {
     flex: 0.2,
-    justifyContent: 'center', // 수직 정렬
-    alignItems: 'center', // 수평 정렬
+    justifyContent: 'center',
+    alignItems: 'center',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     margin: 20,
   },
-
   noallposterfont: {
     color: '#CCCCCC',
     borderBottomWidth: 2,
     borderBottomColor: '#CCCCCC',
-    width: '100%', // 가로 길이 조정
-    textAlign: 'center', // 텍스트 가운데 정렬
+    width: '100%',
+    textAlign: 'center',
     paddingBottom: 10,
     fontSize: 25,
     marginTop: 15,
   },
-
   yesallposterfont: {
     fontSize: 25,
     marginTop: 15,
     borderBottomColor: 'black',
     color: 'black',
-    width: '100%', // 가로 길이 조정
-    textAlign: 'center', // 텍스트 가운데 정렬
+    width: '100%',
+    textAlign: 'center',
   },
-
-  departmentposter: {
-    flex: 0.5,
-    backgroundColor: 'green',
-  },
-
   writeButtom: {
     flex: 0.6,
-    //backgroundColor : 'green',
+    justifyContent: 'flex-end'
   },
   modalContainer: {
     backgroundColor: 'white',
@@ -488,7 +475,7 @@ const modalStyle = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  }
-})
+  },
+});
 
 export default WritePostPage;
