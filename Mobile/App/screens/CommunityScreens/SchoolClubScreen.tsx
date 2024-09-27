@@ -365,7 +365,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 885,
+    post_id: 888,
     title: '동아리 모집 안내',
     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
     date: '2024-06-23',
@@ -375,7 +375,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 886,
+    post_id: 889,
     title: '사진 동아리 전시회 안내',
     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
     date: '2024-06-24',
@@ -385,7 +385,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 887,
+    post_id: 890,
     title: '음악 동아리 공연 소식',
     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
     date: '2024-06-25',
@@ -395,7 +395,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 885,
+    post_id: 891,
     title: '동아리 모집 안내',
     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
     date: '2024-06-23',
@@ -405,7 +405,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 886,
+    post_id: 892,
     title: '사진 동아리 전시회 안내',
     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
     date: '2024-06-24',
@@ -415,7 +415,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 887,
+    post_id: 893,
     title: '음악 동아리 공연 소식',
     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
     date: '2024-06-25',
@@ -425,7 +425,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 885,
+    post_id: 894,
     title: '동아리 모집 안내',
     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
     date: '2024-06-23',
@@ -435,7 +435,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 886,
+    post_id: 895,
     title: '사진 동아리 전시회 안내',
     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
     date: '2024-06-24',
@@ -445,7 +445,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 887,
+    post_id: 896,
     title: '음악 동아리 공연 소식',
     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
     date: '2024-06-25',
@@ -455,7 +455,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 885,
+    post_id: 897,
     title: '동아리 모집 안내',
     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
     date: '2024-06-23',
@@ -465,7 +465,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 886,
+    post_id: 898,
     title: '사진 동아리 전시회 안내',
     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
     date: '2024-06-24',
@@ -475,7 +475,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 887,
+    post_id: 899,
     title: '음악 동아리 공연 소식',
     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
     date: '2024-06-25',
@@ -485,7 +485,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 885,
+    post_id: 900,
     title: '동아리 모집 안내',
     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
     date: '2024-06-23',
@@ -495,7 +495,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 886,
+    post_id: 901,
     title: '사진 동아리 전시회 안내',
     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
     date: '2024-06-24',
@@ -505,7 +505,7 @@ const sampleData: PostData[] = [
     user_title: '동아리장',
   },
   {
-    post_id: 887,
+    post_id: 902,
     title: '음악 동아리 공연 소식',
     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
     date: '2024-06-25',
