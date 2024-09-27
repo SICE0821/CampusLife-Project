@@ -135,7 +135,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
             console.error('일반 게시물 가져오기 실패:', error);
         }
     };
-
+ 
     // 학과 게시물 가져오기
     const getDepartmentPosts = async () => {
         try {
@@ -151,6 +151,7 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         }
     };
 
+    
     // 유저가 북마크한 게시물 가져오기
     const AreYouHavePost = async () => {
         try {

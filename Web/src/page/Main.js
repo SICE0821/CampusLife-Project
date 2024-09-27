@@ -48,8 +48,7 @@ function Main() {
               lecture_grade : lecture.lecture_grade,
               lecture_semester : lecture.lecture_semester,
               lecture_have_week : lecture.lecture_have_week,
-              section_class : lecture.section_class,
-              lecture_start_date : lecture.lecture_start_date
+              section_class : lecture.section_class
             })),
           교양: professorLecture
             .filter((lecture) => lecture.division === '교양')
@@ -65,8 +64,7 @@ function Main() {
               lecture_grade : lecture.lecture_grade,
               lecture_semester : lecture.lecture_semester,
               lecture_have_week : lecture.lecture_have_week,
-              section_class : lecture.section_class,
-              lecture_start_date : lecture.lecture_start_date
+              section_class : lecture.section_class
             })),
         };
     

@@ -164,7 +164,8 @@ const { getGeneralPosts,
   change_GoalGPA,
   RegistorPostPhoto,
   DetailPostPhoto,
-  DeletePostPhoto
+  DeletePostPhoto,
+  ClubPosts
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -670,6 +671,29 @@ app.post('/departmentpost', async (req, res) => {
     console.log("[GeneralPostsScreen] : 학과 게시판 전체 게시물 가져오기 실패");
   }
 });
+
+//게시글화면에서 전체 전체 게시글을 가져온다.
+app.post('/Clubpost', async (req, res) => {
+  try {
+    const rows = await ClubPosts();
+    const processedData = rows.map(item => ({
+      post_id: item.post_id,
+      title: item.title,
+      contents: item.contents,
+      date: formatDate(item.date),
+      view: item.view,
+      like: item.like,
+      name: item.name,
+      user_title: item.user_title
+    }));
+    console.log(processedData)
+    res.json(processedData);
+    console.log("[GeneralPostsScreen] : 동아리 게시판 전체 게시물 가져오기 성공");
+  } catch (error) {
+    console.log("[GeneralPostsScreen] : 동아리 게시판 전체 게시물 가져오기 실패");
+  }
+});
+
 
 app.post('/departmentHotpost', async (req, res) => {
   const { department_id } = req.body;
