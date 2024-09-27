@@ -26,6 +26,7 @@ type PostData = {
   name: string;
   user_title: string;
   image: string; // 이미지 URL 추가
+  Club_check : number;
 };
 
 // 하단 공백 생성 함수 (하단바 영역 고려)
@@ -41,7 +42,29 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
   const [userHavePost, setUserHavePost] = useState<PostData[]>([]); // 유저가 북마크한 게시물 목록 상태
   const [refreshing, setRefreshing] = useState(false); // 새로고침 상태
   const swipeableRefs = useRef<(Swipeable | null)[]>([]); // Swipeable 참조 배열
+  const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지 상태
+  const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 폼 데이터 형태의 이미지 상태
 
+  // 이미지 업로드 API 호출
+  const uploadImages = async () => {
+    try {
+      const uploadedImageDatas = [];
+      for (const formData of selectedFormImages) {
+        const response = await fetch(`${config.serverUrl}/uploadImages`, { method: 'POST', body: formData });
+        const imageData = await response.json();
+        uploadedImageDatas.push(imageData.fileNames[0]);
+      }
+      return uploadedImageDatas;
+    } catch (error) {
+      console.error('Error uploading images: ', error);
+    }
+  };
+
+    // 이미지 삭제
+    const handleImageRemove = (index: number) => {
+      setSelectedImages(selectedImages.filter((_, i) => i !== index));
+      setSelectedFormImages(selectedFormImages.filter((_, i) => i !== index));
+    };
   
   const getClubPosts = async () => {
     try {
@@ -115,7 +138,7 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
   // 화면에 초점을 맞출 때 데이터 로드 (샘플 데이터이므로 필요 없음)
   useFocusEffect(
     useCallback(() => {
-          getClubPosts(); // 동아리 게시물 로드
+           getClubPosts(); // 동아리 게시물 로드
     }, [])
   );
 
@@ -136,7 +159,7 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
           }}>
           <View style={styles.postItem}>
             {/* 이미지 추가 */}
-            <Image source={{ uri: item.image }} style={styles.postImage} />
+            <Image source={{ uri: `${config.photoUrl}/${item.image}.png` }} style={styles.postImage} />
             <View style={styles.postContent}>
               <View style={styles.postHeader}>
                 <Text style={styles.postTitle}>{item.title}</Text>
