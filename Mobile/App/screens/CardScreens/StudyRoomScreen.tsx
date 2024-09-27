@@ -148,8 +148,20 @@ const StudyRoomScreen = ({ route, navigation }: any) => {
   };
 
   const handleTimeSelect = (selectedRoom: string, selectedHour: string) => {
-    const reservedTimesForSelectedDate = reservedTimes[format(selectedDate, "yyyy-MM-dd")] || {};
+    const currentDate = new Date();
+    const currentHour = currentDate.getTime(); // 현재 시간 (UTC+9 적용)
+    const koreaTime = new Date(currentDate.getTime() + 9 * 60 * 60 * 1000); // UTC+9로 변환
+    const koreaHour = koreaTime.getHours(); // 한국 시간의 시 
 
+    // 오늘 날짜인지 확인
+    const isToday = selectedDate.toDateString() === currentDate.toDateString();
+    
+    // 시간(selectedHour)이 현재 시간보다 이전인지 확인
+    if (isToday && Number(selectedHour) <= koreaHour) {
+      Alert.alert("예약 실패", "현재 시간 이전의 시간대는 예약할 수 없습니다.");
+      return;
+    }
+  
     for (const roomName in selectedTimes) {
       const roomTimes = selectedTimes[roomName];
       if (roomName !== selectedRoom && roomTimes.includes(selectedHour)) {
@@ -157,23 +169,24 @@ const StudyRoomScreen = ({ route, navigation }: any) => {
         return;
       }
     }
+  
     const roomTimes = selectedTimes[selectedRoom] || [];
     const newTimes = roomTimes.includes(selectedHour)
       ? roomTimes.filter((time: any) => time !== selectedHour)
       : [...roomTimes, selectedHour].slice(-3);
-
+  
     // 최대 예약 가능한 시간을 초과하는지 확인합니다.
     if (newTimes.length > 3) {
       Alert.alert("예약 실패", "최대 3시간까지 연속된 시간대만 선택할 수 있습니다.");
       return;
     }
-
+  
     // 연속된 시간을 선택했는지 확인합니다.
     if (!isConsecutive(newTimes)) {
       Alert.alert("예약 실패", "연속된 시간대만 선택할 수 있습니다.");
       return;
     }
-
+  
     // 선택한 시간을 상태에 업데이트합니다.
     setSelectedTimes({
       ...selectedTimes,
