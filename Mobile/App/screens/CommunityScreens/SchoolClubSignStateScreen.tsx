@@ -5,49 +5,83 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
-  ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 
+type Question = {
+  id: string;
+  type: 'text' | 'radio' | 'picker';
+  label: string;
+  options?: string[];
+};
+
 type Applicant = {
   id: string;
-  name: string;
-  studentId: string;
-  department: string;
-  gender: string;
-  introduction: string;
+  answers: { [key: string]: string };
+  questions: Question[];
 };
 
 const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
   console.log('you are in SchoolClubSignStateScreen');
   const { item, userData } = route.params;
 
+  // 예시 질문 데이터 (SchoolClubSignScreen과 동일하게 설정)
+  const questions: Question[] = [
+    {
+      id: 'name',
+      type: 'text',
+      label: '입력란',
+    },
+    {
+      id: 'department',
+      type: 'picker',
+      label: '선택지',
+      options: ['선택지1', '선택지2', '선택지3', '선택지4'],
+    },
+    {
+      id: 'gender',
+      type: 'radio',
+      label: '성별',
+      options: ['남성', '여성', '포크레인'],
+    },
+    {
+      id: 'introduction',
+      type: 'text',
+      label: '자기소개',
+    },
+  ];
+
   // 샘플 신청자 데이터
   const [applicants, setApplicants] = useState<Applicant[]>([
     {
       id: '1',
-      name: '김철수',
-      studentId: '20190001',
-      department: '컴퓨터공학과',
-      gender: '남성',
-      introduction: '열정적인 개발자 지망생입니다.',
+      answers: {
+        name: '김철수',
+        department: '선택지1',
+        gender: '남성',
+        introduction: '열정적인 개발자 지망생입니다.',
+      },
+      questions: questions,
     },
     {
       id: '2',
-      name: '이영희',
-      studentId: '20190002',
-      department: '전자공학과',
-      gender: '여성',
-      introduction: '전자공학에 관심이 많습니다.',
+      answers: {
+        name: '이영희',
+        department: '선택지2',
+        gender: '여성',
+        introduction: '전자공학에 관심이 많습니다.',
+      },
+      questions: questions,
     },
     {
       id: '3',
-      name: '박민수',
-      studentId: '20190003',
-      department: '기계공학과',
-      gender: '남성',
-      introduction: '기계 설계에 흥미가 있습니다.',
+      answers: {
+        name: '박민수',
+        department: '선택지3',
+        gender: '남성',
+        introduction: '기계 설계에 흥미가 있습니다.',
+      },
+      questions: questions,
     },
     // 추가 샘플 데이터...
   ]);
@@ -55,13 +89,13 @@ const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
   const renderApplicant = ({ item }: { item: Applicant }) => (
     <TouchableOpacity
       style={styles.applicantItem}
-      onPress={() => navigation.navigate('SchoolClubSignDetailScreen', { applicant: item })}
+      onPress={() =>
+        navigation.navigate('SchoolClubSignDetailScreen', { applicant: item })
+      }
     >
       <View style={styles.applicantInfo}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.detail}>
-          {item.department} | {item.studentId}
-        </Text>
+        <Text style={styles.name}>{item.answers.name}</Text>
+        <Text style={styles.detail}>{item.answers.department}</Text>
       </View>
       <Icon name="right" size={20} color="#555" />
     </TouchableOpacity>

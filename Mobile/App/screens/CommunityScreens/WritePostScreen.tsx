@@ -433,6 +433,7 @@ const modalStyle = StyleSheet.create({
   },
   writeButtom: {
     flex: 0.6,
+    justifyContent: 'flex-end'
   },
   modalContainer: {
     backgroundColor: 'white',

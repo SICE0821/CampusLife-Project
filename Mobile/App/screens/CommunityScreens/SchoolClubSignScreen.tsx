@@ -86,7 +86,9 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
             <Text style={styles.label}>{question.label}</Text>
             <View style={styles.radioGroup}>
               <RadioButton.Group
-                onValueChange={(newValue) => handleInputChange(question.id, newValue)}
+                onValueChange={(newValue) =>
+                  handleInputChange(question.id, newValue)
+                }
                 value={answers[question.id] || ''}
               >
                 {question.options?.map((option, index) => (
@@ -106,7 +108,9 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={answers[question.id] || question.options?.[0]}
-                onValueChange={(itemValue) => handleInputChange(question.id, itemValue)}
+                onValueChange={(itemValue) =>
+                  handleInputChange(question.id, itemValue)
+                }
                 style={styles.picker}
               >
                 {question.options?.map((option, index) => (
@@ -130,8 +134,17 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
       }
     }
 
+    // applicant 객체 생성
+    const applicant = {
+      id: Date.now().toString(), // 임시 ID 생성
+      answers,
+      questions,
+    };
+
     // 입력된 데이터 콘솔 출력
-    console.log('동아리 신청서 제출:', answers);
+    console.log('동아리 신청서 제출:', applicant);
+
+    // 필요한 경우, applicant 데이터를 서버로 전송하거나 상태를 업데이트합니다.
 
     Alert.alert('동아리 신청이 완료되었습니다.');
     navigation.goBack();
