@@ -684,7 +684,8 @@ app.post('/Clubpost', async (req, res) => {
       view: item.view,
       like: item.like,
       name: item.name,
-      user_title: item.user_title
+      image : item.image,
+      user_title: item.user_title,
     }));
     console.log(processedData)
     res.json(processedData);

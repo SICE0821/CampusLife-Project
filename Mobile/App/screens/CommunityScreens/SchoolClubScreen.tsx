@@ -29,44 +29,6 @@ type PostData = {
   Club_check : number;
 };
 
-// 샘플 데이터 정의
-// const sampleData: PostData[] = [
-//   {
-//     post_id: 885,
-//     title: '동아리 모집 안내',
-//     contents: '동아리 A에서 새로운 회원을 모집합니다. 많은 참여 부탁드립니다!',
-//     date: '2024-06-23',
-//     view: 90,
-//     like: 30,
-//     name: '김동아',
-//     user_title: '동아리장',
-//     image: '', // 예시 이미지 URL
-//   },
-//   {
-//     post_id: 886,
-//     title: '사진 동아리 전시회 안내',
-//     contents: '우리 사진 동아리에서 전시회를 개최합니다. 많은 관심 부탁드립니다.',
-//     date: '2024-06-24',
-//     view: 150,
-//     like: 75,
-//     name: '이사진',
-//     user_title: '동아리장',
-//     image: '', 
-//  },
-//   {
-//     post_id: 887,
-//     title: '음악 동아리 공연 소식',
-//     contents: '음악 동아리의 정기 공연이 있습니다. 즐거운 시간 되세요!',
-//     date: '2024-06-25',
-//     view: 200,
-//     like: 120,
-//     name: '박음악',
-//     user_title: '동아리장',
-//     image: '',
-//   },
-//   // 추가 샘플 데이터...
-// ];
-
 // 하단 공백 생성 함수 (하단바 영역 고려)
 const renderEmptyItem = () => {
   return <View style={styles.footerSpacing} />;
@@ -80,7 +42,29 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
   const [userHavePost, setUserHavePost] = useState<PostData[]>([]); // 유저가 북마크한 게시물 목록 상태
   const [refreshing, setRefreshing] = useState(false); // 새로고침 상태
   const swipeableRefs = useRef<(Swipeable | null)[]>([]); // Swipeable 참조 배열
+  const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지 상태
+  const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 폼 데이터 형태의 이미지 상태
 
+  // 이미지 업로드 API 호출
+  const uploadImages = async () => {
+    try {
+      const uploadedImageDatas = [];
+      for (const formData of selectedFormImages) {
+        const response = await fetch(`${config.serverUrl}/uploadImages`, { method: 'POST', body: formData });
+        const imageData = await response.json();
+        uploadedImageDatas.push(imageData.fileNames[0]);
+      }
+      return uploadedImageDatas;
+    } catch (error) {
+      console.error('Error uploading images: ', error);
+    }
+  };
+
+    // 이미지 삭제
+    const handleImageRemove = (index: number) => {
+      setSelectedImages(selectedImages.filter((_, i) => i !== index));
+      setSelectedFormImages(selectedFormImages.filter((_, i) => i !== index));
+    };
   
   const getClubPosts = async () => {
     try {
@@ -154,10 +138,7 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
   // 화면에 초점을 맞출 때 데이터 로드 (샘플 데이터이므로 필요 없음)
   useFocusEffect(
     useCallback(() => {
-      const hasClubPosts = clubData.some(post => post.Club_check === 1);
-            if (hasClubPosts) {
-                getClubPosts(); // 동아리 게시물 로드
-            }
+           getClubPosts(); // 동아리 게시물 로드
     }, [])
   );
 
@@ -178,7 +159,7 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
           }}>
           <View style={styles.postItem}>
             {/* 이미지 추가 */}
-            <Image source={{ uri: item.image }} style={styles.postImage} />
+            <Image source={{ uri: `${config.photoUrl}/${item.image}.png` }} style={styles.postImage} />
             <View style={styles.postContent}>
               <View style={styles.postHeader}>
                 <Text style={styles.postTitle}>{item.title}</Text>

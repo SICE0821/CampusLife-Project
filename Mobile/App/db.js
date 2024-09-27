@@ -240,20 +240,15 @@ async function ClubPosts() {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
-            + "FROM "
-            + "post "
-            + "LEFT JOIN "
-            + "user "
-            + "ON post.user_id = user.user_id "
-            + "LEFT JOIN "
-            + "student "
-            + "ON user.student_id = student.student_id "
-            + "WHERE "
-            + "post.Club_check = 1 "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, post_photo.post_photo AS image, user.title AS user_title "
+            + "FROM post "
+            + "LEFT JOIN user ON post.user_id = user.user_id "
+            + "LEFT JOIN student ON user.student_id = student.student_id "
+            + "LEFT JOIN post_photo ON post.post_id = post_photo.post_id "
+            + "WHERE post.Club_check = 1 "
             + "ORDER BY post.date DESC"
         );
-        const rows = await conn.query(query, [campus_id]);
+        const rows = await conn.query(query, []);
         return rows;
     } catch (err) {
         throw err;
