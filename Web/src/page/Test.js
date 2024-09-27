@@ -97,6 +97,7 @@ function Test() {
 
     //해당과목 날짜 변환기
     const formatDateWithOffset = (dateString, offsetDays) => {
+        console.log(dateString);
         const date = new Date(dateString);
         date.setDate(date.getDate() + offsetDays);
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -250,6 +251,7 @@ function Test() {
     const weeksData = Array.from({ length: selectLecture.lecture_have_week }, (_, i) => {
         const Tiemslosts = splitTimeSlots(selectLecture.lecture_time);
         const lecture_start_date = formatDateWithOffset(selectLecture.lecture_start_date, i * 7);
+        console.log(lecture_start_date);
 
         let attendanceCount = 0;
         let lateCount = 0;

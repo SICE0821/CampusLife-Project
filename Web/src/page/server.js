@@ -107,6 +107,7 @@ app.post('/GetProfessorLecture', async (req, res) => {
         }));
 
         console.log("교수 강의 과목 가져오기 성공");
+        console.log(processedData);
         res.json(processedData);
     } catch (error) {
         console.error("교수 강의 과목 가져오기 실패:", error);
