@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  ScrollView, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Text, 
-  View, 
-  Dimensions, 
-  Image, 
-  Alert 
+import {
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  Dimensions,
+  Image,
+  Alert,
+  Linking
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Swiper from 'react-native-swiper';
@@ -66,6 +67,21 @@ export type UserData = {
   // 추가 필드...
 };
 
+//공모전 데이터 정보 (추가적으로 필요한 경우 수정)
+type ContestData = {
+  post_id: number,
+  user_id: number
+  department_check: boolean,
+  inform_check: boolean,
+  Club_check: boolean,
+  title: string,
+  date : string
+  contest_check: boolean,
+  url: string,
+  sources: string,
+  post_photo: string
+}
+
 const MainPage = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
 
@@ -77,7 +93,7 @@ const MainPage = ({ navigation, route }: any) => {
   const [userPoint, setUserPoint] = useState<UserPoint>({ point: 0 });
   const [eventData, setEventData] = useState<EventData[]>([]);
   const [userDepartment, setUserDepartment] = useState<string>('');
-
+  const [contestdata, setContestdata] = useState<ContestData[]>([]);
   // 프로필 사진 URI
   const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
 
@@ -226,6 +242,27 @@ const MainPage = ({ navigation, route }: any) => {
     }
   };
 
+   /**
+   * 공모전 정보 서버에서 가져오는 함수
+   */
+    const fetchContestpostData = async () => {
+      try {
+        const response = await fetch(`${config.serverUrl}/fetchContestpostData`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            campus_id: userData.campus_pk,
+          })
+        })
+        const data = await response.json();
+        setContestdata(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
   /**
    * 사용자 포인트를 서버에서 가져오는 함수
    */
@@ -354,6 +391,7 @@ const MainPage = ({ navigation, route }: any) => {
           await fetchSchoolPostData();
           await fetchDepartmentPostData();
           await fetchHotPostData();
+          await fetchContestpostData();
           setUserData(userdata);
           await getUserDepartment();
           await getUserPoint();
@@ -393,7 +431,7 @@ const MainPage = ({ navigation, route }: any) => {
                 <View style={styles.userInfoArea}>
                   <View style={styles.userNameRow}>
                     <Text style={styles.userName}>{userData.name}</Text>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                       style={styles.pointCheckBox}
                       onPress={() => navigation.navigate("PointHistoryScreen")}
                     >
@@ -480,7 +518,7 @@ const MainPage = ({ navigation, route }: any) => {
               <Text style={styles.postHeadText}>학교 공지사항</Text>
               <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28} />
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => {
                 navigation.navigate('NoticeScreenStackNavigator', {
                   screen: 'NoticePostTopTabNavigator',
@@ -496,8 +534,8 @@ const MainPage = ({ navigation, route }: any) => {
           <View style={styles.postBoxArea}>
             <View style={styles.postBox}>
               {schoolPostData.slice(0, 5).map((post, index) => (
-                <TouchableOpacity 
-                  key={index} 
+                <TouchableOpacity
+                  key={index}
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
@@ -505,7 +543,7 @@ const MainPage = ({ navigation, route }: any) => {
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
-                    <Text 
+                    <Text
                       style={styles.postLabelText}
                       numberOfLines={1}
                       ellipsizeMode="clip"
@@ -531,7 +569,7 @@ const MainPage = ({ navigation, route }: any) => {
               <Text style={styles.postHeadText}>학사 공지사항</Text>
               <IconG style={styles.postHeadIcon} name="file-document-multiple" size={28} />
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => {
                 navigation.navigate('NoticeScreenStackNavigator', {
                   screen: 'NoticePostTopTabNavigator',
@@ -547,8 +585,8 @@ const MainPage = ({ navigation, route }: any) => {
           <View style={styles.postBoxArea}>
             <View style={styles.postBox}>
               {departmentPostData.slice(0, 5).map((post, index) => (
-                <TouchableOpacity 
-                  key={index} 
+                <TouchableOpacity
+                  key={index}
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
@@ -556,7 +594,7 @@ const MainPage = ({ navigation, route }: any) => {
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
-                    <Text 
+                    <Text
                       style={styles.postLabelText}
                       numberOfLines={1}
                       ellipsizeMode="clip"
@@ -582,7 +620,7 @@ const MainPage = ({ navigation, route }: any) => {
               <Text style={styles.postHeadText}>인기글</Text>
               <IconF style={styles.postHeadIcon} name="fire" size={27} />
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => {
                 navigation.navigate('CommunityScreenStackNavigator', {
                   screen: 'PostTopTabNavigator',
@@ -598,8 +636,8 @@ const MainPage = ({ navigation, route }: any) => {
           <View style={styles.postBoxArea}>
             <View style={styles.postBox}>
               {hotPostData.slice(0, 5).map((post, index) => (
-                <TouchableOpacity 
-                  key={index} 
+                <TouchableOpacity
+                  key={index}
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
@@ -607,7 +645,7 @@ const MainPage = ({ navigation, route }: any) => {
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
-                    <Text 
+                    <Text
                       style={styles.postLabelText}
                       numberOfLines={1}
                       ellipsizeMode="tail"
@@ -631,7 +669,7 @@ const MainPage = ({ navigation, route }: any) => {
               <Text style={styles.contestHeadText}>공모전</Text>
               <IconJ style={styles.contestHeadIcon} name="festival" size={27} />
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => {
                 navigation.navigate('CommunityScreenStackNavigator', {
                   screen: 'PostTopTabNavigator',
@@ -645,62 +683,23 @@ const MainPage = ({ navigation, route }: any) => {
             </TouchableOpacity>
           </View>
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.contestBoxArea}>
-            <TouchableOpacity style={styles.contestBox}>
-              <View style={styles.contestImageArea}>
-                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
-              </View>
-              <View style={styles.contestTextArea}>
-                <View style={styles.contestTextTitleArea}>
-                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
+            {contestdata.map((item) => (
+              <TouchableOpacity
+                style={styles.contestBox}
+                onPress={() => Linking.openURL(item.url)} >
+                <View style={styles.contestImageArea}>
+                  <Image style={styles.contestImage} source={{ uri: `${config.photoUrl}/${item.post_photo}.png` }} />
                 </View>
-                <View style={styles.contestTextInfoArea}>
-                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
+                <View style={styles.contestTextArea}>
+                  <View style={styles.contestTextTitleArea}>
+                    <Text style={styles.contestTextTitle}>{item.title}</Text>
+                  </View>
+                  <View style={styles.contestTextInfoArea}>
+                    <Text style={styles.contestTextInfo}>{item.sources}</Text>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.contestBox}>
-              <View style={styles.contestImageArea}>
-                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
-              </View>
-              <View style={styles.contestTextArea}>
-                <View style={styles.contestTextTitleArea}>
-                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
-                </View>
-                <View style={styles.contestTextInfoArea}>
-                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.contestBox}>
-              <View style={styles.contestImageArea}>
-                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
-              </View>
-              <View style={styles.contestTextArea}>
-                <View style={styles.contestTextTitleArea}>
-                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
-                </View>
-                <View style={styles.contestTextInfoArea}>
-                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.contestBox}>
-              <View style={styles.contestImageArea}>
-                <Image style={styles.contestImage} source={require('../assets/001.png')}/>
-              </View>
-              <View style={styles.contestTextArea}>
-                <View style={styles.contestTextTitleArea}>
-                  <Text style={styles.contestTextTitle}>공모전 제목 공모전 제목 공모전 제목 </Text>
-                </View>
-                <View style={styles.contestTextInfoArea}>
-                  <Text style={styles.contestTextInfo}>공모전 정보(출처) </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-            <View style={styles.contestRightArea}>
-
-            </View>
-
+              </TouchableOpacity>
+            ))}
           </ScrollView>
         </View>
       </ScrollView>
@@ -1026,7 +1025,7 @@ const styles = StyleSheet.create({
   contestImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'repeat',
+    resizeMode: 'contain',
     borderTopRightRadius: 10,
     borderTopLeftRadius: 10,
   },
@@ -1042,7 +1041,7 @@ const styles = StyleSheet.create({
     height: '60%',
     alignSelf: 'center',
   },
-  contestTextTitle:{
+  contestTextTitle: {
     color: 'black',
     fontSize: 14,
     fontWeight: 'bold'

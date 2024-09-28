@@ -8,6 +8,7 @@ import {
   View,
   Dimensions,
   Image,
+  Linking
 } from 'react-native';
 import Swiper from 'react-native-swiper';
 import { UserData, EventData } from '../types/type'
@@ -21,6 +22,34 @@ import IconF from 'react-native-vector-icons/Fontisto';
 import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
 import IconI from 'react-native-vector-icons/FontAwesome5';
+import IconJ from 'react-native-vector-icons/MaterialIcons';
+
+const contestData = [
+  {
+    id: 1,
+    title: '공모전 제목 공모전 제목 공모전 제목',
+    info: '공모전 정보(출처)',
+    image: require('../assets/001.png'),
+  },
+  {
+    id: 2,
+    title: '공모전 제목 공모전 제목 공모전 제목',
+    info: '공모전 정보(출처)',
+    image: require('../assets/001.png'),
+  },
+  {
+    id: 3,
+    title: '공모전 제목 공모전 제목 공모전 제목',
+    info: '공모전 정보(출처)',
+    image: require('../assets/001.png'),
+  },
+  {
+    id: 4,
+    title: '공모전 제목 공모전 제목 공모전 제목',
+    info: '공모전 정보(출처)',
+    image: require('../assets/001.png'),
+  },
+];
 
 const width = Dimensions.get('window').width;
 
@@ -35,15 +64,30 @@ type PostData = {
   admin_check: boolean
 }
 
+type ContestData = {
+  post_id: number,
+  user_id: number
+  department_check: boolean,
+  inform_check: boolean,
+  Club_check: boolean,
+  title: string,
+  date : string
+  contest_check: boolean,
+  url: string,
+  sources: string,
+  post_photo: string
+}
+
 const AdminMain = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
   const [schoolpostdata, setschollpostdata] = useState<PostData[]>([]);
   const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
   const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
+  const [contestdata, setContestdata] = useState<ContestData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
   const [eventData, setEventData] = useState<EventData[]>([]);
   const [Userdepartment, setUserDepartment] = useState();
-  const fileUri = `${config.serverUrl}/${userData.profile_photo}.png`;
+  const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
 
   /** 기본 이벤트 정보 */
   const initialEvents = [
@@ -190,6 +234,25 @@ const AdminMain = ({ navigation, route }: any) => {
     }
   }
 
+  //공모전 정보 가져오기
+  const fetchContestpostData = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/fetchContestpostData`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userData.campus_pk,
+        })
+      })
+      const data = await response.json();
+      setContestdata(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const GetEditEventImage = async (event_id: number) => {
     try {
       const response = await fetch(`${config.serverUrl}/GetEditEventImage`, {
@@ -250,6 +313,7 @@ const AdminMain = ({ navigation, route }: any) => {
       fetchschoolpostData();
       fetchdepartmentpostData();
       fetchhotpostData();
+      fetchContestpostData();
       settingUserData();
       get_user_department();
       Get_Event_Data();
@@ -463,7 +527,47 @@ const AdminMain = ({ navigation, route }: any) => {
             </View>
           </View>
         </View>
-        <View style={{ height: 100, backgroundColor: 'white', }}></View>
+        <View style={styles.contestArea}>
+          <View style={styles.contestHeadArea}>
+            <View style={styles.contestHeadTextArea}>
+              <Text style={styles.contestHeadText}>공모전</Text>
+              <IconJ style={styles.contestHeadIcon} name="festival" size={27} />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('CommunityScreenStackNavigator', {
+                  screen: 'PostTopTabNavigator',
+                  params: { screen: '전체 게시판', params: { screen: 'HOT' } }
+                });
+              }}
+              style={styles.contestDetailArea}
+            >
+              <Text style={styles.contestDetailText}>더보기</Text>
+              <IconB style={styles.contestDetailIcon} name={"caretright"} size={17} />
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.contestBoxArea}>
+            {contestdata.map((item) => (
+              <TouchableOpacity
+                style={styles.contestBox}
+                onPress={() => Linking.openURL(item.url)} >
+                <View style={styles.contestImageArea}>
+                  <Image style={styles.contestImage} source={{ uri: `${config.photoUrl}/${item.post_photo}.png` }} />
+                </View>
+                <View style={styles.contestTextArea}>
+                  <View style={styles.contestTextTitleArea}>
+                    <Text style={styles.contestTextTitle}>{item.title}</Text>
+                  </View>
+                  <View style={styles.contestTextInfoArea}>
+                    <Text style={styles.contestTextInfo}>{item.sources}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+            <View style={styles.contestRightArea}>
+            </View>
+          </ScrollView>
+        </View>
       </ScrollView>
     </View>
   );
@@ -698,6 +802,97 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 17,
   },
+  contestArea: {
+    width: width,
+    marginVertical: 15,
+    alignItems: 'center',
+  },
+  contestHeadArea: {
+    width: width * 0.85,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  contestHeadTextArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  contestHeadText: {
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  contestHeadIcon: {
+    color: "#FFC700",
+    marginHorizontal: 10,
+  },
+  contestDetailArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  contestDetailText: {
+    color: 'black',
+    fontSize: 17,
+    marginHorizontal: 5,
+  },
+  contestDetailIcon: {
+    color: 'black',
+  },
+  contestBoxArea: {
+    height: 300,
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+  },
+  contestBox: {
+    backgroundColor: 'white',
+    width: 150,
+    height: 200,
+    marginHorizontal: 10,
+    borderRadius: 10,
+    elevation: 10,
+  },
+  contestImageArea: {
+    width: '100%',
+    height: '70%',
+    borderTopStartRadius: 10,
+    borderTopEndRadius: 10,
+  },
+  contestImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
+  },
+  contestTextArea: {
+    width: '100%',
+    height: '30%',
+    borderBottomStartRadius: 10,
+    borderBottomEndRadius: 10,
+  },
+
+  contestTextTitleArea: {
+    width: '95%',
+    height: '60%',
+    alignSelf: 'center',
+  },
+  contestTextTitle: {
+    color: 'black',
+    fontSize: 14,
+    fontWeight: 'bold'
+  },
+  contestTextInfoArea: {
+    width: '95%',
+    height: '40%',
+    alignSelf: 'center'
+  },
+  contestTextInfo: {
+    color: 'black',
+    fontSize: 12,
+  },
+  contestRightArea: { // 여백
+    width: 20,
+  }
 });
 
 export default AdminMain;

@@ -811,6 +811,27 @@ export const NoticeScreenStackNavigator = ({ route, navigation }: any) => {
                     title: '공지사항',
                 }}
             />
+            <NoticeStack.Screen
+                name="MyPostScreen"
+                component={MyPostScreen}
+                initialParams={{ userdata }}
+                options={{
+                    headerStyle: {
+                        backgroundColor: '#F27405',
+                    },
+                    headerLeft: () => (
+                        <View style={{ flexDirection: 'row' }}>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate("NoticePostTopTabNavigator")}>
+                                <IconD style={{ marginLeft: 10, }} name="back" size={30} color="white" />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                    headerTintColor: 'white',
+                    headerTitleAlign: 'center',
+                    title: '내가 쓴 게시글',
+                }}
+            />
         </NoticeStack.Navigator>
 
     );

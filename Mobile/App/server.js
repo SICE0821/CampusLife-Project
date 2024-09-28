@@ -165,7 +165,8 @@ const { getGeneralPosts,
   RegistorPostPhoto,
   DetailPostPhoto,
   DeletePostPhoto,
-  ClubPosts
+  ClubPosts,
+  fetchContestpostData
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -570,6 +571,8 @@ app.post('/getMyPostData', async (req, res) => {
       like: item.like,
       name: item.name,
       user_title: item.user_title,
+      inform_check : item.inform_check,
+      contest_check : item.contest_check
     }));
     res.json(processedData);
     console.log("[MyPostScreen] : 내가쓴 게시물 가져오기 성공");
@@ -1220,8 +1223,10 @@ app.post('/recomment_like_num_down', async (req, res) => {
 //게시물 쓰기
 app.post('/write_post', async (req, res) => {
   try {
-    const { user_id, department_check, inform_check, title, contents } = req.body;
-    const postId = await write_post(user_id, department_check, inform_check, title, contents);
+    const { user_id, department_check, inform_check, contest_check, title, contents, url, sources } = req.body;
+    console.log(url);
+    console.log(sources);
+    const postId = await write_post(user_id, department_check, inform_check, contest_check, title, contents,  url, sources);
 
     if (postId) {
       console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 작성 성공");
@@ -3065,8 +3070,33 @@ app.post('/change_GoalGPA', async (req, res) => {
   } catch {
     res.status(500).json({ message: '서버가 잘 마무리되지않았습니다.'});
   }
-
 })
+
+app.post('/fetchContestpostData', async (req, res) => {
+  const { campus_id } = req.body;
+  try {
+    const rows = await fetchContestpostData(campus_id);
+    const processedData = rows.map(item => ({
+      post_id  : item.post_id,
+      user_id : item.user_id,
+      department_check : item.department_check,
+      inform_check : item.inform_check,
+      Club_check : item.Club_check,
+      title : item.title,
+      date : item.date,
+      contest_check : item.datecontest_check,
+      url : item.url,
+      sources : item.sources,
+      post_photo : item.post_photo
+    }));
+    console.log("[AdminMain or MainScreen] : 공모전 데이터 가져오기 성공");
+    res.json(processedData);
+  } catch (error) {
+    console.log("[AdminMain or MainScreen] : 공모전 데이터 가져오기 실패");
+    console.error('API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 //서버 시작

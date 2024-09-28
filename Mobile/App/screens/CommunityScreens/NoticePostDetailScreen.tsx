@@ -14,6 +14,7 @@ const width = Dimensions.get("window").width;
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
   console.log("you are in NoticePostDetailScreen")
   const { item, userData } = route.params;
+  console.log(item);
   const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
   const [inputheight, setinputheight] = useState(40);
   const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>(); //포스터에 대한 정보.
@@ -28,6 +29,19 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
   const [postImages, setpostImages] = useState<PostPhoto[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
+
+  useEffect(() => {
+    if(item.contest_check === true) {
+      navigation.setOptions({
+        title: '공모전', 
+      });
+    }else if (item.contest_check === false) {
+      navigation.setOptions({
+        title: '공지사항', 
+      });
+    }
+    
+  }, [navigation]);
 
   useFocusEffect(
     React.useCallback(() => {

@@ -28,7 +28,7 @@ async function getNoticePosts(campus_id) {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 0 AND post.inform_check = 1 AND student.campus_id = ? "
+            + "post.department_check = 0 AND post.inform_check = 1 AND student.campus_id = ? AND post.contest_check = 0 "
             + "ORDER BY post.date DESC"
         );
         const rows = await conn.query(query, [campus_id]);
@@ -263,7 +263,7 @@ async function getMyPostData(user_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, student.name, user.title AS user_title, student.campus_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.inform_check, post.contest_check, student.name, user.title AS user_title, student.campus_id "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -525,7 +525,7 @@ async function getschoolpostdata(campus_id) {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 0 AND post.inform_check = 1 AND student.campus_id = ? "
+            + "post.department_check = 0 AND post.inform_check = 1 AND student.campus_id = ? AND post.contest_check = 0 "
             + "ORDER BY post.date DESC "
             + "LIMIT 5")
         const rows = await conn.query(query, [campus_id])
@@ -1293,13 +1293,13 @@ async function recomment_like_num_down(recomment_id) {
     }
 }
 
-async function write_post(user_id, department_check, inform_check, title, contents) {
+async function write_post(user_id, department_check, inform_check, contest_check, title, contents, url, sources) {
     let conn;
     try {
         conn = await pool.getConnection();
-        const query = `INSERT INTO post (user_id, department_check, inform_check, title, contents, view, \`like\` )
-        VALUES (?, ?, ?, ?, ?, DEFAULT, DEFAULT);`
-        const result = await conn.query(query, [user_id, department_check, inform_check, title, contents]);
+        const query = `INSERT INTO post (user_id, department_check, inform_check, Club_check, contest_check, title, contents, view, \`like\`, url, sources)
+        VALUES (?, ?, ?, 0, ?, ?, ?, DEFAULT, DEFAULT, ?, ?);`
+        const result = await conn.query(query, [user_id, department_check, inform_check, contest_check, title, contents, url, sources]);
         const postId = result.insertId.toString();
         return postId;
     } catch (err) {
@@ -1795,7 +1795,7 @@ async function addGoodEventAram(user_id, target_id) {
         conn = await pool.getConnection();
         const query = `INSERT INTO aram (user_id, target_id, title, target_type) VALUES (?, ?, "이벤트에 당첨되셨습니다 축하드립니다!", "good_event");`
         await conn.query(query, [user_id, target_id]);
-       
+
         return true;
     } catch (err) {
         console.error(err);
@@ -1856,7 +1856,7 @@ async function addSchoolNoticeAram(target_id) {
         conn = await pool.getConnection();
         const query = `CALL SendEventNotification(?, '학교 공지사항 글이 등록되었습니다!', 'school_notice');`
         await conn.query(query, [target_id]);
-       
+
         return true;
     } catch (err) {
         console.error(err);
@@ -1872,7 +1872,7 @@ async function addDepartmentNoticeAram(target_id) {
         conn = await pool.getConnection();
         const query = `CALL SendEventNotification(?, '학과 공지사항 글이 등록되었습니다!', 'department_notice');`
         await conn.query(query, [target_id]);
-        
+
         return true;
     } catch (err) {
         console.error(err);
@@ -2398,7 +2398,7 @@ async function get_user_report() {
 }
 
 async function put_user_comment_report(comment_id, report_comment_name) {
-    let conn;   
+    let conn;
     try {
         conn = await pool.getConnection();
         const query = `INSERT INTO report_comment (comment_id, report_comment_name) VALUES (?, ?);`
@@ -3125,7 +3125,7 @@ async function GetLectureInfo(student_id, lecture_id) {
                 lecture_week_info
             WHERE 
                 student_fk = ? AND lecture_fk = ?
-            `, 
+            `,
             [student_id, lecture_id]
         );
         console.log('Query Result:', rows);  // 쿼리 결과 확인
@@ -3307,7 +3307,7 @@ async function AddAppAttendancePointHistory(user_id, today) {
             (point_status, point_num, content, user_id) 
             VALUES (1, 10, ?, ?);`
         );
-        const rows = await conn.query(query, ["[앱 출석체크] " + today + " 정기 출석",user_id]);
+        const rows = await conn.query(query, ["[앱 출석체크] " + today + " 정기 출석", user_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -3325,7 +3325,7 @@ async function AddFriendPointHistory(user_id, friendName) {
             (point_status, point_num, content, user_id) 
             VALUES (1, 100, ?, ?);`
         );
-        const rows = await conn.query(query, ["[친구 코드] " +friendName+ "님에게 친구코드 발송", user_id]);
+        const rows = await conn.query(query, ["[친구 코드] " + friendName + "님에게 친구코드 발송", user_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -3343,7 +3343,7 @@ async function AddBuyProductPointHistory(user_id, product, point) {
             (point_status, point_num, content, user_id) 
             VALUES (0, ?, ?, ?);`
         );
-        const rows = await conn.query(query, [point, "[상품 사기] " +product+ " 구매 완료", user_id]);
+        const rows = await conn.query(query, [point, "[상품 사기] " + product + " 구매 완료", user_id]);
         return rows;
     } catch (err) {
         throw err;
@@ -3459,7 +3459,57 @@ async function change_GoalGPA(user_id, goal_gpa) {
     }
 }
 
-
+async function fetchContestpostData(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            `
+                SELECT 
+                	post.post_id,
+                	post.user_id,
+                	post.department_check,
+                	post.inform_check,
+                	post.Club_check,
+                	post.title,
+                	post.date,
+                	post.contest_check,
+                	post.url,
+                	post.sources,
+                	post_photo.post_photo,
+                	student.campus_id
+                FROM 
+                	post
+                LEFT JOIN 
+                	post_photo
+                ON
+                	post.post_id = post_photo.post_id
+                LEFT JOIN
+                	user
+                ON 
+                	post.user_id = user.user_id
+                LEFT JOIN
+                	student
+                ON
+                	user.student_id = student.student_id
+                WHERE
+                	post.inform_check = 1
+                AND
+                	post.contest_check = 1
+                AND
+                	student.campus_id = ?
+                ORDER BY 
+                    post.date DESC;
+            `
+        );
+        const row = await conn.query(query, [campus_id]);
+        return row;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
 
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
@@ -3627,5 +3677,6 @@ module.exports = {
     RegistorPostPhoto,
     DetailPostPhoto,
     DeletePostPhoto,
-    ClubPosts
+    ClubPosts,
+    fetchContestpostData
 };

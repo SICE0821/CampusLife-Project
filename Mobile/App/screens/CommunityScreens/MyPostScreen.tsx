@@ -6,6 +6,7 @@ import IconC from 'react-native-vector-icons/FontAwesome';
 import { UserData } from '../../types/type';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import config from '../../config';
+import { el } from 'date-fns/locale';
 
 type PostData = {
     post_id: number;
@@ -16,6 +17,8 @@ type PostData = {
     like: number;
     name: string;
     user_title: string;
+    inform_check : boolean;
+    contest_check : boolean;
 };
 
 const renderEmptyItem = () => <View style={styles.footerSpacing} />;
@@ -113,6 +116,7 @@ const MyPostScreen = ({ route, navigation }: any) => {
                 body: JSON.stringify({ user_id: userData.user_pk }),
             });
             const postsData = await response.json();
+            //console.log(postsData);
             setCommunityData(postsData);
         } catch (error) {
             console.error('게시물 가져오기 실패:', error);
@@ -146,7 +150,12 @@ const MyPostScreen = ({ route, navigation }: any) => {
                 <TouchableWithoutFeedback
                     onPress={async () => {
                         await viewCountUp(item.post_id);
-                        navigation.navigate('PostDetailScreen', { item, userData });
+                        if(item.inform_check === true) {
+                            navigation.navigate('NoticePostDetailScreen', { item, userData })
+
+                        }else{
+                            navigation.navigate('PostDetailScreen', { item, userData });
+                        }
                     }}>
                     <View style={styles.postItem}>
                         <View style={styles.postHeader}>
