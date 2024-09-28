@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Text, View, TouchableOpacity, TextInput, FlatList, Alert, Image, Dimensions, StyleSheet, ScrollView } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
 import IconCancel from 'react-native-vector-icons/AntDesign';
-import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 import { launchImageLibrary } from 'react-native-image-picker';
-import LottieView from 'lottie-react-native';
 import config from '../../config'; // 서버 URL 설정 파일
 import { UserData } from '../../types/type'; // 사용자 데이터 타입 정의
 
@@ -15,8 +13,12 @@ const { width, height } = Dimensions.get('window'); // 화면의 너비와 높�
 
 // 비어있는 상태에서 보여줄 안내 텍스트 컴포넌트
 const EmptyMainText = () => {
-  const content = `\n\n\n캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다...`;
-
+  const content =     "\n\n\n" +
+  "캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다. 위반 시 게시물이 삭제되고 서비스 이용이 일정 기간 제한될 수 있습니다." +
+  "\n\n정치·사회 관련 행위 금지\n\n국가기관, 정치 관련 단체, 언론, 시민단체에 대한 언급 혹은 이와 관련한 행위" +
+  "\n정책·외교 또는 정치·정파에 대한 의견, 주장 및 이념, 가치관을 드러내는 행위\n성별, 종교, 인종, 출신, 지역, 직업, 이념 등 사회적 이슈에 대한 언급 혹은 이와 관련한 행위" +
+  "\n위와 같은 내용으로 유추될 수 있는 비유, 은어 사용 행위\n영리 여부와 관계 없이 사업체·기관·단체·개인에게 직간접적으로 영향을 줄 수 있는 게시물 작성 행위\n불법촬영물 유통 금지\n불법촬영물등을 게재할 경우 전기통신사업법에 따라 삭제 조치 및 서비스 이용이 영구적으로 제한될 수 있으며 관련 법률에 따라 처벌받을 수 있습니다." +
+  "\n\n그 밖의 규칙 위반\n타인의 권리를 침해하거나 불쾌감을 주는 행위\n범죄, 불법 행위 등 법령을 위반하는 행위\n욕설, 비하, 차별, 혐오, 자살, 폭력 관련 내용을 포함한 게시물 작성 행위\n음란물, 성적 수치심을 유발하는 행위\n스포일러, 공포, 속임, 놀라게 하는 행위"
   return (
     <View style={{ padding: 6 }}>
       <Text style={{ color: 'gray' }}>{content}</Text>
@@ -33,13 +35,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const [postfontoption, setPostFontOption] = useState("게시판을 정해주세요"); // 게시판 선택 옵션
   const [titletext, setTitleText] = useState(''); // 게시물 제목 상태
   const [maintext, setMainText] = useState(''); // 게시물 내용 상태
-  const [userData, setUserData] = useState<UserData>(userdata); // 사용자 데이터 상태
+  const [userData] = useState<UserData>(userdata); // 사용자 데이터 상태
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지 상태
   const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 폼 데이터 형태의 이미지 상태
-
-  const [isModalVisible, setIsModalVisible] = useState(false); // 모달 표시 여부 상태
-
-  const forceUpdate = React.useReducer(() => ({}), {})[1]; // 리렌더링 강제 함수
 
   // 화면이 포커스될 때 헤더의 오른쪽 버튼을 업데이트하는 효과
   useFocusEffect(
@@ -84,16 +82,6 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const handleDepartmentPosterPress = () => {
     setSelectAllPosterOption(0);
     setSelectDepartmentPoster(1);
-  };
-
-  // 제목 텍스트 변경 핸들러
-  const handleTitleTextChange = (inputText: string) => {
-    setTitleText(inputText);
-  };
-
-  // 본문 텍스트 변경 핸들러
-  const handleMainTextChange = (inputText: string) => {
-    setMainText(inputText);
   };
 
   // 헤더의 오른쪽 버튼 업데이트
@@ -173,7 +161,6 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           return formData;
         });
         setSelectedFormImages(formDataArray);
-        forceUpdate();
       }
     });
   };
@@ -212,7 +199,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         <View style={styles.postTitleArea}>
           <TextInput
             style={styles.postTitleText}
-            onChangeText={handleTitleTextChange}
+            onChangeText={setTitleText}
             value={titletext}
             placeholder="제목"
             placeholderTextColor={'gray'}
@@ -223,7 +210,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         <View style={styles.postContentArea}>
           <TextInput
             style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
-            onChangeText={handleMainTextChange}
+            onChangeText={setMainText}
             value={maintext}
             multiline={true}
             placeholder="이곳에 글을 입력해 주세요!"
@@ -240,26 +227,20 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
               horizontal
               showsHorizontalScrollIndicator={false}
               snapToAlignment="center" // 이미지 중앙 정렬
-              snapToInterval={width - 70} // 스냅 간격을 이미지 너비에 맞춤
+              snapToInterval={width - 125} // 스냅 간격을 이미지 너비에 맞춤
               decelerationRate="fast" // 스크롤 속도를 빠르게 하여 자연스럽게 멈춤
               renderItem={({ item, index }) => (
-                <View key={index} style={styles.fileInfo}>
+                <View key={index} style={styles.imageCard}>
                   <Image
                     source={{ uri: item.uri }}
-                    resizeMode="contain"
+                    resizeMode="cover"
                     style={styles.imagePreview}
                   />
-                  <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
-                    <IconCancel name="closecircleo" size={22} color={'white'} />
+                  <TouchableOpacity
+                    onPress={() => handleImageRemove(index)}
+                    style={styles.cancelButton}>
+                    <IconCancel name="closecircleo" size={22} color="white" />
                   </TouchableOpacity>
-                  {index !== selectedImages.length - 1 && (
-                    <LottieView
-                      source={require('../../assets/Animation - 1725980201082.json')}
-                      autoPlay
-                      loop
-                      style={{ width: 50, right: 45 }}
-                    />
-                  )}
                 </View>
               )}
               keyExtractor={(item, index) => index.toString()}
@@ -297,17 +278,6 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           </View>
         </View>
       </ModalBox>
-
-      {/* 글 등록 확인 모달 */}
-      <Modal isVisible={isModalVisible}>
-        <View style={modalStyle.modalContainer}>
-          <Text style={modalStyle.title}>등록 확인</Text>
-          <Text style={modalStyle.message}>글이 등록되었습니다.</Text>
-          <TouchableOpacity style={modalStyle.confirmButton} onPress={goBack}>
-            <Text style={modalStyle.confirmButtonText}>확인</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -352,28 +322,34 @@ const styles = StyleSheet.create({
     width: 50,
     alignItems: 'center',
   },
-  fileInfo: {
-    width: width - 70,
-    height: height - 980,
-    padding: 40,
-    flexDirection: 'row',
-  },
-  cancelButton: {
-    alignSelf: 'flex-start',
-    bottom: 10,
-    right: 10,
-  },
-  imagePreview: {
-    width: "100%",
-    height: "100%",
-    resizeMode: 'cover',
-    backgroundColor: '#eeeeee',
-  },
   photoArea: {
-    width: "100%",
+    width: '100%',
     height: height - 549,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  imageCard: {
+    width: width * 0.7, // 카드 스타일 적용
+    height: width * 0.7, // 이미지의 높이도 너비와 동일하게 설정
+    marginRight: 15, // 이미지 사이에 여백 추가
+    borderRadius: 10, // 카드 모양을 위한 테두리 곡선 적용
+    elevation: 5, // 그림자 효과
+    backgroundColor: '#f0f0f0',
+    position: 'relative', // 삭제 버튼의 절대 위치를 위한 설정
+    overflow: 'hidden', // 이미지가 카드에서 넘치지 않도록 설정
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+  },
+  cancelButton: {
+    position: 'absolute', // 삭제 버튼의 위치를 이미지의 오른쪽 상단에 고정
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(0,0,0,0.5)', // 반투명 배경으로 버튼을 돋보이게
+    borderRadius: 15,
+    padding: 5,
   },
   headerButton: {
     flexDirection: 'row',
@@ -434,32 +410,6 @@ const modalStyle = StyleSheet.create({
   writeButtom: {
     flex: 0.6,
     justifyContent: 'flex-end'
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  message: {
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  confirmButton: {
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  confirmButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 
