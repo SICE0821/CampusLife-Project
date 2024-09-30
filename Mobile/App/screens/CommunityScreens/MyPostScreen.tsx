@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback , useEffect} from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Text, View, FlatList, TouchableWithoutFeedback, TouchableOpacity, RefreshControl, StyleSheet } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
@@ -7,6 +7,7 @@ import { UserData } from '../../types/type';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import config from '../../config';
 import { el } from 'date-fns/locale';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 type PostData = {
     post_id: number;
@@ -17,19 +18,91 @@ type PostData = {
     like: number;
     name: string;
     user_title: string;
-    inform_check : boolean;
-    contest_check : boolean;
+    inform_check: boolean;
+    contest_check: boolean;
+    Club_check: boolean;
+    department_check: boolean;
 };
 
 const renderEmptyItem = () => <View style={styles.footerSpacing} />;
 
 const MyPostScreen = ({ route, navigation }: any) => {
     const { userdata } = route.params;
-    const [communityData, setCommunityData] = useState<PostData[]>([]);
+    const [communityData, setCommunityData] = useState<PostData[]>([]); //전체
     const [userData, setUserData] = useState<UserData>(userdata);
     const [userHavePost, setUserHavePost] = useState<any[]>([]);
     const [refreshing, setRefreshing] = useState(false);
     const swipeableRefs = useRef<(Swipeable | null)[]>(new Array().fill(null));
+    const [open, setOpen] = useState(false); //드롭다운 메뉴 열기 닫기
+    const [value, setValue] = useState('전체'); //카테고리 값
+
+    const [noticePost, setNoticePost] = useState<PostData[]>([]); //학교공지사항
+    const [noticeDepartmentPost, setNoticeDepartmentPost] = useState<PostData[]>([]); //학과공지사항
+    const [contestPost, setContestPost] = useState<PostData[]>([]); //공모전
+    const [communityPost, setCommunityPost] = useState<PostData[]>([]); //전체게시글
+    const [departmentCommunityPost, SetDepartmentCommunityPost] = useState<PostData[]>([]); //학과게시글
+    const [clubPost, SetClubPost] = useState<PostData[]>([]); //동아리
+
+    useEffect(() => {
+        if (value == "전체") {
+            setValue("전체");
+        }else if(value == "전체게시판") {
+            setValue("전체게시판");
+        }else if(value == "학과게시판") {
+            setValue("학과게시판");
+        }else if(value == "동아리게시판") {
+            setValue("동아리게시판");
+        }else if(value == "학교공지사항") {
+            setValue("학교공지사항");
+        }else if(value == "학과공지사항") {
+            setValue("학과공지사항");
+        }else if(value == "공모전게시글") {
+            setValue("공모전게시글");
+        }
+      }, [value]);
+
+    //일반유저
+    const [items1, setItems1] = useState([
+        { label: '전체', value: '전체' },
+        { label: '전체게시판', value: '전체게시판' },
+        { label: '학과게시판', value: '학과게시판' },
+        { label: '동아리게시판', value: '동아리게시판' }
+    ]);
+
+    //권한유저
+    const [items2, setItems2] = useState([
+        { label: '전체', value: '전체' },
+        { label: '전체게시판', value: '전체게시판' },
+        { label: '학과게시판', value: '학과게시판' },
+        { label: '학과공지사항', value: '학과공지사항' },
+        { label: '동아리게시판', value: '동아리게시판' }
+    ]);
+
+    //관리자
+    const [items3, setItems3] = useState([
+        { label: '전체', value: '전체' },
+        { label: '학교공지사항', value: '학교공지사항' },
+        { label: '학과공지사항', value: '학과공지사항' },
+        { label: '공모전게시글', value: '공모전게시글' },
+    ]);
+
+    const FilterData = () => {
+        if(value == "전체") {
+            return communityData
+        }else if(value == "전체게시판" ) {
+            return communityPost
+        }else if (value == "학과게시판") {
+            return departmentCommunityPost
+        }else if (value == "동아리게시판") {
+            return clubPost
+        }else if (value == "학교공지사항") {
+            return noticePost
+        }else if (value == "학과공지사항") {
+            return noticeDepartmentPost
+        }else if (value == "공모전게시글") {
+            return contestPost
+        }
+    }
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -116,8 +189,40 @@ const MyPostScreen = ({ route, navigation }: any) => {
                 body: JSON.stringify({ user_id: userData.user_pk }),
             });
             const postsData = await response.json();
-            //console.log(postsData);
-            setCommunityData(postsData);
+
+            let noticePost : PostData[]= [];
+            let noticeDepartmentPost : PostData[] = [];
+            let contestPost : PostData[] = [];
+            let communityPost : PostData[] = [];
+            let departmentCommunityPost : PostData[] = [];
+            let clubPost : PostData[] = [];
+
+           
+
+            // postsData 배열을 순회하며 조건에 맞게 분류
+            postsData.forEach((post : PostData)=> {
+                if (post.inform_check === true && post.contest_check === false && post.department_check === false) {
+                    noticePost.push(post);  // 공지사항 게시물
+                } else if (post.inform_check === true && post.contest_check === false && post.department_check === true) {
+                    noticeDepartmentPost.push(post);  // 학과 공지사항 게시물
+                } else if (post.inform_check === true && post.contest_check === true && post.department_check === false) {
+                    contestPost.push(post);  // 경진대회 게시물
+                } else if (post.inform_check === false && post.Club_check === false && post.department_check === false) {
+                    communityPost.push(post);  // 커뮤니티 게시물
+                } else if (post.inform_check === false && post.Club_check === false && post.department_check === true) {
+                    departmentCommunityPost.push(post);  // 학과 커뮤니티 게시물
+                } else if (post.inform_check === false && post.Club_check === true && post.department_check === false) {
+                    clubPost.push(post);  // 동아리 게시물
+                }
+            });
+            // 각각의 상태 업데이트
+            setNoticePost(noticePost);
+            setNoticeDepartmentPost(noticeDepartmentPost);
+            setContestPost(contestPost);
+            setCommunityPost(communityPost);
+            SetDepartmentCommunityPost(departmentCommunityPost);
+            SetClubPost(clubPost);
+            setCommunityData(postsData); //전체
         } catch (error) {
             console.error('게시물 가져오기 실패:', error);
         }
@@ -137,6 +242,26 @@ const MyPostScreen = ({ route, navigation }: any) => {
         }
     };
 
+    const SetCategoryItem = () => {
+        if (userData.title == "일반학생") {
+            return items1
+        } else if (userData.title == "학교") {
+            return items3
+        } else {
+            return items2
+        }
+    }
+
+    const SetCategorySetItem = () => {
+        if (userData.title == "일반학생") {
+            return setItems1
+        } else if (userData.title == "학교") {
+            return setItems3
+        } else {
+            return setItems2
+        }
+    }
+
     useFocusEffect(
         useCallback(() => {
             getMyPostData();
@@ -150,10 +275,10 @@ const MyPostScreen = ({ route, navigation }: any) => {
                 <TouchableWithoutFeedback
                     onPress={async () => {
                         await viewCountUp(item.post_id);
-                        if(item.inform_check === true) {
+                        if (item.inform_check === true) {
                             navigation.navigate('NoticePostDetailScreen', { item, userData })
 
-                        }else{
+                        } else {
                             navigation.navigate('PostDetailScreen', { item, userData });
                         }
                     }}>
@@ -197,8 +322,23 @@ const MyPostScreen = ({ route, navigation }: any) => {
 
     return (
         <View style={styles.container}>
+            <View style={styles.CategorySpace}>
+                <DropDownPicker
+                    open={open}
+                    value={value}
+                    items={SetCategoryItem()}
+                    setOpen={setOpen}
+                    setValue={setValue}
+                    setItems={SetCategorySetItem()}
+                    containerStyle={{ width: 160, backgroundColor: 'white', zIndex: 1000 }}
+                    dropDownContainerStyle={styles.dropdown}
+                    style={styles.dropdownStyle}
+                    labelStyle={styles.labelStyle}
+                    placeholderStyle={styles.placeholderStyle}
+                />
+            </View>
             <FlatList
-                data={communityData}
+                data={FilterData()}
                 renderItem={renderItem}
                 ListFooterComponent={renderEmptyItem}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -301,6 +441,39 @@ const styles = StyleSheet.create({
         marginLeft: 7,
         top: 1
     },
+    dropdown: {
+        backgroundColor: '#ffffff',  // 드롭다운 리스트의 배경색
+        borderColor: '#cccccc',  // 테두리 색상
+        borderRadius: 10,  // 모서리 둥글게
+        borderLeftWidth: 2,
+        borderRightWidth: 2,
+        borderBottomWidth: 2
+    },
+
+    dropdownStyle: {
+        backgroundColor: 'white',  // 선택된 옵션의 배경색
+        borderColor: '#cccccc',  // 기본 테두리 색상
+        borderRadius: 10,  // 모서리를 둥글게
+        height: 50,  // 높이 설정
+        paddingHorizontal: 10,  // 텍스트와 테두리 사이 간격
+        borderWidth: 2
+    },
+
+    labelStyle: {
+        fontSize: 16,  // 폰트 크기 설정
+        color: 'black',  // 글자 색상
+        fontWeight: 'bold'
+    },
+
+    placeholderStyle: {
+        fontSize: 14,  // 플레이스홀더 폰트 크기
+        color: 'black',  // 플레이스홀더 색상
+    },
+
+    CategorySpace: {
+        height: '7%',
+        padding: 10
+    }
 });
 
 export default MyPostScreen;

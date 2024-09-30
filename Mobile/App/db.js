@@ -263,7 +263,8 @@ async function getMyPostData(user_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.inform_check, post.contest_check, student.name, user.title AS user_title, student.campus_id "
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.inform_check, post.contest_check, student.name, user.title AS user_title, student.campus_id " 
+            + ",post.department_check, post.Club_check "
             + "FROM "
             + "post "
             + "LEFT JOIN "
@@ -1325,7 +1326,7 @@ async function RegistorPostPhoto(post_id, post_photo) {
     }
 }
 
-async function update_post(post_id, department_check, inform_check, title, contents) {
+async function update_post(post_id, department_check, contest_check, Club_check, url, sources, inform_check, title, contents) {
     let conn;
     try {
         conn = await pool.getConnection();
@@ -1333,12 +1334,17 @@ async function update_post(post_id, department_check, inform_check, title, conte
         UPDATE 
             post
         SET 
+            inform_check = ?,
             department_check = ?,
+            contest_check = ?,
+            Club_check = ?,
             title = ?,
-            contents = ?
+            contents = ?,
+            url = ?,
+            sources =?
         WHERE
             post_id = ?`
-        const result = await conn.query(query, [department_check, title, contents, post_id]);
+        const result = await conn.query(query, [inform_check, department_check, contest_check, Club_check, title, contents, url, sources, post_id]);
         const postId = result.insertId.toString(); // Retrieve the inserted post's ID
         return postId;
     } catch (err) {
@@ -3164,7 +3170,11 @@ async function get_post_info(post_id) {
                 department_check,
                 inform_check,
                 title,
-                contents
+                contents,
+                Club_check,
+                contest_check,
+                url,
+                sources
             FROM 
                 post
             WHERE post.post_id = ?`, [post_id]);

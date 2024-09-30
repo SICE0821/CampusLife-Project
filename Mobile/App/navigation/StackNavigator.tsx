@@ -720,7 +720,7 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                                 <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
                             </TouchableOpacity>
                             {userdata.title !== "학교" && (
-                                <TouchableOpacity onPress={() => navigation.navigate("MyPostScreen", { userdata })}>
+                                <TouchableOpacity onPress={() => navigation.navigate("StudentMyPostScreen", { userdata })}>
                                     <IconF style={{ marginLeft: 10 }} name="user" size={30} color="white" />
                                 </TouchableOpacity>
                             )}
@@ -744,7 +744,7 @@ export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
                 }}
             />
             <CoummunityStack.Screen
-                name="MyPostScreen"
+                name="StudentMyPostScreen"
                 component={MyPostScreen}
                 initialParams={{ userdata }}
                 options={{
@@ -788,7 +788,7 @@ export const NoticeScreenStackNavigator = ({ route, navigation }: any) => {
                                 <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
                             </TouchableOpacity>
                             {userdata.title !== "일반학생" && (
-                                <TouchableOpacity onPress={() => navigation.navigate("MyPostScreen", { userdata })}>
+                                <TouchableOpacity onPress={() => navigation.navigate("AdminMyPostScreen", { userdata })}>
                                     <IconF style={{ marginLeft: 10 }} name="user" size={30} color="white" />
                                 </TouchableOpacity>
                             )}
@@ -812,7 +812,7 @@ export const NoticeScreenStackNavigator = ({ route, navigation }: any) => {
                 }}
             />
             <NoticeStack.Screen
-                name="MyPostScreen"
+                name="AdminMyPostScreen"
                 component={MyPostScreen}
                 initialParams={{ userdata }}
                 options={{

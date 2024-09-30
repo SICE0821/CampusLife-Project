@@ -572,12 +572,15 @@ app.post('/getMyPostData', async (req, res) => {
       name: item.name,
       user_title: item.user_title,
       inform_check : item.inform_check,
-      contest_check : item.contest_check
+      department_check : item.department_check,
+      contest_check : item.contest_check,
+      Club_check : item.Club_check
     }));
     res.json(processedData);
     console.log("[MyPostScreen] : 내가쓴 게시물 가져오기 성공");
   } catch (error) {
     console.log("[MyPostScreen] : 내가쓴 게시물 가져오기 실패");
+    console.log(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
@@ -1256,8 +1259,8 @@ app.post('/RegistorPostPhoto', async (req, res) => {
 //게시물 수정
 app.post('/update_post', async (req, res) => {
   try {
-    const { post_id, department_check, inform_check, title, contents } = req.body;
-    const postId = await update_post(post_id, department_check, inform_check, title, contents);
+    const { post_id, department_check, inform_check, contest_check, Club_check, url, sources, title, contents } = req.body;
+    const postId = await update_post(post_id, department_check, contest_check, Club_check, url, sources, inform_check, title, contents);
 
     if (postId) {
       console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 수정 성공");
@@ -2818,7 +2821,11 @@ app.post('/get_post_info', async (req, res) => {
       department_check: rows[0].department_check,
       inform_check: rows[0].inform_check,
       title: rows[0].title,
-      contents: rows[0].contents
+      contents: rows[0].contents,
+      Club_check : rows[0].Club_check,
+      contest_check : rows[0].contest_check,
+      url : rows[0].url,
+      sources : rows[0].sources
     };
     console.log("[CheckReportPost] : 포스터 수정 정보 가져오기 성공");
     res.json(processedData);

@@ -549,6 +549,7 @@ const AdminMain = ({ navigation, route }: any) => {
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.contestBoxArea}>
             {contestdata.map((item) => (
               <TouchableOpacity
+                key = {item.post_id}
                 style={styles.contestBox}
                 onPress={() => Linking.openURL(item.url)} >
                 <View style={styles.contestImageArea}>

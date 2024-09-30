@@ -14,7 +14,6 @@ const width = Dimensions.get("window").width;
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
   console.log("you are in NoticePostDetailScreen")
   const { item, userData } = route.params;
-  console.log(item);
   const [commenttext, setcommenttext] = useState('댓글을 입력해주세요');
   const [inputheight, setinputheight] = useState(40);
   const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>(); //포스터에 대한 정보.
@@ -72,7 +71,6 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
       })
       const DetailPostPhoto = await response.json();
       setpostImages(DetailPostPhoto);
-      console.log(DetailPostPhoto);
     } catch (error) {
       console.error('유저 학과 이름 가져오기 실패:', error);
     }

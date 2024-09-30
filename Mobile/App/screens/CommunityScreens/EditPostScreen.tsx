@@ -5,11 +5,13 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
 import { UserData, Edit_Post_Info, PostPhoto } from '../../types/type'
+import Clipboard from '@react-native-clipboard/clipboard';
 import IconCancel from 'react-native-vector-icons/AntDesign';
 import config from '../../config';
 import IconC from 'react-native-vector-icons/FontAwesome';
 import { launchImageLibrary } from 'react-native-image-picker';
 import LottieView from 'lottie-react-native';
+import Icon from 'react-native-vector-icons/Octicons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,11 +42,18 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   const [postfontoption, setpostfontoption] = useState("");
   const [titletext, settitleText] = useState(post_edit_info.title);
   const [maintext, setmainText] = useState(post_edit_info.contents);
+  const [urltext, seturlText] = useState(post_edit_info.url);
+  const [sourcestext, setSourcesText] = useState(post_edit_info.sources);
   const [userData, setUserData] = useState<UserData>(userdata);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
   const [selectedFormImages, setSelectedFormImages] = useState<FormData[]>([]); // 선택된 이미지를 폼데이터에 저장
   const [postImages2, setpostImages] = useState<PostPhoto[]>(postImages);
+  const [selectclubposter, setSelectClubPoster] = useState(0); // 동아리 게시판 선택 여부
+  const [selectcontestposter, setSelectContestPoster] = useState(0); //공모전 선택
+
+
+
 
   const forceUpdate = React.useReducer(() => ({}), {})[1];
 
@@ -58,7 +67,7 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
         }
       };
       fetchData();
-    }, [selectdepartmentposter, titletext, maintext, selectedFormImages])
+    }, [selectdepartmentposter, selectcontestposter, selectclubposter, titletext, maintext, urltext, sourcestext, selectedFormImages, postImages2])
   );
 
 
@@ -67,21 +76,47 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   };
 
   useEffect(() => {
-    // selectallposter와 selectdepartmentposter를 비교하여 postfontoption을 설정
-    if (selectallposter === 1) {
-      setpostfontoption("전체 게시판");
-    } else if (selectdepartmentposter === 1) {
-      setpostfontoption("학과 게시판");
+    if (post_edit_info.inform_check == true) {
+      if (selectallposter == 1 && selectcontestposter == 0) {
+        setpostfontoption("학교 공지사항");
+      } else if (selectdepartmentposter == 1) {
+        setpostfontoption("학과 공지사항")
+      } else if (selectcontestposter == 1) {
+        setpostfontoption("공모전 게시판")
+      } else {
+        if (post_edit_info.inform_check == true && post_edit_info.department_check == false && post_edit_info.contest_check == false) {
+          setpostfontoption("학교 공지사항");
+          handleAllPosterPress();
+        } else if (post_edit_info.inform_check == true && post_edit_info.department_check == true && post_edit_info.contest_check == false) {
+          setpostfontoption("학과 공지사항");
+          handleDepartmentPosterPress();
+        } else if (post_edit_info.inform_check == true && post_edit_info.department_check == false && post_edit_info.contest_check == true) {
+          setpostfontoption("공모전 게시판");
+          handleContestPosterPress();
+        }
+      }
     } else {
-      if (post_edit_info.department_check == true) {
-        setpostfontoption("학과 게시판");
-        handleDepartmentPosterPress();
-      } else if (post_edit_info.department_check == false) {
+      if (selectallposter == 1) {
         setpostfontoption("전체 게시판");
-        handleAllPosterPress();
+      } else if (selectdepartmentposter == 1) {
+        setpostfontoption("학과 게시판")
+      } else if (selectcontestposter == 1) {
+        setpostfontoption("동아리 게시판")
+      } else {
+        if (post_edit_info.department_check == false) {
+          setpostfontoption("전체 게시판");
+          handleAllPosterPress();
+        } else if (post_edit_info.department_check == true) {
+          setpostfontoption("학과 게시판");
+          handleDepartmentPosterPress();
+        } else if (post_edit_info.inform_check == false && post_edit_info.department_check == false && post_edit_info.Club_check == true) {
+          setpostfontoption("동아리 게시판");
+          handleClubPosterPress();
+        }
       }
     }
-  }, [selectallposter, selectdepartmentposter]);
+  }, [selectallposter, selectdepartmentposter, selectcontestposter, post_edit_info]);
+
 
   const openModal = () => {
     setIsModalOpen(true); // 모달을 열기 위해 상태를 true로 설정
@@ -94,11 +129,30 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   const handleAllPosterPress = () => {
     setselectapllposterOption(1);
     setselectdepartmentposter(0);
+    setSelectContestPoster(0);
+    setSelectClubPoster(0);
   };
 
   const handleDepartmentPosterPress = () => {
     setselectapllposterOption(0);
     setselectdepartmentposter(1);
+    setSelectContestPoster(0);
+    setSelectClubPoster(0);
+  };
+
+  const handleContestPosterPress = () => {
+    setselectapllposterOption(1);
+    setselectdepartmentposter(0);
+    setSelectClubPoster(0);
+    setSelectContestPoster(1);
+  };
+
+  // 동아리 게시판 선택
+  const handleClubPosterPress = () => {
+    setselectapllposterOption(0);
+    setselectdepartmentposter(0);
+    setSelectContestPoster(0);
+    setSelectClubPoster(1); // 동아리 게시판 선택
   };
 
   const handletitleTextChange = (inputText: string) => {
@@ -109,7 +163,20 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
     setmainText(inputText);
   };
 
-  const chagneImageArray = (addImage : any) => {
+  const handleurlTextChange = (inputText: string) => {
+    seturlText(inputText);
+  };
+
+  const handlesorceTextChange = (inputText: string) => {
+    setSourcesText(inputText);
+  };
+
+  const pasteFromClipboard = async () => {
+    const clipboardContent = await Clipboard.getString();
+    seturlText(clipboardContent);
+  };
+
+  const chagneImageArray = (addImage: any) => {
     const ChangeServerImageArray = postImages2.map(photo => photo.post_photo);
     //console.log(ChangeServerImageArray);
 
@@ -168,24 +235,24 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
     }
   }
 
-    //기존 DB에 저장되어있는 사진을 삭제하고 새 배열을 넣어줄거임
-    const DeletePostPhoto = async () => {
-      try {
-        const response = await fetch(`${config.serverUrl}/DeletePostPhoto`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            post_id: post_edit_info.post_id,
-          }),
-        })
-        await response.json();
-      } catch (error) {
-        console.error(error);
-      } finally {
-      }
+  //기존 DB에 저장되어있는 사진을 삭제하고 새 배열을 넣어줄거임
+  const DeletePostPhoto = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/DeletePostPhoto`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          post_id: post_edit_info.post_id,
+        }),
+      })
+      await response.json();
+    } catch (error) {
+      console.error(error);
+    } finally {
     }
+  }
 
   // 서버에서 가져온 이미지 삭제 함수
   const handleServerImageRemove = (index: number) => {
@@ -277,9 +344,13 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
         body: JSON.stringify({
           post_id: post_edit_info.post_id,
           department_check: selectdepartmentposter,
-          inform_check: 0,
+          contest_check: selectcontestposter,
+          inform_check: selectallposter,
+          Club_check : selectclubposter,
           title: titletext,
           contents: maintext,
+          url: urltext,
+          sources: sourcestext
         })
       });
       await response.json();
@@ -314,17 +385,45 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
             placeholderTextColor={'gray'}
           />
         </View>
-        <View style={styles.postContentArea}>
-          <TextInput
-            style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
-            onChangeText={handlemainTextChange}
-            value={maintext}
-            multiline={true}
-            placeholder="이 곳에 글을 입력해주세요!"
-            placeholderTextColor={'gray'}
-          />
-          {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
-        </View>
+        {selectcontestposter === 1 ? (
+          // selectcontestposter가 1일 때 렌더링할 내용
+          <>
+            <View style={styles.postTitleArea}>
+              <TextInput
+                style={styles.postTitleText}
+                onChangeText={handleurlTextChange}
+                value={urltext}
+                placeholder="URL 입력"
+                placeholderTextColor={'gray'}
+              />
+              <TouchableOpacity style={{ marginRight: 15 }} onPress={pasteFromClipboard}>
+                <Icon name="paste" size={36} color={'black'} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.postTitleArea}>
+              <TextInput
+                style={styles.postTitleText}
+                onChangeText={handlesorceTextChange}
+                value={sourcestext}
+                placeholder="출처"
+                placeholderTextColor={'gray'}
+              />
+            </View>
+          </>
+        ) : (
+          // selectcontestposter가 1이 아닐 때 렌더링할 내용
+          <View style={styles.postContentArea}>
+            <TextInput
+              style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
+              onChangeText={handlemainTextChange}
+              value={maintext}
+              multiline={true}
+              placeholder={"이곳에 글을 입력해 주세요!"}
+              placeholderTextColor={'gray'}
+            />
+            {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
+          </View>
+        )}
         {(postImages2.length > 0 || selectedImages.length > 0) ? (
           <View style={styles.photoArea}>
             <ScrollView style={styles.photoScrollViewArea} horizontal={true}>
@@ -392,12 +491,47 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
         onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
       >
         <View style={styles.modalContent}>
-          <TouchableOpacity style={styles.allposter} onPress={handleAllPosterPress}>
-            <Text style={[styles.noallposterfont, selectallposter == 1 && styles.yesallposterfont]}> 전체 게시판 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.allposter} onPress={handleDepartmentPosterPress}>
-            <Text style={[styles.noallposterfont, selectdepartmentposter === 1 && styles.yesallposterfont]}> 학과 게시판 </Text>
-          </TouchableOpacity>
+          {post_edit_info.inform_check ? (
+            // post_edit_info.inform_check가 true일 때
+            <>
+              {userData.title === "학교" && (
+                <TouchableOpacity style={styles.allposter} onPress={handleAllPosterPress}>
+                  <Text style={[styles.noallposterfont, selectallposter === 1 && selectcontestposter === 0 && styles.yesallposterfont]}>
+                    학교 공지사항
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity style={styles.allposter} onPress={handleDepartmentPosterPress}>
+                <Text style={[styles.noallposterfont, selectdepartmentposter === 1 && styles.yesallposterfont]}>
+                  학과 공지사항
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.allposter} onPress={handleContestPosterPress}>
+                <Text style={[styles.noallposterfont, selectcontestposter === 1 && selectallposter === 1 && styles.yesallposterfont]}>
+                  공모전 게시판
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            // post_edit_info.inform_check가 false일 때
+            <>
+              <TouchableOpacity style={styles.allposter} onPress={handleAllPosterPress}>
+                <Text style={[styles.noallposterfont, selectallposter === 1 && styles.yesallposterfont]}>
+                  전체 게시판
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.allposter} onPress={handleDepartmentPosterPress}>
+                <Text style={[styles.noallposterfont, selectdepartmentposter === 1 && styles.yesallposterfont]}>
+                  학과 게시판
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.allposter} onPress={handleClubPosterPress}>
+                <Text style={[styles.noallposterfont, selectclubposter === 1 && styles.yesallposterfont]}>
+                  동아리 게시판
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
           <View style={styles.writeButtom}>
             <View style={{ flex: 0.65, }}>
             </View>
@@ -458,7 +592,7 @@ const styles = StyleSheet.create({
   modal: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    height: 400,
+    height: 500,
   },
   modalContent: {
     flex: 1,
@@ -584,6 +718,8 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     marginVertical: 20,
     borderBottomWidth: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
   selectPostText: {
     fontSize: 22,
