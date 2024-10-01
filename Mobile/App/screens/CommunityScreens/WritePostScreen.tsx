@@ -160,9 +160,14 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         body: JSON.stringify({
           user_id: userData.user_pk,
           department_check: selectdepartmentposter,
+          contest_check: 0,
           inform_check: 0,
+          Club_check : selectclubposter,
           title: titletext,
           contents: maintext,
+          url : '',
+          sources : ''
+
         }),
       });
       return await response.json();

@@ -1226,10 +1226,10 @@ app.post('/recomment_like_num_down', async (req, res) => {
 //게시물 쓰기
 app.post('/write_post', async (req, res) => {
   try {
-    const { user_id, department_check, inform_check, contest_check, title, contents, url, sources } = req.body;
+    const { user_id, department_check, inform_check, contest_check, Club_check, title, contents, url, sources } = req.body;
     console.log(url);
     console.log(sources);
-    const postId = await write_post(user_id, department_check, inform_check, contest_check, title, contents,  url, sources);
+    const postId = await write_post(user_id, department_check, inform_check, contest_check, title, contents,  url, sources, Club_check);
 
     if (postId) {
       console.log("[WritePostScreen or NoticeWritePostScreen] : 게시물 작성 성공");

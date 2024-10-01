@@ -250,6 +250,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           department_check: selectdepartmentposter,
           inform_check: adminCheck(),
           contest_check: selectcontestposter,
+          Club_check : 0,
           title: titletext,
           contents: maintext,
           url: urltext,

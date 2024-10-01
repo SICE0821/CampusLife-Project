@@ -223,7 +223,7 @@ async function getGeneralPosts(campus_id) {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 0 AND post.inform_check =0 AND student.campus_id = ? "
+            + "post.department_check = 0 AND post.inform_check =0 AND student.campus_id = ? AND post.Club_check = 0 "
             + "ORDER BY post.date DESC"
         );
         const rows = await conn.query(query, [campus_id]);
@@ -1294,13 +1294,13 @@ async function recomment_like_num_down(recomment_id) {
     }
 }
 
-async function write_post(user_id, department_check, inform_check, contest_check, title, contents, url, sources) {
+async function write_post(user_id, department_check, inform_check, contest_check, title, contents, url, sources, Club_check) {
     let conn;
     try {
         conn = await pool.getConnection();
         const query = `INSERT INTO post (user_id, department_check, inform_check, Club_check, contest_check, title, contents, view, \`like\`, url, sources)
-        VALUES (?, ?, ?, 0, ?, ?, ?, DEFAULT, DEFAULT, ?, ?);`
-        const result = await conn.query(query, [user_id, department_check, inform_check, contest_check, title, contents, url, sources]);
+        VALUES (?, ?, ?, ?, ?, ?, ?, DEFAULT, DEFAULT, ?, ?);`
+        const result = await conn.query(query, [user_id, department_check, inform_check, Club_check, contest_check, title, contents, url, sources]);
         const postId = result.insertId.toString();
         return postId;
     } catch (err) {
