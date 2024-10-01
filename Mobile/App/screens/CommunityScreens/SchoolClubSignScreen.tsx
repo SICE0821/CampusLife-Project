@@ -11,49 +11,86 @@ import {
   Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { Picker } from '@react-native-picker/picker';
-import { RadioButton } from 'react-native-paper';
 
+// 질문 타입 정의
 type Question = {
   id: string;
-  type: 'text' | 'radio' | 'picker';
+  type: 'text'; // 모든 질문은 'text' 타입으로 정의
   label: string;
-  options?: string[];
 };
 
-const SchoolClubSignScreen = ({ route, navigation }: any) => {
-  console.log('you are in SchoolClubSignScreen');
-  const { item, userData } = route.params;
+/**
+ * 두 개의 텍스트 입력 질문을 같은 행에 배치하는 컴포넌트
+ */
+const RowTextQuestions: React.FC<{
+  question1: Question;
+  question2: Question;
+  value1: string;
+  value2: string;
+  onChange: (id: string, value: string) => void;
+}> = ({ question1, question2, value1, value2, onChange }) => (
+  <View style={rowTextStyles.rowContainer}>
+    <View style={rowTextStyles.inputContainer}>
+      <Text style={rowTextStyles.label}>{question1.label}</Text>
+      <TextInput
+        style={rowTextStyles.input}
+        placeholder={`${question1.label}을 입력하세요`}
+        value={value1}
+        onChangeText={(text) => onChange(question1.id, text)}
+      />
+    </View>
+    <View style={rowTextStyles.inputContainer}>
+      <Text style={rowTextStyles.label}>{question2.label}</Text>
+      <TextInput
+        style={rowTextStyles.input}
+        placeholder={`${question2.label}을 입력하세요`}
+        value={value2}
+        onChangeText={(text) => onChange(question2.id, text)}
+      />
+    </View>
+  </View>
+);
 
+/**
+ * 거주지 입력 칸 (하나의 긴 텍스트 입력칸)
+ */
+const SingleTextQuestion: React.FC<{
+  question: Question;
+  value: string;
+  onChange: (id: string, value: string) => void;
+}> = ({ question, value, onChange }) => (
+  <View style={singleTextStyles.container}>
+    <Text style={singleTextStyles.label}>{question.label}</Text>
+    <TextInput
+      style={singleTextStyles.input}
+      placeholder={`${question.label}을 입력하세요`}
+      value={value}
+      onChangeText={(text) => onChange(question.id, text)}
+    />
+  </View>
+);
+
+/**
+ * 동아리 신청서 작성 화면 컴포넌트
+ */
+const SchoolClubSignScreen = ({ route, navigation }: any) => {
   // 예시 질문 데이터
   const questions: Question[] = [
-    {
-      id: 'name',
-      type: 'text',
-      label: '입력란',
-    },
-    {
-      id: 'department',
-      type: 'picker',
-      label: '선택지',
-      options: ['선택지1', '선택지2', '선택지3', '선택지4'],
-    },
-    {
-      id: 'gender',
-      type: 'radio',
-      label: '성별',
-      options: ['남성', '여성', '포크레인'],
-    },
-    {
-      id: 'introduction',
-      type: 'text',
-      label: '자기소개',
-    },
+    { id: 'name', type: 'text', label: '이름' },
+    { id: 'birthDate', type: 'text', label: '생년월일' },
+    { id: 'school', type: 'text', label: '학교' },
+    { id: 'department', type: 'text', label: '학과' },
+    { id: 'year', type: 'text', label: '학년' },
+    { id: 'contact', type: 'text', label: '연락처' },
+    { id: 'address', type: 'text', label: '거주지' },
   ];
 
   // 각 질문에 대한 응답 상태 관리
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
 
+  /**
+   * 입력 값 변경 핸들러
+   */
   const handleInputChange = (id: string, value: string) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -61,72 +98,10 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
     }));
   };
 
-  const renderQuestion = (question: Question) => {
-    switch (question.type) {
-      case 'text':
-        return (
-          <View key={question.id} style={styles.inputContainer}>
-            <Text style={styles.label}>{question.label}</Text>
-            <TextInput
-              style={[
-                styles.input,
-                question.id === 'introduction' && styles.textArea,
-              ]}
-              placeholder={`${question.label}을 입력하세요`}
-              value={answers[question.id] || ''}
-              onChangeText={(text) => handleInputChange(question.id, text)}
-              multiline={question.id === 'introduction'}
-              numberOfLines={question.id === 'introduction' ? 5 : 1}
-            />
-          </View>
-        );
-      case 'radio':
-        return (
-          <View key={question.id} style={styles.inputContainer}>
-            <Text style={styles.label}>{question.label}</Text>
-            <View style={styles.radioGroup}>
-              <RadioButton.Group
-                onValueChange={(newValue) =>
-                  handleInputChange(question.id, newValue)
-                }
-                value={answers[question.id] || ''}
-              >
-                {question.options?.map((option, index) => (
-                  <View key={index} style={styles.radioItem}>
-                    <RadioButton value={option} color="#3498db" />
-                    <Text style={styles.radioLabel}>{option}</Text>
-                  </View>
-                ))}
-              </RadioButton.Group>
-            </View>
-          </View>
-        );
-      case 'picker':
-        return (
-          <View key={question.id} style={styles.inputContainer}>
-            <Text style={styles.label}>{question.label}</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={answers[question.id] || question.options?.[0]}
-                onValueChange={(itemValue) =>
-                  handleInputChange(question.id, itemValue)
-                }
-                style={styles.picker}
-              >
-                {question.options?.map((option, index) => (
-                  <Picker.Item key={index} label={option} value={option} />
-                ))}
-              </Picker>
-            </View>
-          </View>
-        );
-      default:
-        return null;
-    }
-  };
-
+  /**
+   * 제출 버튼 핸들러
+   */
   const handleSubmit = () => {
-    // 모든 질문에 대한 응답이 있는지 확인
     for (let question of questions) {
       if (!answers[question.id]) {
         Alert.alert('모든 입력란에 입력해주세요.');
@@ -134,17 +109,12 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
       }
     }
 
-    // applicant 객체 생성
     const applicant = {
-      id: Date.now().toString(), // 임시 ID 생성
+      id: Date.now().toString(),
       answers,
-      questions,
     };
 
-    // 입력된 데이터 콘솔 출력
     console.log('동아리 신청서 제출:', applicant);
-
-    // 필요한 경우, applicant 데이터를 서버로 전송하거나 상태를 업데이트합니다.
 
     Alert.alert('동아리 신청이 완료되었습니다.');
     navigation.goBack();
@@ -152,27 +122,63 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={mainScreenStyles.container}
       behavior={Platform.select({ ios: 'padding', android: undefined })}
     >
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.title}>동아리 신청서</Text>
+      <ScrollView contentContainerStyle={mainScreenStyles.contentContainer}>
+        <Text style={mainScreenStyles.title}>동아리 신청서</Text>
 
-        {questions.map((question) => renderQuestion(question))}
+        {/* 이름/생년월일 */}
+        <RowTextQuestions
+          question1={questions[0]}
+          question2={questions[1]}
+          value1={answers['name'] || ''}
+          value2={answers['birthDate'] || ''}
+          onChange={handleInputChange}
+        />
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        {/* 학교/학과 */}
+        <RowTextQuestions
+          question1={questions[2]}
+          question2={questions[3]}
+          value1={answers['school'] || ''}
+          value2={answers['department'] || ''}
+          onChange={handleInputChange}
+        />
+
+        {/* 학년/연락처 */}
+        <RowTextQuestions
+          question1={questions[4]}
+          question2={questions[5]}
+          value1={answers['year'] || ''}
+          value2={answers['contact'] || ''}
+          onChange={handleInputChange}
+        />
+
+        {/* 거주지 칸 (한 줄로 길게) */}
+        <SingleTextQuestion
+          question={questions[6]}
+          value={answers['address'] || ''}
+          onChange={handleInputChange}
+        />
+
+        {/* 제출 버튼 */}
+        <TouchableOpacity style={mainScreenStyles.submitButton} onPress={handleSubmit}>
           <Icon name="checkcircle" size={24} color="#fff" />
-          <Text style={styles.submitButtonText}>신청하기</Text>
+          <Text style={mainScreenStyles.submitButtonText}>신청하기</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-// 스타일 정의
-const styles = StyleSheet.create({
+/**
+ * 메인 스타일 정의
+ */
+const mainScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f5f6fa',
   },
   contentContainer: {
     padding: 20,
@@ -185,13 +191,40 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginVertical: 20,
   },
+  submitButton: {
+    flexDirection: 'row',
+    backgroundColor: '#3498db',
+    borderRadius: 30,
+    paddingVertical: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 30,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 20,
+    marginLeft: 10,
+    fontWeight: 'bold',
+  },
+});
+
+/**
+ * 두 개의 텍스트 질문이 같은 줄에 배치되는 스타일 정의
+ */
+const rowTextStyles = StyleSheet.create({
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
   inputContainer: {
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    elevation: 2,
+    flex: 1,
+    marginHorizontal: 5,
   },
   label: {
     fontSize: 16,
@@ -205,49 +238,39 @@ const styles = StyleSheet.create({
     padding: 10,
     fontSize: 16,
     backgroundColor: '#ecf0f1',
-    textAlignVertical: 'top',
+    textAlignVertical: 'center',
   },
-  textArea: {
-    height: 100,
+});
+
+/**
+ * 단일 텍스트 질문 스타일 정의 (거주지 입력용)
+ */
+const singleTextStyles = StyleSheet.create({
+  container: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
-  submitButton: {
-    flexDirection: 'row',
-    backgroundColor: '#3498db',
-    borderRadius: 30,
-    paddingVertical: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 30,
-    elevation: 3,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 20,
-    marginLeft: 10,
-    fontWeight: 'bold',
-  },
-  radioGroup: {
-    flexDirection: 'column',
-  },
-  radioItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  radioLabel: {
+  label: {
     fontSize: 16,
     color: '#34495e',
+    marginBottom: 5,
   },
-  pickerContainer: {
+  input: {
     borderWidth: 1,
     borderColor: '#bdc3c7',
     borderRadius: 5,
-    overflow: 'hidden',
+    padding: 10,
+    fontSize: 16,
     backgroundColor: '#ecf0f1',
-  },
-  picker: {
-    height: 50,
-    width: '100%',
+    textAlignVertical: 'center',
   },
 });
 
