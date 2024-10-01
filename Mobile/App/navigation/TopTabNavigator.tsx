@@ -399,7 +399,7 @@ export const TopbTabNavigator = ({ route, navigation }: any) => {
 }
 
 //공지사항 학교 학과 상단 탭 네비게이션
-export const NoticeTopbTabNavigator = ({ route, navigation }: any) => {
+export const NoticeTopbTabNavigator = ({ route }: any) => {
     const { userdata } = route.params;
     return (
         <NoticeTopTab.Navigator

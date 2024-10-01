@@ -29,6 +29,19 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
   const [showModal, setShowModal] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
 
+  useEffect(() => {
+    if(item.contest_check === true) {
+      navigation.setOptions({
+        title: '공모전', 
+      });
+    }else if (item.contest_check === false) {
+      navigation.setOptions({
+        title: '공지사항', 
+      });
+    }
+    
+  }, [navigation]);
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
@@ -58,7 +71,6 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
       })
       const DetailPostPhoto = await response.json();
       setpostImages(DetailPostPhoto);
-      console.log(DetailPostPhoto);
     } catch (error) {
       console.error('유저 학과 이름 가져오기 실패:', error);
     }

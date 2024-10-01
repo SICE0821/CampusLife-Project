@@ -3,6 +3,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Text, View, Button, StyleSheet, Dimensions, TouchableOpacity, TextInput, ScrollView, Alert, Image } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
+import Clipboard from '@react-native-clipboard/clipboard';
 import IconCancel from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
 import ModalBox from 'react-native-modalbox';
@@ -10,6 +11,7 @@ import { UserData } from '../../types/type'
 import config from '../../config';
 import { launchImageLibrary } from 'react-native-image-picker';
 import LottieView from 'lottie-react-native';
+import Icon from 'react-native-vector-icons/Octicons';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,6 +43,8 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   const [selectcontestposter, setSelectContestPoster] = useState(0);
   const [postfontoption, setpostfontoption] = useState("게시판을 정해주세요");
   const [titletext, settitleText] = useState('');
+  const [urltext, seturlText] = useState('');
+  const [sourcestext, setSourcesText] = useState('');
   const [maintext, setmainText] = useState('');
   const [userData, setUserData] = useState<UserData>(userdata);
   const [selectedImages, setSelectedImages] = useState<any[]>([]); // 선택된 이미지
@@ -52,7 +56,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   useFocusEffect(
     React.useCallback(() => {
       changeHeaderRightContent();
-    }, [selectdepartmentposter, titletext, maintext, selectedFormImages])
+    }, [selectdepartmentposter, titletext, maintext, urltext, sourcestext, selectedFormImages])
   );
 
   const goback = () => {
@@ -76,7 +80,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         setpostfontoption("게시판을 정해주세요");
       }
     }
-  }, [selectallposter, selectdepartmentposter, userData.title]);
+  }, [selectallposter, selectdepartmentposter, selectcontestposter, userData.title]);
 
   const openModal = () => {
     setIsModalOpen(true); // 모달을 열기 위해 상태를 true로 설정
@@ -90,37 +94,58 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     setselectapllposterOption(1);
     setselectdepartmentposter(0);
     setSelectContestPoster(0);
+    setSourcesText('');
+    seturlText('');
   };
 
   const handleDepartmentPosterPress = () => {
     setselectapllposterOption(0);
     setselectdepartmentposter(1);
     setSelectContestPoster(0);
+    setSourcesText('');
+    seturlText('');
   };
 
   const handleContestPosterPress = () => {
     setselectapllposterOption(0);
     setselectdepartmentposter(0);
-    setSelectContestPoster(1); 
+    setSelectContestPoster(1);
   };
 
   const handletitleTextChange = (inputText: string) => {
     settitleText(inputText);
   };
 
+  const handleurlTextChange = (inputText: string) => {
+    seturlText(inputText);
+  };
+
+  const handlesorceTextChange = (inputText: string) => {
+    setSourcesText(inputText);
+  };
+
   const handlemainTextChange = (inputText: string) => {
     setmainText(inputText);
+  };
+
+  const pasteFromClipboard = async () => {
+    const clipboardContent = await Clipboard.getString();
+    seturlText(clipboardContent);
   };
 
   const changeHeaderRightContent = () => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={async () => {
-          const post_id = await write_post();
-          const post_id_int = parseInt(post_id.postId);
-          const imageGroup = await uploadImages();
-          await RegistorPostPhoto(post_id_int, imageGroup); //포스트 사진 등록
-          ok_go();
+          if(selectcontestposter === 1 && selectedImages.length > 1) {
+            contest_photo_no();
+          } else {
+            const post_id = await write_post();
+            const post_id_int = parseInt(post_id.postId);
+            const imageGroup = await uploadImages();
+            await RegistorPostPhoto(post_id_int, imageGroup); //포스트 사진 등록
+            ok_go();
+          }
 
         }}>
           <View style={{ flexDirection: 'row', backgroundColor: '#B20000', justifyContent: 'center', alignItems: 'center', width: 65, height: 35, borderRadius: 20, marginRight: 10 }}>
@@ -141,66 +166,76 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     );
   };
 
-    //사진 등록 함수 프로시저 사용할거임
-    const RegistorPostPhoto = async (post_id: number, post_photo: any) => {
-      try {
-        const response = await fetch(`${config.serverUrl}/RegistorPostPhoto`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            post_id: post_id,
-            post_photo: post_photo
-          }),
-        })
-        await response.json();
-      } catch (error) {
-        console.error(error);
-      } finally {
-      }
+  const contest_photo_no = () => {
+    Alert.alert(
+      "공모전 작성 실패",
+      "공모전 작성 사진은 하나만 들어갈 수 있습니다.",
+      [
+        { text: "확인" }
+      ]
+    );
+  };
+
+  //사진 등록 함수 프로시저 사용할거임
+  const RegistorPostPhoto = async (post_id: number, post_photo: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/RegistorPostPhoto`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          post_id: post_id,
+          post_photo: post_photo
+        }),
+      })
+      await response.json();
+    } catch (error) {
+      console.error(error);
+    } finally {
     }
+  }
 
   const adminCheck = () => {
-    if(userData.title === "일반학생"){
+    if (userData.title === "일반학생") {
       return 0;
-    }else{
+    } else {
       return 1;
     }
   }
 
-  const addSchoolNoticeAram = async (value : number) => {
+  const addSchoolNoticeAram = async (value: number) => {
     try {
-        const response = await fetch(`${config.serverUrl}/addSchoolNoticeAram`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                target_id: value
-            })
-        });
-    } catch (error) {
-        console.error('알람 전송 실패', error);
-    }
-}
-
-
-const addDepartmentNoticeAram = async (value : number) => {
-  try {
-      const response = await fetch(`${config.serverUrl}/addDepartmentNoticeAram`, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              target_id: value
-          })
+      const response = await fetch(`${config.serverUrl}/addSchoolNoticeAram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          target_id: value
+        })
       });
-  } catch (error) {
+    } catch (error) {
       console.error('알람 전송 실패', error);
+    }
   }
-}
+
+
+  const addDepartmentNoticeAram = async (value: number) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/addDepartmentNoticeAram`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          target_id: value
+        })
+      });
+    } catch (error) {
+      console.error('알람 전송 실패', error);
+    }
+  }
 
 
   const write_post = async () => {
@@ -214,83 +249,87 @@ const addDepartmentNoticeAram = async (value : number) => {
           user_id: userData.user_pk,
           department_check: selectdepartmentposter,
           inform_check: adminCheck(),
+          contest_check: selectcontestposter,
+          Club_check : 0,
           title: titletext,
           contents: maintext,
+          url: urltext,
+          sources: sourcestext
         })
       });
       const value = await response.json();
-      if(selectdepartmentposter === 0) {
-      await addSchoolNoticeAram(value.postId);
-      return value;
-    }else if(selectdepartmentposter === 1) {
-      await addDepartmentNoticeAram(value.postId);
-      return value;
-    }
+      if (selectdepartmentposter === 0) {
+        await addSchoolNoticeAram(value.postId);
+        return value;
+      } else if (selectdepartmentposter === 1) {
+        await addDepartmentNoticeAram(value.postId);
+        return value;
+      }
 
     } catch (error) {
       console.error('게시글 쓰기 실패!', error);
     }
   }
 
-    // 이미지 선택 함수
-    const handleImagePick = () => {
-      launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
-        if (response.assets) {
-          const newSelectedImage = [...selectedImages, ...response.assets];
-          setSelectedImages(newSelectedImage);
-          const formDataArray = newSelectedImage.map((image, index) => {
-            const formData = new FormData();
-            const fileNameWithoutExtension = image.fileName.split('.').slice(0, -1).join('.');
-            const newFileName = `${Date.now()}_${fileNameWithoutExtension}.png`;
-            formData.append('images', {
-              uri: image.uri,
-              type: image.type,
-              name: newFileName,
-              index: index,
-            });
-            return formData;
+  // 이미지 선택 함수
+  const handleImagePick = () => {
+    launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
+      if (response.assets) {
+        const newSelectedImage = [...selectedImages, ...response.assets];
+        setSelectedImages(newSelectedImage);
+        const formDataArray = newSelectedImage.map((image, index) => {
+          const formData = new FormData();
+          const fileNameWithoutExtension = image.fileName.split('.').slice(0, -1).join('.');
+          const newFileName = `${Date.now()}_${fileNameWithoutExtension}.png`;
+          formData.append('images', {
+            uri: image.uri,
+            type: image.type,
+            name: newFileName,
+            index: index,
           });
-          setSelectedFormImages(formDataArray);
-          forceUpdate();
-        } else if (response.errorCode) {
-          //console.log('Image picker error: ', response.errorMessage);
+          return formData;
+        });
+        setSelectedFormImages(formDataArray);
+        forceUpdate();
+      } else if (response.errorCode) {
+        //console.log('Image picker error: ', response.errorMessage);
+      }
+    });
+  };
+
+  // 이미지 업로드 함수
+  const uploadImages = async () => {
+    try {
+      const uploadedImageDatas = [];
+      for (const formData of selectedFormImages) {
+        const response = await fetch(`${config.serverUrl}/uploadImages`, {
+          method: 'POST',
+          body: formData,
+        });
+        const imageData = await response.json();
+        uploadedImageDatas.push(imageData.fileNames[0]);
+        if (response.ok) {
+          //console.log('Image uploaded successfully');
+        } else {
+          //console.error('Image upload failed');
         }
-      });
-    };
-  
-      // 이미지 업로드 함수
-      const uploadImages = async () => {
-        try {
-          const uploadedImageDatas = [];
-          for (const formData of selectedFormImages) {
-            const response = await fetch(`${config.serverUrl}/uploadImages`, {
-              method: 'POST',
-              body: formData,
-            });
-            const imageData = await response.json();
-            uploadedImageDatas.push(imageData.fileNames[0]);
-            if (response.ok) {
-              //console.log('Image uploaded successfully');
-            } else {
-              //console.error('Image upload failed');
-            }
-          }
-          //console.log(uploadedImageDatas);
-          return uploadedImageDatas;
-        } catch (error) {
-          console.error('Error uploading images: ', error);
-        }
-      };
-    
-  
-    // 이미지 삭제 함수
-    const handleImageRemove = (index: number) => {
-      const updatedImages = selectedImages.filter((_, i) => i !== index);
-      setSelectedImages(updatedImages);
-  
-      const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
-      setSelectedFormImages(updatedFormImages);
-    };
+      }
+      //console.log(uploadedImageDatas);
+      return uploadedImageDatas;
+    } catch (error) {
+      console.error('Error uploading images: ', error);
+    }
+  };
+
+
+  // 이미지 삭제 함수
+  const handleImageRemove = (index: number) => {
+    const updatedImages = selectedImages.filter((_, i) => i !== index);
+    setSelectedImages(updatedImages);
+
+    const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
+    setSelectedFormImages(updatedFormImages);
+  };
 
   return (
     <View style={styles.container}>
@@ -301,66 +340,97 @@ const addDepartmentNoticeAram = async (value : number) => {
             <IconB name="down" onPress={openModal} size={30} color={'black'} />
           )}
         </View>
-      <View style={styles.postTitleArea}>
-        <TextInput
-          style={styles.postTitleText}
-          onChangeText={handletitleTextChange}
-          value={titletext}
-          placeholder="제목"
-          placeholderTextColor={'gray'}
-        />
-      </View>
-      <View style={styles.postContentArea}>
-        <TextInput
-          style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
-          onChangeText={handlemainTextChange}
-          value={maintext}
-          multiline={true}
-          placeholder={"이곳에 글을 입력해 주세요!"}
-          placeholderTextColor={'gray'}
-        />
-        {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
-      </View>
-      {selectedImages.length > 0 && (
-        <View style={styles.photoArea}>
-          <ScrollView style={styles.photoScrollViewArea} horizontal={true}>
-            {selectedImages.map((image, index) => (
-              <View key={index} style={styles.fileInfo}>
-                <Image
-                  source={{ uri: image.uri }}
-                  resizeMode="contain"
-                  style={styles.imagePreview} />
-                <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
-                  <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
-                </TouchableOpacity>
-
-                {/* 마지막 인덱스가 아닐 때만 LottieView를 렌더링 */}
-                {index !== selectedImages.length - 1 && (
-                  <LottieView
-                    source={require('../../assets/Animation - 1725980201082.json')}
-                    autoPlay
-                    onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
-                    loop
-                    style={{ width: width - 440, height: height - 910, right: width - 455, top: height - 830 }}
-                  />
-                )}
-              </View>
-            ))}
-          </ScrollView>
+        <View style={styles.postTitleArea}>
+          <TextInput
+            style={styles.postTitleText}
+            onChangeText={handletitleTextChange}
+            value={titletext}
+            placeholder="제목"
+            placeholderTextColor={'gray'}
+          />
         </View>
-      )}
-    </ScrollView>
-    <View style={styles.postImageArea}>
-      <TouchableOpacity onPress={handleImagePick} style={styles.postImageButton}>
-        <IconC name="image" size={35} color={'black'} />
-      </TouchableOpacity>
-    </View>
-    <ModalBox
-      isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
-      style={modalStyle.modal}
-      position="bottom"
-      swipeToClose={false}
-      onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
+
+        {selectcontestposter === 1 ? (
+          // selectcontestposter가 1일 때 렌더링할 내용
+          <>
+            <View style={styles.postTitleArea}>
+              <TextInput
+                style={styles.postTitleText}
+                onChangeText={handleurlTextChange}
+                value={urltext}
+                placeholder="URL 입력"
+                placeholderTextColor={'gray'}
+              />
+              <TouchableOpacity style={{ marginRight: 15 }} onPress={pasteFromClipboard}>
+                <Icon name="paste" size={36} color={'black'} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.postTitleArea}>
+              <TextInput
+                style={styles.postTitleText}
+                onChangeText={handlesorceTextChange}
+                value={sourcestext}
+                placeholder="출처"
+                placeholderTextColor={'gray'}
+              />
+            </View>
+          </>
+        ) : (
+          // selectcontestposter가 1이 아닐 때 렌더링할 내용
+          <View style={styles.postContentArea}>
+            <TextInput
+              style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
+              onChangeText={handlemainTextChange}
+              value={maintext}
+              multiline={true}
+              placeholder={"이곳에 글을 입력해 주세요!"}
+              placeholderTextColor={'gray'}
+            />
+            {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
+          </View>
+        )}
+        {selectedImages.length > 0 && (
+          <View style={styles.photoArea}>
+            <ScrollView style={styles.photoScrollViewArea} horizontal={true}>
+              {selectedImages.map((image, index) => (
+                <View key={index} style={styles.fileInfo}>
+                  <Image
+                    source={{ uri: image.uri }}
+                    resizeMode="contain"
+                    style={styles.imagePreview} />
+                  <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
+                    <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+                  </TouchableOpacity>
+
+                  {/* 마지막 인덱스가 아닐 때만 LottieView를 렌더링 */}
+                  {index !== selectedImages.length - 1 && (
+                    <LottieView
+                      source={require('../../assets/Animation - 1725980201082.json')}
+                      autoPlay
+                      onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
+                      loop
+                      style={{ width: width - 440, height: height - 910, right: width - 455, top: height - 830 }}
+                    />
+                  )}
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+      </ScrollView>
+      <View style={styles.postImageArea}>
+        {!(selectcontestposter === 1 && selectedImages.length > 0) && (
+          <TouchableOpacity onPress={handleImagePick} style={styles.postImageButton}>
+            <IconC name="image" size={35} color={'black'} />
+          </TouchableOpacity>
+        )}
+      </View>
+      <ModalBox
+        isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
+        style={modalStyle.modal}
+        position="bottom"
+        swipeToClose={false}
+        onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
       >
         <View style={modalStyle.modalContent}>
           {userData.title === "학교" && (
@@ -381,17 +451,17 @@ const addDepartmentNoticeAram = async (value : number) => {
             </TouchableOpacity>
           </View>
         </View>
-    </ModalBox>
-    <Modal isVisible={isModalVisible}>
-      <View style={modalStyle.modalContainer}>
-        <Text style={modalStyle.title}>등록 확인</Text>
-        <Text style={modalStyle.message}>글이 등록되었습니다.</Text>
-        <TouchableOpacity style={modalStyle.confirmButton} onPress={goback}>
-          <Text style={modalStyle.confirmButtonText}>확인</Text>
-        </TouchableOpacity>
-      </View>
-    </Modal>
-  </View>
+      </ModalBox>
+      <Modal isVisible={isModalVisible}>
+        <View style={modalStyle.modalContainer}>
+          <Text style={modalStyle.title}>등록 확인</Text>
+          <Text style={modalStyle.message}>글이 등록되었습니다.</Text>
+          <TouchableOpacity style={modalStyle.confirmButton} onPress={goback}>
+            <Text style={modalStyle.confirmButtonText}>확인</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
@@ -424,6 +494,8 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
     marginVertical: 20,
     borderBottomWidth: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   },
 
   postImageArea: {
@@ -507,7 +579,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     backgroundColor: '#eeeeee'
   },
-  
+
   writespace: {
     margin: 15,
     flex: 0.82,
@@ -544,7 +616,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginTop: 15,
   },
-  
+
   yesallposterfont: {
     fontSize: 25,
     marginTop: 15,
