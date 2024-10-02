@@ -34,7 +34,6 @@ function Test() {
     const navigate = useNavigate();
     const location = useLocation();
     const { selectLecture } = location.state || {};
-    console.log(selectLecture); //이게 선택한 과목 정보
     const [selected, setSelected] = useState({ weekIndex: 0, classIndex: 0 }); //주차와 교시(차시)를 선택할때 사용하는 데이터
     const [totalStudentNum, setTotalStudentNum] = useState();
     const [studentAttendanceStates, setStudentAttendanceStates] = useState([]);
@@ -163,7 +162,6 @@ function Test() {
                 })
             })
             const StudentAttendanceStates = await response.json();
-            console.log(StudentAttendanceStates);
             setStudentAttendanceStates(StudentAttendanceStates);
         } catch (error) {
             console.error(error);
@@ -222,7 +220,7 @@ function Test() {
                                         key={classIndex}
                                         className={`${styles.detailClassBox} ${selected.weekIndex === weekIndex && selected.classIndex === classIndex ? styles.selected : ''}`}
                                         onClick={() => {
-                                            console.log(`${weekIndex}주차 ${classIndex}번 누름`);
+                                        
                                             handleButtonClick(weekIndex, classIndex);
                                         }}
                                         role="button"

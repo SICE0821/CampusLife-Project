@@ -6,6 +6,9 @@ import logo from '../image/logo.png'
 
 const HeaderPage = () => {
   const { isLoggedIn } = useAuth();
+  const { professorData } = useAuth();
+
+  console.log(professorData);
 
   if (!isLoggedIn) {
     return null; // Return null to hide the header when not logged in
@@ -17,7 +20,12 @@ const HeaderPage = () => {
       <nav>
         <ul className={styles.nav}>
           <li className={styles.navItem}>
-            <Link to="/" className={styles.navLink}>Home</Link>
+            <Link 
+              to="/" 
+              state={{ ProfessorInfo: professorData }}
+              className={styles.navLink}>
+                Home
+            </Link>
           </li>
           {/* <li className={styles.navItem}>
             <Link to="/Test" className={styles.navLink}>Test Page</Link>
