@@ -262,6 +262,76 @@ app.post('/ChangeStudentState', async (req, res) => {
     }
 });
 
+app.post('/GetTotalStudentPK', async (req, res) => {
+    const { lecture_id } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query =
+            `
+                SELECT student_id FROM lecture_have_object WHERE lecture_have_object.lecture_id = ?
+            `;
+        const rows = await conn.query(query, [lecture_id]);
+        conn.release();
+
+        const processedData = rows.map(item => ({
+            student_id: item.student_id,
+        }));
+
+        console.log("해당 과목 듣는 학생 정보 FK 배열 가져오기 성공");
+        res.json(processedData);
+    } catch (error) {
+        console.error("해당 과목 듣는 학생 정보 FK 배열 가져오기 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+app.post('/GetAttendanceStudentPK', async (req, res) => {
+    const { lecture_id, weeknum } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query =
+            `
+                SELECT DISTINCT 
+                    student_fk 
+                FROM 
+                    lecture_week_info 
+                WHERE 
+                    lecture_fk = ? AND weeknum = ?;
+            `;
+        const rows = await conn.query(query, [lecture_id, weeknum]);
+        conn.release();
+
+        const processedData = rows.map(item => ({
+            student_id: item.student_fk,
+        }));
+
+        console.log("해당 과목 출석 학생 정보 FK 배열 가져오기 성공");
+        res.json(processedData);
+    } catch (error) {
+        console.error("해당 과목 출석 학생 정보 FK 배열 가져오기 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+app.post('/InsertMissingStudentAttendance', async (req, res) => {
+    const { sutdent_fk, lecture_fk, weeknum, classnum } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query =
+            `
+                INSERT INTO lecture_week_info (student_fk, lecture_fk, weeknum, classnum, attendance_Info)
+                VALUES (?, ?, ?, ? , '결석');
+            `;
+        await conn.query(query, [sutdent_fk, lecture_fk, weeknum, classnum]);
+        conn.release();
+        res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+    } catch (error) {
+        console.error("나머지 학생 데이터 넣기 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+
 
 app.listen(PORT, () => {
     console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);

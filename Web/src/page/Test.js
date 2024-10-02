@@ -133,8 +133,8 @@ function Test() {
 
 
     //QR 코드 화면으로 이동하기
-    const handleNavigateToQrCheck = () => {
-        navigate('/qrcheck', { state: { selectLecture } });
+    const handleNavigateToQrCheck = (weeknum) => {
+        navigate('/qrcheck', { state: { selectLecture, weeknum } });
     };
 
     //해당 과목을 듣는 전체 총 학생 수 가져오기
@@ -192,9 +192,6 @@ function Test() {
                 })
             })
             const StudentAttendanceStates = await response.json();
-<<<<<<< HEAD
-            setStudentAttendanceStates(StudentAttendanceStates);
-=======
             let filteredStates = StudentAttendanceStates;
             console.log(filteredStates);
 
@@ -245,7 +242,6 @@ function Test() {
             })
             await response.json();
             await GetWeekClassStudentAttendanceStates(weeknum, classnum);
->>>>>>> 5eedc300d92e39c3d8c785e77f440b16c66000aa
         } catch (error) {
             console.error(error);
         }
@@ -313,7 +309,7 @@ function Test() {
                                     <div className={styles.classStudent}>
                                         <p className={styles.studentNum}>총 수강학생: {totalStudentNum}</p>
                                     </div>
-                                    <BiQrScan onClick={handleNavigateToQrCheck} size={80} className={styles.qr} />
+                                    <BiQrScan onClick={() => handleNavigateToQrCheck(weekIndex + 1)} size={80} className={styles.qr} />
                                 </div>
                                 {week.classTimes.map((classTime, classIndex) => (
                                     <div

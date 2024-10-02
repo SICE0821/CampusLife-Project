@@ -30,6 +30,35 @@
   color: #61dafb;
 }
 
+.Button_space {
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.completeAttendance {
+  width: 300px;
+  height: 60px;
+  background-color:#FDA72A;
+  border-radius: 10px;
+  cursor: pointer; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease; 
+}
+
+.completeAttendance:hover {
+  background-color: #E18F21; 
+}
+
+.completeAttendanceText {
+  font-size: 14pt;
+  color: white;
+  font-weight: bold;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
