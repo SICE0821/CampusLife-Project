@@ -489,9 +489,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', // 중앙 정렬
   },
   imagePreviewArea: {
-    marginTop: 20, // 위 여백 20
+    marginTop: 150, // 위 여백 20
     width: '100%', // 너비 100%
-    height: 200, // 높이 200
+    height: 300, // 높이 200
     alignItems: 'center', // 중앙 정렬
   },
   imageCard: {
