@@ -223,18 +223,24 @@ const AttendanceScreen = ({ navigation, route }: any) => {
   };
 
   const openCamera = (lecture: Lecture) => {
-    const currentTime = new Date().getTime();
-    if (!lecture.today_lecture_state) {
+    if (lecture.isScanned) {
       Alert.alert(
         '출석 처리됨',
         '이미 출석 처리가 완료되었습니다. 하루에 한 번만 출석할 수 있습니다.',
-        [{ text: '확인' }],
-        { cancelable: false }
+        [{ text: '확인' }]
       );
     } else {
+      navigation.navigate('FullScreenCamera', { selectedLecture: lecture });
+      closeModal();
       setIsScanned(false);
-      setIsCameraButton(true);
       lecture.today_lecture_state = false;
+
+      // 해당 과목의 출석 상태를 '이미 출석 완료'로 표시
+      setLectureList(prevList =>
+        prevList.map(lec =>
+          lec.lecture_name === lecture.lecture_name ? { ...lec, isScanned: true } : lec
+        )
+      );
     }
   };
 
@@ -265,12 +271,12 @@ const AttendanceScreen = ({ navigation, route }: any) => {
     requestPermission();
   }, []);
 
-  React.useEffect(() => {
+  /*React.useEffect(() => {
     if (isCameraButton) {
       navigation.navigate('FullScreenCamera');
       closeModal();
     }
-  }, [isCameraButton]);
+  }, [isCameraButton]);*/
 
   useEffect(() => {
     setScannedCode(route.params?.scannedCode);
@@ -401,7 +407,7 @@ const AttendanceScreen = ({ navigation, route }: any) => {
                 <View style={styles.Icon}>
                   <TouchableOpacity onPress={() => openCamera(selectedLecture)}
                     disabled={nowday !== selectedLecture?.week}>
-                    <IconA name="camera" size={32} color={nowday === selectedLecture?.week ? "black" : "gray"} />
+                    <IconA name="camera" size={32} color={nowday === selectedLecture?.week && !selectedLecture?.isScanned ? "black" : "gray"} />
                   </TouchableOpacity>
                 </View>
               </View>

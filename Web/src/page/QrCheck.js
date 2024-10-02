@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
 import styles from './QrCheck.module.css';
+import { useLocation } from 'react-router-dom';
 
 function QrCheck() {
   const [qrData, setQrData] = useState("");
   const [remainingTime, setRemainingTime] = useState(1); // QR code validity time (seconds)
   const qrTime = 1; // QR code regeneration interval (seconds)
+  const location = useLocation();
+  const { selectLecture } = location.state || {};
 
   useEffect(() => {
     const generateQRDataWithTimestamp = () => {
-      const prefix = "CampusLife_";
+      const prefix = "CampusLife_" + selectLecture.lecture_name+"_";
       const now = new Date();
       const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-      return prefix + timestamp;
+      console.log(prefix + timestamp);
+      return prefix + timestamp; 
     };
 
     const updateQRCode = () => {

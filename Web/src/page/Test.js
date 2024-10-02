@@ -6,28 +6,15 @@ import { FaSearch } from "react-icons/fa";
 import { useLocation } from 'react-router-dom';
 import config from './config'
 import Modal from 'react-modal';
+import Select from 'react-select';
 
 Modal.setAppElement('#root'); // 접근성을 위해 필요합니다.
 
-const studentsData = [
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-    { id: '2033053', name: '최지태', department: '컴퓨터소프트웨어과' },
-    { id: '2033054', name: '김영희', department: '컴퓨터소프트웨어과' },
-
-    // Add more student data here
+const options = [
+    { value: 'all', label: '전체' },
+    { value: 'attendance', label: '출결' },
+    { value: 'absent', label: '결석' },
+    { value: 'late', label: '지각' }
 ];
 
 function Test() {
@@ -36,12 +23,54 @@ function Test() {
     const { selectLecture } = location.state || {};
     const [selected, setSelected] = useState({ weekIndex: 0, classIndex: 0 }); //주차와 교시(차시)를 선택할때 사용하는 데이터
     const [totalStudentNum, setTotalStudentNum] = useState();
-    const [studentAttendanceStates, setStudentAttendanceStates] = useState([]);
+    const [studentAttendanceStates, setStudentAttendanceStates] = useState([]); //주차와 교시(차시)를 선택하여 학생들의 데이터를 가져옴
     const [totalStudentInfo, setTotalStudentInfo] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState(options[0]); //리스트 박스 값 저장
+    const [inputValue, setInputValue] = useState(''); //학생 이름 찾는 Text
+    const [filteredStudents, setFilteredStudents] = useState(''); // 필터링된 학생 상태
+    const [selectedStudent, setSelectedStudent] = useState(null); //선택한 학생 id
 
     const openModal = () => setIsOpen(true);
     const closeModal = () => setIsOpen(false);
+
+    // 리스트 박스 핸들러
+    const handleChange = (option) => {
+        setSelectedOption(option);
+        console.log("Selected option:", option);
+    }
+
+    // 학생 이름 찾을 때 사용되는 함수
+    const handleInputChange = (event) => {
+        const value = event.target.value;
+        setInputValue(value);
+
+        if (value === '') {
+            setFilteredStudents([]);
+            return;
+        }
+
+        const filtered = studentAttendanceStates.filter((student) =>
+            student.student_name.includes(value)
+        );
+        let filteredStates = filtered;
+        console.log(filtered);
+
+        if (selectedOption.value === 'attendance') {
+            filteredStates = filtered.filter(
+                (student) => student.attendance_Info === '출결'
+            );
+        } else if (selectedOption.value === 'absent') {
+            filteredStates = filtered.filter(
+                (student) => student.attendance_Info === '결석'
+            );
+        } else if (selectedOption.value === 'late') {
+            filteredStates = filtered.filter(
+                (student) => student.attendance_Info === '지각'
+            );
+        }
+        setFilteredStudents(filteredStates);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -55,7 +84,7 @@ function Test() {
             }
         };
         fetchData();
-    }, []);
+    }, [selectedOption]);
 
 
 
@@ -67,6 +96,7 @@ function Test() {
 
     //해당과목 날짜 변환기
     const formatDateWithOffset = (dateString, offsetDays) => {
+        console.log(dateString);
         const date = new Date(dateString);
         date.setDate(date.getDate() + offsetDays);
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -104,7 +134,7 @@ function Test() {
 
     //QR 코드 화면으로 이동하기
     const handleNavigateToQrCheck = () => {
-        navigate('/qrcheck');
+        navigate('/qrcheck', { state: { selectLecture } });
     };
 
     //해당 과목을 듣는 전체 총 학생 수 가져오기
@@ -162,7 +192,60 @@ function Test() {
                 })
             })
             const StudentAttendanceStates = await response.json();
+<<<<<<< HEAD
             setStudentAttendanceStates(StudentAttendanceStates);
+=======
+            let filteredStates = StudentAttendanceStates;
+            console.log(filteredStates);
+
+            if (selectedOption.value === 'attendance') {
+                filteredStates = StudentAttendanceStates.filter(
+                    (student) => student.attendance_Info === '출결'
+                );
+            } else if (selectedOption.value === 'absent') {
+                filteredStates = StudentAttendanceStates.filter(
+                    (student) => student.attendance_Info === '결석'
+                );
+            } else if (selectedOption.value === 'late') {
+                filteredStates = StudentAttendanceStates.filter(
+                    (student) => student.attendance_Info === '지각'
+                );
+            }
+
+            setStudentAttendanceStates(filteredStates);
+            setFilteredStudents(filteredStates);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    //학생의 출결정보 변경 처리 함수
+    const ChangeStudentState = async (weeknum, classnum, student_id, state) => {
+        let student_info = '';
+        if (state === 1) {
+            student_info = "출결"
+        } else if (state === 2) {
+            student_info = "결석"
+        } else if (state === 3) {
+            student_info = "지각"
+        }
+        try {
+            const response = await fetch(`${config.serverUrl}/ChangeStudentState`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: student_id,
+                    lecture_id: selectLecture.lecture_id,
+                    weeknum: weeknum,
+                    classnum: classnum,
+                    student_info: student_info
+                })
+            })
+            await response.json();
+            await GetWeekClassStudentAttendanceStates(weeknum, classnum);
+>>>>>>> 5eedc300d92e39c3d8c785e77f440b16c66000aa
         } catch (error) {
             console.error(error);
         }
@@ -171,9 +254,27 @@ function Test() {
     const weeksData = Array.from({ length: selectLecture.lecture_have_week }, (_, i) => {
         const Tiemslosts = splitTimeSlots(selectLecture.lecture_time);
         const lecture_start_date = formatDateWithOffset(selectLecture.lecture_start_date, i * 7);
+        console.log(lecture_start_date);
+
+        let attendanceCount = 0;
+        let lateCount = 0;
+        let absentCount = 0;
+
+        studentAttendanceStates.forEach(student => {
+        if (student.weeknum === i + 1) { // 현재 주차에 맞는 학생들만 처리
+            if (student.attendance_Info === '출결') {
+                attendanceCount++;
+            } else if (student.attendance_Info === '지각') {
+                lateCount++;
+            } else if (student.attendance_Info === '결석') {
+                absentCount++;
+            }
+        }
+    });
+
         return {
             week: `${i + 1}주차 (${lecture_start_date})`,
-            attendance: '출석: 0 지각: 0 결석: 0',
+            attendance: `출석: ${attendanceCount} 지각: ${lateCount} 결석: ${absentCount}`,
             classStatus: '강의상태: 미출결',
             classTimes: [
                 `1교시 ${lecture_start_date} ${Tiemslosts[0]}`,
@@ -211,7 +312,6 @@ function Test() {
                                     </div>
                                     <div className={styles.classStudent}>
                                         <p className={styles.studentNum}>총 수강학생: {totalStudentNum}</p>
-
                                     </div>
                                     <BiQrScan onClick={handleNavigateToQrCheck} size={80} className={styles.qr} />
                                 </div>
@@ -238,49 +338,96 @@ function Test() {
                     <div className={styles.student}>
                         <div className={styles.attendaceFind}>
                             <p className={styles.attendaceFindText}>출석자현황</p>
+                            <input
+                                type="text"
+                                value={inputValue}
+                                onChange={handleInputChange}
+                                placeholder="찾으시는 학생 이름을 입력해주세요"
+                                style={{ width: '400px' }}
+                            />
+
                             <FaSearch size={50} className={styles.search} />
                         </div>
-                        {(studentAttendanceStates.length > 0 ? studentAttendanceStates : totalStudentInfo).map((student, index) => (
+                        <Select
+                            value={selectedOption}
+                            onChange={handleChange}
+                            options={options}
+                        />
+                        {(filteredStudents.length
+                            ? filteredStudents
+                            : (studentAttendanceStates.length > 0
+                                ? studentAttendanceStates
+                                : (inputValue === ''
+                                    ? totalStudentInfo
+                                    : []))
+                        ).map((student, index) => (
                             <div key={index} className={styles.studentInfoBox}>
                                 <div className={styles.studentInfo}>
                                     <div className={styles.studentText}>
                                         <p className={styles.studentInfoText}>({student.student_id}) {student.student_name}</p>
                                         <p className={styles.studentDepartment}>{student.department_name}</p>
                                     </div>
-                                    <div className={styles.chagneAttendaceBox}>
-                                        <button className={styles.changeAttendaceButton} onClick={ () => {
-                                            openModal();
-                                            console.log("모달 열려라 얍 : " + isOpen)}}>
-                                            <p className={styles.changeAttendaceButtonText}>출석자 정보변경</p>
-                                        </button >
-                                        <Modal
-                                            isOpen={isOpen}
-                                            onRequestClose={closeModal}
-                                            contentLabel="Example Modal"
-                                            style={{
-                                                overlay: {
-                                                  backgroundColor: 'rgba(0, 0, 0, 0.5)',  // 모달 배경 반투명 처리
-                                                  zIndex: 1000,  // 다른 요소보다 위에 있도록 설정
-                                                },
-                                                content: {
-                                                  top: '50%',
-                                                  left: '50%',
-                                                  right: 'auto',
-                                                  bottom: 'auto',
-                                                  marginRight: '-50%',
-                                                  transform: 'translate(-50%, -50%)',  // 화면 중앙에 배치
-                                                  width: '400px',  // 모달의 너비 설정
-                                                  height: '200px',  // 모달의 높이 설정
-                                                  borderRadius: '10px',  // 모달의 둥근 테두리 설정
-                                                  padding: '20px',  // 내부 여백
-                                                },
-                                              }}
-                                        >
-                                            <h2>모달 제목</h2>
-                                            <button onClick={closeModal}>닫기</button>
-                                        </Modal>
-
-                                    </div>
+                                    {studentAttendanceStates.length > 0 && (
+                                        <div className={styles.chagneAttendaceBox}>
+                                            <button className={styles.changeAttendaceButton} onClick={() => {
+                                                setSelectedStudent(student);
+                                                openModal();
+                                                console.log("모달 열려라 얍 : " + isOpen)
+                                            }}>
+                                                <p className={styles.changeAttendaceButtonText}>출석자 정보변경</p>
+                                            </button>
+                                            <Modal
+                                                isOpen={isOpen}
+                                                onRequestClose={closeModal}
+                                                contentLabel="Example Modal"
+                                                style={{
+                                                    overlay: {
+                                                        backgroundColor: 'rgba(0, 0, 0, 0.5)',  // 모달 배경 반투명 처리
+                                                        zIndex: 1000,  // 다른 요소보다 위에 있도록 설정
+                                                    },
+                                                    content: {
+                                                        top: '50%',
+                                                        left: '50%',
+                                                        right: 'auto',
+                                                        bottom: 'auto',
+                                                        marginRight: '-50%',
+                                                        transform: 'translate(-50%, -50%)',
+                                                        width: '220px',
+                                                        height: '260px',
+                                                        borderRadius: '10px',
+                                                        padding: '10px',
+                                                    },
+                                                }}
+                                            >
+                                                <div className={styles.modalheaderBox}>
+                                                    <p className={styles.modalheaderText}>출석정보변경</p>
+                                                    <button className={styles.ModalCancleButton} onClick={closeModal}>닫기</button>
+                                                </div>
+                                                <div className={styles.modalbuttonBox}>
+                                                    <button className={styles.ModalButton} onClick={async () => {
+                                                        await ChangeStudentState(student.weeknum, student.classnum, selectedStudent.student_id, 1);
+                                                        console.log(student.student_id);
+                                                        closeModal();
+                                                    }
+                                                    }>출결 처리</button>
+                                                </div>
+                                                <div className={styles.modalbuttonBox}>
+                                                    <button className={styles.ModalButton} onClick={async () => {
+                                                        await ChangeStudentState(student.weeknum, student.classnum, selectedStudent.student_id, 2);
+                                                        closeModal();
+                                                    }
+                                                    }>결석 처리</button>
+                                                </div>
+                                                <div className={styles.modalbuttonBox}>
+                                                    <button className={styles.ModalButton} onClick={async () => {
+                                                        await ChangeStudentState(student.weeknum, student.classnum, selectedStudent.student_id, 3);
+                                                        closeModal();
+                                                    }
+                                                    }>지각 처리</button>
+                                                </div>
+                                            </Modal>
+                                        </div>
+                                    )}
                                     <div className={styles.attendaceBox}>
                                         <div className={`${styles.attendaceCheckBox} 
                                                          ${student.attendance_Info === '출결' ? styles.present :

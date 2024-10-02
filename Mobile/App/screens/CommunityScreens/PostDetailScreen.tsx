@@ -1584,7 +1584,7 @@ const styles = StyleSheet.create({
     },
     optionBox: {
         position: 'absolute',
-        top: 70,
+        top: 65,
         right: 20,
         width: 120,
         backgroundColor: 'white',
