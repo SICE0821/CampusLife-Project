@@ -685,14 +685,17 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
             <View style = {{height : 20}}></View>
             <Text>or</Text>
             <View style = {{height : 20}}></View>
-            <Button
-                title="(게시글 주인)동아리 현황파악하기."
-                onPress={() => {
-                    console.log("동아리 현황파악하기.");
-                    navigation.navigate("SchoolClubSignStateScreen", {item, userData});
-                }}
-            />
-                
+            {(userdata?.user_pk === postDetailInfo?.user_id) && (
+                    <>
+                        <Button
+                            title="(게시글 주인)동아리 현황파악하기."
+                            onPress={() => {
+                                console.log("동아리 현황파악하기.");
+                                navigation.navigate("SchoolClubSignStateScreen", { item, userData });
+                            }}
+                        />
+                                </>
+                            )}          
             </View>
         </View>
     );

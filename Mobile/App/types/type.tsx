@@ -22,6 +22,7 @@ export type UserData = {
   user_pk: number,
   point: number,
   birth: string,
+  phone: string,
   currentstatus: string,
   profile_photo: string | null,
   id: string,

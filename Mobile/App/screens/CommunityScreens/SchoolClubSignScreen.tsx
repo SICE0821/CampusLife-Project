@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Text,
   View,
@@ -11,6 +11,9 @@ import {
   Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { RadioButton } from 'react-native-paper';
+import config from '../../config';
+import { useFocusEffect } from '@react-navigation/native';
 
 // 질문 타입 정의
 type Question = {
@@ -71,9 +74,93 @@ const SingleTextQuestion: React.FC<{
 );
 
 /**
+ * 성별 선택 라디오 버튼 컴포넌트
+ */
+const GenderRadioButton: React.FC<{
+  value: string;
+  onChange: (newValue: string) => void;
+}> = ({ value, onChange }) => (
+  <View style={radioStyles.container}>
+    <Text style={radioStyles.label}>성별</Text>
+    <RadioButton.Group onValueChange={onChange} value={value}>
+      <View style={radioStyles.radioItem}>
+        <RadioButton value="남자" />
+        <Text style={radioStyles.radioLabel}>남자</Text>
+      </View>
+      <View style={radioStyles.radioItem}>
+        <RadioButton value="여자" />
+        <Text style={radioStyles.radioLabel}>여자</Text>
+      </View>
+    </RadioButton.Group>
+  </View>
+);
+
+/**
+ * 긴 텍스트 입력 칸 컴포넌트 (지원동기/자기소개)
+ */
+const LongTextQuestion: React.FC<{
+  question: Question;
+  value: string;
+  onChange: (id: string, value: string) => void;
+}> = ({ question, value, onChange }) => (
+  <View style={longTextStyles.container}>
+    <Text style={longTextStyles.label}>{question.label}</Text>
+    <TextInput
+      style={longTextStyles.input}
+      placeholder={`${question.label}을 입력하세요`}
+      value={value}
+      onChangeText={(text) => onChange(question.id, text)}
+      multiline
+      numberOfLines={6}
+      textAlignVertical="top"
+    />
+  </View>
+);
+
+/**
  * 동아리 신청서 작성 화면 컴포넌트
  */
 const SchoolClubSignScreen = ({ route, navigation }: any) => {
+  const { item, userData } = route.params;
+  const [userDepartment, setUserDepartment] = useState<string>('');
+  const [UserUniversity, setUserUniversity] = useState<string | undefined>();
+
+  const getUserDepartment = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/get_department_name`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ department_name: userData.department_pk }),
+      });
+      const userDepartmentData = await response.json();
+      const departmentName = userDepartmentData.userdepartment;
+      setUserDepartment(departmentName);
+    } catch (error) {
+      console.error('유저 학과 이름 가져오기 실패:', error);
+    }
+  };
+
+  const getUserUniversity = async () => {
+    try {
+        const response = await fetch(`${config.serverUrl}/get_university_name`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                university_name: userData.campus_pk,
+            }),
+        });
+        const result = await response.json();
+        setUserUniversity(result.useruniversity);
+    } catch (error) {
+        console.error('유저 학교 이름 가져오기 실패:', error);
+    }
+};
+
+
   // 예시 질문 데이터
   const questions: Question[] = [
     { id: 'name', type: 'text', label: '이름' },
@@ -83,10 +170,35 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
     { id: 'year', type: 'text', label: '학년' },
     { id: 'contact', type: 'text', label: '연락처' },
     { id: 'address', type: 'text', label: '거주지' },
+    { id: 'motivation', type: 'text', label: '지원동기' },
+    { id: 'introduction', type: 'text', label: '자기소개' },
   ];
 
   // 각 질문에 대한 응답 상태 관리
   const [answers, setAnswers] = useState<{ [key: string]: string }>({});
+  const [gender, setGender] = useState<string>(''); // 성별 상태 관리
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getUserUniversity();
+      getUserDepartment();
+    }, [])
+  );
+
+  // userData에서 초기값을 설정하기 위한 useEffect
+  useEffect(() => {
+    setAnswers({
+      name: userData.name || '',
+      birthDate: userData.birth || '',
+      school: UserUniversity || '', // 학교 정보를 채워넣으면 됩니다.
+      department: userDepartment || '', // 학과 정보를 채워넣으면 됩니다.
+      year: userData.grade ? String(userData.grade) : '',
+      contact: userData.phone || '',
+      address: '', // 거주지 정보가 없으므로 빈 값으로 시작
+      motivation: '',
+      introduction: '',
+    });
+  }, [userDepartment, UserUniversity, userData]);
 
   /**
    * 입력 값 변경 핸들러
@@ -101,23 +213,54 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
   /**
    * 제출 버튼 핸들러
    */
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!gender) {
+      Alert.alert('성별을 선택해주세요.');
+      return;
+    }
+  
     for (let question of questions) {
       if (!answers[question.id]) {
         Alert.alert('모든 입력란에 입력해주세요.');
         return;
       }
     }
-
+  
     const applicant = {
-      id: Date.now().toString(),
-      answers,
+      post_id: item.post_id, // 임의의 post_id 생성
+      name: answers.name,
+      birth: answers.birthDate,
+      university: answers.school,
+      department: answers.department,
+      grade: answers.year,
+      phone: answers.contact,
+      sex: gender,
+      residence: answers.address,
+      application: answers.motivation,
+      introduce: answers.introduction,
     };
-
-    console.log('동아리 신청서 제출:', applicant);
-
-    Alert.alert('동아리 신청이 완료되었습니다.');
-    navigation.goBack();
+  
+    try {
+      // 서버로 데이터 전송
+      const response = await fetch(`${config.serverUrl}/ClubInsert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(applicant),
+      });
+  
+      const result = await response.json();
+      if (result.message === 'Data received successfully') {
+        Alert.alert('동아리 신청이 완료되었습니다.');
+        navigation.goBack();
+      } else {
+        Alert.alert('신청에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      Alert.alert('서버와 통신 중 오류가 발생했습니다.');
+    }
   };
 
   return (
@@ -132,8 +275,8 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
         <RowTextQuestions
           question1={questions[0]}
           question2={questions[1]}
-          value1={answers['name'] || ''}
-          value2={answers['birthDate'] || ''}
+          value1={answers['name']}
+          value2={answers['birthDate']}
           onChange={handleInputChange}
         />
 
@@ -141,8 +284,8 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
         <RowTextQuestions
           question1={questions[2]}
           question2={questions[3]}
-          value1={answers['school'] || ''}
-          value2={answers['department'] || ''}
+          value1={answers['school']}
+          value2={answers['department']}
           onChange={handleInputChange}
         />
 
@@ -150,15 +293,32 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
         <RowTextQuestions
           question1={questions[4]}
           question2={questions[5]}
-          value1={answers['year'] || ''}
-          value2={answers['contact'] || ''}
+          value1={answers['year']}
+          value2={answers['contact']}
           onChange={handleInputChange}
         />
+
+        {/* 성별 선택 라디오 버튼 */}
+        <GenderRadioButton value={gender} onChange={setGender} />
 
         {/* 거주지 칸 (한 줄로 길게) */}
         <SingleTextQuestion
           question={questions[6]}
-          value={answers['address'] || ''}
+          value={answers['address']}
+          onChange={handleInputChange}
+        />
+
+        {/* 지원동기 긴 텍스트 입력칸 */}
+        <LongTextQuestion
+          question={questions[7]}
+          value={answers['motivation']}
+          onChange={handleInputChange}
+        />
+
+        {/* 자기소개 긴 텍스트 입력칸 */}
+        <LongTextQuestion
+          question={questions[8]}
+          value={answers['introduction']}
           onChange={handleInputChange}
         />
 
@@ -271,6 +431,70 @@ const singleTextStyles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#ecf0f1',
     textAlignVertical: 'center',
+  },
+});
+
+/**
+ * 긴 텍스트 질문 스타일 정의 (지원동기/자기소개 입력용)
+ */
+const longTextStyles = StyleSheet.create({
+  container: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  label: {
+    fontSize: 16,
+    color: '#34495e',
+    marginBottom: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#bdc3c7',
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
+    backgroundColor: '#ecf0f1',
+    textAlignVertical: 'top',
+  },
+});
+
+/**
+ * 성별 라디오 버튼 스타일 정의
+ */
+const radioStyles = StyleSheet.create({
+  container: {
+    marginBottom: 15,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  label: {
+    fontSize: 16,
+    color: '#34495e',
+    marginBottom: 10,
+  },
+  radioItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  radioLabel: {
+    fontSize: 16,
+    color: '#34495e',
   },
 });
 

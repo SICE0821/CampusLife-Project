@@ -522,7 +522,8 @@ const MainPage = ({ navigation, route }: any) => {
               onPress={() => {
                 navigation.navigate('NoticeScreenStackNavigator', {
                   screen: 'NoticePostTopTabNavigator',
-                  params: { screen: '학교 공지사항' }
+                  params: { screen: '학교 공지사항' },
+                  item : {userDepartment}
                 });
               }}
               style={styles.postDetailArea}
@@ -539,7 +540,7 @@ const MainPage = ({ navigation, route }: any) => {
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
-                    navigation.navigate("NoticePostDetailScreen", { item: post, userData });
+                    navigation.navigate("NoticePostDetailScreen", { item: post, userData , userDepartment});
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
@@ -573,7 +574,8 @@ const MainPage = ({ navigation, route }: any) => {
               onPress={() => {
                 navigation.navigate('NoticeScreenStackNavigator', {
                   screen: 'NoticePostTopTabNavigator',
-                  params: { screen: '학과 공지사항' }
+                  params: { screen: '학과 공지사항' },
+                  item : {userDepartment}
                 });
               }}
               style={styles.postDetailArea}
@@ -590,7 +592,8 @@ const MainPage = ({ navigation, route }: any) => {
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
-                    navigation.navigate("NoticePostDetailScreen", { item: post, userData });
+                    navigation.navigate("NoticePostDetailScreen", { item: post, userData , userDepartment});
+                    
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
@@ -624,7 +627,8 @@ const MainPage = ({ navigation, route }: any) => {
               onPress={() => {
                 navigation.navigate('CommunityScreenStackNavigator', {
                   screen: 'PostTopTabNavigator',
-                  params: { screen: '전체 게시판', params: { screen: 'HOT' } }
+                  params: { screen: '전체 게시판', params: { screen: 'HOT' } },
+                  item : {userDepartment}
                 });
               }}
               style={styles.postDetailArea}
@@ -641,7 +645,7 @@ const MainPage = ({ navigation, route }: any) => {
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
-                    navigation.navigate("PostDetailScreen", { item: post, userData });
+                    navigation.navigate("PostDetailScreen", { item: post, userData, userDepartment});
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
@@ -673,7 +677,8 @@ const MainPage = ({ navigation, route }: any) => {
               onPress={() => {
                 navigation.navigate('CommunityScreenStackNavigator', {
                   screen: 'PostTopTabNavigator',
-                  params: { screen: '전체 게시판', params: { screen: 'HOT' } }
+                  params: { screen: '전체 게시판', params: { screen: 'HOT' } },
+                  item : {userDepartment}
                 });
               }}
               style={styles.contestDetailArea}
