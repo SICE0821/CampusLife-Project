@@ -1,113 +1,111 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import config from '../../config'; // 서버 URL이 포함된 config 파일
 
-type Question = {
-  id: string;
-  type: 'text' | 'radio' | 'picker';
-  label: string;
-  options?: string[];
-};
-
-type Applicant = {
-  id: string;
-  answers: { [key: string]: string };
-  questions: Question[];
+type userInfo = {
+  Post_fk: number;
+  Name: string;
+  Birth: string;
+  University: string;
+  Department: string;
+  Grade: number;
+  Phone: string;
+  Sex: string;
+  Residence: string;
+  Application: string;
+  Introduce: string;
 };
 
 const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
-  console.log('you are in SchoolClubSignStateScreen');
   const { item, userData } = route.params;
+  const [userInfo, setUserInfo] = useState<userInfo[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 예시 질문 데이터 (SchoolClubSignScreen과 동일하게 설정)
-  const questions: Question[] = [
-    {
-      id: 'name',
-      type: 'text',
-      label: '입력란',
-    },
-    {
-      id: 'department',
-      type: 'picker',
-      label: '선택지',
-      options: ['선택지1', '선택지2', '선택지3', '선택지4'],
-    },
-    {
-      id: 'gender',
-      type: 'radio',
-      label: '성별',
-      options: ['남성', '여성', '포크레인'],
-    },
-    {
-      id: 'introduction',
-      type: 'text',
-      label: '자기소개',
-    },
-  ];
-
-  // 샘플 신청자 데이터
-  const [applicants, setApplicants] = useState<Applicant[]>([
-    {
-      id: '1',
-      answers: {
-        name: '김철수',
-        department: '선택지1',
-        gender: '남성',
-        introduction: '열정적인 개발자 지망생입니다.',
-      },
-      questions: questions,
-    },
-    {
-      id: '2',
-      answers: {
-        name: '이영희',
-        department: '선택지2',
-        gender: '여성',
-        introduction: '전자공학에 관심이 많습니다.',
-      },
-      questions: questions,
-    },
-    {
-      id: '3',
-      answers: {
-        name: '박민수',
-        department: '선택지3',
-        gender: '남성',
-        introduction: '기계 설계에 흥미가 있습니다.',
-      },
-      questions: questions,
-    },
-    // 추가 샘플 데이터...
-  ]);
-
-  const renderApplicant = ({ item }: { item: Applicant }) => (
-    <TouchableOpacity
-      style={styles.applicantItem}
-      onPress={() =>
-        navigation.navigate('SchoolClubSignDetailScreen', { applicant: item })
+  useEffect(() => {
+    const fetchClubData = async () => {
+      try {
+        const response = await fetch(`${config.serverUrl}/fetchClubData`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ post_id: item.post_id }),
+        });
+        const result = await response.json();
+        if (response.ok) {
+          setUserInfo(result);
+        } else {
+          Alert.alert(
+            '오류', // 제목
+            '데이터가 존재하지 않습니다.', // 메시지
+            [
+              {
+                text: '확인',
+                onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
+              },
+            ],
+            { cancelable: false } // 취소 불가능
+          );
+        }
+      } catch (error) {
+        Alert.alert(
+          '오류', // 제목
+          '데이터가 존재하지 않습니다.', // 메시지
+          [
+            {
+              text: '확인',
+              onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
+            },
+          ],
+          { cancelable: false } // 취소 불가능
+        );
+      } finally {
+        setLoading(false);
       }
-    >
-      <View style={styles.applicantInfo}>
-        <Text style={styles.name}>{item.answers.name}</Text>
-        <Text style={styles.detail}>{item.answers.department}</Text>
-      </View>
-      <Icon name="right" size={20} color="#555" />
-    </TouchableOpacity>
-  );
+    };
+
+    fetchClubData();
+  }, [item]);
+
+  // 중간 렌더링 값 확인
+  const renderApplicant = ({ item }: { item: userInfo }) => {
+    console.log('Rendering item:', item); // 렌더링 값 확인
+    return (
+      <TouchableOpacity
+        style={styles.applicantItem}
+        onPress={() =>
+          navigation.navigate('SchoolClubSignDetailScreen', { applicant: item })
+        }
+      >
+        <View style={styles.applicantInfo}>
+          <Text style={styles.name}>{item.Name || 'Unknown'}</Text>
+          <Text style={styles.detail}>{item.Department || 'Unknown'}</Text>
+        </View>
+        <Icon name="right" size={20} color="#555" />
+      </TouchableOpacity>
+    );
+  };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#6C5CE7" style={{ marginTop: 50 }} />;
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>동아리 신청자 목록</Text>
       <FlatList
-        data={applicants}
+        data={userInfo}
         renderItem={renderApplicant}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => (item.Post_fk ? `${item.Post_fk}_${index}` : Math.random().toString())} 
         contentContainerStyle={styles.listContent}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
@@ -115,7 +113,6 @@ const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
   );
 };
 
-// 스타일 정의
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -569,8 +569,11 @@ async function getuserpk(user_id, user_passwd) {
                 user.id,
                 user.title,
                 user.report_confirm,
-                student.name, student.campus_id, 
-                student.department_id, student.email, 
+                student.name, 
+                student.campus_id, 
+                student.department_id, 
+                student.phone,
+                student.email, 
                 student.grade,
                 student.birth,
                 student.currentstatus,
@@ -3469,6 +3472,62 @@ async function change_GoalGPA(user_id, goal_gpa) {
     }
 }
 
+async function addClubInfo(post_id, name, birth, university, department, grade, phone, sex, residence, application, introduce) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = `
+          INSERT INTO club_register 
+          (Post_fk, Name, Birth, University, Department, Grade, Phone, Sex, Residence, Application, Introduce) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        `;
+        await conn.query(query, [post_id, name, birth, university, department, grade, phone, sex, residence, application, introduce]);
+
+        return true;
+    } catch (err) {
+        console.error(err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function getClubInfo(post_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 조회 쿼리 작성
+        const query = `
+            SELECT 
+                club_register.Post_fk, 
+                club_register.Name, 
+                club_register.Birth, 
+                club_register.University,
+                club_register.Department,
+                club_register.Grade,
+                club_register.Phone,
+                club_register.Sex,
+                club_register.Residence,
+                club_register.Application,
+                club_register.Introduce
+            FROM 
+                club_register
+                LEFT JOIN post ON post.post_id = club_register.Post_fk
+            WHERE 
+                post.post_id = ?`;
+
+        const rows = await conn.query(query, [post_id]);
+        console.log('Query result:', rows); // 쿼리 결과 확인
+        return rows;
+
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        throw err; // 오류 발생 시 던짐
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 async function fetchContestpostData(campus_id) {
     let conn;
     try {
@@ -3688,5 +3747,7 @@ module.exports = {
     DetailPostPhoto,
     DeletePostPhoto,
     ClubPosts,
+    addClubInfo,
+    getClubInfo,
     fetchContestpostData
 };

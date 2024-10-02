@@ -186,7 +186,7 @@ export const RootStackNavigator = (route: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '커뮤니티',
+                    title: '동아리 신청',
                 })}
             />
 
@@ -703,13 +703,13 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
 
 //커뮤니티 페이지 관련 스택 네비게이터
 export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
-    const { userdata } = route.params;
+    const { userdata , userDepartment} = route.params;
     return (
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
                 name="PostTopTabNavigator"
                 component={TopbTabNavigator}
-                initialParams={{ userdata }}
+                initialParams={{ userdata ,userDepartment}}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

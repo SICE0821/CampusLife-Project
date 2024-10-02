@@ -166,6 +166,8 @@ const { getGeneralPosts,
   DetailPostPhoto,
   DeletePostPhoto,
   ClubPosts,
+  addClubInfo,
+  getClubInfo,
   fetchContestpostData
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
@@ -332,6 +334,7 @@ app.post('/get_user_data', async (req, res) => {
       email: rows[0].email,
       grade: rows[0].grade,
       birth: formatDate(rows[0].birth),
+      phone: rows[0].phone,
       point: rows[0].point,
       currentstatus: rows[0].currentstatus,
       student_semester: rows[0].student_semester,
@@ -339,7 +342,6 @@ app.post('/get_user_data', async (req, res) => {
       title: rows[0].title,
       report_confirm: rows[0].report_confirm,
     };
-
     res.json(userData);
 
   } catch (error) {
@@ -3105,6 +3107,55 @@ app.post('/fetchContestpostData', async (req, res) => {
   }
 });
 
+app.post('/ClubInsert', async (req, res) => {
+  const { post_id, name, birth, university, department, grade, phone, sex, residence, application, introduce } = req.body;
+
+  const success = await addClubInfo(post_id, name, birth, university, department, grade, phone, sex, residence, application, introduce);
+
+  if (success) {
+    res.json({ message: 'Data received successfully', receivedData: req.body });
+  } else {
+    res.status(500).json({ message: 'Error inserting data' });
+  }
+});
+
+app.post('/fetchClubData', async (req, res) => {
+  const { post_id } = req.body;
+  
+  if (!post_id) {
+    return res.status(400).json({ error: 'Missing post_id' });
+  }
+  
+  try {
+    const rows = await getClubInfo(post_id);
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'No data found for the given post_id' });
+    }
+
+    const processedData = rows.map(item => ({
+      Post_fk: item.Post_fk,
+      Name: item.Name,
+      Birth: item.Birth,
+      University: item.University,
+      Department: item.Department,
+      Grade: item.Grade,
+      Phone: item.Phone,
+      Sex: item.Sex,
+      Residence: item.Residence,
+      Application: item.Application,
+      Introduce: item.Introduce
+    }));
+
+    console.log("[AdminMain or MainScreen] : 동아리 데이터 가져오기 성공");
+    console.log(processedData);
+    res.json(processedData);
+  } catch (error) {
+    console.log("[AdminMain or MainScreen] : 동아리 데이터 가져오기 실패");
+    console.error('API Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //서버 시작
 app.listen(PORT, () => {
