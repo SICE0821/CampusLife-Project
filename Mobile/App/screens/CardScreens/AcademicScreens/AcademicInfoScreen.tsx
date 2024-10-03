@@ -11,7 +11,6 @@ import {
     TouchableOpacity,
     Alert,
     TextInput,
-    Button,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
@@ -67,7 +66,7 @@ const HorizontalBarGraph = ({ currentGPA, goalGPA }: any) => {
                     <LottieView
                         source={require('../../../assets/Animation - 1725893333150.json')}
                         autoPlay
-                        loop
+                        loop={true} // 반복하도록 설정
                         style={[
                             styles.lottieAnimation,
                             {
@@ -370,10 +369,10 @@ const AcademicInfoScreen = ({ route }: any) => {
     // 그래프의 최대 너비 설정
     const maxBarWidth = width * 0.6; // 화면 너비의 60% 사용
 
-    // 애니메이션 값 설정
-    const animatedValues = gradesData.map(() => new Animated.Value(0));
+    // 애니메이션 값 설정을 useRef로 변경하여 재생성 방지
+    const animatedValues = useRef(gradesData.map(() => new Animated.Value(0))).current;
 
-    // 등급별 애니메이션 시작 useEffect
+    // 등급별 애니메이션 시작 useEffect를 빈 배열로 변경하여 컴포넌트 마운트 시 한 번만 실행
     useEffect(() => {
         const timer = setTimeout(() => {
             // 애니메이션 시작
@@ -388,7 +387,7 @@ const AcademicInfoScreen = ({ route }: any) => {
         }, 1000);
 
         return () => clearTimeout(timer);
-    }, [gradesData]);
+    }, []); // 빈 배열로 설정하여 한 번만 실행
 
     // 등급별 색상 설정
     const gradeColors = [
@@ -397,66 +396,6 @@ const AcademicInfoScreen = ({ route }: any) => {
 
     return (
         <View style={styles.container}>
-            {/* 뱃지 영역 */}
-            <ScrollView horizontal={true} style={styles.badgeContainer}>
-                {/* 개별 뱃지 */}
-                <View style={styles.badgeItem}>
-                    <Image
-                        source={require('../../../assets/뱃지.png')}
-                        resizeMode="contain"
-                        style={{ width: 50, height: 50 }}
-                    />
-                    <Text style={{ color: 'black' }}>우등상</Text>
-                </View>
-                <View style={styles.badgeItem}>
-                    <Image
-                        source={require('../../../assets/뱃지2.png')}
-                        resizeMode="contain"
-                        style={{ width: 50, height: 50 }}
-                    />
-                    <Text style={{ color: 'black' }}>수강상</Text>
-                </View>
-                <View style={styles.badgeItem}>
-                    <Image
-                        source={require('../../../assets/뱃지3.png')}
-                        resizeMode="contain"
-                        style={{ width: 50, height: 50 }}
-                    />
-                    <Text style={{ color: 'black' }}>성장상</Text>
-                </View>
-                <View style={styles.badgeItem}>
-                    <Image
-                        source={require('../../../assets/뱃지4.png')}
-                        resizeMode="contain"
-                        style={{ width: 50, height: 50 }}
-                    />
-                    <Text style={{ color: 'black' }}>노력상</Text>
-                </View>
-                <View style={styles.badgeItem}>
-                    <Image
-                        source={require('../../../assets/뱃지5.png')}
-                        resizeMode="contain"
-                        style={{ width: 50, height: 50 }}
-                    />
-                    <Text style={{ color: 'black' }}>출석상</Text>
-                </View>
-                <View style={styles.badgeItem}>
-                    <Image
-                        source={require('../../../assets/뱃지6.png')}
-                        resizeMode="contain"
-                        style={{ width: 50, height: 50 }}
-                    />
-                    <Text style={{ color: 'black' }}>소통상</Text>
-                </View>
-                <View style={styles.badgeItem}>
-                    <Image
-                        source={require('../../../assets/뱃지7.png')}
-                        resizeMode="contain"
-                        style={{ width: 50, height: 50 }}
-                    />
-                    <Text style={{ color: 'black' }}>최고상</Text>
-                </View>
-            </ScrollView>
 
             <ScrollView>
                 {/* 원형 프로그레스 표시 */}
@@ -484,42 +423,9 @@ const AcademicInfoScreen = ({ route }: any) => {
                 <View style={styles.goalGPAContainer}>
                     <View style={styles.goalGPATitleContainer}>
                         <Text style={styles.goalGPATitleText}>목표학점</Text>
+                        {/* 트로피 아이콘 제거 */}
                         <IconH style={styles.goalGPAIcon} name="trophy" size={30} />
                     </View>
-                    <TouchableOpacity
-                        style={styles.ChangGoalgpaArea}
-                        onPress={() => toggleModal()}>
-                        <Text style={styles.ChangGoalgpaFont}>목표 학점 변경 하기</Text>
-                    </TouchableOpacity>
-                    <Modal
-                isVisible={isModalVisible}
-                animationIn="slideInUp"
-                animationOut="slideOutDown"
-                animationInTiming={500}
-                animationOutTiming={500}
-                backdropOpacity={0.6}
-            >
-                <View style={styles.modalContent}>
-                    <Text style={styles.modalTitle}>목표 학점 설정</Text>
-                    <TextInput
-                        style={styles.input}
-                        keyboardType="numeric"
-                        value={changegoalGPA}
-                        onChangeText={handleNumberInput}
-                        placeholder="0 ~ 4.5"
-                        maxLength={4} // 소수점 포함하여 최대 4글자로 제한
-                    />
-                    <View style={styles.buttons}>
-                        <TouchableOpacity style={styles.submitButton} onPress={change_GoalGPA}>
-                            <Text style={styles.buttonText}>설정</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.cancelButton} onPress={toggleModal}>
-                            <Text style={styles.buttonText}>닫기</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </Modal>
-
                 </View>
 
                 {/* 가로 막대 그래프 */}
@@ -528,9 +434,48 @@ const AcademicInfoScreen = ({ route }: any) => {
                     goalGPA={goalGPA}
                 />
 
+                {/* 목표 학점 변경 버튼 */}
+                <View style={styles.changeGoalGPAButtonContainer}>
+                    <TouchableOpacity
+                        style={styles.changeGoalGPAButton}
+                        onPress={() => toggleModal()}>
+                        <Text style={styles.changeGoalGPAButtonText}>목표 학점 변경 하기</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* 목표 학점 변경 모달 */}
+                <Modal
+                    isVisible={isModalVisible}
+                    animationIn="slideInUp"
+                    animationOut="slideOutDown"
+                    animationInTiming={500}
+                    animationOutTiming={500}
+                    backdropOpacity={0.6}
+                >
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>목표 학점 설정</Text>
+                        <TextInput
+                            style={styles.input}
+                            keyboardType="numeric"
+                            value={changegoalGPA}
+                            onChangeText={handleNumberInput}
+                            placeholder="0 ~ 4.5"
+                            maxLength={4} // 소수점 포함하여 최대 4글자로 제한
+                        />
+                        <View style={styles.buttons}>
+                            <TouchableOpacity style={styles.submitButton} onPress={change_GoalGPA}>
+                                <Text style={styles.buttonText}>설정</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.cancelButton} onPress={toggleModal}>
+                                <Text style={styles.buttonText}>닫기</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+
                 {/* 등급별 성적 분포 그래프 */}
                 <Text style={styles.gradeDistributionTitle}>등급별 성적 분포</Text>
-                <ScrollView style={styles.gradeDistributionChartContainer}>
+                <View style={styles.gradeDistributionChartContainer}>
                     <View style={styles.gradeDistributionChart}>
                         {gradesData.map((value, index) => (
                             <View key={index} style={styles.gradeBarContainer}>
@@ -548,7 +493,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                             </View>
                         ))}
                     </View>
-                </ScrollView>
+                </View>
 
                 {/* 학기 선택기 */}
                 <View style={styles.semesterPickerContainer}>
@@ -615,6 +560,7 @@ const AcademicInfoScreen = ({ route }: any) => {
             </ScrollView>
         </View>
     );
+
 };
 
 // 스타일 시트 정의
@@ -666,138 +612,158 @@ const styles = StyleSheet.create({
     },
     // 목표 학점 영역 스타일
     goalGPAContainer: {
-        flexDirection: 'row',
         marginHorizontal: 20,
-        justifyContent: 'space-around'
+        marginTop: 10,
+        marginBottom: 10,
     },
     goalGPATitleContainer: {
         height: 50,
-        width: '33%',
+        width: '50%', // 폭을 전체로 변경
+        marginBottom: 10,
         borderWidth: 1,
         justifyContent: 'center',
+        alignSelf: 'center',
         alignItems: 'center',
         borderRadius: 10,
         flexDirection: 'row',
         borderColor: '#F29F05',
-        paddingBottom: -30,
+        backgroundColor: 'white', // 배경색 추가
+        elevation: 5,
     },
     goalGPATitleText: {
-        fontSize: 18,
-        color: 'black',
-        fontWeight: '500',
+        fontSize: 20,
+        color: '#333',
+        fontWeight: '600',
     },
     goalGPAIcon: {
-        marginLeft: 10,
         color: '#F29F05',
+        marginLeft: 5
     },
-    ChangGoalgpaArea: {
+    // 목표 학점 변경 버튼 스타일
+    changeGoalGPAButtonContainer: {
+        alignItems: 'center',
+        marginTop: 10, // 버튼과 그래프 사이에 여백 추가
+        marginBottom: 20, // 아래쪽에 여백 추가
+    },
+    changeGoalGPAButton: {
         height: 50,
-        width: "40%",
+        width: '50%',
         backgroundColor: '#F29F05',
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 5,
         borderRadius: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
     },
-    ChangGoalgpaFont: {
-        fontSize: 17,
-        fontWeight: '900',
-        color: 'white'
+    changeGoalGPAButtonText: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#fff',
     },
     modalContent: {
         backgroundColor: '#f9f9f9',
-        padding: 20,
-        borderRadius: 15,
+        padding: 25,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 5,
     },
     modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 22,
+        fontWeight: '700',
         color: '#333',
-        marginBottom: 15,
+        marginBottom: 20,
     },
     input: {
-        height: 45,
+        height: 50,
         width: '100%',
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 10,
-        paddingHorizontal: 10,
-        fontSize: 16,
-        marginBottom: 20,
+        paddingHorizontal: 15,
+        fontSize: 18,
+        marginBottom: 25,
         textAlign: 'center',
         backgroundColor: '#fff',
     },
     buttons: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'space-between',
         width: '100%',
     },
     submitButton: {
         backgroundColor: '#4CAF50',
-        paddingVertical: 10,
-        paddingHorizontal: 30,
+        paddingVertical: 12,
+        paddingHorizontal: 35,
         borderRadius: 10,
         alignItems: 'center',
+        flex: 1,
         marginRight: 10,
     },
     cancelButton: {
         backgroundColor: '#f44336',
-        paddingVertical: 10,
-        paddingHorizontal: 30,
+        paddingVertical: 12,
+        paddingHorizontal: 35,
         borderRadius: 10,
         alignItems: 'center',
+        flex: 1,
     },
     buttonText: {
         color: '#fff',
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '700',
     },
     horizontalBarGraphContainer: {
         width: '100%',
         paddingHorizontal: 10,
+        marginTop: 20,
     },
     lottieAnimation: {
-        width: 100,
-        height: 100,
+        width: 80,
+        height: 80,
+        marginTop: -50
     },
     graphContent: {
         position: 'relative',
     },
     graphContainer: {
+        width: '95%',
         marginBottom: 20,
+        alignSelf: 'center'
     },
     graphBarBackground: {
-        height: 30,
+        height: 35,
         backgroundColor: '#e0e0e0',
-        borderRadius: 5,
+        borderRadius: 8,
         overflow: 'hidden',
         position: 'relative', // 자식의 절대 위치 기준
         justifyContent: 'center',
     },
     graphBarFill: {
         height: '100%',
-        borderRadius: 5,
+        borderRadius: 8,
     },
     graphBarText: {
         position: 'absolute',
         alignSelf: 'center',
         color: 'white',
-        fontWeight: 'bold',
+        fontWeight: '600',
+        fontSize: 16,
     },
     // 등급 분포 그래프 스타일
     gradeDistributionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 22,
+        fontWeight: '700',
         textAlign: 'center',
-        marginVertical: 20,
+        marginVertical: 25,
         color: '#333',
     },
     gradeDistributionChartContainer: {
-        marginBottom: 15,
-        paddingHorizontal: 20,
+        marginBottom: 20,
+        paddingHorizontal: 25,
     },
     gradeDistributionChart: {
         flexDirection: 'column',
@@ -806,46 +772,52 @@ const styles = StyleSheet.create({
     gradeBarContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 8,
+        marginVertical: 10,
+        width: '100%',
     },
     gradeBar: {
         height: 25,
         borderRadius: 12.5,
+        marginRight: 10,
     },
     gradeLabel: {
-        width: 50,
+        width: 60,
         marginRight: 10,
         textAlign: 'center',
-        fontWeight: 'bold',
+        fontWeight: '600',
         color: '#555',
+        fontSize: 16,
     },
     gradeCount: {
         marginLeft: 10,
-        fontWeight: 'bold',
+        fontWeight: '600',
         color: '#555',
+        fontSize: 16,
     },
     // 학기 선택기 스타일
     semesterPickerContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     pickerWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#F0F0F0',
         borderRadius: 10,
-        marginHorizontal: 5,
-        paddingHorizontal: 10,
+        marginHorizontal: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 5,
         elevation: 3, // 그림자 효과 추가
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
-        shadowRadius: 3,
+        shadowRadius: 4,
     },
     picker: {
         width: width * 0.35, // 선택기 너비 조정
         color: 'black',
+        fontSize: 16,
     },
     pickerIcon: {
         marginRight: 10,
@@ -856,18 +828,19 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         paddingVertical: 15,
+        paddingHorizontal: 10,
     },
     lectureTableHeader: {
-        height: 40,
+        height: 50,
         backgroundColor: '#4CAF50',
-        borderTopLeftRadius: 5,
-        borderTopRightRadius: 5,
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
     },
     lectureTableHeaderText: {
         textAlign: 'center',
-        fontWeight: 'bold',
+        fontWeight: '700',
         color: 'white',
-        fontSize: 16,
+        fontSize: 18,
     },
     lectureTableRow: {
         height: 50,
@@ -883,11 +856,11 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontWeight: '500',
         color: '#333',
-        fontSize: 14,
+        fontSize: 16,
     },
     noLectureDataText: {
         textAlign: 'center',
-        fontSize: 18,
+        fontSize: 20,
         marginTop: 20,
         color: 'gray',
     },

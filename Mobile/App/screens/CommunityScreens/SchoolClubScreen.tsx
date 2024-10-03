@@ -14,6 +14,7 @@ import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
 import { Swipeable, GestureHandlerRootView } from 'react-native-gesture-handler';
 import config from '../../config';
+import LinearGradient from 'react-native-linear-gradient'; // 그라데이션 추가
 
 // 게시물 데이터 타입 정의
 type PostData = {
@@ -25,8 +26,8 @@ type PostData = {
   like: number;
   name: string;
   user_title: string;
-  image: string; // 이미지 URL 추가
-  Club_check : number;
+  image?: string; // 이미지 URL 추가 (옵셔널)
+  Club_check: number;
 };
 
 // 하단 공백 생성 함수 (하단바 영역 고려)
@@ -37,7 +38,7 @@ const renderEmptyItem = () => {
 const SchoolClubScreen = ({ route, navigation }: any) => {
   // 컴포넌트 상태 및 초기화
   const { userdata } = route.params;
-  const [clubData, setClubData] = useState<PostData[]>([]); // 동아리 게시물 목록 상태를 샘플 데이터로 초기화
+  const [clubData, setClubData] = useState<PostData[]>([]); // 동아리 게시물 목록 상태
   const [userData, setUserData] = useState(userdata); // 유저 데이터 상태
   const [userHavePost, setUserHavePost] = useState<PostData[]>([]); // 유저가 북마크한 게시물 목록 상태
   const [refreshing, setRefreshing] = useState(false); // 새로고침 상태
@@ -60,32 +61,31 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
     }
   };
 
-    // 이미지 삭제
-    const handleImageRemove = (index: number) => {
-      setSelectedImages(selectedImages.filter((_, i) => i !== index));
-      setSelectedFormImages(selectedFormImages.filter((_, i) => i !== index));
-    };
-  
+  // 이미지 삭제
+  const handleImageRemove = (index: number) => {
+    setSelectedImages(selectedImages.filter((_, i) => i !== index));
+    setSelectedFormImages(selectedFormImages.filter((_, i) => i !== index));
+  };
+
+  // 동아리 게시물 가져오기 함수
   const getClubPosts = async () => {
     try {
-        const response = await fetch(`${config.serverUrl}/Clubpost`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        });
-        const postsData = await response.json();
-        setClubData(postsData); // 게시물 데이터 설정
+      const response = await fetch(`${config.serverUrl}/Clubpost`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const postsData = await response.json();
+      setClubData(postsData); // 게시물 데이터 설정
     } catch (error) {
-        console.error('동아리 게시물 가져오기 실패:', error);
+      console.error('동아리 게시물 가져오기 실패:', error);
     }
-};
+  };
 
   // 새로고침 핸들러
   const onRefresh = async () => {
     setRefreshing(true);
-    // 실제로는 여기서 데이터를 다시 로드합니다.
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    await getClubPosts(); // 데이터를 다시 로드
+    setRefreshing(false);
   };
 
   // 북마크 닫기
@@ -124,21 +124,17 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
   const renderRightActions = (item: PostData, index: number) => (
     <TouchableOpacity onPress={() => handleBookmark(item, index)} style={styles.bookmarkButton}>
       {userHavePost.some((post) => post.post_id === item.post_id) ? (
-        <Text style={styles.bookmarkedIcon}>
-          <IconC name="bookmark" size={40} />
-        </Text>
+        <IconC name="bookmark" size={30} color="#F29F05" />
       ) : (
-        <Text style={styles.bookmarkIcon}>
-          <IconC name="bookmark-o" size={40} />
-        </Text>
+        <IconC name="bookmark-o" size={30} color="#F29F05" />
       )}
     </TouchableOpacity>
   );
 
-  // 화면에 초점을 맞출 때 데이터 로드 (샘플 데이터이므로 필요 없음)
+  // 화면에 초점을 맞출 때 데이터 로드
   useFocusEffect(
     useCallback(() => {
-           getClubPosts(); // 동아리 게시물 로드
+      getClubPosts(); // 동아리 게시물 로드
     }, [])
   );
 
@@ -158,8 +154,15 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
             console.log(userData);
           }}>
           <View style={styles.postItem}>
-            {/* 이미지 추가 */}
-            <Image source={{ uri: `${config.photoUrl}/${item.image}.png` }} style={styles.postImage} />
+            {/* 이미지 추가 또는 대체 콘텐츠 표시 */}
+            {item.image ? (
+              <Image source={{ uri: `${config.photoUrl}/${item.image}.png` }} style={styles.postImage} />
+            ) : (
+              <View style={[styles.postImage, styles.noImageContainer]}>
+                <IconB name="picture" size={40} color="#ccc" />
+                <Text style={styles.noImageText}>이미지 없음</Text>
+              </View>
+            )}
             <View style={styles.postContent}>
               <View style={styles.postHeader}>
                 <Text style={styles.postTitle}>{item.title}</Text>
@@ -214,7 +217,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 80
+    paddingTop: 80, // 상단 여백 조정
   },
   listContent: {
     paddingHorizontal: 10,
@@ -231,6 +234,17 @@ const styles = StyleSheet.create({
   postImage: {
     width: 100,
     height: 100,
+    backgroundColor: '#e0e0e0', // 이미지가 없을 때 배경색
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noImageContainer: {
+    backgroundColor: '#e0e0e0',
+  },
+  noImageText: {
+    marginTop: 5,
+    color: '#555',
+    fontSize: 14,
   },
   postContent: {
     flex: 1,

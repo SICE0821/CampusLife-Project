@@ -122,9 +122,31 @@ const LongTextQuestion: React.FC<{
  */
 const SchoolClubSignScreen = ({ route, navigation }: any) => {
   const { item, userData } = route.params;
-  const [userDepartment, setUserDepartment] = useState<string>('');
-  const [UserUniversity, setUserUniversity] = useState<string | undefined>();
 
+  // 상태 변수 정의
+  const [userDepartment, setUserDepartment] = useState<string>('');
+  const [userUniversity, setUserUniversity] = useState<string | undefined>('');
+
+  // 질문 데이터 정의
+  const questions: Question[] = [
+    { id: 'name', type: 'text', label: '이름' },
+    { id: 'birthDate', type: 'text', label: '생년월일' },
+    { id: 'school', type: 'text', label: '학교' },
+    { id: 'department', type: 'text', label: '학과' },
+    { id: 'year', type: 'text', label: '학년' },
+    { id: 'contact', type: 'text', label: '연락처' },
+    { id: 'address', type: 'text', label: '거주지' },
+    { id: 'motivation', type: 'text', label: '지원동기' },
+    { id: 'introduction', type: 'text', label: '자기소개' },
+  ];
+
+  // 각 질문에 대한 응답 상태 관리
+  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
+  const [gender, setGender] = useState<string>(''); // 성별 상태 관리
+
+  /**
+   * 유저의 학과 이름을 서버로부터 가져오는 함수
+   */
   const getUserDepartment = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/get_department_name`, {
@@ -142,42 +164,30 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
     }
   };
 
+  /**
+   * 유저의 대학 이름을 서버로부터 가져오는 함수
+   */
   const getUserUniversity = async () => {
     try {
-        const response = await fetch(`${config.serverUrl}/get_university_name`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                university_name: userData.campus_pk,
-            }),
-        });
-        const result = await response.json();
-        setUserUniversity(result.useruniversity);
+      const response = await fetch(`${config.serverUrl}/get_university_name`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          university_name: userData.campus_pk,
+        }),
+      });
+      const result = await response.json();
+      setUserUniversity(result.useruniversity);
     } catch (error) {
-        console.error('유저 학교 이름 가져오기 실패:', error);
+      console.error('유저 학교 이름 가져오기 실패:', error);
     }
-};
+  };
 
-
-  // 예시 질문 데이터
-  const questions: Question[] = [
-    { id: 'name', type: 'text', label: '이름' },
-    { id: 'birthDate', type: 'text', label: '생년월일' },
-    { id: 'school', type: 'text', label: '학교' },
-    { id: 'department', type: 'text', label: '학과' },
-    { id: 'year', type: 'text', label: '학년' },
-    { id: 'contact', type: 'text', label: '연락처' },
-    { id: 'address', type: 'text', label: '거주지' },
-    { id: 'motivation', type: 'text', label: '지원동기' },
-    { id: 'introduction', type: 'text', label: '자기소개' },
-  ];
-
-  // 각 질문에 대한 응답 상태 관리
-  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
-  const [gender, setGender] = useState<string>(''); // 성별 상태 관리
-
+  /**
+   * 화면 포커스 시 데이터 가져오기
+   */
   useFocusEffect(
     React.useCallback(() => {
       getUserUniversity();
@@ -185,23 +195,27 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
     }, [])
   );
 
-  // userData에서 초기값을 설정하기 위한 useEffect
+  /**
+   * userData에서 초기값을 설정하기 위한 useEffect
+   */
   useEffect(() => {
     setAnswers({
       name: userData.name || '',
       birthDate: userData.birth || '',
-      school: UserUniversity || '', // 학교 정보를 채워넣으면 됩니다.
-      department: userDepartment || '', // 학과 정보를 채워넣으면 됩니다.
+      school: userUniversity || '', // 학교 정보를 채워넣음
+      department: userDepartment || '', // 학과 정보를 채워넣음
       year: userData.grade ? String(userData.grade) : '',
       contact: userData.phone || '',
       address: '', // 거주지 정보가 없으므로 빈 값으로 시작
       motivation: '',
       introduction: '',
     });
-  }, [userDepartment, UserUniversity, userData]);
+  }, [userDepartment, userUniversity, userData]);
 
   /**
    * 입력 값 변경 핸들러
+   * @param id 질문의 id
+   * @param value 입력된 값
    */
   const handleInputChange = (id: string, value: string) => {
     setAnswers((prevAnswers) => ({
@@ -212,22 +226,23 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
 
   /**
    * 제출 버튼 핸들러
+   * 모든 입력란이 채워졌는지 확인하고 서버로 데이터 전송
    */
   const handleSubmit = async () => {
     if (!gender) {
       Alert.alert('성별을 선택해주세요.');
       return;
     }
-  
+
     for (let question of questions) {
       if (!answers[question.id]) {
         Alert.alert('모든 입력란에 입력해주세요.');
         return;
       }
     }
-  
+
     const applicant = {
-      post_id: item.post_id, // 임의의 post_id 생성
+      post_id: item.post_id, // 동아리 게시글 ID
       name: answers.name,
       birth: answers.birthDate,
       university: answers.school,
@@ -239,7 +254,7 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
       application: answers.motivation,
       introduce: answers.introduction,
     };
-  
+
     try {
       // 서버로 데이터 전송
       const response = await fetch(`${config.serverUrl}/ClubInsert`, {
@@ -249,7 +264,7 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
         },
         body: JSON.stringify(applicant),
       });
-  
+
       const result = await response.json();
       if (result.message === 'Data received successfully') {
         Alert.alert('동아리 신청이 완료되었습니다.');
@@ -271,7 +286,7 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
       <ScrollView contentContainerStyle={mainScreenStyles.contentContainer}>
         <Text style={mainScreenStyles.title}>동아리 신청서</Text>
 
-        {/* 이름/생년월일 */}
+        {/* 이름/생년월일 입력 */}
         <RowTextQuestions
           question1={questions[0]}
           question2={questions[1]}
@@ -280,7 +295,7 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
           onChange={handleInputChange}
         />
 
-        {/* 학교/학과 */}
+        {/* 학교/학과 입력 */}
         <RowTextQuestions
           question1={questions[2]}
           question2={questions[3]}
@@ -289,7 +304,7 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
           onChange={handleInputChange}
         />
 
-        {/* 학년/연락처 */}
+        {/* 학년/연락처 입력 */}
         <RowTextQuestions
           question1={questions[4]}
           question2={questions[5]}
@@ -301,21 +316,21 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
         {/* 성별 선택 라디오 버튼 */}
         <GenderRadioButton value={gender} onChange={setGender} />
 
-        {/* 거주지 칸 (한 줄로 길게) */}
+        {/* 거주지 입력 */}
         <SingleTextQuestion
           question={questions[6]}
           value={answers['address']}
           onChange={handleInputChange}
         />
 
-        {/* 지원동기 긴 텍스트 입력칸 */}
+        {/* 지원동기 긴 텍스트 입력 */}
         <LongTextQuestion
           question={questions[7]}
           value={answers['motivation']}
           onChange={handleInputChange}
         />
 
-        {/* 자기소개 긴 텍스트 입력칸 */}
+        {/* 자기소개 긴 텍스트 입력 */}
         <LongTextQuestion
           question={questions[8]}
           value={answers['introduction']}

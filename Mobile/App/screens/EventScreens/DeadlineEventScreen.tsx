@@ -5,34 +5,22 @@ import Swiper from 'react-native-swiper';
 import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { UserData, EventData, VoteEvnetData } from '../../types/type';
-const width = Dimensions.get("window").width;
 import { useFocusEffect } from '@react-navigation/native';
-import config from '../../config';
 import { RadioButton } from 'react-native-paper';
+import config from '../../config';
+
+// 화면 크기 정보 가져오기
+const width = Dimensions.get('window').width;
 
 type userEvent = {
   user_id: number,
   event_id: number
 };
 
-const eventImages = [
-  require('../../assets/001.png'),
-  require('../../assets/002.png'),
-  require('../../assets/부천대.png'),
-  // Add more images here up to a maximum of 10
-];
-
-const voteInfo = [ // null이면 안보임
-  {vote : '문주영'},
-  {vote : '김주연'},
-  {vote : 'null'},
-  {vote : 'null'},
-  {vote : 'null'},
-].filter(info => info.vote !== 'null');
-
 const DeadlineEventScreen = ({ route }: any) => {
   const { userdata, eventdata } = route.params;
-  //console.log(eventdata);
+  
+  // 상태 변수 정의
   const [maintext, setMainText] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState<null | string>(null);
@@ -41,120 +29,101 @@ const DeadlineEventScreen = ({ route }: any) => {
   const [eventData, setEventData] = useState<EventData>(eventdata);
   const [usereventData, setUserEventData] = useState<userEvent[]>([]);
   const [checked, setChecked] = useState('');
-  const [voteOptions, setVoteOptions] = useState<string[]>(); // Initial voting options
+  const [voteOptions, setVoteOptions] = useState<string[]>(); // 투표 옵션
   const [onevoteInfo, setOneVoteInfo] = useState<VoteEvnetData[]>([]);
 
-    useFocusEffect(
-        React.useCallback(() => {
-            const fetchData = async () => {
-                try {
-                  settingDate();
-                  await GetoneEventVote();
-                } catch (error) {
-                    console.error('Error fetching data:', error);
-                }
-            };
-            fetchData();
-        }, [])
-    );
+  // 화면 포커스 시 데이터 불러오기
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          settingDate();
+          await GetoneEventVote();
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
+    }, [])
+  );
 
+  // 특정 이벤트의 투표 정보 불러오기
   const GetoneEventVote = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/GetoneEventVote`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          event_id : eventData.event_id
-        }),
-      })
-      const data : VoteEvnetData[] = await response.json();
-      const voteInfo : VoteEvnetData[]= data.filter(info => info.vote_name !== 'null');
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_id: eventData.event_id }),
+      });
+      const data: VoteEvnetData[] = await response.json();
+      const voteInfo: VoteEvnetData[] = data.filter(info => info.vote_name !== 'null');
       setVoteOptions(voteInfo.map(info => info.vote_name));
     } catch (error) {
       console.error(error);
-    } finally {
     }
-  }
+  };
 
+  // 사용자 투표 정보 전송
   const SendUserEventVote = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/SendUserEventVote`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          event_id : eventData.event_id,
-          vote_name : checked,
-        }),
-      })
-      const data = await response.json();
-      //console.log(data);
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_id: eventData.event_id, vote_name: checked }),
+      });
+      await response.json();
     } catch (error) {
       console.error(error);
-    } finally {
     }
-  }
+  };
 
-  useEffect(() => {
-    const fetchDataAsync = async () => {
-        try {
-          await fetchEventData();
-        } catch (error) {
-            console.error('Error fetching data:', error); 
-        }
-    };
-    fetchDataAsync(); 
-}, []);
-
+  // 화면 로드 시 데이터 설정
   const settingDate = () => {
     setUserData(userData);
     setEventData(eventdata);
   };
 
+  // 텍스트 입력 핸들러
   const handleMainTextChange = (inputText: string) => {
     setMainText(inputText);
   };
 
+  // 이미지 클릭 시 확대 이미지 보기
   const handleImagePress = (image: string) => {
     setSelectedImage(image);
     setModalVisible(true);
   };
 
+  // 파일 선택
   const handleFilePick = async () => {
     try {
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles],
-      });
+      const res = await DocumentPicker.pick({ type: [DocumentPicker.types.allFiles] });
       if (selectedFiles.length < 5) {
         setSelectedFiles([...selectedFiles, res[0]]);
       } else {
-        Alert.alert('You can upload a maximum of 5 files.');
+        Alert.alert('파일은 최대 5개까지 첨부할 수 있습니다.');
       }
     } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        //console.log('User cancelled the picker');
-      } else {
+      if (!DocumentPicker.isCancel(err)) {
         throw err;
       }
     }
   };
 
+  // 파일 업로드
   const uploadAllFiles = async () => {
     const formData = new FormData();
-    selectedFiles.forEach((file) => {
+    selectedFiles.forEach(file => {
       formData.append('images', {
         uri: file.uri,
         type: file.type,
-        name: `${Date.now()}_${userData.user_pk}_${eventData.event_id}.png`
+        name: `${Date.now()}_${userData.user_pk}_${eventData.event_id}.png`,
       });
     });
-    //console.log(formData);
     await uploadImages(formData);
   };
 
+  // 이미지 서버 업로드 처리
   const uploadImages = async (formData: FormData) => {
     try {
       const controller = new AbortController();
@@ -164,61 +133,27 @@ const DeadlineEventScreen = ({ route }: any) => {
         body: formData,
       });
       clearTimeout(timeoutId);
-      const imageName = await response.text();
-      //console.log(imageName);
-      if (response.ok) {
-        //console.log('Images uploaded successfully');
-      } else {
-        console.error('Error uploading images');
-      }
+      await response.text();
     } catch (error) {
-      console.error('Error uploading images:', error);
+      console.error('이미지 업로드 중 오류:', error);
     }
   };
 
+  // 사용자 이벤트 정보 전송
   const send_user_event_info = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/send_user_event_info`, {
+      await fetch(`${config.serverUrl}/send_user_event_info`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user_id: userData.user_pk,
-          event_id: eventData.event_id,
-          content: maintext,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userData.user_pk, event_id: eventData.event_id, content: maintext }),
       });
-
-      if (!response.ok) {
-        throw new Error('서버 응답 오류');
-      }
-
     } catch (error) {
       console.error(error);
     }
   };
 
-  const fetchEventData = async () => {
-    try {
-      const response = await fetch(`${config.serverUrl}/select_user_event_info`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          student_pk: userData.student_pk
-        })
-      });
-      const data = await response.json();
-      setUserEventData(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+  // 이벤트 전송 확인 및 알림 처리
   const send_event_alert = async () => {
-    // 사용자가 이미 해당 이벤트를 등록한 경우
     let hasRegistered = false;
     usereventData.forEach(data => {
       if (data.user_id === userData.user_pk && data.event_id === eventData.event_id) {
@@ -227,39 +162,29 @@ const DeadlineEventScreen = ({ route }: any) => {
     });
 
     if (hasRegistered) {
-      // 이미 등록한 사용자인 경우
-      Alert.alert("이미 이벤트를 등록하셨습니다.");
+      Alert.alert('이미 이벤트를 등록하셨습니다.');
     } else {
-      // 등록되지 않은 사용자인 경우
       Alert.alert(
-        "이벤트 작성완료",
-        `이벤트를 성공적으로 작성하셨습니다. 
-당첨되시면 알람이 자동으로 가게됩니다.
-종료 일자 : ${eventData.close_date}`,
+        '이벤트 작성완료',
+        `이벤트를 성공적으로 작성하셨습니다.\n종료 일자: ${eventData.close_date}`,
         [
           {
-            text: "확인", onPress: async () => {
+            text: '확인',
+            onPress: async () => {
               await send_user_event_info();
               await SendUserEventVote();
               if (selectedFiles.length > 0) {
                 await uploadAllFiles();
               }
-              // 여기서 이벤트 등록 상태를 업데이트합니다.
               setUserEventData([...usereventData, { user_id: userData.user_pk, event_id: eventData.event_id }]);
-            }
-          }
+            },
+          },
         ]
       );
     }
   };
 
-  const sendEvent = () => {
-
-    // 사용자가 이벤트를 등록하지 않은 경우, 초기화 코드 실행
-    setSelectedFiles([]);
-    setMainText("");
-  };
-
+  // 파일 제거
   const handleFileRemove = (index: number) => {
     const updatedFiles = selectedFiles.filter((_, i) => i !== index);
     setSelectedFiles(updatedFiles);
@@ -271,36 +196,10 @@ const DeadlineEventScreen = ({ route }: any) => {
         <View style={styles.eventLabelArea}>
           <Text style={styles.eventLabel}>{eventData?.name}</Text>
         </View>
-        <View style={styles.eventInfoArea}>
-          <Text style={styles.explaintext}>{eventData?.simple_info}</Text>
-          <Text style={styles.eventInfo}>{eventData?.info}</Text>
-
-          <View style={styles.eventVoteArea}>
-            {voteOptions?.map((option, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.eventVoteBox}
-                onPress={() => {
-                  setChecked(option)
-                  //console.log(option)
-                }}
-              >
-                <Text style={styles.eventVoteText}>{index + 1}. {option}</Text>
-                <RadioButton
-                  value={option}
-                  status={checked === option ? 'checked' : 'unchecked'}
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 20 }}>
-            <Text style={styles.endInfo}>종료날짜 : {eventData?.close_date}</Text>
-          </View>
-        </View>
-
+        
+        {/* 이벤트 이미지 슬라이더 */}
         <View style={styles.eventImageArea}>
-          <Swiper showsPagination={true} loop={true} removeClippedSubviews={false}>
+          <Swiper showsPagination={true} loop={true}>
             {eventData.event_photo.map((image, index) => (
               <TouchableOpacity key={index} style={styles.eventImageBox} onPress={() => handleImagePress(image.event_photo)}>
                 <Image style={styles.eventImage} source={{ uri: `${config.photoUrl}/${image.event_photo}.png` }} />
@@ -308,57 +207,70 @@ const DeadlineEventScreen = ({ route }: any) => {
             ))}
           </Swiper>
         </View>
-        {voteOptions && voteOptions.length === 0 ? (
-      <>
-        <View style={styles.fileInputArea}>
-          <TouchableOpacity style={styles.fileButton} onPress={() => {
-            handleFilePick();
-            //console.log(selectedFiles);
-          }}>
-            <Text style={styles.fileButtonText}>파일 첨부</Text>
-          </TouchableOpacity>
-          {selectedFiles.map((file, index) => (
-            <View key={index} style={styles.fileInfo}>
-              <Text style={styles.fileName}>{file.name}</Text>
-              <TouchableOpacity onPress={() => handleFileRemove(index)} style={styles.cancelButton}>
-                <Icon name="closecircleo" size={18} />
+
+        <View style={styles.eventInfoArea}>
+          <Text style={styles.explaintext}>{eventData?.simple_info}</Text>
+          <Text style={styles.eventInfo}>{eventData?.info}</Text>
+
+          {/* 투표 영역 */}
+          <View style={styles.eventVoteArea}>
+            {voteOptions?.map((option, index) => (
+              <TouchableOpacity key={index} style={styles.eventVoteBox} onPress={() => setChecked(option)}>
+                <Text style={styles.eventVoteText}>{index + 1}. {option}</Text>
+                <RadioButton value={option} status={checked === option ? 'checked' : 'unchecked'} />
               </TouchableOpacity>
-            </View>
-          ))}
+            ))}
+          </View>
+
+          <View style={styles.dateInfo}>
+            <Text style={styles.endInfo}>종료 날짜: {eventData?.close_date}</Text>
+          </View>
         </View>
-        <View style={styles.writeSpace}>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={handleMainTextChange}
-            value={maintext}
-            multiline={true}
-            placeholder="이 곳에 글을 입력해주세요!"
-            placeholderTextColor={'gray'}
-          />
-        </View>
-      </>
-    ) : null}
+
         
-        <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity onPress={async () => {
-            sendEvent();
-            send_event_alert();
-          }}>
+
+        {/* 파일 첨부 및 텍스트 입력 */}
+        {voteOptions && voteOptions.length === 0 && (
+          <>
+            <View style={styles.fileInputArea}>
+              <TouchableOpacity style={styles.fileButton} onPress={handleFilePick}>
+                <Text style={styles.fileButtonText}>파일 첨부</Text>
+              </TouchableOpacity>
+              {selectedFiles.map((file, index) => (
+                <View key={index} style={styles.fileInfo}>
+                  <Text style={styles.fileName}>{file.name}</Text>
+                  <TouchableOpacity onPress={() => handleFileRemove(index)} style={styles.cancelButton}>
+                    <Icon name="closecircleo" size={18} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.writeSpace}>
+              <TextInput
+                style={styles.textInput}
+                onChangeText={handleMainTextChange}
+                value={maintext}
+                multiline={true}
+                placeholder="이 곳에 글을 입력해주세요!"
+                placeholderTextColor="gray"
+              />
+            </View>
+          </>
+        )}
+
+        <View style={styles.sendButtonContainer}>
+          <TouchableOpacity onPress={send_event_alert}>
             <View style={styles.sendArea}>
               <Text style={styles.sendText}>전송</Text>
             </View>
           </TouchableOpacity>
         </View>
-        <View style={{ height: 20 }}></View>
       </ScrollView>
 
+      {/* 이미지 확대 모달 */}
       {selectedImage !== null && (
-        <Modal
-          visible={modalVisible}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
-        >
+        <Modal visible={modalVisible} transparent={true} animationType="slide" onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
               <Image style={{ width: width, height: width }} source={{ uri: `${config.photoUrl}/${selectedImage}.png` }} />
@@ -373,13 +285,13 @@ const DeadlineEventScreen = ({ route }: any) => {
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
   eventLabelArea: {
-    //alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
     width: width,
@@ -392,24 +304,27 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 20,
     fontWeight: 'bold',
-    //textAlign : 'center'
   },
   eventInfoArea: {
-    //alignItems: 'center',
     padding: 10,
     backgroundColor: 'white',
     width: width,
     minHeight: 150,
+  },
+  explaintext: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'black',
+    marginBottom: 5,
   },
   eventInfo: {
     fontSize: 17,
     color: 'black',
   },
   eventVoteArea: {
-    //backgroundColor: 'red',
     alignItems: 'center',
     width: '100%',
-    marginTop: 15
+    marginTop: 15,
   },
   eventVoteBox: {
     backgroundColor: '#dddddd',
@@ -426,8 +341,12 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 22,
     fontWeight: 'bold',
-    marginLeft: 10
-
+    marginLeft: 10,
+  },
+  dateInfo: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
   endInfo: {
     fontSize: 16,
@@ -458,7 +377,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#FFC700',
     borderRadius: 10,
-    elevation: 2
+    elevation: 2,
   },
   fileButtonText: {
     fontSize: 16,
@@ -476,15 +395,13 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     marginLeft: 5,
-    top: 3,
-    //backgroundColor: 'red',
   },
   writeSpace: {
     padding: 10,
     backgroundColor: 'white',
     minHeight: 250,
     margin: 20,
-    marginBottom : 5,
+    marginBottom: 5,
     borderWidth: 1,
     borderRadius: 5,
   },
@@ -492,19 +409,23 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: 'black',
   },
+  sendButtonContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   sendArea: {
-    marginTop : 30,
+    marginTop: 30,
     width: width - 40,
     height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFC700',
-    borderRadius: 10
+    borderRadius: 10,
   },
   sendText: {
     color: 'white',
     fontSize: 22,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   modalBackground: {
     flex: 1,
@@ -515,14 +436,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: '100%',
     backgroundColor: '#fff',
-    //padding: 20,
-    borderRadius: 10,
     alignItems: 'center',
-  },
-  modalImage: {
-    width: '100%',
-    height: 500,
-    resizeMode: 'contain',
   },
   closeButton: {
     marginTop: 20,
@@ -534,12 +448,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
-  explaintext: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: 'black',
-    marginBottom: 5,
-  }
 });
 
 export default DeadlineEventScreen;

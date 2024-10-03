@@ -274,12 +274,7 @@ const FriendCodeEventScreen = ({ route }: any) => {
   return (
     <View style={styles.container}>
       <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         <View style={styles.topArea}>
           <View style={styles.circleArea}>
@@ -292,27 +287,30 @@ const FriendCodeEventScreen = ({ route }: any) => {
           <TouchableOpacity onPress={copyToClipboard}>
             <View style={styles.mycodeArea}>
               <Text style={styles.mycodeText}>초대코드 </Text>
-              <Text style={styles.mycode}>[ {userData.friend_code} ]</Text>
+              <Text style={styles.mycode}>[{userData.friend_code}]</Text>
               <Text style={styles.mycodeText}> 복사하기</Text>
             </View>
           </TouchableOpacity>
         </View>
+
         <View style={styles.infoTextArea}>
           <Text style={styles.infoText}>친구를 초대하여 100P 지급!</Text>
         </View>
-        <View style={styles.inputcode}>
+
+        <View style={styles.inputCode}>
           <TextInput
             style={styles.input}
             onChangeText={setFriendCode}
             value={friendCode}
             placeholder="친구 코드 입력"
-            placeholderTextColor={'gray'}
+            placeholderTextColor="gray"
           />
           <TouchableOpacity onPress={pasteFromClipboard}>
-            <Icon name="paste" size={36} color={'black'} />
+            <Icon name="paste" size={36} color="black" />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={registerFriendCode} style={{ marginTop: 10, justifyContent: 'center', alignItems: 'center' }}>
+
+        <TouchableOpacity onPress={registerFriendCode} style={styles.registerContainer}>
           <View style={styles.register}>
             <Text style={styles.registerText}>등록하기</Text>
           </View>
@@ -322,15 +320,15 @@ const FriendCodeEventScreen = ({ route }: any) => {
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
   },
   topArea: {
-    borderBottomWidth: 1,
     marginTop: 60,
-    marginBottom: 30
+    marginBottom: 30,
   },
   circleArea: {
     alignItems: 'center',
@@ -343,32 +341,27 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   imageArea: {
-    alignSelf: 'center',
     width: 300,
     height: 180,
-    //backgroundColor: 'red',
     position: 'absolute',
-    top: -80
+    top: -80,
   },
   image: {
     flex: 1,
     width: 300,
-    overflow: 'hidden',
     resizeMode: 'cover',
   },
   circleText: {
     color: 'white',
     fontSize: 34,
     fontWeight: 'bold',
-    top: 40,
-    textShadowRadius: 1
+    marginTop: 100,
   },
   circleNum: {
     color: 'white',
     fontSize: 90,
     fontWeight: 'bold',
-    top: 30,
-    textShadowRadius: 1
+    marginTop: 30,
   },
   mycodeArea: {
     flexDirection: 'row',
@@ -378,31 +371,28 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 10,
     borderColor: 'pink',
-    marginHorizontal: 20,
-    marginVertical: 20,
     backgroundColor: 'white',
-    elevation: 5
+    elevation: 5,
+    marginTop: 20,
   },
   mycodeText: {
     color: 'black',
     fontSize: 22,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   mycode: {
     color: 'blue',
     fontSize: 22,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   infoTextArea: {
-    width: '90%',
-    alignSelf: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   infoText: {
     color: 'gray',
-    fontSize: 16
+    fontSize: 16,
   },
-  inputcode: {
+  inputCode: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -413,29 +403,41 @@ const styles = StyleSheet.create({
     width: width * 0.6,
     borderColor: 'gray',
     borderWidth: 1,
-    borderRadius: -5,
-    color: 'black',
-    paddingHorizontal: 10,
-    padding: -5,
-    marginHorizontal: 10,
-    fontSize: 18,
-    backgroundColor: 'white'
-  },
-  register: {
-    padding: 5,
-    paddingHorizontal: 10,
-    borderWidth: 1,
     borderRadius: 10,
-    backgroundColor: 'lightblue',
+    paddingHorizontal: 10,
+    fontSize: 18,
+    backgroundColor: 'white',
+    marginRight: 10,
+  },
+  registerContainer: {
+    marginTop: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    width: width - 300
+    backgroundColor: 'transparent',
+  },
+  register: {
+    padding: 12,
+    paddingHorizontal: 20,
+    borderWidth: 1,
+    borderRadius: 30,
+    backgroundColor: '#03A9F4', // 파란색 버튼
+    borderColor: '#0288D1', // 경계선 색상
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 }, // 그림자 위치
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: width * 0.5, // 버튼 크기 절반으로 설정
   },
   registerText: {
-    color: 'black',
     fontSize: 20,
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+    color: 'white',
+    textTransform: 'uppercase', // 대문자로 텍스트 변환
+    letterSpacing: 2, // 문자 간격
+  },
 });
 
 export default FriendCodeEventScreen;

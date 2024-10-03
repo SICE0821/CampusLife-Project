@@ -67,15 +67,15 @@ export type UserData = {
   // 추가 필드...
 };
 
-//공모전 데이터 정보 (추가적으로 필요한 경우 수정)
+// 공모전 데이터 정보 (추가적으로 필요한 경우 수정)
 type ContestData = {
   post_id: number,
-  user_id: number
+  user_id: number,
   department_check: boolean,
   inform_check: boolean,
   Club_check: boolean,
   title: string,
-  date : string
+  date: string,
   contest_check: boolean,
   url: string,
   sources: string,
@@ -242,26 +242,26 @@ const MainPage = ({ navigation, route }: any) => {
     }
   };
 
-   /**
+  /**
    * 공모전 정보 서버에서 가져오는 함수
    */
-    const fetchContestpostData = async () => {
-      try {
-        const response = await fetch(`${config.serverUrl}/fetchContestpostData`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            campus_id: userData.campus_pk,
-          })
+  const fetchContestpostData = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/fetchContestpostData`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          campus_id: userData.campus_pk,
         })
-        const data = await response.json();
-        setContestdata(data);
-      } catch (error) {
-        console.error(error);
-      }
+      })
+      const data = await response.json();
+      setContestdata(data);
+    } catch (error) {
+      console.error(error);
     }
+  }
 
   /**
    * 사용자 포인트를 서버에서 가져오는 함수
@@ -523,7 +523,7 @@ const MainPage = ({ navigation, route }: any) => {
                 navigation.navigate('NoticeScreenStackNavigator', {
                   screen: 'NoticePostTopTabNavigator',
                   params: { screen: '학교 공지사항' },
-                  item : {userDepartment}
+                  item: { userDepartment }
                 });
               }}
               style={styles.postDetailArea}
@@ -536,11 +536,11 @@ const MainPage = ({ navigation, route }: any) => {
             <View style={styles.postBox}>
               {schoolPostData.slice(0, 5).map((post, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={post.post_id}
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
-                    navigation.navigate("NoticePostDetailScreen", { item: post, userData , userDepartment});
+                    navigation.navigate("NoticePostDetailScreen", { item: post, userData, userDepartment });
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
@@ -551,11 +551,12 @@ const MainPage = ({ navigation, route }: any) => {
                     >
                       {post.title}
                     </Text>
-                    {index === 0 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
+                    {/* 조회수가 20 미만일 때 "new" 아이콘 표시 */}
+                    {post.view < 20 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
                   </View>
                   <View style={styles.postViewArea}>
                     <Text style={styles.postViewText}>{post.view}</Text>
-                    <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                    <IconB style={styles.postViewIcon} name="eyeo" size={25} />
                   </View>
                 </TouchableOpacity>
               ))}
@@ -575,7 +576,7 @@ const MainPage = ({ navigation, route }: any) => {
                 navigation.navigate('NoticeScreenStackNavigator', {
                   screen: 'NoticePostTopTabNavigator',
                   params: { screen: '학과 공지사항' },
-                  item : {userDepartment}
+                  item: { userDepartment }
                 });
               }}
               style={styles.postDetailArea}
@@ -588,12 +589,11 @@ const MainPage = ({ navigation, route }: any) => {
             <View style={styles.postBox}>
               {departmentPostData.slice(0, 5).map((post, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={post.post_id}
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
-                    navigation.navigate("NoticePostDetailScreen", { item: post, userData , userDepartment});
-                    
+                    navigation.navigate("NoticePostDetailScreen", { item: post, userData, userDepartment });
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
@@ -604,11 +604,12 @@ const MainPage = ({ navigation, route }: any) => {
                     >
                       {post.title}
                     </Text>
-                    {index === 0 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
+                    {/* 조회수가 20 미만일 때 "new" 아이콘 표시 */}
+                    {post.view < 20 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
                   </View>
                   <View style={styles.postViewArea}>
                     <Text style={styles.postViewText}>{post.view}</Text>
-                    <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                    <IconB style={styles.postViewIcon} name="eyeo" size={25} />
                   </View>
                 </TouchableOpacity>
               ))}
@@ -628,7 +629,7 @@ const MainPage = ({ navigation, route }: any) => {
                 navigation.navigate('CommunityScreenStackNavigator', {
                   screen: 'PostTopTabNavigator',
                   params: { screen: '전체 게시판', params: { screen: 'HOT' } },
-                  item : {userDepartment}
+                  item: { userDepartment }
                 });
               }}
               style={styles.postDetailArea}
@@ -641,11 +642,11 @@ const MainPage = ({ navigation, route }: any) => {
             <View style={styles.postBox}>
               {hotPostData.slice(0, 5).map((post, index) => (
                 <TouchableOpacity
-                  key={index}
+                  key={post.post_id}
                   style={styles.postLabelArea}
                   onPress={async () => {
                     await viewCountUp(post.post_id);
-                    navigation.navigate("PostDetailScreen", { item: post, userData, userDepartment});
+                    navigation.navigate("PostDetailScreen", { item: post, userData, userDepartment });
                   }}
                 >
                   <View style={styles.postLabelTextArea}>
@@ -656,17 +657,20 @@ const MainPage = ({ navigation, route }: any) => {
                     >
                       {post.title}
                     </Text>
-                    {index === 0 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
+                    {/* 조회수가 20 미만일 때 "new" 아이콘 표시 */}
+                    {post.view < 20 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
                   </View>
                   <View style={styles.postViewArea}>
                     <Text style={styles.postViewText}>{post.view}</Text>
-                    <IconB style={styles.postViewIcon} name="eyeo" size={30} />
+                    <IconB style={styles.postViewIcon} name="eyeo" size={25} />
                   </View>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
         </View>
+
+        {/* 공모전 영역 */}
         <View style={styles.contestArea}>
           <View style={styles.contestHeadArea}>
             <View style={styles.contestHeadTextArea}>
@@ -678,7 +682,7 @@ const MainPage = ({ navigation, route }: any) => {
                 navigation.navigate('CommunityScreenStackNavigator', {
                   screen: 'PostTopTabNavigator',
                   params: { screen: '전체 게시판', params: { screen: 'HOT' } },
-                  item : {userDepartment}
+                  item: { userDepartment }
                 });
               }}
               style={styles.contestDetailArea}
@@ -690,11 +694,18 @@ const MainPage = ({ navigation, route }: any) => {
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.contestBoxArea}>
             {contestdata.map((item) => (
               <TouchableOpacity
-                key = {item.post_id}
+                key={item.post_id}
                 style={styles.contestBox}
                 onPress={() => Linking.openURL(item.url)} >
                 <View style={styles.contestImageArea}>
-                  <Image style={styles.contestImage} source={{ uri: `${config.photoUrl}/${item.post_photo}.png` }} />
+                  {item.post_photo ? (
+                    <Image style={styles.contestImage} source={{ uri: `${config.photoUrl}/${item.post_photo}.png` }} />
+                  ) : (
+                    <View style={[styles.contestImage, styles.noImageContainer]}>
+                      <IconB name="picture" size={40} color="#ccc" />
+                      <Text style={styles.noImageText}>이미지 없음</Text>
+                    </View>
+                  )}
                 </View>
                 <View style={styles.contestTextArea}>
                   <View style={styles.contestTextTitleArea}>
@@ -955,10 +966,12 @@ const styles = StyleSheet.create({
   postLabelText: {
     color: 'black',
     fontSize: 19,
+    paddingRight: 5
   },
+  // 조회수가 20 미만일 때 "new" 아이콘 스타일
   postLabelIcon: {
     color: 'red',
-    marginHorizontal: 5,
+    marginLeft: 5, // 제목과 아이콘 간의 간격 조절
   },
   postViewArea: {
     flexDirection: 'row-reverse',
@@ -1027,6 +1040,9 @@ const styles = StyleSheet.create({
     height: '70%',
     borderTopStartRadius: 10,
     borderTopEndRadius: 10,
+    backgroundColor: '#e0e0e0', // 이미지가 없을 때 배경색
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contestImage: {
     width: '100%',
@@ -1063,7 +1079,21 @@ const styles = StyleSheet.create({
   },
   contestRightArea: { // 여백
     width: 20,
-  }
+  },
+  // 이미지가 없을 때 표시할 대체 콘텐츠 스타일
+  noImageContainer: {
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noImageText: {
+    marginTop: 5,
+    color: '#555',
+    fontSize: 14,
+  },
+  footerSpacing: {
+    height: 85,
+  },
 });
 
 export default MainPage;
