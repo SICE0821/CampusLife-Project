@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import config from '../../config'; // 서버 URL이 포함된 config 파일
+import { useFocusEffect } from '@react-navigation/native';
 
 type userInfo = {
   Post_fk: number;
@@ -30,20 +31,34 @@ const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
   const [userInfo, setUserInfo] = useState<userInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchClubData = async () => {
-      try {
-        const response = await fetch(`${config.serverUrl}/fetchClubData`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ post_id: item.post_id }),
-        });
-        const result = await response.json();
-        if (response.ok) {
-          setUserInfo(result);
-        } else {
+  useFocusEffect(
+    useCallback(() => {
+      const fetchClubData = async () => {
+        try {
+          const response = await fetch(`${config.serverUrl}/fetchClubData`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post_id: item.post_id }),
+          });
+          const result = await response.json();
+          if (response.ok) {
+            setUserInfo(result);
+          } else {
+            Alert.alert(
+              '오류', // 제목
+              '데이터가 존재하지 않습니다.', // 메시지
+              [
+                {
+                  text: '확인',
+                  onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
+                },
+              ],
+              { cancelable: false } // 취소 불가능
+            );
+          }
+        } catch (error) {
           Alert.alert(
             '오류', // 제목
             '데이터가 존재하지 않습니다.', // 메시지
@@ -55,26 +70,14 @@ const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
             ],
             { cancelable: false } // 취소 불가능
           );
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        Alert.alert(
-          '오류', // 제목
-          '데이터가 존재하지 않습니다.', // 메시지
-          [
-            {
-              text: '확인',
-              onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
-            },
-          ],
-          { cancelable: false } // 취소 불가능
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchClubData();
-  }, [item]);
+      fetchClubData();
+    }, [item])
+  );
 
   // 중간 렌더링 값 확인
   const renderApplicant = ({ item }: { item: userInfo }) => {
