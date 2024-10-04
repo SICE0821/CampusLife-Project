@@ -10,7 +10,8 @@ import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, TouchableOp
 import AcademicInfoScreen from '../screens/CardScreens/AcademicScreens/AcademicInfoScreen';
 import AcademicRecord from '../screens/CardScreens/AcademicScreens/AcademicRecordScreen';
 import SchoolClubScreen from '../screens/CommunityScreens/SchoolClubScreen';
-import { EventShopScreenStackNavigator} from '../navigation/StackNavigator'
+import ContestPostScreen from '../screens/CommunityScreens/ContestPostScreen';
+import { EventShopScreenStackNavigator } from '../navigation/StackNavigator'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
@@ -27,7 +28,7 @@ const AcademicTopTab = createMaterialTopTabNavigator();
 import { UserData } from '../types/type';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-export const AcademicTopTabNavigator = ({route} : any) => {
+export const AcademicTopTabNavigator = ({ route }: any) => {
     const { userdata, LectureData } = route.params;
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -65,20 +66,20 @@ export const AcademicTopTabNavigator = ({route} : any) => {
                 <AcademicTopTab.Screen
                     name="학적"
                     component={AcademicInfoScreen}
-                    initialParams={{ userdata,LectureData }} 
-                    />
+                    initialParams={{ userdata, LectureData }}
+                />
                 <AcademicTopTab.Screen
                     name="수강신청이력"
-                    component={AcademicRecord} 
-                    initialParams={{ userdata,LectureData }}
-                    />
+                    component={AcademicRecord}
+                    initialParams={{ userdata, LectureData }}
+                />
             </AcademicTopTab.Navigator>
         </View>
     )
 }
 
 
-export const PostTopTabNavigator = ({route} : any) => {
+export const PostTopTabNavigator = ({ route }: any) => {
     const { userdata } = route.params;
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -95,11 +96,11 @@ export const PostTopTabNavigator = ({route} : any) => {
                         width: 260,
                         //borderBottomWidth : 1,
                         zIndex: 0,
-                        borderWidth : 1,
-                        marginLeft : 10,
-                        marginTop : 10,
-                        borderRadius : 5,
-                        
+                        borderWidth: 1,
+                        marginLeft: 10,
+                        marginTop: 10,
+                        borderRadius: 5,
+
                     },
                     tabBarIndicatorStyle: {
                         backgroundColor: 'transparent',
@@ -108,13 +109,13 @@ export const PostTopTabNavigator = ({route} : any) => {
                         //left: 43,
                         borderTopColor: '#9A9EFF', // 인디케이터의 색상 설정
                         borderTopWidth: 5, // 인디케이터의 두께 설정
-                        width : 60,
-                        marginLeft : 33
+                        width: 60,
+                        marginLeft: 33
                     },
-                    tabBarLabelStyle: {           
+                    tabBarLabelStyle: {
                         fontSize: 20,
                         fontWeight: 'bold',
-                        borderRadius : 16,
+                        borderRadius: 16,
                         //elevation : 5,
                     },
                     //gestureEnabled: false,
@@ -124,20 +125,20 @@ export const PostTopTabNavigator = ({route} : any) => {
                 <PostTopTab.Screen
                     name="전체 게시판"
                     component={PostDetailTopTabNavigator}
-                    initialParams = {{department_check: 0, userdata}} />
+                    initialParams={{ department_check: 0, userdata }} />
                 <PostTopTab.Screen
                     name="학과 게시판"
                     component={PostDetailTopTabNavigator}
-                    initialParams = {{department_check: 1, userdata}} />
+                    initialParams={{ department_check: 1, userdata }} />
             </PostTopTab.Navigator>
         </View>
     )
 }
 
-export const PostDetailTopTabNavigator = ({route} : any) => {
+export const PostDetailTopTabNavigator = ({ route }: any) => {
     const { department_check, userdata } = route.params;
     return (
-        <View style = {{flex : 1, backgroundColor : 'white'}}>
+        <View style={{ flex: 1, backgroundColor: 'white' }}>
             <PostDetailTopTab.Navigator
                 screenOptions={({ }) => ({
                     tabBarStyle: {
@@ -151,16 +152,16 @@ export const PostDetailTopTabNavigator = ({route} : any) => {
                         borderTopRightRadius: 20,
                         borderTopLeftRadius: 20,
                         backgroundColor: 'white',
-                        width : 240,
-                        height : 45,
-                        
-        
+                        width: 240,
+                        height: 45,
+
+
                     },
                     tabBarIndicatorStyle: {
                         //borderWidth : 2,
                         backgroundColor: 'transparent',
-                        width : 20,
-                        marginLeft : 31,
+                        width: 20,
+                        marginLeft: 31,
                         borderTopColor: '#9A9EFF', // 인디케이터의 색상 설정
                         borderTopWidth: 5, // 인디케이터의 두께 설정
                     },
@@ -170,7 +171,7 @@ export const PostDetailTopTabNavigator = ({route} : any) => {
                         fontWeight: 'bold',
                         //paddingVertical: 8, // 위아래 여백 추가
                         //paddingHorizontal: 16, // 좌우 여백 추가
-                        borderRadius : 16,
+                        borderRadius: 16,
                         //elevation : 5,
                     },
                     gestureEnabled: true,
@@ -180,15 +181,15 @@ export const PostDetailTopTabNavigator = ({route} : any) => {
                 <PostDetailTopTab.Screen
                     name="전체"
                     component={GeneralPostsScreen}
-                    initialParams = {{department_check, userdata}} />
+                    initialParams={{ department_check, userdata }} />
                 <PostDetailTopTab.Screen
                     name="HOT"
                     component={HotPostsScreen}
-                    initialParams = {{department_check, userdata}} />
+                    initialParams={{ department_check, userdata }} />
                 <PostDetailTopTab.Screen
                     name="책갈피"
                     component={BookmarkScreen}
-                    initialParams = {{department_check, userdata}} />
+                    initialParams={{ department_check, userdata }} />
             </PostDetailTopTab.Navigator>
         </View>
 
@@ -200,7 +201,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
     //전체, HOT게시글, 책갈피 상단 탭 네비게이션
     return (
         <CommunityTopBottomTab.Navigator
-            
+
             screenOptions={{
                 tabBarStyle: {
                     shadowOffset: {
@@ -210,14 +211,14 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
                     elevation: 5,
                     zIndex: 0,
                     //borderWidth: 1,
-                    borderRadius : 5,
+                    borderRadius: 5,
                     backgroundColor: 'white',
-                    width : 210,
-                    height : 34,
-                    position : 'absolute',
-                    top : 80,
-                    marginLeft : 10,
-    
+                    width: 210,
+                    height: 34,
+                    position: 'absolute',
+                    top: 80,
+                    marginLeft: 10,
+
                 },
                 tabBarLabelStyle: {
                     //backgroundColor : '#9A9EFF',
@@ -225,16 +226,16 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
                     fontWeight: 'bold',
                     //paddingVertical: 8, // 위아래 여백 추가
                     //paddingHorizontal: 16, // 좌우 여백 추가
-                    borderRadius : 5,
+                    borderRadius: 5,
                     //elevation : 5,
-                    marginBottom : 6,
+                    marginBottom: 6,
                 },
                 tabBarActiveTintColor: 'black'
 
             }}>
             <CommunityTopBottomTab.Screen name='전체'
                 component={GeneralPostsScreen}
-                initialParams={{department_check, userdata }}
+                initialParams={{ department_check, userdata }}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
@@ -243,7 +244,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
             <CommunityTopBottomTab.Screen name='HOT'
                 component={HotPostsScreen}
-                initialParams={{department_check, userdata }}
+                initialParams={{ department_check, userdata }}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
@@ -277,14 +278,14 @@ export const NoticeTopBottomTabNavigator = ({ navigation, route }: any) => {
                     elevation: 5,
                     zIndex: 0,
                     //borderWidth: 1,
-                    borderRadius : 5,
+                    borderRadius: 5,
                     backgroundColor: 'white',
-                    width : 210,
-                    height : 34,
-                    position : 'absolute',
-                    top : 80,
-                    marginLeft : 10,
-    
+                    width: 210,
+                    height: 34,
+                    position: 'absolute',
+                    top: 80,
+                    marginLeft: 10,
+
                 },
                 tabBarLabelStyle: {
                     //backgroundColor : '#9A9EFF',
@@ -292,16 +293,16 @@ export const NoticeTopBottomTabNavigator = ({ navigation, route }: any) => {
                     fontWeight: 'bold',
                     //paddingVertical: 8, // 위아래 여백 추가
                     //paddingHorizontal: 16, // 좌우 여백 추가
-                    borderRadius : 5,
+                    borderRadius: 5,
                     //elevation : 5,
-                    marginBottom : 6,
+                    marginBottom: 6,
                 },
                 tabBarActiveTintColor: 'black'
 
             }}>
             <NoticeCommunityTopBottomTab.Screen name='전체'
                 component={NoticeSchoolPostsScreen}
-                initialParams={{department_check, userdata }}
+                initialParams={{ department_check, userdata }}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
@@ -310,7 +311,7 @@ export const NoticeTopBottomTabNavigator = ({ navigation, route }: any) => {
 
             <NoticeCommunityTopBottomTab.Screen name='HOT'
                 component={NoticeHotPostsScreen}
-                initialParams={{department_check, userdata }}
+                initialParams={{ department_check, userdata }}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
@@ -348,20 +349,20 @@ export const TopbTabNavigator = ({ route, navigation }: any) => {
                     //borderBottomWidth : 1,
                     zIndex: 0,
                     //borderWidth : 1,
-                    marginLeft : 10,
-                    marginTop : 10,
-                    borderRadius : 5,
-                    position : 'absolute',
-                    top : 5
+                    marginLeft: 10,
+                    marginTop: 10,
+                    borderRadius: 5,
+                    position: 'absolute',
+                    top: 5
 
 
                 },
                 tabBarLabelStyle: {
                     fontSize: 20,
                     fontWeight: 'bold',
-                    borderRadius : 16,
+                    borderRadius: 16,
                     //elevation : 5,
-                    marginBottom : 9,
+                    marginBottom: 9,
                 },
                 tabBarActiveTintColor: 'black'
 
@@ -384,15 +385,15 @@ export const TopbTabNavigator = ({ route, navigation }: any) => {
                 }} />
 
             <CommunityTopTab.Screen name="동아리"
-            initialParams={{ userdata }}
+                initialParams={{ userdata }}
                 component={SchoolClubScreen}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
                     tabBarItemStyle: {
                         marginLeft: -14, // 원하는 만큼 왼쪽으로 이동 (값은 조정 가능)
-                      },
-                    
+                    },
+
                 }} />
         </CommunityTopTab.Navigator>
     );
@@ -412,28 +413,28 @@ export const NoticeTopbTabNavigator = ({ route }: any) => {
                     elevation: 5,
                     backgroundColor: 'white',
                     height: 50,
-                    width: 290,
+                    width: 400,
                     //borderBottomWidth : 1,
                     zIndex: 0,
                     //borderWidth : 1,
-                    marginLeft : 10,
-                    marginTop : 10,
-                    borderRadius : 5,
-                    position : 'absolute',
-                    top : 5
+                    marginLeft: 10,
+                    marginTop: 10,
+                    borderRadius: 5,
+                    position: 'absolute',
+                    top: 5
 
 
                 },
                 tabBarLabelStyle: {
                     fontSize: 20,
                     fontWeight: 'bold',
-                    borderRadius : 16,
+                    borderRadius: 16,
                     //elevation : 5,
-                    marginBottom : 9,
+                    marginBottom: 9,
                 },
-                tabBarActiveTintColor: 'black',
+                tabBarActiveTintColor: 'black'
             }}>
-            <NoticeTopTab.Screen name ="학교 공지사항"
+            <NoticeTopTab.Screen name="학교 공지사항"
                 initialParams={{ department_check: 0, userdata }}
                 component={NoticeTopBottomTabNavigator}
                 options={{
@@ -448,6 +449,18 @@ export const NoticeTopbTabNavigator = ({ route }: any) => {
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
+                }} />
+
+            <NoticeTopTab.Screen name="공모전"
+                initialParams={{ userdata }}
+                component={ContestPostScreen}
+                options={{
+                    headerShown: false,
+                    tabBarIcon: () => null,
+                    tabBarItemStyle: {
+                        marginLeft: -23, // 원하는 만큼 왼쪽으로 이동 (값은 조정 가능)
+                    },
+
                 }} />
         </NoticeTopTab.Navigator>
     );

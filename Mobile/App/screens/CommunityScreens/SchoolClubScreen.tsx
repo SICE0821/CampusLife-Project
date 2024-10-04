@@ -94,10 +94,17 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
   }, []);
 
   // 조회수 증가 함수 (샘플 데이터에서는 기능하지 않음)
-  const viewCountUp = async (post_id: number) => {
-    // 실제로는 서버에 조회수 증가 요청을 보냅니다.
-    console.log(`조회수 증가: ${post_id}`);
-  };
+  const viewCountUp = async (post_id: any) => {
+    try {
+        await fetch(`${config.serverUrl}/view_count_up`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ post_id }),
+        });
+    } catch (error) {
+        console.error('조회수 증가 실패', error);
+    }
+};
 
   // 북마크 추가 함수
   const addBookmark = async (item: PostData) => {

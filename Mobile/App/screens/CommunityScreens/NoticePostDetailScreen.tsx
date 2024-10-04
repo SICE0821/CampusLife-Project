@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, Image, Dimensions, Modal, Alert, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, Image, Dimensions, Modal, Alert, FlatList, TouchableOpacity, Linking } from 'react-native';
 import IconA from 'react-native-vector-icons/Entypo';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconD from 'react-native-vector-icons/EvilIcons';
@@ -30,16 +30,16 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
   const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
 
   useEffect(() => {
-    if(item.contest_check === true) {
+    if (item.contest_check === true) {
       navigation.setOptions({
-        title: '공모전', 
+        title: '공모전',
       });
-    }else if (item.contest_check === false) {
+    } else if (item.contest_check === false) {
       navigation.setOptions({
-        title: '공지사항', 
+        title: '공지사항',
       });
     }
-    
+
   }, [navigation]);
 
   useFocusEffect(
@@ -389,6 +389,11 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         <View style={styles.postArea}>
           <Text style={styles.postTitle}>{postDetailInfo?.title}</Text>
           <Text style={styles.postContent}>{postDetailInfo?.contents}</Text>
+          {postDetailInfo?.contest_check && (
+            <TouchableOpacity onPress={() => Linking.openURL(postDetailInfo?.url)}>
+              <Text style={styles.postURL}>{postDetailInfo?.url}</Text>
+            </TouchableOpacity>
+          )}
           <ScrollView horizontal style={styles.imagePreviewContainer} showsHorizontalScrollIndicator={false}>
             {postImages.map((image, index) => (
               <TouchableOpacity key={index} onPress={() => openImageModal(index)}
@@ -559,6 +564,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                       <IconD size={30} color="black" name={'like'} />
                     </Text>
                     <Text style={{ fontSize: 15, marginTop: 2 }}>{subitem.like}</Text>
+
                   </View>
                 </View>
               </View>
@@ -759,6 +765,13 @@ const styles = StyleSheet.create({
   postContent: { // 게시물 내용
     fontSize: 18,
     color: 'black',
+    marginTop: 10,
+    marginBottom: 20
+  },
+
+  postURL: { // 게시물 내용
+    fontSize: 18,
+    color: 'blue',
     marginTop: 10,
     marginBottom: 20
   },

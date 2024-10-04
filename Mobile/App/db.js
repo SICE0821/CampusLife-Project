@@ -235,6 +235,34 @@ async function getGeneralPosts(campus_id) {
     }
 }
 
+//전체 게시판에서 전체 게시글을 가져오는 쿼리
+async function getContestPosts(campus_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = (
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.url, post.sources, post.contest_check, student.name, user.title AS user_title, student.campus_id "
+            + "FROM "
+            + "post "
+            + "LEFT JOIN "
+            + "user "
+            + "ON post.user_id = user.user_id "
+            + "LEFT JOIN "
+            + "student "
+            + "ON user.student_id = student.student_id "
+            + "WHERE "
+            + "post.department_check = 0 AND post.inform_check =1 AND student.campus_id = ? AND post.Club_check = 0 AND post.contest_check = 1 "
+            + "ORDER BY post.date DESC"
+        );
+        const rows = await conn.query(query, [campus_id]);
+        return rows;
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
+
 async function ClubPosts() {
     let conn;
     try {
@@ -970,7 +998,7 @@ async function get_post_detail(post_id) {
             + "student.name AS student_name, department.name AS department_name,"
             + "post.date, post.title, "
             + "post.`contents`, post.`like`,"
-            + "post.`view`, user.profilePhoto, post.post_id, post.user_id "
+            + "post.`view`, user.profilePhoto, post.post_id, post.user_id, post.url, post.sources, post.contest_check "
             + "FROM "
             + "student "
             + "LEFT JOIN "
@@ -1465,7 +1493,7 @@ async function searchPost(search_text) {
     try {
         conn = await pool.getConnection();
         const rows = await conn.query(
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.department_check, post.inform_check, student.name, user.title AS user_title " +
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.department_check, post.inform_check, student.name, user.title AS user_title, post.contest_check, post.Club_check, post.url, post.sources " +
             "FROM post " +
             "LEFT JOIN user ON post.user_id = user.user_id " +
             "LEFT JOIN student ON user.student_id = student.student_id " +
@@ -1475,6 +1503,7 @@ async function searchPost(search_text) {
         );
         return rows;
     } catch (err) {
+        console.log(err)
         throw err;
     } finally {
         if (conn) conn.release();
@@ -3749,5 +3778,6 @@ module.exports = {
     ClubPosts,
     addClubInfo,
     getClubInfo,
-    fetchContestpostData
+    fetchContestpostData,
+    getContestPosts
 };

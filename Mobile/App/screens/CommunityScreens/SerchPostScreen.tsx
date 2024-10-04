@@ -20,7 +20,11 @@ type PostData = {
     name: string,
     user_title: string,
     department_check : boolean,
-    inform_check : boolean
+    inform_check : boolean,
+    Club_check : boolean,
+    contest_check : boolean,
+    url : string,
+    sources : string
 }
 const trueZero:PostData[] = [];
 const falseZero:PostData[] = []
@@ -33,12 +37,14 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
     console.log("you are in SearchPostScreen")
     const { userdata } = route.params;
     const [searchtext, setsearchtext] = useState('');
-    const [generalCommunityData, setgeneralCommunityData] = useState<PostData[]>([]);
-    const [departmentCommunityData, setDepartmentCommunityPost] = useState<PostData[]>([]);
-    const [schoolNoticeData, setSchoolNoticeData] = useState<PostData[]>([]);
-    const [departmentNoticeData, setDepartmentNoticeData] = useState<PostData[]>([]);
+    const [generalCommunityData, setgeneralCommunityData] = useState<PostData[]>([]);// 전체 게시판
+    const [departmentCommunityData, setDepartmentCommunityPost] = useState<PostData[]>([]); //학과 게시판
+    const [schoolNoticeData, setSchoolNoticeData] = useState<PostData[]>([]); //학교 공지사항
+    const [departmentNoticeData, setDepartmentNoticeData] = useState<PostData[]>([]); //학과 공지사항
     const [allPostData, setAllPostData] = useState<PostData[]>([]); 
     const [userData, setUserData] = useState<UserData>(userdata);
+    const [contestPost, setContestPost] = useState<PostData[]>([]); //공모전
+    const [clubPost, SetClubPost] = useState<PostData[]>([]); //동아리
 
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
@@ -84,10 +90,14 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
             return generalCommunityData
         }else if (value == "커뮤니티" && value2 == "학과") {
             return departmentCommunityData
+        }else if (value == "동아리" && value2 == "학과") {
+            return clubPost
         }else if (value == "공지사항" && value2 == "학교") {
             return schoolNoticeData
         }else if (value == "공지사항" && value2 == "학과") {
             return departmentNoticeData
+        }else if (value == "공모전" && value2 == "학교") {
+            return contestPost
         }
     }
 
@@ -101,13 +111,16 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
             setValue("커뮤니티");
             setItems([
                 {label: '커뮤니티', value: '커뮤니티'},
-                {label: '공지사항', value: '공지사항'}
+                {label: '공지사항', value: '공지사항'},
+                {label: '공모전', value: '공모전'},
+                
               ]);
         }else if(value2 == "학과") {
             setValue("커뮤니티");
             setItems([
                 {label: '커뮤니티', value: '커뮤니티'},
-                {label: '공지사항', value: '공지사항'}
+                {label: '공지사항', value: '공지사항'},
+                {label: '동아리', value: '동아리'},
               ]);
         }
       }, [value2]);
@@ -131,23 +144,36 @@ const SearchPostScreen: React.FC = ({ route, navigation }: any) => {
             }
 
             const postsdata:PostData[] = await response.json();
-            postsdata.forEach(item=> {
-                if (item.department_check && item.inform_check) {
-                  trueTrue.push(item); //학과 공지사항
-                } else if (item.department_check && !item.inform_check) {
-                  trueFalse.push(item); //학과 게시판
-                } else if (!item.department_check && item.inform_check) {
-                  falseTrue.push(item);  //학교 공지사항
-                } else {
-                  falseFalse.push(item); //전체 게시판
+
+            let noticePost : PostData[]= [];
+            let noticeDepartmentPost : PostData[] = [];
+            let contestPost : PostData[] = [];
+            let communityPost : PostData[] = [];
+            let departmentCommunityPost : PostData[] = [];
+            let clubPost : PostData[] = [];
+            
+            postsdata.forEach((post : PostData)=> {
+                if (post.inform_check === true && post.contest_check === false && post.department_check === false) {
+                    noticePost.push(post);  // 공지사항 게시물
+                } else if (post.inform_check === true && post.contest_check === false && post.department_check === true) {
+                    noticeDepartmentPost.push(post);  // 학과 공지사항 게시물
+                } else if (post.inform_check === true && post.contest_check === true && post.department_check === false) {
+                    contestPost.push(post);  // 경진대회 게시물
+                } else if (post.inform_check === false && post.Club_check === false && post.department_check === false) {
+                    communityPost.push(post);  // 커뮤니티 게시물
+                } else if (post.inform_check === false && post.Club_check === false && post.department_check === true) {
+                    departmentCommunityPost.push(post);  // 학과 커뮤니티 게시물
+                } else if (post.inform_check === false && post.Club_check === true && post.department_check === false) {
+                    clubPost.push(post);  // 동아리 게시물
                 }
-              });
-              setDepartmentNoticeData(trueTrue);
-              setDepartmentCommunityPost(trueFalse);
-              setAllPostData(postsdata);
-              setSchoolNoticeData(falseTrue);
-              setgeneralCommunityData(falseFalse);
-            // setCommunityData(postsdata);
+            });
+              setDepartmentNoticeData(noticeDepartmentPost);
+              setDepartmentCommunityPost(departmentCommunityPost);
+              setSchoolNoticeData(noticePost);
+              setgeneralCommunityData(communityPost);
+              setContestPost(contestPost);
+              SetClubPost(clubPost);
+             setAllPostData(postsdata);
         } catch (error) {
             console.error('Error fetching posts:', error);
         }
