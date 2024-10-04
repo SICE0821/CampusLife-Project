@@ -7,7 +7,7 @@ const pool = mariadb.createPool({
     port: 3306,
     user: 'dohyun',
     password: '0000',
-    connectionLimit: 5,
+    connectionLimit: 10,
     database: 'campuslife',
 });
 
@@ -3580,6 +3580,21 @@ async function fetchContestpostData(campus_id) {
     }
 }
 
+async function delete_Club(post_id, name, phone) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "DELETE FROM club_register WHERE Post_fk = ? AND Name = ? AND Phone = ?"
+        const result = await conn.query(query, [post_id, name, phone]);
+        return true;
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -3749,5 +3764,6 @@ module.exports = {
     ClubPosts,
     addClubInfo,
     getClubInfo,
-    fetchContestpostData
+    fetchContestpostData,
+    delete_Club
 };

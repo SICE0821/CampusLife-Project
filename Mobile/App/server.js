@@ -168,7 +168,8 @@ const { getGeneralPosts,
   ClubPosts,
   addClubInfo,
   getClubInfo,
-  fetchContestpostData
+  fetchContestpostData,
+  delete_Club
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -198,7 +199,7 @@ function formatDate2(dateString) {
 const pool = mariadb.createPool({
   host: '14.6.152.120',
   port: 3306,
-  user: 'yuhwan',
+  user: 'dohyun',
   password: '0000',
   connectionLimit: 10,
   database: 'campuslife',
@@ -3156,6 +3157,17 @@ app.post('/fetchClubData', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+app.post('/deleteclub', async (req, res) => {
+  const { post_id, name, phone } = req.body;
+  const success = await delete_Club(post_id, name, phone);
+  if (success) {
+    res.json({ message: "삭제되었습니다." });
+  } else {
+    res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
+  }
+});
+
 
 //서버 시작
 app.listen(PORT, () => {
