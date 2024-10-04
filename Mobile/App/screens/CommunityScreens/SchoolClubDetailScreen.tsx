@@ -674,28 +674,42 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     </View>
                 </Modal>
             )}
-            <View style = {{flex : 1, alignItems : 'center'}}>
-            <Button
-                title="(유저)동아리 신청하기."
-                onPress={() => {
-                    console.log("동아리 신청하기.");
-                    navigation.navigate("SchoolClubSignScreen", {item, userData});
-                }}
-            />
-            <View style = {{height : 20}}></View>
-            <Text>or</Text>
-            <View style = {{height : 20}}></View>
-            {(userdata?.user_pk === postDetailInfo?.user_id) && (
-                    <>
-                        <Button
-                            title="(게시글 주인)동아리 현황파악하기."
-                            onPress={() => {
-                                console.log("동아리 현황파악하기.");
-                                navigation.navigate("SchoolClubSignStateScreen", { item, userData });
-                            }}
-                        />
-                                </>
-                            )}          
+            <View style={{ height: 230, alignItems: 'center', justifyContent: 'center' }}>
+                {(userdata?.user_pk === postDetailInfo?.user_id) ? (
+                    <TouchableOpacity
+                        style={{
+                            height: 60,
+                            width: 300,
+                            backgroundColor: '#F27400',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 20,
+                            elevation: 5
+                        }}
+                        onPress={() => {
+                            navigation.navigate("SchoolClubSignStateScreen", { item, userData });
+                        }}
+                    >
+                        <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>동아리 현황 파악하기</Text>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={{
+                            height: 60,
+                            width: 300,
+                            backgroundColor: '#F27400',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            borderRadius: 20,
+                            elevation: 5
+                        }}
+                        onPress={() => {
+                            navigation.navigate("SchoolClubSignScreen", { item, userData });
+                        }}
+                    >
+                        <Text style={{ fontSize: 20, color: 'white', fontWeight: 'bold' }}>동아리 신청하기</Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );

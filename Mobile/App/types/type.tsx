@@ -42,7 +42,10 @@ export type PostDeatilData = {
   view: number,
   writer_propile: string,
   post_id : number,
-  user_id : number
+  user_id : number,
+  url : any,
+  source : string,
+  contest_check : boolean
 }
 
 export type PostCommentData = {

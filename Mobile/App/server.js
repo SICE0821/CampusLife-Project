@@ -168,7 +168,8 @@ const { getGeneralPosts,
   ClubPosts,
   addClubInfo,
   getClubInfo,
-  fetchContestpostData
+  fetchContestpostData,
+  getContestPosts
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -609,6 +610,32 @@ app.post('/generalpost', async (req, res) => {
     console.log("[GeneralPostsScreen] : 전체 게시판 전체 게시물 가져오기 실패");
   }
 });
+
+//게시글화면에서 공모전 게시글을 가져온다.
+app.post('/getContestPosts', async (req, res) => {
+  try {
+    const { campus_id } = req.body;
+    const rows = await getContestPosts(campus_id);
+    const processedData = rows.map(item => ({
+      post_id: item.post_id,
+      title: item.title,
+      contents: item.contents,
+      date: formatDate(item.date),
+      view: item.view,
+      like: item.like,
+      name: item.name,
+      user_title: item.user_title,
+      url : item.url,
+      sources : item.sources,
+      contest_check : item.contest_check
+    }));
+    res.json(processedData);
+    console.log("[GeneralPostsScreen] : 공모전 게시물 가져오기 성공");
+  } catch (error) {
+    console.log("[GeneralPostsScreen] : 공모전 게시물 가져오기 실패");
+  }
+});
+
 
 //게시글화면에서 전체 핫 게시글을 가져온다.
 app.post('/Hotpost', async (req, res) => {
@@ -1293,7 +1320,11 @@ app.post('/search_post', async (req, res) => {
       name: item.name,
       user_title: item.user_title,
       department_check: item.department_check,
-      inform_check: item.inform_check
+      inform_check: item.inform_check,
+      contest_check : item.contest_check,
+      Club_check : item.Club_check,
+      sources : item.sources,
+      url : item.url
     }));
     console.log("[SearchPostScreen] : 찾는 게시물 정보 가져오기 성공");
     res.json(processedData);
@@ -1358,6 +1389,9 @@ app.post('/get_post_detail', async (req, res) => {
       writer_propile: row[0].profilePhoto,
       post_id: row[0].post_id,
       user_id: row[0].user_id,
+      url : row[0].url,
+      source : row[0].source,
+      contest_check : row[0].contest_check
     };
     console.log("[PostDetailScreen or NoticePostDetailScreen] : 자세한 포스터 내용 가져오기 성공");
     res.json(userData);
