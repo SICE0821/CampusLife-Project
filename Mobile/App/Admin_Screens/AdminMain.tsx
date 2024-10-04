@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -8,14 +7,18 @@ import {
   View,
   Dimensions,
   Image,
+  Alert,
   Linking
 } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Swiper from 'react-native-swiper';
-import { UserData, EventData } from '../types/type'
 import ImageCropPicker from 'react-native-image-crop-picker';
 import config from '../config';
 
+// 다양한 아이콘 라이브러리 import
+import IconA from 'react-native-vector-icons/MaterialIcons';
 import IconB from 'react-native-vector-icons/AntDesign';
+import IconC from 'react-native-vector-icons/FontAwesome';
 import IconD from 'react-native-vector-icons/Feather';
 import IconE from 'react-native-vector-icons/Ionicons';
 import IconF from 'react-native-vector-icons/Fontisto';
@@ -24,32 +27,7 @@ import IconH from 'react-native-vector-icons/Foundation';
 import IconI from 'react-native-vector-icons/FontAwesome5';
 import IconJ from 'react-native-vector-icons/MaterialIcons';
 
-const contestData = [
-  {
-    id: 1,
-    title: '공모전 제목 공모전 제목 공모전 제목',
-    info: '공모전 정보(출처)',
-    image: require('../assets/001.png'),
-  },
-  {
-    id: 2,
-    title: '공모전 제목 공모전 제목 공모전 제목',
-    info: '공모전 정보(출처)',
-    image: require('../assets/001.png'),
-  },
-  {
-    id: 3,
-    title: '공모전 제목 공모전 제목 공모전 제목',
-    info: '공모전 정보(출처)',
-    image: require('../assets/001.png'),
-  },
-  {
-    id: 4,
-    title: '공모전 제목 공모전 제목 공모전 제목',
-    info: '공모전 정보(출처)',
-    image: require('../assets/001.png'),
-  },
-];
+import { UserData, EventData } from '../types/type'
 
 const width = Dimensions.get('window').width;
 
@@ -71,7 +49,7 @@ type ContestData = {
   inform_check: boolean,
   Club_check: boolean,
   title: string,
-  date : string
+  date: string
   contest_check: boolean,
   url: string,
   sources: string,
@@ -80,13 +58,13 @@ type ContestData = {
 
 const AdminMain = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
-  const [schoolpostdata, setschollpostdata] = useState<PostData[]>([]);
-  const [departmentpostdata, setdepartmentpostdata] = useState<PostData[]>([]);
-  const [hotpostdata, sethotpostdata] = useState<PostData[]>([]);
-  const [contestdata, setContestdata] = useState<ContestData[]>([]);
+  const [schoolpostdata, setSchoolPostData] = useState<PostData[]>([]);
+  const [departmentpostdata, setDepartmentPostData] = useState<PostData[]>([]);
+  const [hotpostdata, setHotPostData] = useState<PostData[]>([]);
+  const [contestdata, setContestData] = useState<ContestData[]>([]);
   const [userData, setUserData] = useState<UserData>(userdata);
   const [eventData, setEventData] = useState<EventData[]>([]);
-  const [Userdepartment, setUserDepartment] = useState();
+  const [Userdepartment, setUserDepartment] = useState<string>('');
   const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
 
   /** 기본 이벤트 정보 */
@@ -131,30 +109,34 @@ const AdminMain = ({ navigation, route }: any) => {
         })
       })
       const result = await response.json();
-      //console.log("포스트 View 올리기 성공!")
     } catch (error) {
       console.error('포스트 View 올리기 누르기 실패', error);
     }
   }
 
   const getPhotos = async () => {
-    ImageCropPicker.openPicker({
-      multiple: true,
-      mediaType: 'photo',
-      includeBase64: true,
-      includeExif: true,
-    }).then(res => {
+    try {
+      const images = await ImageCropPicker.openPicker({
+        multiple: true,
+        mediaType: 'photo',
+        includeBase64: true,
+        includeExif: true,
+      });
+
       const formData = new FormData();
-      res.forEach(image => {
+      images.forEach(image => {
         formData.append('images', {
           uri: image.path,
           type: 'image/jpeg',
           name: `${Date.now()}_${image.filename || userData.user_pk}.png`,
         });
       });
-      //console.log(formData);
-      //uploadImages(formData);
-    });
+
+      // 이미지 업로드 함수 호출 (현재는 주석 처리됨)
+      // await uploadImages(formData);
+    } catch (error) {
+      console.error('이미지 선택 실패:', error);
+    }
   };
 
   const get_user_department = async () => {
@@ -188,7 +170,7 @@ const AdminMain = ({ navigation, route }: any) => {
         })
       })
       const data = await response.json();
-      setschollpostdata(data);
+      setSchoolPostData(data);
     } catch (error) {
       console.error('유저 학과 이름 가져오기 실패:', error);
     }
@@ -206,7 +188,7 @@ const AdminMain = ({ navigation, route }: any) => {
         }),
       })
       const data = await response.json();
-      setdepartmentpostdata(data);
+      setDepartmentPostData(data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -228,7 +210,7 @@ const AdminMain = ({ navigation, route }: any) => {
         })
       })
       const data = await response.json();
-      sethotpostdata(data);
+      setHotPostData(data);
     } catch (error) {
       console.error('유저 학과 이름 가져오기 실패:', error);
     }
@@ -247,7 +229,7 @@ const AdminMain = ({ navigation, route }: any) => {
         })
       })
       const data = await response.json();
-      setContestdata(data);
+      setContestData(data);
     } catch (error) {
       console.error(error);
     }
@@ -265,7 +247,6 @@ const AdminMain = ({ navigation, route }: any) => {
         }),
       })
       const data = await response.json();
-      //console.log(data);
       return data;
     } catch (error) {
       console.error(error);
@@ -297,14 +278,12 @@ const AdminMain = ({ navigation, route }: any) => {
         };
       }));
       setEventData(eventsWithImages);
-      //console.log(JSON.stringify(eventsWithImages, null, 2));
     } catch (error) {
       console.error(error);
     }
   };
 
   const StudentInfo = async () => {
-    //console.log(userData);
     navigation.navigate('StudentInfoNavigator', { userData, Userdepartment });
   }
 
@@ -434,7 +413,7 @@ const AdminMain = ({ navigation, route }: any) => {
                     <Text style={styles.postLabelText}
                       numberOfLines={1}
                       ellipsizeMode="tail">{post?.title}</Text>
-                    {index === 0 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
+                    {post.view < 20 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
                   </View>
                   <View style={styles.postViewArea}>
                     <Text style={styles.postViewText}>{post?.view}</Text>
@@ -475,7 +454,7 @@ const AdminMain = ({ navigation, route }: any) => {
                     <Text style={styles.postLabelText}
                       numberOfLines={1}
                       ellipsizeMode="tail">{post?.title}</Text>
-                    {index === 0 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
+                    {post.view < 20 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
                   </View>
                   <View style={styles.postViewArea}>
                     <Text style={styles.postViewText}>{post?.view}</Text>
@@ -516,7 +495,7 @@ const AdminMain = ({ navigation, route }: any) => {
                     <Text style={styles.postLabelText}
                       numberOfLines={1}
                       ellipsizeMode="tail">{post?.title}</Text>
-                    {index === 0 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
+                    {post.view < 20 && <IconH style={styles.postLabelIcon} name="burst-new" size={40} />}
                   </View>
                   <View style={styles.postViewArea}>
                     <Text style={styles.postViewText}>{post?.view}</Text>
@@ -527,6 +506,8 @@ const AdminMain = ({ navigation, route }: any) => {
             </View>
           </View>
         </View>
+
+        {/* 공모전 영역 */}
         <View style={styles.contestArea}>
           <View style={styles.contestHeadArea}>
             <View style={styles.contestHeadTextArea}>
@@ -549,11 +530,18 @@ const AdminMain = ({ navigation, route }: any) => {
           <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.contestBoxArea}>
             {contestdata.map((item) => (
               <TouchableOpacity
-                key = {item.post_id}
+                key={item.post_id}
                 style={styles.contestBox}
                 onPress={() => Linking.openURL(item.url)} >
                 <View style={styles.contestImageArea}>
-                  <Image style={styles.contestImage} source={{ uri: `${config.photoUrl}/${item.post_photo}.png` }} />
+                  {item.post_photo ? (
+                    <Image style={styles.contestImage} source={{ uri: `${config.photoUrl}/${item.post_photo}.png` }} />
+                  ) : (
+                    <View style={[styles.contestImage, styles.noImageContainer]}>
+                      <IconB name="picture" size={40} color="#ccc" />
+                      <Text style={styles.noImageText}>이미지 없음</Text>
+                    </View>
+                  )}
                 </View>
                 <View style={styles.contestTextArea}>
                   <View style={styles.contestTextTitleArea}>
@@ -565,8 +553,6 @@ const AdminMain = ({ navigation, route }: any) => {
                 </View>
               </TouchableOpacity>
             ))}
-            <View style={styles.contestRightArea}>
-            </View>
           </ScrollView>
         </View>
       </ScrollView>
@@ -785,10 +771,11 @@ const styles = StyleSheet.create({
   postLabelText: {
     color: 'black',
     fontSize: 19,
+    paddingRight: 5
   },
   postLabelIcon: {
     color: 'red',
-    marginHorizontal: 5,
+    marginLeft: 5, // 제목과 아이콘 간의 간격 조절
   },
   postViewArea: {
     flexDirection: 'row-reverse',
@@ -857,6 +844,9 @@ const styles = StyleSheet.create({
     height: '70%',
     borderTopStartRadius: 10,
     borderTopEndRadius: 10,
+    backgroundColor: '#e0e0e0', // 이미지가 없을 때 배경색
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contestImage: {
     width: '100%',
@@ -893,7 +883,18 @@ const styles = StyleSheet.create({
   },
   contestRightArea: { // 여백
     width: 20,
-  }
+  },
+  // 이미지가 없을 때 표시할 대체 콘텐츠 스타일
+  noImageContainer: {
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noImageText: {
+    marginTop: 5,
+    color: '#555',
+    fontSize: 14,
+  },
 });
 
 export default AdminMain;

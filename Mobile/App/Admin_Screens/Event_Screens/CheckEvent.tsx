@@ -1,159 +1,143 @@
-import { View, StyleSheet, Dimensions, Image, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Image,
+  Text,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+  Modal,
+} from 'react-native';
 import Icon_event from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { UserData, AdminEventList, VoteEvnetData, VoteInfoItem, VoteDataItem } from '../../types/type'
-const width = Dimensions.get("window").width;
+import { useFocusEffect } from '@react-navigation/native';
+import {
+  UserData,
+  AdminEventList,
+  VoteEvnetData,
+  VoteInfoItem,
+  VoteDataItem,
+} from '../../types/type';
 import config from '../../config';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-/** 현재 등록되어 있는 이벤트들을 확인 합니다. */
+const width = Dimensions.get('window').width;
+
+/**
+ * 현재 등록되어 있는 이벤트들을 확인하는 컴포넌트입니다.
+ */
 const CheckEvent = ({ route, navigation }: any) => {
   const { userdata } = route.params;
-  const [userData, setUserData] = useState<UserData>(userdata); //유저 데이터
-  const [eventList, setEventList] = useState<AdminEventList[]>([]); //이벤트 리스트
+
+  const [userData, setUserData] = useState<UserData>(userdata);
+  const [eventList, setEventList] = useState<AdminEventList[]>([]);
   const [voteData, setVoteData] = useState<VoteDataItem[]>([]);
   const [voteInfo, setVoteInfo] = useState<VoteInfoItem[]>([]);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false); // 삭제 모달 표시 여부
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null); // 선택된 이벤트 ID
 
   useFocusEffect(
     React.useCallback(() => {
-        const fetchData = async () => {
-            try {
-              setUserData(userdata);
-              await GetEventList();
-              await GetEventVote();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchData();
+      const fetchData = async () => {
+        try {
+          setUserData(userdata);
+          await GetEventList();
+          await GetEventVote();
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
     }, [])
-);
+  );
 
-  //설정한 이벤트 보여주기
   const GetEventList = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/GetEventList`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          campus_id: userData.campus_pk
-        }),
-      })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campus_id: userData.campus_pk }),
+      });
       const data = await response.json();
       setEventList(data);
-      //console.log(data);
     } catch (error) {
       console.error(error);
-    } finally {
     }
-  }
+  };
 
-
-  //해당 이벤트 초기화 후 다시 행삽입
-  const DeleteEvent = async (eventId: any) => {
-    try {
-      const response = await fetch(`${config.serverUrl}/DeleteEvent`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          event_id: eventId
-        }),
-      })
-      //GetEventList();
-    } catch (error) {
-      console.error(error);
-    } finally {
-    }
-  }
-
-  //설정한 이벤트 보여주기
   const GetEventVote = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/GetEventVote`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          campus_id: userData.campus_pk
-        }),
-      })
-      const data : VoteEvnetData[] = await response.json();
-      const groupedData : any = {};
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campus_id: userData.campus_pk }),
+      });
+      const data: VoteEvnetData[] = await response.json();
+      const groupedData: any = {};
 
-      // rawData를 순회하여 groupedData 객체에 이벤트별로 그룹화
-      data.forEach(item => {
+      data.forEach((item) => {
         if (!groupedData[item.event_id]) {
           groupedData[item.event_id] = {
             votes: [],
-            results: []
+            results: [],
           };
         }
         groupedData[item.event_id].votes[item.vote_index - 1] = item.vote_name;
         groupedData[item.event_id].results[item.vote_index - 1] = item.vote_count;
       });
 
-      // 결과 배열 초기화
-      const voteInfo : any = [];
-      const voteData : any = [];
+      const voteInfoArray: VoteInfoItem[] = [];
+      const voteDataArray: VoteDataItem[] = [];
 
-      // groupedData 객체를 순회하여 voteInfo와 voteData 배열을 생성
-      Object.keys(groupedData).forEach(event_id => {
+      Object.keys(groupedData).forEach((event_id) => {
         const { votes, results } = groupedData[event_id];
 
-        // 투표 항목이 비어 있는 경우 기본 값을 설정
         for (let i = 0; i < votes.length; i++) {
           if (!votes[i]) {
             votes[i] = `투표 항목${i + 1}`;
           }
         }
 
-        voteInfo.push({
+        voteInfoArray.push({
           id: parseInt(event_id, 10),
-          votes: votes
+          votes: votes,
         });
 
-        voteData.push({
+        voteDataArray.push({
           id: parseInt(event_id, 10),
-          results: results
+          results: results,
         });
       });
 
-      setVoteData(voteData);
-      setVoteInfo(voteInfo);
-      //console.log('voteInfo:', voteInfo);
-      //console.log('voteData:', voteData);
-      //console.log(data);
-      //console.log(data);
+      setVoteInfo(voteInfoArray);
+      setVoteData(voteDataArray);
     } catch (error) {
       console.error(error);
-    } finally {
     }
-  }
+  };
+
+  const DeleteEvent = async (eventId: number) => {
+    try {
+      await fetch(`${config.serverUrl}/DeleteEvent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_id: eventId }),
+      });
+      await GetEventList();
+      await GetEventVote();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleEditEvent = (eventId: number) => {
-    navigation.navigate("ModifyEvent", { userdata, eventId })
+    navigation.navigate('ModifyEvent', { userdata, eventId });
   };
 
   const handleDeleteEvent = (eventId: number) => {
-    Alert.alert(
-      "이벤트 삭제",
-      "해당 이벤트를 정말 삭제 하시겠습니까??",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "OK", onPress: async () => {
-            await DeleteEvent(eventId)
-            await GetEventList();
-            await GetEventVote();
-          }
-        }
-      ]
-    );
+    setSelectedEventId(eventId);
+    setDeleteModalVisible(true);
   };
 
   const calculatePercentages = (votes: any[], results: any[]) => {
@@ -161,187 +145,280 @@ const CheckEvent = ({ route, navigation }: any) => {
     return votes.map((vote, index) => ({
       vote,
       count: results[index],
-      percentage: totalVotes === 0 ? 0 : (results[index] / totalVotes) * 100
+      percentage: totalVotes === 0 ? 0 : (results[index] / totalVotes) * 100,
     }));
   };
 
   return (
     <View style={styles.container}>
+      {/* 상단 버튼 영역 */}
       <View style={styles.btnArea}>
-        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("RegisterEvent", userdata)}>
-          <Icon_event style={styles.eventRegistIcon} name='note-plus-outline' />
+        {/* 이벤트 등록 버튼 */}
+        <TouchableOpacity
+          style={styles.eventBtn}
+          onPress={() => navigation.navigate('RegisterEvent', userdata)}
+        >
+          <Icon_event style={styles.eventRegistIcon} name="note-plus-outline" />
           <Text style={styles.eventRegistText}>이벤트 등록</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.eventBtn} onPress={() => navigation.navigate("ParticipantEvent", userdata)}>
-          <Icon_event style={styles.eventRegistIcon} name='note-text-outline' />
+        {/* 참여 확인 버튼 */}
+        <TouchableOpacity
+          style={styles.eventBtn}
+          onPress={() => navigation.navigate('ParticipantEvent', userdata)}
+        >
+          <Icon_event style={styles.eventRegistIcon} name="note-text-outline" />
           <Text style={styles.eventCheckText}>참여 확인</Text>
         </TouchableOpacity>
       </View>
+      {/* 이벤트 목록 */}
       <ScrollView>
         {eventList?.map((event) => {
-          const votes = voteInfo.find(vote => vote.id === event.event_id)?.votes || [];
-          const results = voteData.find(vote => vote.id === event.event_id)?.results || [];
+          const votes = voteInfo.find((vote) => vote.id === event.event_id)?.votes || [];
+          const results = voteData.find((vote) => vote.id === event.event_id)?.results || [];
           const percentages = calculatePercentages(votes, results);
 
           return (
-
-            <View key={event.event_id} style={styles.eventBox}>
-              <View style={styles.eventImageArea}>
-                <Image style={styles.image} source={{ uri: `${config.photoUrl}/${event?.event_photo}.png` }} />
-              </View>
-              <View style={styles.eventInfo}>
-                <View style={styles.eventInfoTextArea}>
-                  <Text style={styles.eventTitle}>{event.name}</Text>
-                  <Text style={styles.eventContent}>{event.info}</Text>
-                  {percentages.map((vote, index) => (
+            <View key={event.event_id} style={styles.eventCard}>
+              {/* 이벤트 이미지 영역 */}
+              <Image
+                style={styles.eventImage}
+                source={{ uri: `${config.photoUrl}/${event?.event_photo}.png` }}
+              />
+              {/* 이벤트 정보 영역 */}
+              <View style={styles.eventContentArea}>
+                <Text style={styles.eventTitle}>{event.name}</Text>
+                <Text style={styles.eventInfo}>{event.info}</Text>
+                {/* 투표 결과 표시 */}
+                {percentages.map(
+                  (vote, index) =>
                     vote.vote !== 'null' && (
                       <View key={index} style={styles.voteResult}>
                         <Text style={styles.voteText}>{vote.vote}</Text>
                         <View style={styles.voteTextArea}>
-                          <Text style={styles.voteText}>{vote.count} 표</Text>
-                          <Text style={styles.voteText}>({vote.percentage.toFixed(1)}%)</Text>
+                          <Text style={styles.voteCount}>{vote.count}표</Text>
+                          <Text style={styles.votePercentage}>
+                            ({vote.percentage.toFixed(1)}%)
+                          </Text>
                         </View>
                       </View>
                     )
-                  ))}
-
-                  <Text style={styles.DeadLineDate}>{event.start_date} ~ {event.close_date}</Text>
-                </View>
-                <View style={styles.eventBoxBtnArea}>
-                  <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleEditEvent(event.event_id)}>
-                    <Text style={styles.eventBoxBtnText}>이벤트 수정</Text>
+                )}
+                {/* 이벤트 기간 표시 */}
+                <Text style={styles.eventDate}>
+                  {event.start_date} ~ {event.close_date}
+                </Text>
+                {/* 이벤트 수정 및 삭제 버튼 영역 */}
+                <View style={styles.eventButtonArea}>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => handleEditEvent(event.event_id)}
+                  >
+                    <Ionicons name="pencil-outline" size={16} color="#fff" />
+                    <Text style={styles.actionButtonText}>수정</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.eventBoxBtn} onPress={() => handleDeleteEvent(event.event_id)}>
-                    <Text style={styles.eventBoxBtnText}>이벤트 삭제</Text>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => handleDeleteEvent(event.event_id)}
+                  >
+                    <Ionicons name="trash-outline" size={16} color="#fff" />
+                    <Text style={styles.actionButtonText}>삭제</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
           );
         })}
-        <View style={{ height: 100 }}></View>
+        {/* 하단 여백 */}
+        <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* 삭제 확인 모달 */}
+      <Modal
+        visible={deleteModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>이벤트 삭제</Text>
+            <Text style={styles.modalMessage}>해당 이벤트를 정말 삭제하시겠습니까?</Text>
+            <View style={styles.modalButtonContainer}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  setDeleteModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalButtonText}>취소</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={async () => {
+                  if (selectedEventId !== null) {
+                    await DeleteEvent(selectedEventId);
+                    setDeleteModalVisible(false);
+                  }
+                }}
+              >
+                <Text style={styles.modalButtonText}>확인</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
+// 스타일 시트 정의
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
   },
   btnArea: {
-    width: width * 0.95,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginVertical: 10
+    marginVertical: 10,
+    marginHorizontal: 10,
   },
   eventBtn: {
-    backgroundColor: 'white',
-    justifyContent: 'center',
+    backgroundColor: '#f27400',
+    flexDirection: 'row',
     alignItems: 'center',
-    padding: 5,
-    marginHorizontal: 5,
-    borderRadius: 10,
-    elevation: 5
+    padding: 8,
+    marginLeft: 10,
+    borderRadius: 5,
   },
   eventRegistIcon: {
-    color: 'black',
-    fontSize: 30
+    color: '#fff',
+    fontSize: 20,
+    marginRight: 5,
   },
   eventRegistText: {
-    color: 'black',
-    fontSize: 14,
-    fontWeight: 'bold'
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   eventCheckText: {
-    color: 'black',
-    fontSize: 14,
-    fontWeight: 'bold'
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  eventBox: {
-    backgroundColor: 'white',
-    width: width * 0.95,
-    flexDirection: 'row',
-    borderRadius: 15,
-    marginVertical: 5,
-    elevation: 5,
+  eventCard: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginVertical: 8,
+    marginHorizontal: 10,
+    overflow: 'hidden',
+    elevation: 3,
   },
-  eventImageArea: {
-    backgroundColor: '#dddddd',
-    width: 150,
-    height: 150,
-    alignSelf: 'flex-start',
-    borderRadius: 15
-  },
-  image: {
-    flex: 1,
+  eventImage: {
     width: '100%',
-    resizeMode: 'contain',
-    borderRadius: 15
+    height: 200,
   },
-  eventInfo: {
-    width: width * 0.95 - 150,
-    justifyContent: 'space-between',
-    padding: 5
-  },
-  eventInfoTextArea: {
-    width: '100%',
+  eventContentArea: {
+    padding: 15,
   },
   eventTitle: {
-    color: 'black',
     fontSize: 22,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    color: '#333',
   },
-  eventContent: {
-    color: 'black',
+  eventInfo: {
+    fontSize: 16,
+    color: '#666',
+    marginVertical: 8,
+    lineHeight: 22,
+  },
+  eventDate: {
     fontSize: 14,
-    marginVertical: 5
-  },
-  DeadLineDate: {
-    color: 'grey',
-    marginTop: 10,
-    fontSize: 15,
+    color: '#999',
+    marginTop: 5,
   },
   voteResult: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 2,
-    paddingHorizontal: 5
-  },
-  voteTextArea: {
-    width: '35%',
-    //backgroundColor: 'red',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 5
+    alignItems: 'center',
+    marginVertical: 4,
   },
   voteText: {
-    fontSize: 14,
-    color: 'black'
-  },
-  eventBoxBtnArea: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 5
-  },
-  eventBoxBtn: {
-    backgroundColor: 'skyblue',
-    width: 100,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 10,
-    padding: 5,
-    borderRadius: 10,
-    elevation: 3
-  },
-  eventBoxBtnText: {
-    color: 'black',
     fontSize: 16,
+    color: '#333',
+  },
+  voteTextArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  voteCount: {
+    fontSize: 16,
+    color: '#333',
+    marginRight: 10,
+  },
+  votePercentage: {
+    fontSize: 14,
+    color: '#999',
+  },
+  eventButtonArea: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 10,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    backgroundColor: '#f27400',
+    padding: 8,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginLeft: 10,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    marginLeft: 5,
+  },
+  // 모달 스타일 추가
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 25,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-  }
+    marginBottom: 15,
+    color: '#333',
+  },
+  modalMessage: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
+    marginBottom: 25,
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+  },
+  modalButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+    marginHorizontal: 5,
+    backgroundColor: '#f27400',
+    borderRadius: 5,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
 });
 
 export default CheckEvent;

@@ -290,13 +290,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   card: {
+    alignSelf: 'center',
     backgroundColor: '#fff',
     padding: 15,
     marginVertical: 10,
+    borderRadius: 10,
+    elevation: 5,
+    width: '95%'
   },
   cardTitle: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: 'black'
   },
   cardSubtitle: {
     fontSize: 16,
@@ -307,18 +312,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
+    color: 'black'
   },
   infoText: {
     fontSize: 16,
     color: '#333',
+    alignSelf: 'center'
   },
   eventImageArea: {
-    width: width,
-    height: width * 0.6,
+    width: width * 0.95,
+    height: width,
     backgroundColor: '#fff',
+    alignSelf: 'center'
   },
   eventImageBox: {
-    width: width,
+    width: width * 0.95,
     height: '100%',
   },
   eventImage: {
@@ -326,7 +334,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   modalContainer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',

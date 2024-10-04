@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { Text, View, Button, StyleSheet, Dimensions, TouchableOpacity, TextInput, ScrollView, Alert, Image } from 'react-native';
+import { Text, View, Button, StyleSheet, Dimensions, TouchableOpacity, TextInput, ScrollView, Alert, Image, FlatList } from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import IconC from 'react-native-vector-icons/FontAwesome';
+import IconFontAwesome from 'react-native-vector-icons/FontAwesome'; // FontAwesome 아이콘 컴포넌트
 import Clipboard from '@react-native-clipboard/clipboard';
 import IconCancel from 'react-native-vector-icons/AntDesign';
 import Modal from 'react-native-modal';
@@ -137,7 +138,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity onPress={async () => {
-          if(selectcontestposter === 1 && selectedImages.length > 1) {
+          if (selectcontestposter === 1 && selectedImages.length > 1) {
             contest_photo_no();
           } else {
             const post_id = await write_post();
@@ -250,7 +251,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           department_check: selectdepartmentposter,
           inform_check: adminCheck(),
           contest_check: selectcontestposter,
-          Club_check : 0,
+          Club_check: 0,
           title: titletext,
           contents: maintext,
           url: urltext,
@@ -334,15 +335,15 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <View style={styles.selectPostArea}>
-          <Text style={styles.selectPostText}>{postfontoption}</Text>
+        <TouchableOpacity onPress={openModal} style={styles.postSelectionArea}>
+          <Text style={styles.postSelectionText}>{postfontoption}</Text>
           {userData.title === "학교" && (
-            <IconB name="down" onPress={openModal} size={30} color={'black'} />
+            <IconB name="down" size={30} color={'black'} />
           )}
-        </View>
-        <View style={styles.postTitleArea}>
+        </TouchableOpacity>
+        <View style={styles.titleInputArea}>
           <TextInput
-            style={styles.postTitleText}
+            style={styles.titleInput}
             onChangeText={handletitleTextChange}
             value={titletext}
             placeholder="제목"
@@ -353,9 +354,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
         {selectcontestposter === 1 ? (
           // selectcontestposter가 1일 때 렌더링할 내용
           <>
-            <View style={styles.postTitleArea}>
+            <View style={[styles.titleInputArea, {justifyContent: 'space-between'}]}>
               <TextInput
-                style={styles.postTitleText}
+                style={styles.titleInput}
                 onChangeText={handleurlTextChange}
                 value={urltext}
                 placeholder="URL 입력"
@@ -365,9 +366,9 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
                 <Icon name="paste" size={36} color={'black'} />
               </TouchableOpacity>
             </View>
-            <View style={styles.postTitleArea}>
+            <View style={styles.titleInputArea}>
               <TextInput
-                style={styles.postTitleText}
+                style={styles.titleInput}
                 onChangeText={handlesorceTextChange}
                 value={sourcestext}
                 placeholder="출처"
@@ -377,87 +378,85 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           </>
         ) : (
           // selectcontestposter가 1이 아닐 때 렌더링할 내용
-          <View style={styles.postContentArea}>
+          <View style={styles.contentInputArea}>
             <TextInput
-              style={{ fontSize: 20, color: 'black', textAlignVertical: "top" }}
+              style={styles.contentInput}
               onChangeText={handlemainTextChange}
               value={maintext}
               multiline={true}
               placeholder={"이곳에 글을 입력해 주세요!"}
               placeholderTextColor={'gray'}
             />
-            {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
-          </View>
+            {/* 현재 글자 수 표시 */}
+          <Text style={styles.charCountText}>{maintext.length}/500</Text>
+          {/* 내용과 이미지가 비어있을 때 안내 텍스트 표시 */}
+          {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
+        </View>
         )}
+        {/* 이미지 미리보기 영역 */}
         {selectedImages.length > 0 && (
-          <View style={styles.photoArea}>
-            <ScrollView style={styles.photoScrollViewArea} horizontal={true}>
-              {selectedImages.map((image, index) => (
-                <View key={index} style={styles.fileInfo}>
-                  <Image
-                    source={{ uri: image.uri }}
-                    resizeMode="contain"
-                    style={styles.imagePreview} />
+          <View style={styles.imagePreviewArea}>
+            <FlatList
+              data={selectedImages}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToAlignment="center" // 이미지 중앙 정렬
+              snapToInterval={width - 105} // 스냅 간격을 이미지 너비에 맞춤
+              decelerationRate="fast" // 스크롤 속도를 빠르게 하여 자연스럽게 멈춤
+              renderItem={({ item, index }) => (
+                <View key={index} style={styles.imageCard}>
+                  <Image source={{ uri: item.uri }} style={styles.imagePreview} />
+                  {/* 이미지 삭제 버튼 */}
                   <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
-                    <IconCancel name="closecircleo" size={22} color={'white'} style={{ backgroundColor: '#555555', borderRadius: 20 }} />
+                    <IconB name="closecircleo" size={22} color={'white'} />
                   </TouchableOpacity>
-
-                  {/* 마지막 인덱스가 아닐 때만 LottieView를 렌더링 */}
-                  {index !== selectedImages.length - 1 && (
-                    <LottieView
-                      source={require('../../assets/Animation - 1725980201082.json')}
-                      autoPlay
-                      onAnimationFinish={() => console.log('애니메이션이 완료되었습니다')}
-                      loop
-                      style={{ width: width - 440, height: height - 910, right: width - 455, top: height - 830 }}
-                    />
-                  )}
+                  {/* 필요 시 LottieView 애니메이션 추가 가능 */}
                 </View>
-              ))}
-            </ScrollView>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
           </View>
         )}
       </ScrollView>
-      <View style={styles.postImageArea}>
-        {!(selectcontestposter === 1 && selectedImages.length > 0) && (
-          <TouchableOpacity onPress={handleImagePick} style={styles.postImageButton}>
-            <IconC name="image" size={35} color={'black'} />
-          </TouchableOpacity>
-        )}
+      <View style={styles.imageSelectionArea}>
+      <TouchableOpacity onPress={handleImagePick} style={styles.imageSelectButton}>
+          <IconFontAwesome name="image" size={35} color={'black'} />
+        </TouchableOpacity>
       </View>
       <ModalBox
         isOpen={isModalOpen} // 모달의 열기/닫기 상태를 prop으로 전달
-        style={modalStyle.modal}
+        style={[modalStyles.modal, { justifyContent: 'flex-end' }]}
         position="bottom"
         swipeToClose={false}
         onClosed={closeModal} // 모달이 닫힐 때 호출되는 콜백 함수
+        backdrop
+        backdropOpacity={0.5}
+        backdropPressToClose
       >
-        <View style={modalStyle.modalContent}>
+        <View style={modalStyles.modalContent}>
           {userData.title === "학교" && (
-            <TouchableOpacity style={modalStyle.allposter} onPress={handleAllPosterPress}>
-              <Text style={[modalStyle.noallposterfont, selectallposter == 1 && modalStyle.yesallposterfont]}> 학교 공지사항 </Text>
+            <TouchableOpacity style={[
+              modalStyles.optionButton, 
+              selectallposter === 1 && modalStyles.selectedOption
+            ]} 
+            onPress={handleAllPosterPress}>
+              <Text style={[modalStyles.optionText, selectallposter == 1 && modalStyles.selectedText]}> 학교 공지사항 </Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={modalStyle.allposter} onPress={handleDepartmentPosterPress}>
-            <Text style={[modalStyle.noallposterfont, selectdepartmentposter === 1 && modalStyle.yesallposterfont]}> 학과 공지사항 </Text>
+          <TouchableOpacity style={modalStyles.optionButton} onPress={handleDepartmentPosterPress}>
+            <Text style={[modalStyles.optionText, selectdepartmentposter === 1 && modalStyles.selectedText]}> 학과 공지사항 </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={modalStyle.allposter} onPress={handleContestPosterPress}>
-            <Text style={[modalStyle.noallposterfont, selectcontestposter === 1 && modalStyle.yesallposterfont]}>공모전 게시판</Text>
+          <TouchableOpacity style={modalStyles.optionButton} onPress={handleContestPosterPress}>
+            <Text style={[modalStyles.optionText, selectcontestposter === 1 && modalStyles.selectedText]}>공모전 게시판</Text>
           </TouchableOpacity>
-          <View style={modalStyle.writeButtom}>
-            <View style={{ flex: 0.65 }} />
-            <TouchableOpacity onPress={closeModal} style={{ flex: 0.35, justifyContent: 'center', alignItems: "center", backgroundColor: '#9A9EFF' }}>
-              <Text style={{ fontSize: 20, color: 'black' }}>선택 완료</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </ModalBox>
       <Modal isVisible={isModalVisible}>
-        <View style={modalStyle.modalContainer}>
-          <Text style={modalStyle.title}>등록 확인</Text>
-          <Text style={modalStyle.message}>글이 등록되었습니다.</Text>
-          <TouchableOpacity style={modalStyle.confirmButton} onPress={goback}>
-            <Text style={modalStyle.confirmButtonText}>확인</Text>
+        <View style={modalStyles.modalContainer}>
+          <Text style={modalStyles.title}>등록 확인</Text>
+          <Text style={modalStyles.message}>글이 등록되었습니다.</Text>
+          <TouchableOpacity style={modalStyles.confirmButton} onPress={goback}>
+            <Text style={modalStyles.confirmButtonText}>확인</Text>
           </TouchableOpacity>
         </View>
       </Modal>
@@ -468,278 +467,176 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //backgroundColor : 'green'
+    backgroundColor: '#fff', // 배경색 흰색
   },
-
-  selectPostText: {
-    fontSize: 22,
-    color: 'black',
+  postSelectionArea: {
+    flexDirection: 'row', // 가로 방향 정렬
+    marginHorizontal: 20, // 좌우 여백 20
+    marginVertical: 20, // 상하 여백 20
+    paddingVertical: 10, // 상하 패딩 10
+    justifyContent: 'space-between', // 양 끝 정렬
+    borderBottomWidth: 1, // 아래 테두리 두께 1
+    borderBottomColor: '#ccc', // 아래 테두리 색상 회색
   },
-
-  postTitleText: {
-    fontSize: 22,
-    color: 'black',
+  postSelectionText: {
+    fontSize: 22, // 글자 크기 22
+    color: 'black', // 글자 색상 검정
   },
-
-  photoArea: {
-    width: "100%",
-    height: height - 549,
-    justifyContent: 'center',
+  titleInputArea: {
+    marginHorizontal: 20, // 좌우 여백 20
+    marginVertical: 10, // 상하 여백 10
+    borderBottomWidth: 1, // 아래 테두리 두께 1
+    borderBottomColor: '#ccc', // 아래 테두리 색상 회색
+    flexDirection: 'row',
     alignItems: 'center',
-    //backgroundColor : 'red'
   },
-
-  postTitleArea: {
-    marginHorizontal: 20,
-    paddingVertical: 0,
-    marginVertical: 20,
-    borderBottomWidth: 2,
-    flexDirection: 'row',
-    justifyContent: 'space-between'
+  titleInput: {
+    fontSize: 22, // 글자 크기 22
+    color: 'black', // 글자 색상 검정
+    width: '80%'
   },
-
-  postImageArea: {
-    width: '100%',
-    justifyContent: 'center'
+  contentInputArea: {
+    marginHorizontal: 20, // 좌우 여백 20
+    marginBottom: 20, // 아래 여백 20
   },
-
-  postImageButton: {
-    margin: 10,
-    width: 50,
-    alignItems: 'center'
+  contentInput: {
+    fontSize: 20, // 글자 크기 20
+    color: 'black', // 글자 색상 검정
+    textAlignVertical: 'top', // 텍스트 상단 정렬
+    minHeight: 150, // 최소 높이 150
   },
-
-  selectPostArea: {
-    flex: 1,
-    flexDirection: 'row',
-    marginHorizontal: 20,
-    paddingVertical: 10,
-    marginVertical: 20,
-    justifyContent: 'space-between',
-    borderBottomWidth: 2,
+  charCountText: {
+    textAlign: 'right', // 오른쪽 정렬
+    marginTop: 5, // 위 여백 5
+    color: 'gray', // 글자 색상 회색
+    fontSize: 14, // 글자 크기 14
   },
-
-  photoScrollViewArea: {
-    width: "85%",
-    height: "100%",
-    //backgroundColor : 'red',
-    borderWidth: 3,
-    borderColor: "#CCCCCC",
-    borderRadius: 20
+  imageSelectionArea: {
+    width: '100%', // 너비 100%
+    alignItems: 'flex-start', // 좌측 정렬
+    paddingVertical: 10, // 상하 패딩 10
   },
-
-  cancelButton: {
-    alignSelf: 'flex-end',
-    bottom: height - 647,
-    left: width - 492
+  imageSelectButton: {
+    margin: 10, // 여백 10
+    width: 50, // 너비 50
+    alignItems: 'center', // 중앙 정렬
   },
-
-  fileInfo: {
-    width: width - 79,
-    height: height - 980,
-    padding: 40,
-    flexDirection: 'row',
-    //backgroundColor: 'blue'
+  imagePreviewArea: {
+    marginTop: 150, // 위 여백 20
+    width: '100%', // 너비 100%
+    height: 300, // 높이 200
+    alignItems: 'center', // 중앙 정렬
   },
-
-  postoption: {
-    height: 70,
-    //backgroundColor : 'red'
+  imageCard: {
+    width: width * 0.6, // 화면 너비의 60%
+    height: width * 0.6, // 화면 너비의 60%
+    marginRight: 15, // 오른쪽 여백 15
+    borderRadius: 10, // 모서리 반경 10
+    backgroundColor: '#f0f0f0', // 배경색 연회색
+    overflow: 'hidden', // 자식 요소 넘침 숨김
+    marginHorizontal: 10, // 좌우 여백 10
+    elevation: 5, // 그림자 효과 (안드로이드)
   },
-
-  postContentArea: {
-    marginHorizontal: 20,
-    marginBottom: 20
-  },
-
-  selectpostcontainer: {
-    height: 70,
-    //backgroundColor : 'blue'
-  },
-  selectpost: {
-    flex: 1,
-    margin: 10,
-    marginRight: 15,
-    marginLeft: 15,
-    //backgroundColor : 'yellow',
-    borderBottomWidth: 1,
-    alignItems: 'center',
-    flexDirection: 'row'
-  },
-  selectfont: {
-    //marginTop : 10,
-    fontSize: 20,
-    color: 'black',
-    //backgroundColor : 'yellow'
-  },
-
   imagePreview: {
-    width: "100%",
-    height: "100%",
-    resizeMode: 'cover',
-    backgroundColor: '#eeeeee'
+    width: '100%', // 너비 100%
+    height: '100%', // 높이 100%
   },
+  cancelButton: {
+    position: 'absolute', // 절대 위치
+    top: 10, // 위에서 10
+    right: 10, // 오른쪽에서 10
+    backgroundColor: 'rgba(0,0,0,0.5)', // 반투명 검정 배경
+    borderRadius: 15, // 모서리 반경 15
+    padding: 5, // 패딩 5
+  },
+  headerButton: {
+    backgroundColor: '#B20000', // 배경색 빨강
+    justifyContent: 'center', // 중앙 정렬
+    alignItems: 'center', // 중앙 정렬
+    width: 65, // 너비 65
+    height: 35, // 높이 35
+    borderRadius: 20, // 모서리 반경 20
+    marginRight: 10, // 오른쪽 여백 10
+  },
+  headerButtonText: {
+    color: 'white', // 글자 색상 흰색
+    fontSize: 17, // 글자 크기 17
+    fontWeight: 'bold', // 글자 두께 굵게
+  },
+  emptyTextContainer: {
+    padding: 6, // 패딩 6
+  },
+  emptyText: {
+    color: 'gray', // 글자 색상 회색
+    fontSize: 16, // 글자 크기 16
+  },
+});
 
-  writespace: {
-    margin: 15,
-    flex: 0.82,
-    //backgroundColor : 'blue'
-  },
+/**
+ * 모달 스타일 정의
+ */
+const modalStyles = StyleSheet.create({
   modal: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: 400,
+    backgroundColor: 'transparent', // 배경색 투명
+    height: 300, // 높이 300
   },
   modalContent: {
-    flex: 1,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'white', // 배경색 흰색
+    borderTopLeftRadius: 20, // 왼쪽 상단 모서리 반경 20
+    borderTopRightRadius: 20, // 오른쪽 상단 모서리 반경 20
+    padding: 20, // 패딩 20
+    paddingTop: 25, // 위 패딩 25
+    flex: 1, // 플렉스 1
+    elevation: 5, // 그림자 효과 (안드로이드)
   },
-
-  allposter: {
-    flex: 0.2,
-    justifyContent: 'center', // 수직 정렬
-    alignItems: 'center', // 수평 정렬
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    margin: 20,
+  optionButton: {
+    paddingVertical: 15, // 상하 패딩 15
+    marginVertical: 10, // 상하 여백 10
+    borderBottomWidth: 1, // 아래 테두리 두께 1
+    borderBottomColor: '#e0e0e0', // 아래 테두리 색상 연회색
   },
-
-  noallposterfont: {
-    color: '#CCCCCC',
-    borderBottomWidth: 2,
-    borderBottomColor: '#CCCCCC',
-    width: '100%', // 가로 길이 조정
-    textAlign: 'center', // 텍스트 가운데 정렬
-    paddingBottom: 10,
-    fontSize: 25,
-    marginTop: 15,
+  optionText: {
+    fontSize: 22, // 글자 크기 22
+    color: '#555', // 글자 색상 진회색
   },
-
-  yesallposterfont: {
-    fontSize: 25,
-    marginTop: 15,
-    borderBottomColor: 'black',
-    color: 'black',
-    width: '100%', // 가로 길이 조정
-    textAlign: 'center', // 텍스트 가운데 정렬
+  selectedOption: {
+    backgroundColor: '#f0f0f0', // 배경색 연회색
   },
-
-  departmentposter: {
-    flex: 0.5,
-    backgroundColor: 'green',
+  selectedText: {
+    color: 'black', // 글자 색상 검정
+    fontWeight: 'bold', // 글자 두께 굵게
   },
-
-  writeButtom: {
-    flex: 0.6,
-    //backgroundColor : 'green',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  message: {
-    fontSize: 16,
-    marginBottom: 20,
+  confirmButtonContainer: {
+    alignItems: 'center', // 중앙 정렬
+    justifyContent: 'flex-end', // 아래 정렬
+    height: 100, // 높이 100
   },
   confirmButton: {
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    backgroundColor: '#9A9EFF', // 배경색 연보라
+    borderRadius: 10, // 모서리 반경 10
+    paddingVertical: 15, // 상하 패딩 15
+    paddingHorizontal: 30, // 좌우 패딩 30
   },
   confirmButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-})
-
-const modalStyle = StyleSheet.create({
-  modal: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: 500,
-  },
-  modalContent: {
-    flex: 1,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    backgroundColor: 'white',
-  },
-
-  allposter: {
-    flex: 0.2,
-    justifyContent: 'center', // 수직 정렬
-    alignItems: 'center', // 수평 정렬
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    margin: 20,
-  },
-
-  noallposterfont: {
-    color: '#CCCCCC',
-    borderBottomWidth: 2,
-    borderBottomColor: '#CCCCCC',
-    width: '100%', // 가로 길이 조정
-    textAlign: 'center', // 텍스트 가운데 정렬
-    paddingBottom: 10,
-    fontSize: 25,
-    marginTop: 15,
-  },
-
-  yesallposterfont: {
-    fontSize: 25,
-    marginTop: 15,
-    borderBottomColor: 'black',
-    color: 'black',
-    width: '100%', // 가로 길이 조정
-    textAlign: 'center', // 텍스트 가운데 정렬
-  },
-
-  departmentposter: {
-    flex: 0.5,
-    backgroundColor: 'green',
-  },
-
-  writeButtom: {
-    flex: 0.6,
-    //backgroundColor : 'green',
+    fontSize: 18, // 글자 크기 18
+    color: 'white', // 글자 색상 흰색
   },
   modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
+    backgroundColor: 'white', // 배경색 흰색
+    borderRadius: 20, // 모서리 반경 20
+    padding: 20, // 패딩 20
+    alignItems: 'center', // 중앙 정렬
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 20, // 글자 크기 20
+    fontWeight: 'bold', // 글자 두께 굵게
+    marginBottom: 10, // 아래 여백 10
   },
   message: {
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 16, // 글자 크기 16
+    marginBottom: 20, // 아래 여백 20
+    textAlign: 'center', // 중앙 정렬
   },
-  confirmButton: {
-    backgroundColor: '#009688',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  confirmButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  }
-})
+});
 
 export default WritePostPage;

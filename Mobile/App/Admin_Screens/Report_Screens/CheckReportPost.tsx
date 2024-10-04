@@ -1,340 +1,297 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Text, View, StyleSheet, FlatList, TouchableWithoutFeedback, RefreshControl, Dimensions } from 'react-native';
+import {
+  Text,
+  View,
+  FlatList,
+  TouchableWithoutFeedback,
+  RefreshControl,
+  StyleSheet,
+} from 'react-native';
 import IconB from 'react-native-vector-icons/AntDesign';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Picker } from '@react-native-picker/picker';
-import { UserData } from '../../types/type'
+import { UserData } from '../../types/type';
 import config from '../../config';
 
+// 타입 정의
 type ReportUser = {
-  reportId: number,
-  report_name: string,
-  post_id: number,
-  department_check: boolean,
-  user_id: number,
-  title: string,
-  contents: string,
-  write_date: string,
-  view: number,
-  like: number,
-  userStudentId: number,
-  userTitle: string,
-  post_writer: string,
-  campusId: number,
-  campusName: string,
-  departmentId: number,
-  writer_department: string,
-  writer_profile: string,
+  reportId: number;
+  report_name: string;
+  post_id: number;
+  department_check: boolean;
+  user_id: number;
+  title: string;
+  contents: string;
+  write_date: string;
+  view: number;
+  like: number;
+  userStudentId: number;
+  userTitle: string;
+  post_writer: string;
+  campusId: number;
+  campusName: string;
+  departmentId: number;
+  writer_department: string;
+  writer_profile: string;
 };
 
-type commentReport = {
-  report_comment_id: number,
-  comment_id: number,
-  report_comment_name: string,
-  contents: string,
-  comment_date: string,
-  comment_like: number,
-  post_id: number,
-  department_check: boolean,
-  user_id: number,
-  student_id: number,
-  student_name: string,
-  department_id: number,
-  department_name: string
-}
+type CommentReport = {
+  report_comment_id: number;
+  comment_id: number;
+  report_comment_name: string;
+  contents: string;
+  comment_date: string;
+  comment_like: number;
+  post_id: number;
+  department_check: boolean;
+  user_id: number;
+  student_id: number;
+  student_name: string;
+  department_id: number;
+  department_name: string;
+};
 
+/**
+ * 신고된 게시글과 댓글을 확인하는 컴포넌트입니다.
+ */
 const CheckReportPost = ({ route, navigation }: any) => {
   const { userdata } = route.params;
   const ref = useRef(null);
-  const [userReport, setUserReport] = useState<ReportUser[]>([]);
-  const [userCommentReport, setUserCommentReport] = useState<commentReport[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
+
+  // 상태 변수 선언
   const [userData, setUserData] = useState<UserData>(userdata);
-  const [selectedCategory, setSelectedCategory] = useState('전체 게시판');
-  const [selectedDepartment, setSelectedDepartment] = useState('컴퓨터소프트웨어과');
-  const [departments, setDepartments] = useState<string[]>([]);
-  const [selectedType, setSelectedType] = useState('게시글'); // New state for the new Picker
+  const [userReport, setUserReport] = useState<ReportUser[]>([]);
+  const [userCommentReport, setUserCommentReport] = useState<CommentReport[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedType, setSelectedType] = useState('게시글'); // 게시글/댓글 선택
+  const [selectedCategory, setSelectedCategory] = useState('전체 게시판'); // 카테고리 선택
+  const [selectedDepartment, setSelectedDepartment] = useState(''); // 학과 선택
+  const [departments, setDepartments] = useState<string[]>([]); // 학과 목록
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    if (selectedType === '게시글') {
-      await get_user_report();
-    } else if (selectedType === '댓글') {
-      await get_user_comment_report();
+  // 화면에 집중될 때마다 데이터 가져오기
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchData = async () => {
+        try {
+          await getUserReport();
+          await getDepartments();
+          await getUserCommentReport();
+        } catch (error) {
+          console.error('데이터 가져오기 오류:', error);
+        }
+      };
+      fetchData();
+    }, [])
+  );
+
+  // 학과 게시판 선택 시 학과 기본값 설정
+  useEffect(() => {
+    if (selectedCategory === '학과 게시판' && departments.length > 0) {
+      setSelectedDepartment(departments[0]);
     }
-    setTimeout(() => setRefreshing(false), 500);
-  };
+  }, [selectedCategory, departments]);
 
-  const get_user_report = async () => {
+  /**
+   * 신고된 게시글 데이터를 서버로부터 가져옵니다.
+   */
+  const getUserReport = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/getUserReportInfo`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('네트워크 응답 오류');
+
       let data = await response.json();
-
-      // Sort data in descending order based on write_date
-      data.sort((a: ReportUser, b: ReportUser) => {
-        return new Date(b.write_date).getTime() - new Date(a.write_date).getTime();
-      });
-
+      // 작성일 기준 내림차순 정렬
+      data.sort(
+        (a: ReportUser, b: ReportUser) =>
+          new Date(b.write_date).getTime() - new Date(a.write_date).getTime()
+      );
       setUserReport(data);
-      return data;
     } catch (error) {
-      console.error('값 가져오기 실패:', error);
+      console.error('게시글 데이터 가져오기 실패:', error);
     }
   };
 
-  const get_user_comment_report = async () => {
+  /**
+   * 신고된 댓글 데이터를 서버로부터 가져옵니다.
+   */
+  const getUserCommentReport = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/getUserCommentReportInfo`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-  
-      if (!response.ok) {
-        const errorDetails = await response.json();
-        throw new Error(`Network response was not ok: ${response.status} - ${errorDetails.message}`);
-      }
-  
+      if (!response.ok) throw new Error('네트워크 응답 오류');
+
       let data = await response.json();
       setUserCommentReport(data);
-      return data;
     } catch (error) {
-      console.error('값 가져오기 실패:', error);
+      console.error('댓글 데이터 가져오기 실패:', error);
     }
   };
-  const get_department = async () => {
+
+  /**
+   * 학과 목록을 서버로부터 가져옵니다.
+   */
+  const getDepartments = async () => {
     try {
       const response = await fetch(`${config.serverUrl}/get_department`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          campus_id: userData.campus_pk
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ campus_id: userData.campus_pk }),
       });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
+      if (!response.ok) throw new Error('네트워크 응답 오류');
 
       const data = await response.json();
-      //console.log(data); // API에서 받아온 데이터 확인
-
-      // 데이터에서 학과 이름들을 추출하여 departments 배열에 저장
-      const departmentNames = data.map((item: any) => item.department_name); // 예시로 department_name을 가져오는 코드
-      setDepartments(departmentNames); // departments 배열 업데이트
+      const departmentNames = data.map((item: any) => item.department_name);
+      setDepartments(departmentNames);
     } catch (error) {
-      console.error('Failed to fetch departments:', error);
+      console.error('학과 목록 가져오기 실패:', error);
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-        const fetchData = async () => {
-            try {
-              await get_user_report();
-              await get_department();
-              await get_user_comment_report();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        };
-        fetchData();
-    }, [])
-);
-  //console.log(userCommentReport);
-  useEffect(() => {
-    if (selectedCategory === '학과 게시판' && !selectedDepartment) {
-      setSelectedDepartment(departments[0]);
-    }
-  }, [selectedCategory]);
-
-  const renderEmptyItem = () => (
-    <View style={{ height: 85 }} />
-  );
-
-  const renderItem = ({ item, index }: { item: ReportUser | commentReport, index: number }) => {
+  /**
+   * 화면 새로고침 시 데이터를 다시 가져옵니다.
+   */
+  const onRefresh = async () => {
+    setRefreshing(true);
     if (selectedType === '게시글') {
-      if ('title' in item) { // Check if item is of type ReportUser
-        if (selectedCategory === '전체 게시판' && !item.department_check) {
-          return (
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <TouchableWithoutFeedback onPress={() => {
-                navigation.navigate("PostDetailScreen", { item, userData: userdata });
-              }}>
-                <View style={styles.writeboxcontainer}>
-                  <View style={styles.writetitle}>
-                    <View style={styles.titlebox}>
-                      <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}>{item.title}</Text>
-                    </View>
-                    <View style={styles.eyesnum}>
-                      <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 3 }}>{item.view}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.wirterandtime}>
-                    <View style={styles.writerbox}>
-                      <Text
-                        style={{
-                          fontSize: 13,
-                          marginLeft: 10,
-                          color:
-                            item.userTitle === "학교" ? 'red' :
-                            item.userTitle === "반장" ? 'green' :
-                            item.userTitle === "학우회장" ? 'blue' :
-                            'black'
-                        }}
-                      >
-                        {item.post_writer}
-                      </Text>
-                      <Text style={{ color: 'black' }}> | {item.write_date}</Text>
-                      <Text style={{ color: 'black', fontSize: 13, paddingLeft: 20 }}>신고자 : {item.report_name}</Text>
-                    </View>
-                    <View style={styles.likenum}>
-                      <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 7, marginBottom: 4 }}>{item.like}</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            </GestureHandlerRootView>
-          );
-        } else if (selectedCategory === '학과 게시판' && item.department_check && item.writer_department === selectedDepartment) {
-          return (
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <TouchableWithoutFeedback onPress={() => {
-                navigation.navigate("PostDetailScreen", { item, userData: userdata });
-              }}>
-                <View style={styles.writeboxcontainer}>
-                  <View style={styles.writetitle}>
-                    <View style={styles.titlebox}>
-                      <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}>{item.title}</Text>
-                    </View>
-                    <View style={styles.eyesnum}>
-                      <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 3 }}>{item.view}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.wirterandtime}>
-                    <View style={styles.writerbox}>
-                      <Text
-                        style={{
-                          fontSize: 13,
-                          marginLeft: 10,
-                          color:
-                            item.userTitle === "학교" ? 'red' :
-                            item.userTitle === "반장" ? 'green' :
-                            item.userTitle === "학우회장" ? 'blue' :
-                            'black'
-                        }}
-                      >
-                        {item.post_writer}
-                      </Text>
-                      <Text style={{ color: 'black' }}> | {item.write_date}</Text>
-                      <Text style={{ color: 'black', fontSize: 13, paddingLeft: 20 }}>신고자 : {item.report_name}</Text>
-                    </View>
-                    <View style={styles.likenum}>
-                      <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 7, marginBottom: 4 }}>{item.like}</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            </GestureHandlerRootView>
-          );
-        } else {
-          return null; // Return null explicitly
-        }
-      }
+      await getUserReport();
     } else if (selectedType === '댓글') {
-      if ('comment_id' in item) { // Check if item is of type commentReport
-        if (selectedCategory === '전체 게시판' && !item.department_check) {
-          return (
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <TouchableWithoutFeedback onPress={() => {
-                navigation.navigate("PostDetailScreen", { item, userData: userdata });
-              }}>
-                <View style={styles.writeboxcontainer}>
-                  <View style={styles.writetitle}>
-                    <View style={styles.titlebox}>
-                      <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}>{item.contents}</Text>
-                    </View>
-                    <View style={styles.eyesnum}>
-                      <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 3 }}>{item.comment_like}</Text>
-                    </View>
+      await getUserCommentReport();
+    }
+    setRefreshing(false);
+  };
+
+  /**
+   * 리스트 아이템을 렌더링합니다.
+   */
+  const renderItem = ({ item }: { item: ReportUser | CommentReport }) => {
+    if (selectedType === '게시글' && 'title' in item) {
+      // 게시글 필터링
+      if (
+        (selectedCategory === '전체 게시판' && !item.department_check) ||
+        (selectedCategory === '학과 게시판' &&
+          item.department_check &&
+          item.writer_department === selectedDepartment)
+      ) {
+        return (
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <TouchableWithoutFeedback
+              onPress={() =>
+                navigation.navigate('PostDetailScreen', { item, userData: userdata })
+              }
+            >
+              <View style={styles.postItem}>
+                <View style={styles.postHeader}>
+                  <View style={styles.postTitleSection}>
+                    <Text style={styles.postTitle}>{item.title}</Text>
                   </View>
-                  <View style={styles.wirterandtime}>
-                    <View style={styles.writerbox}>
-                      <Text style={{ fontSize: 13, marginLeft: 10, color: 'black' }}>
-                        {item.student_name}
-                      </Text>
-                      <Text style={{ color: 'black' }}> | {item.comment_date}</Text>
-                      <Text style={{ color: 'black', fontSize: 13, paddingLeft: 20 }}>신고자 : {item.report_comment_name}</Text>
-                    </View>
-                    <View style={styles.likenum}>
-                      <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 7, marginBottom: 4 }}>{item.comment_like}</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableWithoutFeedback>
-            </GestureHandlerRootView>
-          );
-        } else if (selectedCategory === '학과 게시판' && item.department_check && item.department_name === selectedDepartment) {
-          return (
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <TouchableWithoutFeedback onPress={() => {
-                navigation.navigate("PostDetailScreen", { item, userData: userdata });
-              }}>
-                <View style={styles.writeboxcontainer}>
-                  <View style={styles.writetitle}>
-                    <View style={styles.titlebox}>
-                      <Text style={{ fontSize: 19, margin: 5, marginLeft: 10, color: 'black' }}>{item.contents}</Text>
-                    </View>
-                    <View style={styles.eyesnum}>
-                      <Text style={{ color: '#F29F05', }}> <IconB name="eyeo" size={26} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 3 }}>{item.comment_like}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.wirterandtime}>
-                    <View style={styles.writerbox}>
-                      <Text style={{ fontSize: 13, marginLeft: 10, color: 'black' }}>
-                        {item.student_name}
-                      </Text>
-                      <Text style={{ color: 'black' }}> | {item.comment_date}</Text>
-                      <Text style={{ color: 'black', fontSize: 13, paddingLeft: 20 }}>신고자 : {item.report_comment_name}</Text>
-                    </View>
-                    <View style={styles.likenum}>
-                      <Text style={{ color: '#F29F05', marginBottom: 7 }}> <IconB name="like1" size={21} /></Text>
-                      <Text style={{ color: 'black', marginLeft: 7, marginBottom: 4 }}>{item.comment_like}</Text>
-                    </View>
+                  <View style={styles.viewCountSection}>
+                    <Text style={styles.viewIcon}>
+                      <IconB name="eyeo" size={20} />
+                    </Text>
+                    <Text style={styles.viewCountText}>{item.view}</Text>
                   </View>
                 </View>
-              </TouchableWithoutFeedback>
-            </GestureHandlerRootView>
-          );
-        } else {
-          return null; // Return null explicitly
-        }
+                <View style={styles.postFooter}>
+                  <View style={styles.authorSection}>
+                    <Text
+                      style={[
+                        styles.authorName,
+                        item.userTitle === '학교' && styles.schoolRole,
+                        item.userTitle === '반장' && styles.leaderRole,
+                        item.userTitle === '학우회장' && styles.presidentRole,
+                      ]}
+                    >
+                      {item.post_writer}
+                    </Text>
+                    <Text> | {item.write_date}</Text>
+                    <Text style={styles.reporterText}>신고자: {item.report_name}</Text>
+                  </View>
+                  <View style={styles.likeCountSection}>
+                    <Text style={styles.likeIcon}>
+                      <IconB name="like1" size={18} />
+                    </Text>
+                    <Text style={styles.likeCountText}>{item.like}</Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </GestureHandlerRootView>
+        );
+      }
+    } else if (selectedType === '댓글' && 'comment_id' in item) {
+      // 댓글 필터링
+      if (
+        (selectedCategory === '전체 게시판' && !item.department_check) ||
+        (selectedCategory === '학과 게시판' &&
+          item.department_check &&
+          item.department_name === selectedDepartment)
+      ) {
+        return (
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <TouchableWithoutFeedback
+              onPress={() =>
+                navigation.navigate('PostDetailScreen', { item, userData: userdata })
+              }
+            >
+              <View style={styles.postItem}>
+                <View style={styles.postHeader}>
+                  <View style={styles.postTitleSection}>
+                    <Text style={styles.postTitle}>{item.contents}</Text>
+                  </View>
+                  <View style={styles.viewCountSection}>
+                    <Text style={styles.viewIcon}>
+                      <IconB name="eyeo" size={20} />
+                    </Text>
+                    <Text style={styles.viewCountText}>{item.comment_like}</Text>
+                  </View>
+                </View>
+                <View style={styles.postFooter}>
+                  <View style={styles.authorSection}>
+                    <Text style={styles.authorName}>{item.student_name}</Text>
+                    <Text> | {item.comment_date}</Text>
+                    <Text style={styles.reporterText}>신고자: {item.report_comment_name}</Text>
+                  </View>
+                  <View style={styles.likeCountSection}>
+                    <Text style={styles.likeIcon}>
+                      <IconB name="like1" size={18} />
+                    </Text>
+                    <Text style={styles.likeCountText}>{item.comment_like}</Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </GestureHandlerRootView>
+        );
       }
     }
-    return null; // Return null explicitly
+    return null;
   };
-  
+
+  /**
+   * 사용자 타이틀에 따라 색상을 반환합니다.
+   */
+  const getTitleColor = (title: string) => {
+    switch (title) {
+      case '학교':
+        return 'red';
+      case '반장':
+        return 'green';
+      case '학우회장':
+        return 'blue';
+      default:
+        return 'black';
+    }
+  };
+
   return (
     <View style={styles.container} ref={ref}>
+      {/* 필터 선택 영역 */}
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={selectedType}
@@ -349,7 +306,7 @@ const CheckReportPost = ({ route, navigation }: any) => {
           style={styles.picker}
           onValueChange={(itemValue) => {
             setSelectedCategory(itemValue);
-            if (itemValue === '학과 게시판') {
+            if (itemValue === '학과 게시판' && departments.length > 0) {
               setSelectedDepartment(departments[0]);
             }
           }}
@@ -369,23 +326,21 @@ const CheckReportPost = ({ route, navigation }: any) => {
           </Picker>
         )}
       </View>
+
+      {/* 신고된 게시글/댓글 리스트 */}
       <FlatList
         style={styles.flatliststyle}
         data={selectedType === '게시글' ? userReport : userCommentReport}
         renderItem={renderItem}
-        ListFooterComponent={renderEmptyItem}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-          />
-        }
+        keyExtractor={(item, index) => index.toString()}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListFooterComponent={<View style={styles.footerSpacing} />}
       />
     </View>
   );
 };
 
-
+// 스타일 정의
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -403,45 +358,91 @@ const styles = StyleSheet.create({
     backgroundColor: '#eeeeee',
   },
   flatliststyle: {
-    // marginTop: 40,
+    flex: 1,
   },
-  writeboxcontainer: {
+  postItem: {
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#CCCCCC',
+    backgroundColor: 'white',
+    flex: 1,
     height: 70,
   },
-  writetitle: {
-    flex: 0.6,
-    flexDirection: 'row',
-    marginTop: 5,
-  },
-  wirterandtime: {
-    flex: 0.4,
+  postHeader: {
+    flex: 1,
+    height: '60%',
     flexDirection: 'row',
   },
-  titlebox: {
-    flex: 0.85,
+  postFooter: {
+    width: '100%',
+    height: '40%',
+    flexDirection: 'row',
   },
-  eyesnum: {
-    flex: 0.15,
+  postTitleSection: {
+    width: '87%',
+    justifyContent: 'center',
+    paddingRight: 10,
+  },
+  viewCountSection: {
+    width: '13%',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
-  writerbox: {
-    flex: 0.85,
-    flexDirection: 'row',
-  },
-  likenum: {
-    flex: 0.15,
+  authorSection: {
+    width: '87%',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  delete: {
-    width: 20,
-    height: 20,
-    backgroundColor: 'red',
+  likeCountSection: {
+    width: '13%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    bottom: 5,
+    left: 2,
+    justifyContent: 'flex-start',
+  },
+  postTitle: {
+    fontSize: 18,
+    margin: 5,
+    marginLeft: 10,
+    color: 'black',
+  },
+  viewIcon: {
+    color: '#F29F05',
+  },
+  viewCountText: {
+    color: 'black',
+    marginLeft: 4,
+  },
+  authorName: {
+    fontSize: 13,
+    marginLeft: 10,
+  },
+  schoolRole: {
+    color: 'red',
+  },
+  leaderRole: {
+    color: 'green',
+  },
+  presidentRole: {
+    color: 'blue',
+  },
+  reporterText: {
+    color: 'black',
+    fontSize: 13,
+    paddingLeft: 10,
+  },
+  likeIcon: {
+    color: '#F29F05',
+  },
+  likeCountText: {
+    color: 'black',
+    marginLeft: 7,
+    top: 1,
+  },
+  footerSpacing: {
+    height: 85,
   },
 });
 
