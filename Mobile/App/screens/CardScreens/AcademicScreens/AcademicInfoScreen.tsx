@@ -5,7 +5,6 @@ import {
     StyleSheet,
     Dimensions,
     ScrollView,
-    Image,
     Animated,
     Easing,
     TouchableOpacity,
@@ -815,7 +814,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
     },
     picker: {
-        width: width * 0.35, // 선택기 너비 조정
+        width: width * 0.3, // 선택기 너비 조정
         color: 'black',
         fontSize: 16,
     },

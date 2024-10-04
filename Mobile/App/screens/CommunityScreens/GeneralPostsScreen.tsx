@@ -306,6 +306,7 @@ const styles = StyleSheet.create({
     },
     postTitle: {
         fontSize: 19,
+        margin: 5,
         marginLeft: 10,
         color: 'black',
     },

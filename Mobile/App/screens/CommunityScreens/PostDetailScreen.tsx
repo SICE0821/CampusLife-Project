@@ -1605,15 +1605,15 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "bold",
         color: "black",
-        paddingLeft: 10
+        paddingLeft: 10,
     },
     optionLine: {
         width: 100,
-        height: 0.4,
-        backgroundColor: 'black',
+        height: 1,
+        backgroundColor: 'gray',
         marginRight: 20,
-        marginTop: 10,
-        marginBottom: 10
+        marginTop: 5,
+        marginBottom: 5
     },
     postArea: {
         flex: 1,

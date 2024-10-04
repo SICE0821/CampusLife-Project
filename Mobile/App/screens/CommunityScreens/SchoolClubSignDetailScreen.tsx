@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: 'black',
     lineHeight: 24,
   },
 });
