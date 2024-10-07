@@ -19,6 +19,7 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
   const [showOptions, setShowOptions] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false); // 모달 가시성 상태
   const [message, setMessage] = useState(''); // 쪽지 내용 상태
+  const [user_id, setuser_id] = useState();
 
   const toggleOptions = () => {
     setShowOptions(!showOptions);
@@ -52,11 +53,68 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
     }
   };
 
+
+
+  const updateComment = async () => {
+    try {
+        const response = await fetch(`${config.serverUrl}/updateComment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                comment : message,
+                Phone : applicant.Phone
+            }),
+        });
+        await response.json();
+    } catch (error) {
+        console.error('일반 게시물 가져오기 실패:', error);
+    }
+};
+
+      // 쪽지 보내기
+      const SendAramData = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/SendAramData`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id : user_id,
+                    target_id : applicant.Post_fk,
+                    title : message
+                }),
+            });
+            await response.json();
+        
+        } catch (error) {
+            console.error('일반 게시물 가져오기 실패:', error);
+        }
+    };
+
+    // 신청자 PK가져오기
+    const GetClubPersonPK = async () => {
+      try {
+          const response = await fetch(`${config.serverUrl}/GetClubPersonPK`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                  user_name : applicant.Name
+              }),
+          });
+          const user_PK = await response.json();
+          console.log(user_PK);
+          setuser_id(user_PK.user_id);
+      
+      } catch (error) {
+          console.error('일반 게시물 가져오기 실패:', error);
+      }
+  };
+
+
   // 데이터를 불러오거나 준비가 완료되면 로딩 상태를 false로 변경
   useEffect(() => {
     if (applicant) {
-      // 데이터를 받으면 로딩 상태를 false로 변경
       setLoading(false);
+      GetClubPersonPK();
     }
   }, [applicant]);
 
@@ -87,7 +145,10 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
           {showOptions && (
             // 상단 옵션
             <View style={styles.optionBox}>
-              <TouchableOpacity onPress={() => {setIsModalVisible(true); setShowOptions(false);}}>
+              <TouchableOpacity onPress={() => {
+                setIsModalVisible(true); 
+                setShowOptions(false);
+                }}>
                 <Text style={styles.optionText}>쪽지 보내기</Text>
               </TouchableOpacity>
               <View style={styles.optionLine}></View>
@@ -148,7 +209,12 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
               value={message}
             />
             <View style={styles.modalButtons}>
-              <TouchableOpacity style={styles.sendButton}>
+              <TouchableOpacity style={styles.sendButton} 
+              onPress={async () => {
+                await updateComment();
+                await SendAramData();
+                console.log(user_id);
+              }}>
                 <Text style={styles.sendButtonText}>전송</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.closeButton} onPress={() => setIsModalVisible(false)}>

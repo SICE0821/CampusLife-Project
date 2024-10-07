@@ -168,6 +168,8 @@ export type aramData = {
   recomment_recomment_id : number,
   recomment_comment_id : number,
   recomment_contents : string
+  my_club_register_post_id : number,
+  my_club_register_comment : string
 }
 
 export type EventData = {

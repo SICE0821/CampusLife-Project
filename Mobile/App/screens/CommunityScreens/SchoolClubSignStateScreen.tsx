@@ -31,6 +31,7 @@ const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
   const [userInfo, setUserInfo] = useState<userInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
+
   useFocusEffect(
     useCallback(() => {
       const fetchClubData = async () => {
@@ -43,6 +44,7 @@ const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
             body: JSON.stringify({ post_id: item.post_id }),
           });
           const result = await response.json();
+          console.log(result);
           if (response.ok) {
             setUserInfo(result);
           } else {

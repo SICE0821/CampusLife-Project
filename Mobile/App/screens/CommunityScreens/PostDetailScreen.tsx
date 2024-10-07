@@ -1538,7 +1538,6 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     <Text style={{ color: '#F29F05', justifyContent: 'flex-end' }}> <IconC name="send" size={34} /></Text>
                 </TouchableOpacity>
             </View>
-
         </View>
     );
 };
