@@ -170,7 +170,10 @@ const { getGeneralPosts,
   getClubInfo,
   fetchContestpostData,
   delete_Club,
-  getContestPosts
+  getContestPosts,
+  GetClubPersonPK,
+  SendAramData,
+  updateComment
 
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
@@ -1577,7 +1580,9 @@ app.post('/get_aram_data', async (req, res) => {
       comment_comment_id: item.comment_comment_id,
       recomment_recomment_id: item.recomment_recomment_id,
       recomment_comment_id: item.recomment_comment_id,
-      recomment_contents: item.recomment_contents
+      recomment_contents: item.recomment_contents,
+      my_club_register_post_id : item.my_club_register_post_id,
+      my_club_register_comment : item.my_club_register_comment
     }));
     console.log("[AlarmDialogScreen] : 해당 유저의 모든 알람 데이터 가져오기 성공");
     res.json(processedData);
@@ -3199,6 +3204,42 @@ app.post('/deleteclub', async (req, res) => {
     res.json({ message: "삭제되었습니다." });
   } else {
     res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
+  }
+});
+
+//메인페이지에 전체 게시글 데이터를 가져온다.
+app.post('/GetClubPersonPK', async (req, res) => {
+  const { user_name } = req.body;
+  try {
+    const rows = await GetClubPersonPK(user_name);
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
+    console.log(error)
+  }
+});
+
+//메인페이지에 전체 게시글 데이터를 가져온다.
+app.post('/SendAramData', async (req, res) => {
+  const { user_id, target_id, title } = req.body;
+  try {
+    const rows = await SendAramData(user_id, target_id, title);
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
+    console.log(error)
+  }
+});
+
+//메인페이지에 전체 게시글 데이터를 가져온다.
+app.post('/updateComment', async (req, res) => {
+  const { comment, Phone } = req.body;
+  try {
+    await updateComment(comment, Phone);
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
+    console.log(error)
   }
 });
 

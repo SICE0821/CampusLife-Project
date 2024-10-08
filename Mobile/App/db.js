@@ -1744,7 +1744,9 @@ async function get_aram_data(user_id) {
             my_comment_like.comment_id AS comment_comment_id,
             my_recomment_like.recomment_id AS recomment_recomment_id,
             my_recomment_like.comment_id AS recomment_comment_id,
-            my_recomment_like.contents AS recomment_contents
+            my_recomment_like.contents AS recomment_contents,
+            my_club_register.Post_fk AS my_club_register_post_id,
+            my_club_register.comment AS my_club_register_comment
         FROM
             aram
         LEFT JOIN
@@ -1771,6 +1773,8 @@ async function get_aram_data(user_id) {
              comment AS my_comment_like ON aram.target_type = 'my_comment_like' AND aram.target_id = my_comment_like.comment_id
         LEFT JOIN
              recomment AS my_recomment_like ON aram.target_type = 'my_recomment_like' AND aram.target_id = my_recomment_like.recomment_id
+        LEFT JOIN
+        		 club_register AS my_club_register ON aram.target_type = 'school_club' AND aram.target_id = my_club_register.Post_fk
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -3507,8 +3511,8 @@ async function addClubInfo(post_id, name, birth, university, department, grade, 
         conn = await pool.getConnection();
         const query = `
           INSERT INTO club_register 
-          (Post_fk, Name, Birth, University, Department, Grade, Phone, Sex, Residence, Application, Introduce) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+          (Post_fk, Name, Birth, University, Department, Grade, Phone, Sex, Residence, Application, Introduce, comment) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '');
         `;
         await conn.query(query, [post_id, name, birth, university, department, grade, phone, sex, residence, application, introduce]);
 
@@ -3619,6 +3623,76 @@ async function delete_Club(post_id, name, phone) {
     } catch (err) {
         console.error('Error updating data:', err);
         return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function GetClubPersonPK(user_name) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 조회 쿼리 작성
+        const query = `
+SELECT 
+	user.user_id
+FROM 
+	user
+LEFT JOIN 
+	student
+ON
+	user.student_id = student.student_id
+WHERE student.name = ?`;
+
+        const rows = await conn.query(query, [user_name]);
+        console.log('Query result:', rows); // 쿼리 결과 확인
+        return rows;
+
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        throw err; // 오류 발생 시 던짐
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function SendAramData(user_id, target_id, title ) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 조회 쿼리 작성
+        const query = `
+        INSERT INTO aram (user_id, target_id, title, target_type, time)
+VALUES 
+(?, ?, '동아리 관련 쪽지가 도착했습니다', 'school_club', DEFAULT)
+`;
+
+        const rows = await conn.query(query, [user_id, target_id]);
+        console.log('Query result:', rows); // 쿼리 결과 확인
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        throw err; // 오류 발생 시 던짐
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function updateComment(comment, Phone) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 조회 쿼리 작성
+        const query = `
+        UPDATE club_register
+SET comment = ?
+WHERE Phone = ?;
+`;
+
+        const rows = await conn.query(query, [comment, Phone]);
+        console.log('Query result:', rows); // 쿼리 결과 확인
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        throw err; // 오류 발생 시 던짐
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
@@ -3795,5 +3869,8 @@ module.exports = {
     getClubInfo,
     fetchContestpostData,
     delete_Club,
-    getContestPosts
+    getContestPosts,
+    GetClubPersonPK,
+    SendAramData,
+    updateComment
 };

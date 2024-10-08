@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { 
-    Text, 
-    View, 
-    StyleSheet, 
-    ScrollView, 
-    RefreshControl, 
-    TouchableHighlight, 
-    Alert 
+import {
+    Text,
+    View,
+    StyleSheet,
+    ScrollView,
+    RefreshControl,
+    TouchableHighlight,
+    Alert,
+    Modal,
+    TouchableOpacity
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
@@ -31,6 +33,9 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     const [refreshing, setRefreshing] = useState(false);
     const [userData, setUserData] = useState<UserData>(userdata);
     const [aramList, setAaramList] = useState<aramData[]>([]);
+    const [isModalVisible, setIsModalVisible] = useState(false); // 모달 가시성 상태
+    const [message, setMessage] = useState(''); // 쪽지 내용 상태
+    const [club_aram, setmessage] = useState('');
 
     /**
      * 화면 포커스 시 데이터 가져오기
@@ -210,7 +215,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                     style: "cancel"
                 },
                 {
-                    text: "확인", 
+                    text: "확인",
                     onPress: async () => {
                         await deleteMyaram(aram_id);
                         delete_aram();
@@ -346,6 +351,10 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                     }
                 }
                 break;
+            case 'school_club': // 동아리
+                setmessage(item2.my_club_register_comment);
+                setIsModalVisible(true);
+                break;
             default:
                 console.log("알람 타입에 맞는 화면이 없습니다.");
         }
@@ -382,6 +391,9 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                 return <Text style={styles.content}>{item.comment_contents}</Text>;
             case 'my_recomment_like':
                 return <Text style={styles.content}>{item.recomment_contents}</Text>;
+            case 'school_club':
+                console.log(item.my_club_register_comment);
+                return <Text style={styles.content} numberOfLines={1}>{item.my_club_register_comment}</Text>;
             default:
                 return null;
         }
@@ -418,6 +430,8 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                 return <IconB name="like1" size={30} color="#F29F05" />;
             case 'my_recomment_like': // 내 대댓글 좋아요
                 return <IconB name="like1" size={30} color="#F29F05" />;
+            case 'school_club': // 내 대댓글 좋아요
+                return <IconE name="address-book" size={30} color="#F29F05" />;
             default:
                 return null;
         }
@@ -425,7 +439,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <ScrollView 
+            <ScrollView
                 style={styles.scrollView}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -452,6 +466,31 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                         </TouchableHighlight>
                     </View>
                 ))}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isModalVisible}
+                    onRequestClose={() => {
+                        setIsModalVisible(false);
+                    }}
+                >
+                    <View style={styles.modalContainer}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalTitle}>동아리 쪽지</Text>
+                            <Text
+                                style={styles.messageInput}
+                                numberOfLines={4}
+                            >
+                                {club_aram}
+                            </Text>
+                            <View style={styles.modalButtons}>
+                                <TouchableOpacity style={styles.closeButton} onPress={() => setIsModalVisible(false)}>
+                                    <Text style={styles.closeButtonText}>취소</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
             </ScrollView>
         </View>
     );
@@ -514,6 +553,64 @@ const styles = StyleSheet.create({
     time: {
         fontSize: 14,
         color: '#999999',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: '85%',
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 25,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        color: '#2D3436',
+    },
+    messageInput: {
+        width: '100%',
+        height: 120,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 20,
+        textAlignVertical: 'top',
+        fontSize: 16,
+        color: '#34495E',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    sendButton: {
+        backgroundColor: '#6C5CE7',
+        paddingVertical: 12,
+        paddingHorizontal: 25,
+        borderRadius: 10,
+    },
+    sendButtonText: {
+        fontSize: 16,
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    closeButton: {
+        backgroundColor: '#b2bec3',
+        paddingVertical: 12,
+        paddingHorizontal: 25,
+        borderRadius: 10,
+    },
+    closeButtonText: {
+        fontSize: 16,
+        color: 'white',
+        fontWeight: 'bold',
     },
 });
 
