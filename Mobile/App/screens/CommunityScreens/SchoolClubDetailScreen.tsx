@@ -772,7 +772,7 @@ const styles = StyleSheet.create({
         elevation: 5,
         paddingVertical: 10,
         paddingHorizontal: 5,
-        zIndex: 999
+        zIndex: 9999
     },
     optionText: { // 옵션 텍스트 스타일
         fontSize: 15,

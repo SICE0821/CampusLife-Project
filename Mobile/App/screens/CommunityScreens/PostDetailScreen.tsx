@@ -1247,6 +1247,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                             <View style={styles.optionLine}></View>
                             <TouchableOpacity
                                 onPress={() => {
+                                    console.log("asd")
                                     if (userdata.user_pk === postDetailInfo?.user_id) {
                                         Alert.alert("본인은 신고할 수 없습니다.");
                                     } else {

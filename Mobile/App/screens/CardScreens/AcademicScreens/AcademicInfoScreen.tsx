@@ -542,10 +542,10 @@ const AcademicInfoScreen = ({ route }: any) => {
                                             lecture.lecture_credit,
                                             lecture.lecture_grades,
                                         ]}
-                                        style={[
-                                            styles.lectureTableRow,
-                                            index % 2 === 0 ? styles.evenRow : styles.oddRow
-                                        ]}
+                                        style={{
+                                            ...styles.lectureTableRow,
+                                            ...(index % 2 === 0 ? styles.evenRow : styles.oddRow),
+                                        }}
                                         textStyle={styles.lectureTableText}
                                         widthArr={[width * 0.65, width * 0.1, width * 0.1, width * 0.1]}
                                     />
