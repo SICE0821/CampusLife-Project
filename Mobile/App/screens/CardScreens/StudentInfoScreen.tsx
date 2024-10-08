@@ -219,7 +219,12 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
      */
     useFocusEffect(
         React.useCallback(() => {
-            getUserUniversity();
+            const fetchData = async () => {
+                await getUserUniversity(); // 비동기 함수 호출
+            };
+    
+            fetchData(); // 비동기 함수를 호출하여 실행
+    
         }, [])
     );
 

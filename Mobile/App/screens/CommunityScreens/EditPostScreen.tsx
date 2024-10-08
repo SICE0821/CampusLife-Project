@@ -255,14 +255,6 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
     }
   }
 
-  // 서버에서 가져온 이미지 삭제 함수
-  const handleServerImageRemove = (index: number) => {
-    const updatedServerImages = postImages2.filter((_, i) => i !== index);
-    setpostImages(updatedServerImages);
-    //console.log("서버 이미지 배열 삭제")
-  };
-
-
   // 이미지 선택 함수
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {

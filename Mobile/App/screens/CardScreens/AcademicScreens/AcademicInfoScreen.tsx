@@ -223,7 +223,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                 await response.json();
                 ChangGoalGpaAlert(); // 성공 알림
                 setChangegoalGPA(''); // 입력 필드 초기화
-                getGoalGPA(); // 목표 학점 재갱신
+                await getGoalGPA(); // 목표 학점 재갱신
             } else {
                 Alert.alert('오류', '목표 학점은 0에서 4.5 사이여야 합니다.');
             }

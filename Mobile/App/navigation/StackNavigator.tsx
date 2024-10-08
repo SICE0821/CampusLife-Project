@@ -388,7 +388,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '학적확인',
+                    title: '학적정보',
                 }}
             />
             <MainStack.Screen
@@ -547,7 +547,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '학적확인',
+                    title: '학적정보',
                 }}
             />
             <AdminMainStack.Screen

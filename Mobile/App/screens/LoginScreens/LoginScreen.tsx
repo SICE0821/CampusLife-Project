@@ -89,20 +89,6 @@ function LoginScreen({ navigation }: any) {
     }
   }
 
-
-  useFocusEffect(
-    React.useCallback(() => {
-    }, [])
-  )
-
-  const navigateToRegister = () => {
-    navigation.navigate('RegisterPage');
-  };
-
-  const navigateToSearch = () => {
-    navigation.navigate('SearchPage')
-  };
-
   return (
     <View style={styles.container}>
       <Image style={styles.logo} source={require('../../assets/logo.png')} />
@@ -156,7 +142,7 @@ function LoginScreen({ navigation }: any) {
       <TouchableOpacity style={styles.loginButton} onPress={async () => {
           const userdata = await get_user_data();
           const LectureData = await fetchLectureData(userdata);
-          handleLogin(userdata, LectureData);
+          await handleLogin(userdata, LectureData);
           }}>
         <Text style={styles.loginButtonText}>로그인</Text>
       </TouchableOpacity>

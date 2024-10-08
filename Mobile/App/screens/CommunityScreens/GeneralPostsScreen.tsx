@@ -167,18 +167,40 @@ const GeneralPostsScreen = ({ route, navigation }: any) => {
         }
     };
 
-    // 화면에 초점을 맞출 때 데이터 로드
     useFocusEffect(
         useCallback(() => {
-            if (department_check === 0) {
-                getGeneralPosts(); // 일반 게시물 로드
-            } else if (department_check === 1) {
-                getDepartmentPosts(); // 학과 게시물 로드
-            }
-            setUserData(userdata); // 유저 데이터 설정
-            AreYouHavePost(); // 북마크 게시물 로드
+            const fetchData = async () => {
+                if (department_check === 0) {
+                    await getGeneralPosts(); // 일반 게시물 로드
+                } else if (department_check === 1) {
+                    await getDepartmentPosts(); // 학과 게시물 로드
+                }
+                setUserData(userdata); // 유저 데이터 설정
+                await AreYouHavePost(); // 북마크 게시물 로드
+            };
+    
+            fetchData(); // 비동기 함수를 호출하여 실행
+    
         }, [])
     );
+    
+    useFocusEffect(
+        useCallback(() => {
+            const fetchData2 = async () => {
+                if (department_check === 0) {
+                    await getGeneralPosts(); // 일반 게시물 로드
+                } else if (department_check === 1) {
+                    await getDepartmentPosts(); // 학과 게시물 로드
+                }
+                setUserData(userdata); // 유저 데이터 설정
+                await AreYouHavePost(); // 북마크 게시물 로드 // 비동기 함수 호출
+            };
+    
+            fetchData2(); // 비동기 함수를 호출하여 실행
+    
+        }, [])
+    );
+
 
     // 게시물 리스트 아이템 렌더링 함수
     const renderItem = ({ item, index }: { item: PostData; index: number }) => (

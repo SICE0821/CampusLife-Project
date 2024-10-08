@@ -143,7 +143,7 @@ const App = ({ route }: any) => {
     React.useCallback(() => {
       const fetchData = async () => {
         try {
-          getTimeTableData();
+          await getTimeTableData();
         } catch (error) {
           console.error('Error fetching data:', error);
         }

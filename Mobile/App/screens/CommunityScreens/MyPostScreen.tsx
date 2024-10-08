@@ -263,12 +263,17 @@ const MyPostScreen = ({ route, navigation }: any) => {
     }
 
     useFocusEffect(
-        useCallback(() => {
-            getMyPostData();
-            AreYouHavePost();
+        React.useCallback(() => {
+            const fetchData = async () => {
+                await getMyPostData();
+                await AreYouHavePost();
+            };
+    
+            fetchData(); // 비동기 함수를 호출하여 실행
+    
         }, [])
     );
-
+    
     const renderItem = ({ item, index }: { item: PostData; index: number }) => (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <Swipeable ref={instance => (swipeableRefs.current[index] = instance)} renderRightActions={() => renderRightActions(item, index)}>

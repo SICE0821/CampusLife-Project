@@ -112,10 +112,13 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
 
   // 데이터를 불러오거나 준비가 완료되면 로딩 상태를 false로 변경
   useEffect(() => {
-    if (applicant) {
-      setLoading(false);
-      GetClubPersonPK();
+    const fetchData = async () => {
+      if (applicant) {
+        setLoading(false);
+        await GetClubPersonPK();
+      }
     }
+    fetchData();
   }, [applicant]);
 
   const applicationData = [

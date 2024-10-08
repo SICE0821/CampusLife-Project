@@ -132,6 +132,10 @@ const StudyRoomDetailScreen = ({ route }: any) => {
    * @param study_room_time 스터디룸 예약 시간대
    */
   const confirmDelete = (student: number, study_room_name: string, study_room_date: string, study_room_time: string) => {
+    const handleDelete = async () => {
+      await deleteStudyRoom(student, study_room_name, study_room_date, study_room_time); // 비동기 함수 호출
+    };
+  
     Alert.alert(
       "삭제 확인",
       "스터디룸 예약을 삭제하시겠습니까?",
@@ -142,7 +146,7 @@ const StudyRoomDetailScreen = ({ route }: any) => {
         },
         {
           text: "확인",
-          onPress: () => deleteStudyRoom(student, study_room_name, study_room_date, study_room_time)
+          onPress: handleDelete // 비동기 함수를 호출
         }
       ],
       { cancelable: false }
