@@ -101,9 +101,9 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
         setpostfontoption("전체 게시판");
       } else if (selectdepartmentposter == 1) {
         setpostfontoption("학과 게시판")
-      } else if (selectcontestposter == 1) {
+      } else if (selectclubposter == 1) {
         setpostfontoption("동아리 게시판")
-      } else {
+      }else {
         if (post_edit_info.department_check == false) {
           setpostfontoption("전체 게시판");
           handleAllPosterPress();
@@ -128,7 +128,7 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   };
 
   const handleAllPosterPress = () => {
-    setselectapllposterOption(1);
+    setselectapllposterOption(0);
     setselectdepartmentposter(0);
     setSelectContestPoster(0);
     setSelectClubPoster(0);
@@ -472,21 +472,47 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
         backdropPressToClose
       >
         <View style={modalStyles.modalContent}>
-          {userData.title === "학교" && (
-            <TouchableOpacity style={[
-              modalStyles.optionButton, 
-              selectallposter === 1 && modalStyles.selectedOption
-            ]} 
-            onPress={handleAllPosterPress}>
-              <Text style={[modalStyles.optionText, selectallposter == 1 && modalStyles.selectedText]}> 학교 공지사항 </Text>
-            </TouchableOpacity>
+        {post_edit_info.inform_check ? (
+            // post_edit_info.inform_check가 true일 때
+            <>
+              {userData.title === "학교" && (
+                <TouchableOpacity style={modalStyles.optionButton} onPress={handleAllPosterPress}>
+                  <Text style={[modalStyles.optionText, selectallposter === 1 && selectcontestposter === 0 && modalStyles.selectedText]}>
+                    학교 공지사항
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleDepartmentPosterPress}>
+                <Text style={[modalStyles.optionText, selectdepartmentposter === 1 && modalStyles.selectedText]}>
+                  학과 공지사항
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleContestPosterPress}>
+                <Text style={[modalStyles.optionText, selectcontestposter === 1 && selectallposter === 1 && modalStyles.selectedText]}>
+                  공모전 게시판
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            // post_edit_info.inform_check가 false일 때
+            <>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleAllPosterPress}>
+                <Text style={[modalStyles.optionText, selectallposter === 1 && modalStyles.selectedText]}>
+                  전체 게시판
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleDepartmentPosterPress}>
+                <Text style={[modalStyles.optionText, selectdepartmentposter === 1 && modalStyles.selectedText]}>
+                  학과 게시판
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleClubPosterPress}>
+                <Text style={[modalStyles.optionText, selectclubposter === 1 && modalStyles.selectedText]}>
+                  동아리 게시판
+                </Text>
+              </TouchableOpacity>
+            </>
           )}
-          <TouchableOpacity style={modalStyles.optionButton} onPress={handleDepartmentPosterPress}>
-            <Text style={[modalStyles.optionText, selectdepartmentposter === 1 && modalStyles.selectedText]}> 학과 공지사항 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={modalStyles.optionButton} onPress={handleContestPosterPress}>
-            <Text style={[modalStyles.optionText, selectcontestposter === 1 && modalStyles.selectedText]}>공모전 게시판</Text>
-          </TouchableOpacity>
         </View>
       </ModalBox>
       <Modal isVisible={isModalVisible}>

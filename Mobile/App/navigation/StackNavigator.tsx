@@ -127,7 +127,7 @@ export const RootStackNavigator = (route: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("CommunityScreenStackNavigator")}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
                             <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -668,13 +668,13 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
 
 //커뮤니티 페이지 관련 스택 네비게이터
 export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
-    const { userdata , userDepartment} = route.params;
+    const { userdata } = route.params;
     return (
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
                 name="PostTopTabNavigator"
                 component={TopbTabNavigator}
-                initialParams={{ userdata ,userDepartment}}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
