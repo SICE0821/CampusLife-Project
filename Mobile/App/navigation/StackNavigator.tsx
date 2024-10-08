@@ -452,11 +452,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -469,11 +464,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -485,11 +475,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -636,11 +621,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -654,11 +634,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -670,11 +645,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -688,11 +658,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',

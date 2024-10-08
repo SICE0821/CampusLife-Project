@@ -35,32 +35,25 @@ export const AcademicTopTabNavigator = ({ route }: any) => {
             <AcademicTopTab.Navigator
                 screenOptions={({ }) => ({
                     tabBarStyle: {
-                        shadowOffset: {
-                            width: 0,
-                            height: 0, // for iOS
-                        },
                         elevation: 0,
                         backgroundColor: 'white',
                         height: 55,
-                        width: 300,
                         //borderBottomWidth : 1,
                         zIndex: 0,
+                        width: '50%',
 
                     },
                     tabBarIndicatorStyle: {
                         backgroundColor: '#9A9EFF',
-                        //orderWidth : 5,
-                        //width: 70,
-                        //left: 43,
+                        width: '30%'
                     },
                     tabBarLabelStyle: {
-                        //width : 70,
                         //backgroundColor : 'red',
                         fontSize: 20,
                         fontWeight: 'bold'
                     },
                     gestureEnabled: false,
-                    swipeEnabled: false,
+                    swipeEnabled: true,
                     animationEnabled: false,
                 })}>
                 <AcademicTopTab.Screen
