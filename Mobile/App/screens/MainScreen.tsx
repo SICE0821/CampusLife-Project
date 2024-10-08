@@ -1025,12 +1025,12 @@ const styles = StyleSheet.create({
   contestBoxArea: {
     height: 300,
     flexDirection: 'row',
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
   },
   contestBox: {
     backgroundColor: 'white',
     width: 150,
-    height: 200,
+    height: 220,
     marginHorizontal: 10,
     borderRadius: 10,
     elevation: 10,
