@@ -10,12 +10,14 @@ import {
     TouchableOpacity,
     Alert,
     TextInput,
+    Image,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
 import { UserData, Lecture } from '../../../types/type';
 import LottieView from 'lottie-react-native';
 import IconH from 'react-native-vector-icons/FontAwesome';
+import IconB from 'react-native-vector-icons/SimpleLineIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../../config';
 import Svg, { Circle } from 'react-native-svg';
@@ -395,8 +397,71 @@ const AcademicInfoScreen = ({ route }: any) => {
 
     return (
         <View style={styles.container}>
-
             <ScrollView>
+                {/* 뱃지 영역 */}
+                <View style={styles.badgeTitle}>
+                    <Text style={styles.badgeTitleText}>내 뱃지</Text>
+                    <IconB style={styles.badgeIcon} name="badge" size={30} />
+                </View>
+                <ScrollView horizontal={true} style={styles.badgeContainer}>
+                    {/* 개별 뱃지 일단 반투명 하게 하고 얻으면 불투명하게 하면 될듯?*/}
+                    <View style={styles.badgeItem}>
+                        <Image
+                            source={require('../../../assets/뱃지.png')}
+                            resizeMode="contain"
+                            style={styles.badgeImage}
+                        />
+                        <Text style={styles.badgeText}>우등상</Text>
+                    </View>
+                    <View style={styles.badgeItem}>
+                        <Image
+                            source={require('../../../assets/뱃지2.png')}
+                            resizeMode="contain"
+                            style={styles.badgeImage}
+                        />
+                        <Text style={styles.badgeText}>수강상</Text>
+                    </View>
+                    <View style={styles.badgeItem}>
+                        <Image
+                            source={require('../../../assets/뱃지3.png')}
+                            resizeMode="contain"
+                            style={styles.badgeImage}
+                        />
+                        <Text style={styles.badgeText}>성장상</Text>
+                    </View>
+                    <View style={styles.badgeItem}>
+                        <Image
+                            source={require('../../../assets/뱃지4.png')}
+                            resizeMode="contain"
+                            style={styles.badgeImage}
+                        />
+                        <Text style={styles.badgeText}>노력상</Text>
+                    </View>
+                    <View style={styles.badgeItem}>
+                        <Image
+                            source={require('../../../assets/뱃지5.png')}
+                            resizeMode="contain"
+                            style={styles.badgeImage}
+                        />
+                        <Text style={styles.badgeText}>출석상</Text>
+                    </View>
+                    <View style={styles.badgeItem}>
+                        <Image
+                            source={require('../../../assets/뱃지6.png')}
+                            resizeMode="contain"
+                            style={styles.badgeImage}
+                        />
+                        <Text style={styles.badgeText}>소통상</Text>
+                    </View>
+                    <View style={styles.badgeItem}>
+                        <Image
+                            source={require('../../../assets/뱃지7.png')}
+                            resizeMode="contain"
+                            style={styles.badgeImage}
+                        />
+                        <Text style={styles.badgeText}>최고상</Text>
+                    </View>
+                </ScrollView>
                 {/* 원형 프로그레스 표시 */}
                 <View style={styles.progressCircleContainer}>
                     {[...Array(Math.ceil(progressCircleConfigs.length / 3))].map(
@@ -422,7 +487,6 @@ const AcademicInfoScreen = ({ route }: any) => {
                 <View style={styles.goalGPAContainer}>
                     <View style={styles.goalGPATitleContainer}>
                         <Text style={styles.goalGPATitleText}>목표학점</Text>
-                        {/* 트로피 아이콘 제거 */}
                         <IconH style={styles.goalGPAIcon} name="trophy" size={30} />
                     </View>
                 </View>
@@ -568,18 +632,49 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    // 뱃지 영역 스타일
+    badgeTitle: {
+        height: 50,
+        width: '50%',
+        marginVertical: 10,
+        borderWidth: 1,
+        justifyContent: 'center',
+        alignSelf: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        flexDirection: 'row',
+        borderColor: '#F29F05',
+        backgroundColor: 'white',
+        elevation: 5,
+    },
+    badgeTitleText: {
+        fontSize: 20,
+        color: '#333',
+        fontWeight: '600',
+    },
+    badgeIcon: {
+        color: '#F29F05',
+        marginLeft: 5,
+        
+    },
     badgeContainer: {
         flexDirection: 'row',
         paddingHorizontal: 10,
         paddingVertical: 5,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: 'white',
         height: 100,
     },
     badgeItem: {
         alignItems: 'center',
         justifyContent: 'center',
         marginHorizontal: 5,
+    },
+    badgeImage: {
+        width: 50,
+        height: 50,
+        opacity: 0.3
+    },
+    badgeText: {
+        color: 'black',
     },
     // 프로그레스 서클 영역 스타일
     progressCircleContainer: {
