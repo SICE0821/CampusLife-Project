@@ -1273,7 +1273,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                             {(userdata?.title === "학교" || postDetailInfo?.post_writer === userdata?.name) && (
                                 <>
                                     <View style={styles.optionLine}></View>
-                                    <TouchableOpacity onPress={deletePost}>
+                                    <TouchableOpacity style={{backgroundColor: 'white',}} onPress={deletePost}>
                                         <Text style={styles.optionText}>삭제</Text>
                                     </TouchableOpacity>
                                 </>
@@ -1400,7 +1400,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                     {(userdata?.title === "학교" || item.student_name === userdata?.name) && (
                                         <>
                                             <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
-                                            <TouchableOpacity onPress={() => deleteComment(item.comment_id)}>
+                                            <TouchableOpacity style={{backgroundColor: 'white',}} onPress={() => deleteComment(item.comment_id)}>
                                                 <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
                                             </TouchableOpacity>
                                         </>
@@ -1489,7 +1489,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                             {(userdata?.title === "학교" || subitem.student_name === userdata?.name) && (
                                                 <>
                                                     <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
-                                                    <TouchableOpacity onPress={() => deleterecomment(subitem.recomment_id)}>
+                                                    <TouchableOpacity style={{backgroundColor: 'white',}} onPress={() => deleterecomment(subitem.recomment_id)}>
                                                         <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
                                                     </TouchableOpacity>
                                                 </>
@@ -1501,6 +1501,31 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                         </View>
                     ))
                 }
+                {/* 동아리 신청 및 현황 파악 버튼 */}
+                <View style={styles.buttonContainer}>
+                    {(userdata?.user_pk !== postDetailInfo?.user_id) && (
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                console.log("동아리 신청하기.");
+                                navigation.navigate("SchoolClubSignScreen", { item, userData });
+                            }}
+                        >
+                            <Text style={styles.buttonText}>동아리 신청하기</Text>
+                        </TouchableOpacity>
+                    )}
+                    {(userdata?.user_pk === postDetailInfo?.user_id) && (
+                        <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                                console.log("동아리 현황 파악하기.");
+                                navigation.navigate("SchoolClubSignStateScreen", { item, userData });
+                            }}
+                        >
+                            <Text style={styles.buttonText}>동아리 현황 파악하기</Text>
+                        </TouchableOpacity>
+                    )}
+                </View>
             </ScrollView>
 
             {/* 이미지 모달 */}
@@ -1537,34 +1562,6 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     </View>
                 </Modal>
             )}
-
-
-
-            {/* 동아리 신청 및 현황 파악 버튼 */}
-            <View style={styles.buttonContainer}>
-                {(userdata?.user_pk !== postDetailInfo?.user_id) && (
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            console.log("동아리 신청하기.");
-                            navigation.navigate("SchoolClubSignScreen", { item, userData });
-                        }}
-                    >
-                        <Text style={styles.buttonText}>동아리 신청하기</Text>
-                    </TouchableOpacity>
-                )}
-                {(userdata?.user_pk === postDetailInfo?.user_id) && (
-                    <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                            console.log("동아리 현황 파악하기.");
-                            navigation.navigate("SchoolClubSignStateScreen", { item, userData });
-                        }}
-                    >
-                        <Text style={styles.buttonText}>동아리 현황 파악하기</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
 
 
             <View style={styles.writeCommentBox}>
@@ -1754,10 +1751,7 @@ const styles = StyleSheet.create({
         fontSize: 30,
     },
     buttonContainer: { // 하단 버튼 컨테이너 스타일
-        position: 'absolute',
-        bottom: 20,
-        left: 20,
-        right: 20,
+        marginHorizontal: 10,
         alignItems: 'center',
     },
     button: { // 커스터마이징된 버튼 스타일
