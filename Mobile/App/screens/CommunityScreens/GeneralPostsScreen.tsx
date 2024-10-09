@@ -27,6 +27,7 @@ const renderEmptyItem = () => {
 const GeneralPostsScreen = ({ route, navigation }: any) => {
     // 컴포넌트 상태 및 초기화
     const { department_check, userdata } = route.params;
+    console.log(department_check);
     const [communityData, setCommunityData] = useState<PostData[]>([]); // 게시물 목록 상태
     const [userData, setUserData] = useState<UserData>(userdata); // 유저 데이터 상태
     const [userHavePost, setUserHavePost] = useState<any[]>([]); // 유저가 북마크한 게시물 목록 상태

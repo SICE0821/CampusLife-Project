@@ -223,7 +223,7 @@ async function getGeneralPosts(campus_id) {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 0 AND post.inform_check =0 AND student.campus_id = ? AND post.Club_check = 0 "
+            + "post.department_check = 0 AND post.inform_check = 0 AND student.campus_id = ? AND post.Club_check = 0 "
             + "ORDER BY post.date DESC"
         );
         const rows = await conn.query(query, [campus_id]);
@@ -400,7 +400,7 @@ async function getDepartmentPosts(department_id) {
             + "student "
             + "ON user.student_id = student.student_id "
             + "WHERE "
-            + "post.department_check = 1 AND post.inform_check =0 AND student.department_id = ? "
+            + "post.department_check = 1 AND post.inform_check = 0 AND student.department_id = ? AND post.Club_check = 0 "
             + "ORDER BY post.date DESC"
         );
         const rows = await conn.query(query, [department_id]);

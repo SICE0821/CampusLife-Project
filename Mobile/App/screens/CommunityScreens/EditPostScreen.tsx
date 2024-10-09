@@ -36,7 +36,9 @@ const EmptyMainText = () => {
 };
 
 const EditPostScreen: React.FC = ({ navigation, route }: any) => {
+  console.log("you are in EditPostScreen");
   const { userdata, post_edit_info, postImages } = route.params;
+  console.log(post_edit_info.inform_check);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [selectallposter, setselectapllposterOption] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
   const [selectdepartmentposter, setselectdepartmentposter] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리

@@ -643,7 +643,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '이벤트',
+                    title: '유저 관리',
                 }} />
 
             <AdminMainStack.Screen
