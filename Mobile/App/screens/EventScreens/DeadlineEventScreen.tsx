@@ -321,9 +321,10 @@ const styles = StyleSheet.create({
   },
   eventImageArea: {
     width: width * 0.95,
-    height: width,
-    backgroundColor: '#fff',
-    alignSelf: 'center'
+    height: width * 0.95,
+    backgroundColor: 'white',
+    alignSelf: 'center',
+    elevation: 10,
   },
   eventImageBox: {
     width: width * 0.95,
@@ -332,6 +333,7 @@ const styles = StyleSheet.create({
   eventImage: {
     width: '100%',
     height: '100%',
+    borderRadius: 10,
   },
   modalContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.85)',
