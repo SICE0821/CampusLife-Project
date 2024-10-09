@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
         color: 'blue',
     },
     headerSpacing: {
-        height: 70,
+        height: 120,
         backgroundColor: 'white',
     },
     footerSpacing: {
