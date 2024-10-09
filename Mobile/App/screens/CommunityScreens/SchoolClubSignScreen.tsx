@@ -185,19 +185,18 @@ const SchoolClubSignScreen = ({ route, navigation }: any) => {
     }
   };
 
-  /**
-   * 화면 포커스 시 데이터 가져오기
-   */
   useFocusEffect(
     React.useCallback(() => {
-      getUserUniversity();
-      getUserDepartment();
+      const fetchData = async () => {
+        await getUserUniversity(); // 비동기 함수 호출
+        await getUserDepartment();
+      };
+
+      fetchData(); // 비동기 함수를 호출하여 실행
+
     }, [])
   );
 
-  /**
-   * userData에서 초기값을 설정하기 위한 useEffect
-   */
   useEffect(() => {
     setAnswers({
       name: userData.name || '',

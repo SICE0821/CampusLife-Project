@@ -31,55 +31,60 @@ const SchoolClubSignStateScreen = ({ route, navigation }: any) => {
   const [userInfo, setUserInfo] = useState<userInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
+const fetchClubData = async () => {
+  try {
+    const response = await fetch(`${config.serverUrl}/fetchClubData`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ post_id: item.post_id }),
+    });
+    const result = await response.json();
+    console.log(result);
+    if (response.ok) {
+      setUserInfo(result);
+    } else {
+      Alert.alert(
+        '오류', // 제목
+        '데이터가 존재하지 않습니다.', // 메시지
+        [
+          {
+            text: '확인',
+            onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
+          },
+        ],
+        { cancelable: false } // 취소 불가능
+      );
+    }
+  } catch (error) {
+    Alert.alert(
+      '오류', // 제목
+      '데이터가 존재하지 않습니다.', // 메시지
+      [
+        {
+          text: '확인',
+          onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
+        },
+      ],
+      { cancelable: false } // 취소 불가능
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useFocusEffect(
-    useCallback(() => {
-      const fetchClubData = async () => {
-        try {
-          const response = await fetch(`${config.serverUrl}/fetchClubData`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ post_id: item.post_id }),
-          });
-          const result = await response.json();
-          console.log(result);
-          if (response.ok) {
-            setUserInfo(result);
-          } else {
-            Alert.alert(
-              '오류', // 제목
-              '데이터가 존재하지 않습니다.', // 메시지
-              [
-                {
-                  text: '확인',
-                  onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
-                },
-              ],
-              { cancelable: false } // 취소 불가능
-            );
-          }
-        } catch (error) {
-          Alert.alert(
-            '오류', // 제목
-            '데이터가 존재하지 않습니다.', // 메시지
-            [
-              {
-                text: '확인',
-                onPress: () => navigation.goBack(), // 확인 버튼을 누르면 goBack 호출
-              },
-            ],
-            { cancelable: false } // 취소 불가능
-          );
-        } finally {
-          setLoading(false);
-        }
+    React.useCallback(() => {
+      const fetchData = async () => {
+        await fetchClubData(); // 비동기 함수 호출
       };
 
-      fetchClubData();
+      fetchData(); // 비동기 함수를 호출하여 실행
+
     }, [item])
   );
+
 
   // 중간 렌더링 값 확인
   const renderApplicant = ({ item }: { item: userInfo }) => {

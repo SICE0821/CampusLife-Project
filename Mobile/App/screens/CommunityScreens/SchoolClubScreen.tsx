@@ -96,15 +96,15 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
   // 조회수 증가 함수 (샘플 데이터에서는 기능하지 않음)
   const viewCountUp = async (post_id: any) => {
     try {
-        await fetch(`${config.serverUrl}/view_count_up`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ post_id }),
-        });
+      await fetch(`${config.serverUrl}/view_count_up`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id }),
+      });
     } catch (error) {
-        console.error('조회수 증가 실패', error);
+      console.error('조회수 증가 실패', error);
     }
-};
+  };
 
   // 북마크 추가 함수
   const addBookmark = async (item: PostData) => {
@@ -138,10 +138,14 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
     </TouchableOpacity>
   );
 
-  // 화면에 초점을 맞출 때 데이터 로드
   useFocusEffect(
-    useCallback(() => {
-      getClubPosts(); // 동아리 게시물 로드
+    React.useCallback(() => {
+      const fetchData = async () => {
+        await getClubPosts();  // 비동기 함수 호출
+      };
+
+      fetchData(); // 비동기 함수를 호출하여 실행
+
     }, [])
   );
 
@@ -207,6 +211,7 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerSpacing} />
       <FlatList
         data={clubData}
         renderItem={renderItem}
@@ -226,6 +231,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingTop: 80, // 상단 여백 조정
   },
+
+  headerSpacing: {
+    height: 40,
+    backgroundColor: 'white',
+  },
+
   listContent: {
     paddingHorizontal: 10,
     paddingBottom: 20,

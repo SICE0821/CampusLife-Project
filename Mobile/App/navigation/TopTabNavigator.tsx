@@ -227,7 +227,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
             }}>
             <CommunityTopBottomTab.Screen name='전체'
-                component={GeneralPostsScreen}
+                component={department_check === 3 ? SchoolClubScreen : GeneralPostsScreen}
                 initialParams={{ department_check, userdata }}
                 options={{
                     headerShown: false,
@@ -259,6 +259,7 @@ export const TopBottomTabNavigator = ({ navigation, route }: any) => {
 
 export const NoticeTopBottomTabNavigator = ({ navigation, route }: any) => {
     const { department_check, userdata } = route.params
+    console.log(department_check);
     //전체, HOT게시글, 책갈피 상단 탭 네비게이션
     return (
         <NoticeCommunityTopBottomTab.Navigator
@@ -294,7 +295,7 @@ export const NoticeTopBottomTabNavigator = ({ navigation, route }: any) => {
 
             }}>
             <NoticeCommunityTopBottomTab.Screen name='전체'
-                component={NoticeSchoolPostsScreen}
+                component={department_check === 3 ? ContestPostScreen : NoticeSchoolPostsScreen}
                 initialParams={{ department_check, userdata }}
                 options={{
                     headerShown: false,
@@ -378,8 +379,8 @@ export const TopbTabNavigator = ({ route, navigation }: any) => {
                 }} />
 
             <CommunityTopTab.Screen name="동아리"
-                initialParams={{ userdata }}
-                component={SchoolClubScreen}
+                initialParams={{ department_check: 3, userdata }}
+                component={TopBottomTabNavigator}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,
@@ -445,8 +446,8 @@ export const NoticeTopbTabNavigator = ({ route }: any) => {
                 }} />
 
             <NoticeTopTab.Screen name="공모전"
-                initialParams={{ userdata }}
-                component={ContestPostScreen}
+                initialParams={{ department_check : 3, userdata }}
+                component={NoticeTopBottomTabNavigator}
                 options={{
                     headerShown: false,
                     tabBarIcon: () => null,

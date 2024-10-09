@@ -458,14 +458,14 @@ const MainPage = ({ navigation, route }: any) => {
                 <Text style={styles.tabText}>정보변경</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={navigateToAcademicInfo}>
-                <IconC style={styles.tabIcon} name="calendar-check-o" size={30} />
-                <Text style={styles.tabText}>학적확인</Text>
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("StudyRoomStackNavigator")}>
+                <IconF style={styles.tabIcon} name="prescription" size={30} />
+                <Text style={styles.tabText}>스터디룸</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AlarmDialogScreen")}>
-                <IconD style={styles.tabIcon} name="bell" size={30} />
-                <Text style={styles.tabText}>알림</Text>
+              <TouchableOpacity style={styles.tabButton} onPress={navigateToAcademicInfo}>
+                <IconC style={styles.tabIcon} name="calendar-check-o" size={30} />
+                <Text style={styles.tabText}>학적정보</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("SchoolInfoScreen")}>
@@ -473,10 +473,11 @@ const MainPage = ({ navigation, route }: any) => {
                 <Text style={styles.tabText}>학교정보</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("StudyRoomStackNavigator")}>
-                <IconF style={styles.tabIcon} name="prescription" size={30} />
-                <Text style={styles.tabText}>스터디룸</Text>
+              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AlarmDialogScreen")}>
+                <IconD style={styles.tabIcon} name="bell" size={30} />
+                <Text style={styles.tabText}>알림</Text>
               </TouchableOpacity>
+
             </View>
           </View>
         </View>

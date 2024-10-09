@@ -164,16 +164,20 @@ const NoticeSchoolPostsScreen = ({ route, navigation }: any) => {
         }
     };
 
-    // 화면에 초점을 맞출 때 데이터 불러오기
     useFocusEffect(
-        useCallback(() => {
-            if (department_check === 0) {
-                getNoticeSchoolPosts(); // 학교 공지 불러오기
-            } else if (department_check === 1) {
-                getNoticeDepartmentPosts(); // 학과 공지 불러오기
-            }
-            setUserData(userdata); // 유저 데이터 설정
-            fetchUserPosts(); // 유저 북마크 게시물 불러오기
+        React.useCallback(() => {
+            const fetchData = async () => {
+                if (department_check === 0) {
+                    await getNoticeSchoolPosts(); // 학교 공지 불러오기
+                } else if (department_check === 1) {
+                    await getNoticeDepartmentPosts(); // 학과 공지 불러오기
+                }
+                setUserData(userdata); // 유저 데이터 설정
+                await fetchUserPosts(); // 유저 북마크 게시물 불러오기
+            };
+    
+            fetchData(); // 비동기 함수를 호출하여 실행
+    
         }, [])
     );
 

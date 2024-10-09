@@ -36,7 +36,9 @@ const EmptyMainText = () => {
 };
 
 const EditPostScreen: React.FC = ({ navigation, route }: any) => {
+  console.log("you are in EditPostScreen");
   const { userdata, post_edit_info, postImages } = route.params;
+  console.log(post_edit_info.inform_check);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [selectallposter, setselectapllposterOption] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
   const [selectdepartmentposter, setselectdepartmentposter] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
@@ -52,9 +54,6 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   const [postImages2, setpostImages] = useState<PostPhoto[]>(postImages);
   const [selectclubposter, setSelectClubPoster] = useState(0); // 동아리 게시판 선택 여부
   const [selectcontestposter, setSelectContestPoster] = useState(0); //공모전 선택
-
-
-
 
   const forceUpdate = React.useReducer(() => ({}), {})[1];
 
@@ -128,11 +127,14 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   };
 
   const handleAllPosterPress = () => {
-    setselectapllposterOption(0);
+    setselectapllposterOption(1); // 전체 게시판 선택
     setselectdepartmentposter(0);
     setSelectContestPoster(0);
     setSelectClubPoster(0);
-  };
+
+    // inform_check를 0으로 설정
+    setpostfontoption("전체 게시판");
+};
 
   const handleDepartmentPosterPress = () => {
     setselectapllposterOption(0);
@@ -255,14 +257,6 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
     }
   }
 
-  // 서버에서 가져온 이미지 삭제 함수
-  const handleServerImageRemove = (index: number) => {
-    const updatedServerImages = postImages2.filter((_, i) => i !== index);
-    setpostImages(updatedServerImages);
-    //console.log("서버 이미지 배열 삭제")
-  };
-
-
   // 이미지 선택 함수
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
@@ -337,29 +331,29 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
 
   const update_post = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/update_post`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          post_id: post_edit_info.post_id,
-          department_check: selectdepartmentposter,
-          contest_check: selectcontestposter,
-          inform_check: selectallposter,
-          Club_check : selectclubposter,
-          title: titletext,
-          contents: maintext,
-          url: urltext,
-          sources: sourcestext
-        })
-      });
-      await response.json();
-      ok_go();
+        const response = await fetch(`${config.serverUrl}/update_post`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                post_id: post_edit_info.post_id,
+                department_check: selectdepartmentposter,
+                contest_check: selectcontestposter,
+                inform_check: selectallposter === 1 ? 0 : selectallposter, // 전체 게시판이면 inform_check를 0으로 설정
+                Club_check: selectclubposter,
+                title: titletext,
+                contents: maintext,
+                url: urltext,
+                sources: sourcestext
+            })
+        });
+        await response.json();
+        ok_go();
     } catch (error) {
-      console.error('게시글 수정 실패!', error);
+        console.error('게시글 수정 실패!', error);
     }
-  }
+};
 
   // 이미지 삭제 함수
   const handleImageRemove = (index: number) => {

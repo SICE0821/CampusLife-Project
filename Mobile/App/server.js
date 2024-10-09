@@ -201,7 +201,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '127.0.0.1',
+  host: '14.6.152.120',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -611,6 +611,7 @@ app.post('/generalpost', async (req, res) => {
     res.json(processedData);
     console.log("[GeneralPostsScreen] : 전체 게시판 전체 게시물 가져오기 성공");
   } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
     console.log("[GeneralPostsScreen] : 전체 게시판 전체 게시물 가져오기 실패");
   }
 });
@@ -636,6 +637,7 @@ app.post('/getContestPosts', async (req, res) => {
     res.json(processedData);
     console.log("[GeneralPostsScreen] : 공모전 게시물 가져오기 성공");
   } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
     console.log("[GeneralPostsScreen] : 공모전 게시물 가져오기 실패");
   }
 });
@@ -707,6 +709,7 @@ app.post('/departmentpost', async (req, res) => {
     res.json(processedData);
     console.log("[GeneralPostsScreen] : 학과 게시판 전체 게시물 가져오기 성공");
   } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
     console.log("[GeneralPostsScreen] : 학과 게시판 전체 게시물 가져오기 실패");
   }
 });
@@ -730,6 +733,7 @@ app.post('/Clubpost', async (req, res) => {
     res.json(processedData);
     console.log("[GeneralPostsScreen] : 동아리 게시판 전체 게시물 가져오기 성공");
   } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
     console.log("[GeneralPostsScreen] : 동아리 게시판 전체 게시물 가져오기 실패");
   }
 });
@@ -775,6 +779,7 @@ app.post('/departmentbookmark', async (req, res) => {
     res.json(processedData);
     console.log("[BookmarkScreen] : 학과 게시판 북마크 게시물 가져오기 성공");
   } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
     console.error(error);
     console.log("[BookmarkScreen] : 학과 게시판 북마크 게시물 가져오기 실패");
   }
@@ -867,29 +872,73 @@ app.post('/updatelecture', async (req, res) => {
 //상품 등록하기
 app.post('/postItem', async (req, res) => {
   const { campus_id, name, price, code_num, using_time, image_num, sell_check, explain } = req.body;
-  PostItem(campus_id, name, price, code_num, using_time, image_num, sell_check, explain);
-  console.log("성공적으로 값 넣음");
+  
+  try {
+    await PostItem(campus_id, name, price, code_num, using_time, image_num, sell_check, explain); // 비동기 함수 호출
+    console.log("성공적으로 상품 등록");
+    
+    // 클라이언트에 응답을 보내기
+    res.json({ message: '성공적으로 상품이 등록되었습니다.' });
+  } catch (error) {
+    console.error("상품 등록 중 오류 발생:", error);
+    
+    // 에러 발생 시 클라이언트에 오류 응답 보내기
+    res.status(500).json({ message: '상품 등록에 실패했습니다.' });
+  }
 });
 
 //상품 편집하기
 app.post('/updateItem', async (req, res) => {
   const { name, newname, price, using_time, image_num, sell_check, explain } = req.body;
-  UpdateItem(name, newname, price, using_time, image_num, sell_check, explain);
-  console.log("성공적으로 값 넣음");
+
+  try {
+    await UpdateItem(name, newname, price, using_time, image_num, sell_check, explain);
+    console.log("성공적으로 상품 편집");
+
+    // 클라이언트에게 응답 반환
+    res.json({ message: '성공적으로 상품이 편집되었습니다.' });
+  } catch (error) {
+    console.error("상품 편집 중 오류 발생:", error);
+
+    // 오류 발생 시 클라이언트에게 오류 응답 반환
+    res.status(500).json({ message: '상품 편집에 실패했습니다.' });
+  }
 });
 
-//상품 삭제하기
+// 상품 삭제하기
 app.post('/deleteItem', async (req, res) => {
   const { name, deletenum } = req.body;
-  DeleteItem(name, deletenum);
-  console.log("성공적으로 값 넣음");
+
+  try {
+    await DeleteItem(name, deletenum);
+    console.log("성공적으로 상품 삭제");
+
+    // 클라이언트에게 응답 반환
+    res.json({ message: '성공적으로 상품이 삭제되었습니다.' });
+  } catch (error) {
+    console.error("상품 삭제 중 오류 발생:", error);
+
+    // 오류 발생 시 클라이언트에게 오류 응답 반환
+    res.status(500).json({ message: '상품 삭제에 실패했습니다.' });
+  }
 });
 
-//유저 삭제하기
+// 유저 삭제하기
 app.post('/delete_user', async (req, res) => {
   const { user_pk } = req.body;
-  DeleteUser(user_pk);
-  console.log("성공적으로 값 넣음");
+
+  try {
+    await DeleteUser(user_pk);
+    console.log("성공적으로 유저 삭제");
+
+    // 클라이언트에게 응답 반환
+    res.json({ message: '성공적으로 유저가 삭제되었습니다.' });
+  } catch (error) {
+    console.error("유저 삭제 중 오류 발생:", error);
+
+    // 오류 발생 시 클라이언트에게 오류 응답 반환
+    res.status(500).json({ message: '유저 삭제에 실패했습니다.' });
+  }
 });
 
 //학과 이름 가져오기
@@ -904,6 +953,7 @@ app.post('/get_department_name', async (req, res) => {
     console.log("[MainScreen or AdminMain] : 학과 이름 가져오기 성공");
   } catch {
     console.log("[MainScreen or AdminMain] : 학과 이름 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 
 });
@@ -938,6 +988,7 @@ app.post('/get_university_name', async (req, res) => {
     console.log("[StudentInfoScreen] : 학교 이름 가져오기 성공");
   } catch (error) {
     console.log("[StudentInfoScreen] : 학교 이름 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 
 });
@@ -994,6 +1045,7 @@ app.post('/get_user_have_post', async (req, res) => {
     res.json(user_have_posts);
   } catch (error) {
     console.log("[All Post Screen] : 사용자의 책갈피 정보 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1025,6 +1077,7 @@ app.post('/delete_book_mark', async (req, res) => {
     }
   } catch (error) {
     console.log("[All Post Screen] : 포스터 책갈피 삭제 성공");
+    res.status(500).send({ message: "서버 오류" });
   }
 })
 
@@ -1048,6 +1101,7 @@ app.post('/get_comment', async (req, res) => {
     res.json(commentdata);
   } catch (error) {
     console.log("[PostDetailScreen] : 댓글 내용 및 정보 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1112,6 +1166,7 @@ app.post('/get_recomment', async (req, res) => {
     res.json(recommentdata);
   } catch (error) {
     console.log("[PostDetailScreen] : 대댓글 내용 및 정보 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1126,6 +1181,7 @@ app.post('/upload', upload.array('images'), async (req, res) => {
     res.send(fileNamesString);
   } catch (error) {
     console.log(`[StudentInfoScreen] : 서버에 사진 저장 실패`);
+    res.status(500).send({ message: 'Internal Server Error' });
   }
 });
 
@@ -1144,6 +1200,7 @@ app.post('/writecomment', async (req, res) => {
     }
   } catch (error) {
     console.log("[PostDetailScreen] : 댓글 달기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1161,6 +1218,7 @@ app.post('/rewritecomment', async (req, res) => {
     }
   } catch (error) {
     console.log("[PostDetailScreen] : 대댓글 달기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1401,6 +1459,7 @@ app.post('/get_post_detail', async (req, res) => {
     res.json(userData);
   } catch (error) {
     console.log("[PostDetailScreen or NoticePostDetailScreen] : 자세한 포스터 내용 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1491,6 +1550,7 @@ app.post('/get_user_point', async (req, res) => {
     res.json(rows[0]);
   } catch (error) {
     console.log("[MainScreen] : 유저 포인트 가져오기 실패")
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 
 })
@@ -1630,6 +1690,7 @@ app.post('/addCommentAram', async (req, res) => {
     }
   } catch (error) {
     console.log("[PostDetailScreen] : 댓글 알람 보내기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1647,6 +1708,7 @@ app.post('/addGoodEventAram', async (req, res) => {
     }
   } catch (error) {
     console.error("알람 보내기 실패:", error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1744,6 +1806,7 @@ app.post('/addLikeAram', async (req, res) => {
     }
   } catch (error) {
     console.log("[PostDetailScreen] : 포스터를 좋아요 알람 보내기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1760,6 +1823,7 @@ app.post('/addCommentLikeAram', async (req, res) => {
     }
   } catch (error) {
     console.log("[PostDetailScreen] : 댓글 좋아요 알람 보내기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1776,6 +1840,7 @@ app.post('/addRecommentLikeAram', async (req, res) => {
     }
   } catch (error) {
     console.log("[PostDetailScreen] : 대댓글 좋아요 알람 보내기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1863,6 +1928,7 @@ app.post('/check_end_send', async (req, res) => {
     }
   } catch (error) {
     console.log("[FriendCodeEventScreen] : 친구 코드 중복 검사 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -1985,6 +2051,7 @@ app.post('/Get_Event_Data', async (req, res) => {
     console.log("[MainScreen or AdminMain] : 이벤트 정보 전부 가져오기 성공");
   } catch (error) {
     console.error("[MainScreen or AdminMain] : 이벤트 정보 전부 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -2027,6 +2094,7 @@ app.post('/deletestudyroom', async (req, res) => {
       res.status(500).json({ error: "삭제 실패" });
     }
   } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -2127,6 +2195,7 @@ app.post('/is_user_post_like', async (req, res) => {
     res.json({ isLiked: result });
   } catch (error) {
     console.log("[PostDetailScreen] : 포스터 좋아요 중복 방지 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -2139,6 +2208,7 @@ app.post('/is_user_comment_like', async (req, res) => {
     res.json({ isLiked: result });
   } catch (error) {
     console.log("[PostDetailScreen] : 댓글 좋아요 중복 방지 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -2151,6 +2221,7 @@ app.post('/is_user_recomment_like', async (req, res) => {
     res.json({ isLiked: result });
   } catch (error) {
     console.log("[PostDetailScreen] : 대댓글 좋아요 중복 방지 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -2590,6 +2661,7 @@ app.post('/GetEditEventImage', async (req, res) => {
     console.log("[MainScreen or AdminMain or ModifyEvent[3]] : (편집할) 이벤트 이미지 가져오기 성공");
   } catch (error) {
     console.log("[MainScreen or AdminMain] : (편집할[3]) 이벤트 이미지 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

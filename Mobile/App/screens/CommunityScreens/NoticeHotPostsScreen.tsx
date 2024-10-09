@@ -167,12 +167,12 @@ const NoticeHotPostsScreen = ({ route, navigation }: any) => {
         useCallback(() => {
             const fetchData = async () => {
                 if (department_check === 0) {
-                    getNoticeHotPosts(); // 학교 핫 게시물 가져오기
+                    await getNoticeHotPosts(); // 학교 핫 게시물 가져오기
                 } else if (department_check === 1) {
-                    getNoticeDepartmentHotPosts(); // 학과 핫 게시물 가져오기
+                    await getNoticeDepartmentHotPosts(); // 학과 핫 게시물 가져오기
                 }
                 setUserData(userdata); // 유저 데이터 설정
-                fetchUserPosts(); // 북마크 게시물 불러오기
+                await fetchUserPosts(); // 북마크 게시물 불러오기
             };
             fetchData();
         }, [])
