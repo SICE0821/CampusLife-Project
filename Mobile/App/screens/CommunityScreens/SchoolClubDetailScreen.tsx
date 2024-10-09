@@ -1244,22 +1244,24 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
 
                     {/* 옵션 메뉴 */}
                     {showOptions && (
-                        <View style={styles.optionBox}>
+                        <View style={optionStyle.container}>
                             {/* 수정 옵션 */}
-                            <TouchableOpacity onPress={async () => {
-                                if (userdata.user_pk === postDetailInfo?.user_id) {
-                                    const postEditInfo = await getPostInfo();
-                                    navigation.navigate("EditPostScreen", { userdata, postEditInfo, postImages });
-                                } else {
-                                    noYourPostAlert();
-                                    toggleOptions();
-                                }
-                            }}>
-                                <Text style={styles.optionText}>수정</Text>
+                            <TouchableOpacity style={optionStyle.boxArea}
+                                onPress={async () => {
+                                    if (userdata.user_pk === postDetailInfo?.user_id) {
+                                        const postEditInfo = await getPostInfo();
+                                        navigation.navigate("EditPostScreen", { userdata, postEditInfo, postImages });
+                                    } else {
+                                        noYourPostAlert();
+                                        toggleOptions();
+                                    }
+                                }}>
+                                <Text style={optionStyle.boxText}>수정</Text>
                             </TouchableOpacity>
-                            <View style={styles.optionLine}></View>
+                            <View style={optionStyle.boxLine}></View>
                             {/* 신고 옵션 */}
                             <TouchableOpacity
+                                style={optionStyle.boxArea}
                                 onPress={() => {
                                     if (userdata.user_pk === postDetailInfo?.user_id) {
                                         Alert.alert("본인은 신고할 수 없습니다.");
@@ -1267,14 +1269,14 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                         reportUserDuplicate();
                                     }
                                 }}>
-                                <Text style={styles.optionText}>신고</Text>
+                                <Text style={optionStyle.boxText}>신고</Text>
                             </TouchableOpacity>
                             {/* 삭제 옵션: 사용자 권한에 따라 표시 */}
                             {(userdata?.title === "학교" || postDetailInfo?.post_writer === userdata?.name) && (
                                 <>
-                                    <View style={styles.optionLine}></View>
-                                    <TouchableOpacity style={{backgroundColor: 'white',}} onPress={deletePost}>
-                                        <Text style={styles.optionText}>삭제</Text>
+                                    <View style={optionStyle.boxLine}></View>
+                                    <TouchableOpacity style={optionStyle.boxArea} onPress={deletePost}>
+                                        <Text style={optionStyle.boxText}>삭제</Text>
                                     </TouchableOpacity>
                                 </>
                             )}
@@ -1372,8 +1374,8 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                 </View>
                             </View>
                             {activeCommentId === item.comment_id && (
-                                <View style={styles.commentOption}>
-                                    <TouchableOpacity onPress={() => {
+                                <View style={optionStyle.commentContainer}>
+                                    <TouchableOpacity style={optionStyle.boxArea} onPress={() => {
                                         if (userdata.user_pk == item.user_id) {
                                             setIsEditComment(1);
                                             toggleOptions2(item.comment_id);
@@ -1383,10 +1385,11 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                             NoyourCommentAlert(item.comment_id);
                                         }
                                     }}>
-                                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
+                                        <Text style={optionStyle.boxText}>수정</Text>
                                     </TouchableOpacity>
-                                    <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
+                                    <View style={optionStyle.boxLine}></View>
                                     <TouchableOpacity
+                                        style={optionStyle.boxArea}
                                         onPress={() => {
                                             if (userdata.user_pk === item.user_id) {
                                                 Alert.alert("본인은 신고할 수 없습니다.");
@@ -1395,13 +1398,13 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                 ReportUserduplicate2(item.comment_id);
                                             }
                                         }}>
-                                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
+                                        <Text style={optionStyle.boxText}>신고</Text>
                                     </TouchableOpacity>
                                     {(userdata?.title === "학교" || item.student_name === userdata?.name) && (
                                         <>
-                                            <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
-                                            <TouchableOpacity style={{backgroundColor: 'white',}} onPress={() => deleteComment(item.comment_id)}>
-                                                <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                            <View style={optionStyle.boxLine}></View>
+                                            <TouchableOpacity style={optionStyle.boxArea} onPress={() => deleteComment(item.comment_id)}>
+                                                <Text style={optionStyle.boxText}>삭제</Text>
                                             </TouchableOpacity>
                                         </>
                                     )}
@@ -1460,8 +1463,8 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                         </View>
                                     </View>
                                     {activeCommentId === subitem.recomment_id && (
-                                        <View style={styles.recommentOption}>
-                                            <TouchableOpacity onPress={() => {
+                                        <View style={optionStyle.commentContainer}>
+                                            <TouchableOpacity style={optionStyle.boxArea} onPress={() => {
                                                 if (userdata.user_pk == subitem.user_id) {
                                                     setIsEditComment(1);
                                                     toggleOptions2(subitem.recomment_id);
@@ -1472,10 +1475,11 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                     NoyourreCommentAlert(subitem.recomment_id);
                                                 }
                                             }}>
-                                                <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>수정</Text>
+                                                <Text style={optionStyle.boxText}>수정</Text>
                                             </TouchableOpacity>
-                                            <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
+                                            <View style={optionStyle.boxLine}></View>
                                             <TouchableOpacity
+                                                style={optionStyle.boxArea}
                                                 onPress={() => {
                                                     if (userdata.user_pk === item.user_id) {
                                                         Alert.alert("본인은 신고할 수 없습니다.");
@@ -1484,12 +1488,12 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                         ReportUserduplicate2(item.comment_id);
                                                     }
                                                 }}>
-                                                <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>신고</Text>
+                                                <Text style={optionStyle.boxText}>신고</Text>
                                             </TouchableOpacity>
                                             {(userdata?.title === "학교" || subitem.student_name === userdata?.name) && (
                                                 <>
-                                                    <View style={{ width: 100, height: 0.4, backgroundColor: 'black', marginRight: 20, marginTop: 5, marginBottom: 5 }}></View>
-                                                    <TouchableOpacity style={{backgroundColor: 'white',}} onPress={() => deleterecomment(subitem.recomment_id)}>
+                                                    <View style={optionStyle.boxLine}></View>
+                                                    <TouchableOpacity style={optionStyle.boxArea} onPress={() => deleterecomment(subitem.recomment_id)}>
                                                         <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
                                                     </TouchableOpacity>
                                                 </>
@@ -1670,7 +1674,7 @@ const styles = StyleSheet.create({
     postArea: { // 포스트 내용 영역
         flex: 1,
         marginHorizontal: 25,
-        marginVertical: 10,
+        marginVertical: 15,
     },
     postTitle: { // 포스트 제목
         fontSize: 20,
@@ -1920,5 +1924,40 @@ const styles = StyleSheet.create({
     },
 
 });
+
+const optionStyle = StyleSheet.create({
+    container: {
+        position: 'absolute',
+        top: 65,
+        right: 20,
+        backgroundColor: 'white',
+        elevation: 5,
+        borderRadius: 10,
+    },
+    commentContainer: {
+        position: 'absolute',
+        top: 45,
+        right: 20,
+        backgroundColor: 'white',
+        elevation: 5,
+        borderRadius: 10
+    },
+    boxArea: {
+        width: 100,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+    },
+    boxText: {
+        fontSize: 15,
+        fontWeight: "bold",
+        color: "black",
+    },
+    boxLine: {
+        backgroundColor: 'black',
+        width: '85%',
+        height: 1,
+        alignSelf: 'center'
+    }
+})
 
 export default SchoolClubDetailScreen;
