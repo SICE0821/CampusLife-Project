@@ -57,9 +57,9 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     /**
      * 화면 새로고침 함수
      */
-    const onRefresh = useCallback(() => {
+    const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        get_aram_data().then(() => setRefreshing(false));
+        await get_aram_data().then(() => setRefreshing(false));
     }, []);
 
     /**
@@ -266,9 +266,9 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
      */
     const navigateToDetailScreen = (postDetail: any, screen: string) => {
         if (screen === "PostDetailScreen") {
-            navigation.navigate("PostDetailScreen", { item: postDetail, userData });
+            navigation.navigate("PostDetailScreen", { item: postDetail[0], userData });
         } else if (screen === "NoticePostDetailScreen") {
-            navigation.navigate("NoticePostDetailScreen", { item: postDetail, userData });
+            navigation.navigate("NoticePostDetailScreen", { item: postDetail[0], userData });
         }
     };
 
@@ -276,45 +276,45 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
      * 알람의 target_type에 따라 적절한 화면으로 네비게이션하는 함수
      * @param item2 - 알람 데이터
      */
-    const NavigationPage = async (item2: aramData) => {
-        switch (item2.target_type) {
+    const NavigationPage = async (item: aramData) => {
+        switch (item.target_type) {
             case 'my_post_comment': // 내 게시물 댓글
-                const postList1 = await go_post_detail(item2.post_comment_id);
+                const postList1 = await go_post_detail(item.post_comment_id);
                 if (postList1) {
-                    await view_count_up(item2.post_comment_id);
+                    await view_count_up(item.post_comment_id);
                     navigateToDetailScreen(postList1, "PostDetailScreen");
                 }
                 break;
             case 'hot_post': // 핫 게시물
-                const postList2 = await go_post_detail(item2.hot_post_id);
+                const postList2 = await go_post_detail(item.hot_post_id);
                 if (postList2) {
-                    await view_count_up(item2.hot_post_id);
+                    await view_count_up(item.hot_post_id);
                     navigateToDetailScreen(postList2, "PostDetailScreen");
                 }
                 break;
             case 'school_notice': // 학교 공지사항
-                const postList3 = await go_post_detail(item2.school_notice_id);
+                const postList3 = await go_post_detail(item.school_notice_id);
                 if (postList3) {
-                    await view_count_up(item2.school_notice_id);
+                    await view_count_up(item.school_notice_id);
                     navigateToDetailScreen(postList3, "NoticePostDetailScreen");
                 }
                 break;
             case 'department_notice': // 학과 공지사항
-                const postList4 = await go_post_detail(item2.department_notice_id);
+                const postList4 = await go_post_detail(item.department_notice_id);
                 if (postList4) {
-                    await view_count_up(item2.department_notice_id);
+                    await view_count_up(item.department_notice_id);
                     navigateToDetailScreen(postList4, "NoticePostDetailScreen");
                 }
                 break;
             case 'my_post_like': // 내 게시물 좋아요
-                const postList5 = await go_post_detail(item2.my_post_like_id);
+                const postList5 = await go_post_detail(item.my_post_like_id);
                 if (postList5) {
-                    await view_count_up(item2.my_post_like_id);
+                    await view_count_up(item.my_post_like_id);
                     navigateToDetailScreen(postList5, "PostDetailScreen");
                 }
                 break;
             case 'new_event': // 새 이벤트
-                const eventData: EventData | null = await Get_One_Event_Data(item2.new_event_id);
+                const eventData: EventData | null = await Get_One_Event_Data(item.new_event_id);
                 if (eventData) {
                     navigation.navigate("DeadlineEventScreen", { userdata: userData, eventdata: eventData });
                 } else {
@@ -325,25 +325,25 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                 }
                 break;
             case 'report_post': // 게시물 신고
-                const postList6 = await go_post_detail(item2.report_post_id);
+                const postList6 = await go_post_detail(item.report_post_id);
                 if (postList6) {
                     navigateToDetailScreen(postList6, "PostDetailScreen");
                 }
                 break;
             case 'report_comment': // 댓글 신고
-                const postList7 = await go_post_detail(item2.report_comment_id);
+                const postList7 = await go_post_detail(item.report_comment_id);
                 if (postList7) {
                     navigateToDetailScreen(postList7, "PostDetailScreen");
                 }
                 break;
             case 'my_comment_like': // 내 댓글 좋아요
-                const postList8 = await go_post_detail(item2.comment_post_id);
+                const postList8 = await go_post_detail(item.comment_post_id);
                 if (postList8) {
                     navigateToDetailScreen(postList8, "PostDetailScreen");
                 }
                 break;
             case 'my_recomment_like': // 내 대댓글 좋아요
-                const recomment_post_pk = await get_recomment_post_pk(item2.recomment_comment_id);
+                const recomment_post_pk = await get_recomment_post_pk(item.recomment_comment_id);
                 if (recomment_post_pk !== undefined) {
                     const postList9 = await go_post_detail(recomment_post_pk);
                     if (postList9) {
@@ -352,7 +352,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                 }
                 break;
             case 'school_club': // 동아리
-                setmessage(item2.my_club_register_comment);
+                setmessage(item.my_club_register_comment);
                 setIsModalVisible(true);
                 break;
             default:

@@ -223,7 +223,7 @@ const AcademicInfoScreen = ({ route }: any) => {
                 await response.json();
                 ChangGoalGpaAlert(); // 성공 알림
                 setChangegoalGPA(''); // 입력 필드 초기화
-                getGoalGPA(); // 목표 학점 재갱신
+                await getGoalGPA(); // 목표 학점 재갱신
             } else {
                 Alert.alert('오류', '목표 학점은 0에서 4.5 사이여야 합니다.');
             }
@@ -542,10 +542,10 @@ const AcademicInfoScreen = ({ route }: any) => {
                                             lecture.lecture_credit,
                                             lecture.lecture_grades,
                                         ]}
-                                        style={[
-                                            styles.lectureTableRow,
-                                            index % 2 === 0 ? styles.evenRow : styles.oddRow
-                                        ]}
+                                        style={{
+                                            ...styles.lectureTableRow,
+                                            ...(index % 2 === 0 ? styles.evenRow : styles.oddRow),
+                                        }}
                                         textStyle={styles.lectureTableText}
                                         widthArr={[width * 0.65, width * 0.1, width * 0.1, width * 0.1]}
                                     />

@@ -55,9 +55,6 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   const [selectclubposter, setSelectClubPoster] = useState(0); // 동아리 게시판 선택 여부
   const [selectcontestposter, setSelectContestPoster] = useState(0); //공모전 선택
 
-
-
-
   const forceUpdate = React.useReducer(() => ({}), {})[1];
 
   useFocusEffect(
@@ -103,9 +100,9 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
         setpostfontoption("전체 게시판");
       } else if (selectdepartmentposter == 1) {
         setpostfontoption("학과 게시판")
-      } else if (selectcontestposter == 1) {
+      } else if (selectclubposter == 1) {
         setpostfontoption("동아리 게시판")
-      } else {
+      }else {
         if (post_edit_info.department_check == false) {
           setpostfontoption("전체 게시판");
           handleAllPosterPress();
@@ -130,11 +127,14 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   };
 
   const handleAllPosterPress = () => {
-    setselectapllposterOption(1);
+    setselectapllposterOption(1); // 전체 게시판 선택
     setselectdepartmentposter(0);
     setSelectContestPoster(0);
     setSelectClubPoster(0);
-  };
+
+    // inform_check를 0으로 설정
+    setpostfontoption("전체 게시판");
+};
 
   const handleDepartmentPosterPress = () => {
     setselectapllposterOption(0);
@@ -257,14 +257,6 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
     }
   }
 
-  // 서버에서 가져온 이미지 삭제 함수
-  const handleServerImageRemove = (index: number) => {
-    const updatedServerImages = postImages2.filter((_, i) => i !== index);
-    setpostImages(updatedServerImages);
-    //console.log("서버 이미지 배열 삭제")
-  };
-
-
   // 이미지 선택 함수
   const handleImagePick = () => {
     launchImageLibrary({ mediaType: 'photo', selectionLimit: 10 - selectedImages.length }, (response) => {
@@ -339,29 +331,29 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
 
   const update_post = async () => {
     try {
-      const response = await fetch(`${config.serverUrl}/update_post`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          post_id: post_edit_info.post_id,
-          department_check: selectdepartmentposter,
-          contest_check: selectcontestposter,
-          inform_check: selectallposter,
-          Club_check : selectclubposter,
-          title: titletext,
-          contents: maintext,
-          url: urltext,
-          sources: sourcestext
-        })
-      });
-      await response.json();
-      ok_go();
+        const response = await fetch(`${config.serverUrl}/update_post`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                post_id: post_edit_info.post_id,
+                department_check: selectdepartmentposter,
+                contest_check: selectcontestposter,
+                inform_check: selectallposter === 1 ? 0 : selectallposter, // 전체 게시판이면 inform_check를 0으로 설정
+                Club_check: selectclubposter,
+                title: titletext,
+                contents: maintext,
+                url: urltext,
+                sources: sourcestext
+            })
+        });
+        await response.json();
+        ok_go();
     } catch (error) {
-      console.error('게시글 수정 실패!', error);
+        console.error('게시글 수정 실패!', error);
     }
-  }
+};
 
   // 이미지 삭제 함수
   const handleImageRemove = (index: number) => {
@@ -474,21 +466,47 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
         backdropPressToClose
       >
         <View style={modalStyles.modalContent}>
-          {userData.title === "학교" && (
-            <TouchableOpacity style={[
-              modalStyles.optionButton, 
-              selectallposter === 1 && modalStyles.selectedOption
-            ]} 
-            onPress={handleAllPosterPress}>
-              <Text style={[modalStyles.optionText, selectallposter == 1 && modalStyles.selectedText]}> 학교 공지사항 </Text>
-            </TouchableOpacity>
+        {post_edit_info.inform_check ? (
+            // post_edit_info.inform_check가 true일 때
+            <>
+              {userData.title === "학교" && (
+                <TouchableOpacity style={modalStyles.optionButton} onPress={handleAllPosterPress}>
+                  <Text style={[modalStyles.optionText, selectallposter === 1 && selectcontestposter === 0 && modalStyles.selectedText]}>
+                    학교 공지사항
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleDepartmentPosterPress}>
+                <Text style={[modalStyles.optionText, selectdepartmentposter === 1 && modalStyles.selectedText]}>
+                  학과 공지사항
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleContestPosterPress}>
+                <Text style={[modalStyles.optionText, selectcontestposter === 1 && selectallposter === 1 && modalStyles.selectedText]}>
+                  공모전 게시판
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            // post_edit_info.inform_check가 false일 때
+            <>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleAllPosterPress}>
+                <Text style={[modalStyles.optionText, selectallposter === 1 && modalStyles.selectedText]}>
+                  전체 게시판
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleDepartmentPosterPress}>
+                <Text style={[modalStyles.optionText, selectdepartmentposter === 1 && modalStyles.selectedText]}>
+                  학과 게시판
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={modalStyles.optionButton} onPress={handleClubPosterPress}>
+                <Text style={[modalStyles.optionText, selectclubposter === 1 && modalStyles.selectedText]}>
+                  동아리 게시판
+                </Text>
+              </TouchableOpacity>
+            </>
           )}
-          <TouchableOpacity style={modalStyles.optionButton} onPress={handleDepartmentPosterPress}>
-            <Text style={[modalStyles.optionText, selectdepartmentposter === 1 && modalStyles.selectedText]}> 학과 공지사항 </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={modalStyles.optionButton} onPress={handleContestPosterPress}>
-            <Text style={[modalStyles.optionText, selectcontestposter === 1 && modalStyles.selectedText]}>공모전 게시판</Text>
-          </TouchableOpacity>
         </View>
       </ModalBox>
       <Modal isVisible={isModalVisible}>

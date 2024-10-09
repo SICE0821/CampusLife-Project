@@ -11,12 +11,6 @@ import config from '../../config';
 
 const width = Dimensions.get("window").width;
 
-const eventImages = [
-    require('../../assets/001.png'),
-    require('../../assets/002.png'),
-    require('../../assets/부천대.png'),
-    require('../../assets/wjdtkdghk.jpg'),
-];
 
 type ReportUser = {
     post_id: number,
@@ -32,7 +26,7 @@ type ReportCommentUser = {
 
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     console.log("you are in PostDetailScreen")
-    const { item, userData} = route.params;
+    const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);
     const [postDetailInfo, setPostDetailInfo] = useState<PostDeatilData>();
@@ -54,6 +48,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [showModal, setShowModal] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
 
+    console.log(item)
     const toggleOptions = () => {
         setShowOptions(!showOptions);
     };
@@ -1538,6 +1533,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     <Text style={{ color: '#F29F05', justifyContent: 'flex-end' }}> <IconC name="send" size={34} /></Text>
                 </TouchableOpacity>
             </View>
+
         </View>
     );
 };

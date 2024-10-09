@@ -138,12 +138,16 @@ const SchoolClubScreen = ({ route, navigation }: any) => {
     </TouchableOpacity>
   );
 
-  // 화면에 초점을 맞출 때 데이터 로드
   useFocusEffect(
-    useCallback(() => {
-      getClubPosts(); // 동아리 게시물 로드
+    React.useCallback(() => {
+        const fetchData = async () => {
+            await getClubPosts();  // 비동기 함수 호출
+        };
+
+        fetchData(); // 비동기 함수를 호출하여 실행
+
     }, [])
-  );
+);
 
   // 게시물 리스트 아이템 렌더링 함수
   const renderItem = ({ item, index }: { item: PostData; index: number }) => (

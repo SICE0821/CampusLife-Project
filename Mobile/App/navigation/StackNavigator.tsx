@@ -127,7 +127,7 @@ export const RootStackNavigator = (route: any) => {
                         backgroundColor: '#F27405',
                     },
                     headerLeft: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("CommunityScreenStackNavigator")}>
+                        <TouchableOpacity onPress={() => navigation.goBack()}>
                             <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
                         </TouchableOpacity>
                     ),
@@ -388,7 +388,7 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '학적확인',
+                    title: '학적정보',
                 }}
             />
             <MainStack.Screen
@@ -452,11 +452,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -469,11 +464,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -485,11 +475,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -562,7 +547,7 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
-                    title: '학적확인',
+                    title: '학적정보',
                 }}
             />
             <AdminMainStack.Screen
@@ -636,11 +621,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '유저 관리',
@@ -654,11 +634,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -670,11 +645,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -688,11 +658,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '이벤트',
@@ -703,13 +668,13 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
 
 //커뮤니티 페이지 관련 스택 네비게이터
 export const CommunityScreenStackNavigator = ({ route, navigation }: any) => {
-    const { userdata , userDepartment} = route.params;
+    const { userdata } = route.params;
     return (
         <CoummunityStack.Navigator>
             <CoummunityStack.Screen
                 name="PostTopTabNavigator"
                 component={TopbTabNavigator}
-                initialParams={{ userdata ,userDepartment}}
+                initialParams={{ userdata }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',

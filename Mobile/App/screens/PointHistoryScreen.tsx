@@ -7,11 +7,12 @@ import {
   TouchableOpacity, 
   Alert, 
   Animated, 
-  Easing 
+  Easing, 
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../config';
 import * as Animatable from 'react-native-animatable'; // react-native-animatable import
+import Icon from 'react-native-vector-icons/MaterialIcons'; // icon import
 
 // 사용자 포인트 타입 정의
 export type UserPoint = {
@@ -143,6 +144,16 @@ const PointHistoryScreen = ({ route, navigation }: any) => {
   };
 
   /**
+   * 시간을 보기 좋게 포맷하는 함수
+   * @param {string} timeString - "2024-10-07-21-39"와 같은 시간 문자열
+   * @returns {string} - "2024년 10월 7일 21:39"와 같은 포맷된 시간
+   */
+  const formatDateTime = (timeString: string) => {
+    const [year, month, day, hour, minute] = timeString.split('-');
+    return `${year}년 ${parseInt(month, 10)}월 ${parseInt(day, 10)}일 ${hour}:${minute}`;
+  };
+
+  /**
    * 각 포인트 내역 아이템을 렌더링합니다.
    */
   const renderItem = ({ item }: { item: HistoryItem }) => (
@@ -150,7 +161,8 @@ const PointHistoryScreen = ({ route, navigation }: any) => {
       {/* 포인트 내역 설명 */}
       <View style={styles.itemDescriptionContainer}>
         <Text style={styles.contentText}>{item.content}</Text>
-        <Text style={styles.timeText}>{item.point_time}</Text>
+        {/* 시간 포맷 적용 */}
+        <Text style={styles.timeText}>{formatDateTime(item.point_time)}</Text>
       </View>
       {/* 포인트 내역 상세 */}
       <View style={styles.itemPointContainer}>
@@ -240,6 +252,7 @@ const PointHistoryScreen = ({ route, navigation }: any) => {
           keyExtractor={(item, index) => index.toString()}
           ListEmptyComponent={() => (
             <Animatable.View animation="fadeIn" duration={800} style={styles.emptyContainer}>
+              <Icon name="inbox" size={100} color="grey" style={styles.emptyIcon} />
               <Text style={styles.emptyText}>내역이 없습니다.</Text>
             </Animatable.View>
           )}
@@ -254,15 +267,17 @@ const PointHistoryScreen = ({ route, navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF', // 흰색 배경
+    backgroundColor: '#F3F4F9', // 밝은 회색 배경
   },
   
   // 포인트 섹션 스타일
   pointSection: {
-    height: '17%',
+    height: '20%',
     paddingTop: 20,
     alignItems: 'center',
-    backgroundColor: '#F9F9F9', // 배경색 추가
+    backgroundColor: '#F9F9F9', // 진한 파란색 배경
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   
   descriptionBox: {
@@ -271,8 +286,9 @@ const styles = StyleSheet.create({
   },
   
   descriptionText: {
-    fontSize: 20,
-    color: 'grey',
+    fontSize: 22,
+    color: 'grey', // 흰색 텍스트
+    fontWeight: 'bold',
   },
   
   pointBox: {
@@ -284,12 +300,12 @@ const styles = StyleSheet.create({
   pointText: {
     fontSize: 60,
     fontWeight: '900',
-    color: '#F27400', // 주황색 포인트 텍스트
+    color: '#F27400', // 금색 포인트 텍스트
   },
   
   pointPText: {
-    fontSize: 35, // P 텍스트 크기 조정
-    color: '#F27400',
+    fontSize: 55, // P 텍스트 크기 조정
+    color: '#FFD700',
     marginLeft: 5,
     fontWeight: 'bold',
   },
@@ -299,21 +315,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F2F2F2', // 연한 회색 배경
     paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingTop: 20,
   },
   
   // 메뉴 박스 스타일
   menuBox: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   
   menuButton: {
     width: '30%',
-    height: 40,
+    height: 45,
     backgroundColor: 'white',
-    borderRadius: 20,
+    borderRadius: 25,
     borderWidth: 1,
     borderColor: 'grey',
     justifyContent: 'center',
@@ -322,15 +338,15 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   
   selectedMenu: {
     width: '30%',
-    height: 40,
-    backgroundColor: '#F27400', // 선택된 메뉴 주황색
-    borderRadius: 20,
+    height: 45,
+    backgroundColor: '#F27400', // 선택된 메뉴 금색
+    borderRadius: 25,
     borderWidth: 1,
     borderColor: '#F27400',
     justifyContent: 'center',
@@ -338,9 +354,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 3,
   },
   
   menuText: {
@@ -356,13 +372,13 @@ const styles = StyleSheet.create({
   
   // 히스토리 설명 박스
   descriptionBox2: {
-    marginBottom: 10,
+    marginBottom: 15,
   },
   
   descriptionText2: {
-    fontSize: 17,
-    color: 'black',
-    marginBottom: 20,
+    fontSize: 19,
+    color: '#333333',
+    fontWeight: 'bold',
   },
   
   // FlatList 스타일
@@ -376,6 +392,10 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   
+  emptyIcon: {
+    marginBottom: 10,
+  },
+  
   emptyText: {
     fontSize: 18,
     color: 'grey',
@@ -385,18 +405,18 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 15,
+    paddingVertical: 20,
     borderBottomWidth: 0.5,
     borderColor: 'darkgrey',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    marginBottom: 10,
-    padding: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    marginBottom: 15,
+    padding: 15,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   
   itemDescriptionContainer: {
@@ -407,13 +427,13 @@ const styles = StyleSheet.create({
   
   contentText: {
     fontSize: 18,
-    color: 'black',
+    color: '#333333',
     fontWeight: 'bold',
   },
   
   timeText: {
     fontSize: 15,
-    color: 'black',
+    color: '#666666',
     marginTop: 5,
   },
   
@@ -427,20 +447,20 @@ const styles = StyleSheet.create({
   positivePointText: {
     fontSize: 25,
     fontWeight: '900',
-    color: '#F27400', // 주황색 포인트 텍스트
+    color: '#F27400', // 양수 포인트: 녹색
     textAlign: 'right',
   },
   
   negativePointText: {
     fontSize: 25,
     fontWeight: '900',
-    color: 'red',
+    color: 'red', // 음수 포인트: 빨간색
     textAlign: 'right',
   },
   
   statusText: {
     fontSize: 17,
-    color: 'black',
+    color: '#333333',
     textAlign: 'right',
     fontWeight: 'bold',
     marginTop: 5,

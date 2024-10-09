@@ -153,12 +153,16 @@ const ContestPostScreen = ({ route, navigation }: any) => {
         }
     };
 
-    // 화면에 초점을 맞출 때 데이터 로드
     useFocusEffect(
         useCallback(() => {
-            getContestPosts();
-            setUserData(userdata); // 유저 데이터 설정
-            AreYouHavePost(); // 북마크 게시물 로드
+            const fetchData = async () => {
+                await getContestPosts(); // 비동기 함수 호출
+                setUserData(userdata); // 유저 데이터 설정
+                await AreYouHavePost();
+            };
+    
+            fetchData(); // 비동기 함수를 호출하여 실행
+    
         }, [])
     );
 
