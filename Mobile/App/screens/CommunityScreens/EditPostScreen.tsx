@@ -38,7 +38,6 @@ const EmptyMainText = () => {
 const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   console.log("you are in EditPostScreen");
   const { userdata, post_edit_info, postImages } = route.params;
-  console.log(post_edit_info.inform_check);
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
   const [selectallposter, setselectapllposterOption] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
   const [selectdepartmentposter, setselectdepartmentposter] = useState(0); // 선택된 옵션의 인덱스를 useState로 관리
@@ -54,13 +53,18 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
   const [postImages2, setpostImages] = useState<PostPhoto[]>(postImages);
   const [selectclubposter, setSelectClubPoster] = useState(0); // 동아리 게시판 선택 여부
   const [selectcontestposter, setSelectContestPoster] = useState(0); //공모전 선택
+  const [combinedImages, setcombinedImages] : any = useState([]);
 
+  console.log("서버이미지 : " + postImages2);
+  console.log("선택이미지 : " + selectedFormImages);
   const forceUpdate = React.useReducer(() => ({}), {})[1];
 
   useFocusEffect(
     React.useCallback(() => {
       const fetchData = async () => {
         try {
+          const combinedImages = [...postImages2, ...selectedImages];
+          setcombinedImages(combinedImages);
           changeHeaderRightContent();
         } catch (error) {
           console.error('Error fetching data:', error);
@@ -69,6 +73,7 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
       fetchData();
     }, [selectdepartmentposter, selectcontestposter, selectclubposter, titletext, maintext, urltext, sourcestext, selectedFormImages, postImages2])
   );
+
 
 
   const goback = () => {
@@ -237,6 +242,13 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
     } finally {
     }
   }
+
+  const handleServerImageRemove = (index: number) => {
+    const updatedServerImages = postImages2.filter((_, i) => i !== index);
+    setpostImages(updatedServerImages);
+    //console.log("서버 이미지 배열 삭제")
+  };
+
 
   //기존 DB에 저장되어있는 사진을 삭제하고 새 배열을 넣어줄거임
   const DeletePostPhoto = async () => {
@@ -422,14 +434,14 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
             {/* 현재 글자 수 표시 */}
           <Text style={styles.charCountText}>{maintext.length}/500</Text>
           {/* 내용과 이미지가 비어있을 때 안내 텍스트 표시 */}
-          {maintext === '' && selectedImages.length === 0 && <EmptyMainText />}
+          {maintext === '' && selectedImages.length === 0 && postImages2.length === 0 && <EmptyMainText />}
         </View>
         )}
         {/* 이미지 미리보기 영역 */}
-        {selectedImages.length > 0 && (
+        {postImages2.length > -1 && (
           <View style={styles.imagePreviewArea}>
             <FlatList
-              data={selectedImages}
+              data={combinedImages}
               horizontal
               showsHorizontalScrollIndicator={false}
               snapToAlignment="center" // 이미지 중앙 정렬
@@ -437,9 +449,9 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
               decelerationRate="fast" // 스크롤 속도를 빠르게 하여 자연스럽게 멈춤
               renderItem={({ item, index }) => (
                 <View key={index} style={styles.imageCard}>
-                  <Image source={{ uri: item.uri }} style={styles.imagePreview} />
+                  <Image source={{ uri: item.post_photo ? `${config.photoUrl}/${item.post_photo}.png` : item.uri }} style={styles.imagePreview} />
                   {/* 이미지 삭제 버튼 */}
-                  <TouchableOpacity onPress={() => handleImageRemove(index)} style={styles.cancelButton}>
+                  <TouchableOpacity onPress={() => item.post_photo ? handleServerImageRemove(index) : handleImageRemove(index - 1)} style={styles.cancelButton}>
                     <IconB name="closecircleo" size={22} color={'white'} />
                   </TouchableOpacity>
                   {/* 필요 시 LottieView 애니메이션 추가 가능 */}
