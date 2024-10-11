@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Text, Alert, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, Alert, StyleSheet, Dimensions } from 'react-native';
 import { Camera, useCameraDevice, useCodeScanner } from 'react-native-vision-camera';
 
 const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
@@ -8,6 +8,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
   const [isDelayActive, setIsDelayActive] = useState(false); // 인식 지연 상태 관리
   const device = useCameraDevice('back');
   const selectedLecture = route.params?.selectedLecture;
+  const width = Dimensions.get("window").width;
 
   const isValidQRCode = (code: string): boolean => {
     const prefix = "CampusLife_" + selectedLecture.lecture_name + "_";
@@ -79,7 +80,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
   }, [hasScanned]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: 'black' }}>
       <View style={{ backgroundColor: 'black', width: '100%', height: 40, flexDirection: 'row', alignItems: 'center' }}>
         <View style={{ width: '15%', alignItems: 'center',  }}></View>
         <View style={{ width: '70%', alignItems: 'center',  }}>
@@ -97,7 +98,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
       </View>
       {isCameraActive && device && (
         <Camera
-          style={{ flex: 1 }}
+          style={{ width: width, height: width * 2 }}
           device={device}
           photo={true}
           video={false}
@@ -107,11 +108,9 @@ const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
         />
       )}
 
-      {/* 중앙에 흰색 네모 추가 */}
       <View style={styles.scannerFrame}>
         <View style={styles.scannerBox} />
       </View>
-
     </View>
   );
 };

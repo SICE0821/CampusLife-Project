@@ -1494,7 +1494,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                 <>
                                                     <View style={optionStyle.boxLine}></View>
                                                     <TouchableOpacity style={optionStyle.boxArea} onPress={() => deleterecomment(subitem.recomment_id)}>
-                                                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                                        <Text style={optionStyle.boxText}>삭제</Text>
                                                     </TouchableOpacity>
                                                 </>
                                             )}

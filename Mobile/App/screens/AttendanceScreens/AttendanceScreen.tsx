@@ -406,7 +406,7 @@ const AttendanceScreen = ({ navigation, route }: any) => {
                 </View>
                 <View style={styles.Icon}>
                   <TouchableOpacity onPress={() => openCamera(selectedLecture)}
-                    disabled={nowday !== selectedLecture?.week}>
+                    disabled={nowday === selectedLecture?.week}>
                     <IconA name="camera" size={32} color={nowday === selectedLecture?.week && !selectedLecture?.isScanned ? "black" : "gray"} />
                   </TouchableOpacity>
                 </View>
