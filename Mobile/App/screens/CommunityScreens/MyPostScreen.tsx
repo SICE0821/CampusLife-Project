@@ -280,11 +280,14 @@ const MyPostScreen = ({ route, navigation }: any) => {
                 <TouchableWithoutFeedback
                     onPress={async () => {
                         await viewCountUp(item.post_id);
-                        if (item.inform_check === true) {
+                        console.log(item);
+                        if (item.inform_check === true && item.Club_check === false) {
                             navigation.navigate('NoticePostDetailScreen', { item, userData })
 
-                        } else {
+                        } else if(item.inform_check === false && item.Club_check === false) {
                             navigation.navigate('PostDetailScreen', { item, userData });
+                        } else {
+                            navigation.navigate('SchoolClubDetailScreen', { item, userData });
                         }
                     }}>
                     <View style={styles.postItem}>
