@@ -59,7 +59,6 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [postImages, setPostImages] = useState<PostPhoto[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
-
     // 옵션 메뉴 토글 함수
     const toggleOptions = () => {
         setShowOptions(!showOptions);
@@ -748,7 +747,6 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                 })
             })
             const get_comment = await response.json();
-
             //댓글과 연결된 대댓글을 연결하는 작업
             const commentsWithRecomments = await Promise.all(
                 get_comment.map(async (comment: any) => {
@@ -757,6 +755,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                 })
             );
             setComments(commentsWithRecomments);
+            console.log(comments)
             clearTimeout(timeoutId);
             return (commentsWithRecomments);
         } catch (error) {
@@ -1210,6 +1209,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
         const fetchData = async () => {
             try {
                 await getUserReport();
+                await CommentList();
             } catch (error) {
                 console.error('데이터 가져오기 실패:', error);
             }
@@ -1217,6 +1217,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
 
         fetchData();
     }, []);
+
 
     return (
         <View style={styles.container}>
@@ -1249,8 +1250,8 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                             <TouchableOpacity style={optionStyle.boxArea}
                                 onPress={async () => {
                                     if (userdata.user_pk === postDetailInfo?.user_id) {
-                                        const postEditInfo = await getPostInfo();
-                                        navigation.navigate("EditPostScreen", { userdata, postEditInfo, postImages });
+                                        const post_edit_info = await getPostInfo();
+                                        navigation.navigate("EditPostScreen", { userdata, post_edit_info, postImages });
                                     } else {
                                         noYourPostAlert();
                                         toggleOptions();
@@ -1494,7 +1495,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                                                 <>
                                                     <View style={optionStyle.boxLine}></View>
                                                     <TouchableOpacity style={optionStyle.boxArea} onPress={() => deleterecomment(subitem.recomment_id)}>
-                                                        <Text style={{ fontSize: 15, fontWeight: "bold", color: "black", paddingLeft: 10 }}>삭제</Text>
+                                                        <Text style={optionStyle.boxText}>삭제</Text>
                                                     </TouchableOpacity>
                                                 </>
                                             )}

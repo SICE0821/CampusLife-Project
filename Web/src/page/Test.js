@@ -25,6 +25,7 @@ function Test() {
     const [totalStudentNum, setTotalStudentNum] = useState();
     const [studentAttendanceStates, setStudentAttendanceStates] = useState([]); //주차와 교시(차시)를 선택하여 학생들의 데이터를 가져옴
     const [totalStudentInfo, setTotalStudentInfo] = useState([]);
+    const [StudentAttendanceInfo, setStudentAttendanceInfo] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(options[0]); //리스트 박스 값 저장
     const [inputValue, setInputValue] = useState(''); //학생 이름 찾는 Text
@@ -37,7 +38,7 @@ function Test() {
     // 리스트 박스 핸들러
     const handleChange = (option) => {
         setSelectedOption(option);
-        console.log("Selected option:", option);
+        //console.log("Selected option:", option);
     }
 
     // 학생 이름 찾을 때 사용되는 함수
@@ -54,7 +55,7 @@ function Test() {
             student.student_name.includes(value)
         );
         let filteredStates = filtered;
-        console.log(filtered);
+        //console.log(filtered);
 
         if (selectedOption.value === 'attendance') {
             filteredStates = filtered.filter(
@@ -96,7 +97,7 @@ function Test() {
 
     //해당과목 날짜 변환기
     const formatDateWithOffset = (dateString, offsetDays) => {
-        console.log(dateString);
+        //console.log(dateString);
         const date = new Date(dateString);
         date.setDate(date.getDate() + offsetDays);
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -129,7 +130,7 @@ function Test() {
     // 테스트
     const input = "14 : 10 ~ 17 : 00";
     const result = splitTimeSlots(input);
-    console.log(result);
+    //console.log(result);
 
 
     //QR 코드 화면으로 이동하기
@@ -156,6 +157,25 @@ function Test() {
         }
     }
 
+    const GetStudentAttendanceInfo = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/GetAttendanceStudent`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: selectedStudent.student_id,
+                    lecture_id: selectLecture.lecture_id
+                })
+            })
+            const StudentAttendanceInfo = await response.json();
+            setStudentAttendanceInfo(StudentAttendanceInfo[0]);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
 
     //해당 과목을 듣는 전체 총 학생 정보 가져오기
     const GetTotalStudentInfo = async () => {
@@ -170,7 +190,6 @@ function Test() {
                 })
             })
             const TotalStudentInfo = await response.json();
-            console.log(TotalStudentInfo);
             setTotalStudentInfo(TotalStudentInfo);
         } catch (error) {
             console.error(error);
@@ -193,7 +212,7 @@ function Test() {
             })
             const StudentAttendanceStates = await response.json();
             let filteredStates = StudentAttendanceStates;
-            console.log(filteredStates);
+            //console.log(filteredStates);
 
             if (selectedOption.value === 'attendance') {
                 filteredStates = StudentAttendanceStates.filter(
@@ -217,17 +236,53 @@ function Test() {
     }
 
     //학생의 출결정보 변경 처리 함수
-    const ChangeStudentState = async (weeknum, classnum, student_id, state) => {
-        let student_info = '';
-        if (state === 1) {
-            student_info = "출결"
-        } else if (state === 2) {
-            student_info = "결석"
-        } else if (state === 3) {
-            student_info = "지각"
+    const ChangeStudentState = async (weeknum, classnum, student_id, newState) => {
+        let student_info = ''; // 새로운 상태 설정
+    
+        // 기존 상태에 따라 새로운 상태 설정 및 StudentAttendanceInfo 값 증감 처리
+        let updatedAttendanceInfo = { ...StudentAttendanceInfo };
+    
+        if (selectedStudent.attendance_Info === '출결') {
+            if (newState === 1){
+                student_info = '출결';
+            } else if (newState === 2) { // 결석으로 변경
+                updatedAttendanceInfo.attendance -= 1;
+                updatedAttendanceInfo.absent += 1;
+                student_info = '결석';
+            } else if (newState === 3) { // 지각으로 변경
+                updatedAttendanceInfo.attendance -= 1;
+                updatedAttendanceInfo.tardy += 1;
+                student_info = '지각';
+            }
+        } else if (selectedStudent.attendance_Info === '지각') {
+            if (newState === 1) { // 출결로 변경
+                updatedAttendanceInfo.tardy -= 1;
+                updatedAttendanceInfo.attendance += 1;
+                student_info = '출결';
+            } else if (newState === 2) { // 결석으로 변경
+                updatedAttendanceInfo.tardy -= 1;
+                updatedAttendanceInfo.absent += 1;
+                student_info = '결석';
+            } else if (newState === 3){
+                student_info = '지각';
+            }
+        } else if (selectedStudent.attendance_Info === '결석') {
+            if (newState === 1) { // 출결로 변경
+                updatedAttendanceInfo.absent -= 1;
+                updatedAttendanceInfo.attendance += 1;
+                student_info = '출결';
+            } else if (newState === 2){
+                student_info = '결석';
+            } else if (newState === 3) { // 지각으로 변경
+                updatedAttendanceInfo.absent -= 1;
+                updatedAttendanceInfo.tardy += 1;
+                student_info = '지각';
+            }
         }
+    
         try {
-            const response = await fetch(`${config.serverUrl}/ChangeStudentState`, {
+            // 1. ChangeStudentState API 호출 (해당 주차, 차시의 출석 정보 업데이트)
+            const stateResponse = await fetch(`${config.serverUrl}/ChangeStudentState`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -239,18 +294,46 @@ function Test() {
                     classnum: classnum,
                     student_info: student_info
                 })
-            })
-            await response.json();
-            await GetWeekClassStudentAttendanceStates(weeknum, classnum);
+            });
+    
+            if (!stateResponse.ok) {
+                throw new Error('ChangeStudentState API 호출 실패');
+            }
+    
+            // 2. ChangeStudentInfo API 호출 (StudentAttendanceInfo 값 업데이트)
+            const infoResponse = await fetch(`${config.serverUrl}/ChangeStudentInfo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: student_id,
+                    lecture_id: selectLecture.lecture_id,
+                    nonattendance : updatedAttendanceInfo.nonattendance,
+                    attendance: updatedAttendanceInfo.attendance,
+                    tardy: updatedAttendanceInfo.tardy,
+                    absent: updatedAttendanceInfo.absent
+                })
+            });
+            if (!infoResponse.ok) {
+                throw new Error('ChangeStudentInfo API 호출 실패');
+            }
+    
+            // 3. 로컬에서 StudentAttendanceInfo 업데이트
+            setStudentAttendanceInfo(updatedAttendanceInfo);
+    
+            console.log("출석 상태와 카운트 업데이트 성공");
+            await GetWeekClassStudentAttendanceStates(weeknum, classnum); // 상태 업데이트 후 데이터 다시 불러오기
+    
         } catch (error) {
-            console.error(error);
+            console.error("출석 상태 또는 카운트 업데이트 중 오류:", error);
         }
-    }
+    };
 
     const weeksData = Array.from({ length: selectLecture.lecture_have_week }, (_, i) => {
         const Tiemslosts = splitTimeSlots(selectLecture.lecture_time);
         const lecture_start_date = formatDateWithOffset(selectLecture.lecture_start_date, i * 7);
-        console.log(lecture_start_date);
+        //console.log(lecture_start_date);
 
         let attendanceCount = 0;
         let lateCount = 0;
@@ -279,6 +362,13 @@ function Test() {
             ]
         };
     });
+
+    useEffect(() => {
+        if (selectedStudent) {
+            GetStudentAttendanceInfo();
+        }
+    }, [selectedStudent]);
+    
 
     return (
         <div className={styles.container}>
@@ -365,11 +455,12 @@ function Test() {
                                     </div>
                                     {studentAttendanceStates.length > 0 && (
                                         <div className={styles.chagneAttendaceBox}>
-                                            <button className={styles.changeAttendaceButton} onClick={() => {
-                                                setSelectedStudent(student);
-                                                openModal();
-                                                console.log("모달 열려라 얍 : " + isOpen)
-                                            }}>
+                                            <button
+                                                className={styles.changeAttendaceButton}
+                                                onClick={() => {
+                                                    setSelectedStudent(student);  // 여기서는 selectedStudent를 설정
+                                                    openModal();  // 모달을 연다
+                                                }}>
                                                 <p className={styles.changeAttendaceButtonText}>출석자 정보변경</p>
                                             </button>
                                             <Modal
@@ -402,7 +493,7 @@ function Test() {
                                                 <div className={styles.modalbuttonBox}>
                                                     <button className={styles.ModalButton} onClick={async () => {
                                                         await ChangeStudentState(student.weeknum, student.classnum, selectedStudent.student_id, 1);
-                                                        console.log(student.student_id);
+                                                        //console.log(student.student_id);
                                                         closeModal();
                                                     }
                                                     }>출결 처리</button>
