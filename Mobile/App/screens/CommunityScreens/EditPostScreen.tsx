@@ -108,13 +108,13 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
       } else if (selectclubposter == 1) {
         setpostfontoption("동아리 게시판")
       }else {
-        if (post_edit_info.department_check == false) {
+        if (post_edit_info.inform_check === false && post_edit_info.department_check === false && post_edit_info.Club_check === false) {
           setpostfontoption("전체 게시판");
           handleAllPosterPress();
-        } else if (post_edit_info.department_check == true) {
+        } else if (post_edit_info.inform_check === false && post_edit_info.department_check === true && post_edit_info.Club_check === false) {
           setpostfontoption("학과 게시판");
           handleDepartmentPosterPress();
-        } else if (post_edit_info.inform_check == false && post_edit_info.department_check == false && post_edit_info.Club_check == true) {
+        } else if (post_edit_info.inform_check === false && post_edit_info.department_check === false && post_edit_info.Club_check === true) {
           setpostfontoption("동아리 게시판");
           handleClubPosterPress();
         }
@@ -375,6 +375,8 @@ const EditPostScreen: React.FC = ({ navigation, route }: any) => {
     const updatedFormImages = selectedFormImages.filter((_, i) => i !== index);
     setSelectedFormImages(updatedFormImages);
   };
+
+  console.log(postfontoption)
 
   return (
     <View style={styles.container}>
