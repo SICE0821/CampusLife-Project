@@ -282,9 +282,10 @@ const MyPostScreen = ({ route, navigation }: any) => {
                         await viewCountUp(item.post_id);
                         if (item.inform_check === true) {
                             navigation.navigate('NoticePostDetailScreen', { item, userData })
-
-                        } else {
+                        } else if(item.inform_check === false && item.Club_check === false){
                             navigation.navigate('PostDetailScreen', { item, userData });
+                        } else if(item.Club_check === true){
+                            navigation.navigate('SchoolClubDetailScreen', { item, userData });
                         }
                     }}>
                     <View style={styles.postItem}>
