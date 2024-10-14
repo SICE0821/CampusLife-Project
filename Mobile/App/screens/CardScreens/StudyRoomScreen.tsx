@@ -698,7 +698,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContainer: {
-    width: '80%',
+    width: '85%',
     backgroundColor: '#fff',
     borderRadius: 20,
     padding: 25,
@@ -706,39 +706,35 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   successModal: {
-    borderColor: '#4CAF50',
+    borderColor: 'white',
     borderWidth: 2,
   },
   errorModal: {
-    borderColor: '#f44336',
+    borderColor: 'white',
     borderWidth: 2,
   },
   modalIcon: {
     marginBottom: 15,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#333',
     textAlign: 'center',
   },
   modalMessage: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#555',
-    marginBottom: 20,
     textAlign: 'center',
+    marginBottom: 5
   },
   modalButton: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#4CAF50',
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 10,
     marginTop: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
     elevation: 5,
   },
   modalButtonText: {

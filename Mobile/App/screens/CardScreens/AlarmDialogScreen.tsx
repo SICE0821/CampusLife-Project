@@ -8,7 +8,8 @@ import {
     TouchableHighlight,
     Alert,
     Modal,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
@@ -36,6 +37,8 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
     const [isModalVisible, setIsModalVisible] = useState(false); // 모달 가시성 상태
     const [message, setMessage] = useState(''); // 쪽지 내용 상태
     const [club_aram, setmessage] = useState('');
+    const [loading, setLoading] = useState(false); // 로딩 상태 추가
+
 
     /**
      * 화면 포커스 시 데이터 가져오기
@@ -44,10 +47,13 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
         React.useCallback(() => {
             const fetchData = async () => {
                 try {
+                    setLoading(true); // 로딩 시작
                     setUserData(userdata);
                     await get_aram_data();
                 } catch (error) {
                     console.error('데이터 가져오기 오류:', error);
+                } finally {
+                    setLoading(false); // 로딩 종료
                 }
             };
             fetchData();
@@ -439,6 +445,12 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
 
     return (
         <View style={styles.container}>
+            {loading ? ( // 로딩 중일 때 ActivityIndicator를 보여줌
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#F29F05" />
+                    <Text style={{color: '#333'}}>불러오는 중...</Text>
+                </View>
+            ) : (
             <ScrollView
                 style={styles.scrollView}
                 refreshControl={
@@ -492,6 +504,7 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                     </View>
                 </Modal>
             </ScrollView>
+            )}
         </View>
     );
 };
@@ -503,6 +516,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F2F2F2',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     scrollView: {
         paddingVertical: 10,

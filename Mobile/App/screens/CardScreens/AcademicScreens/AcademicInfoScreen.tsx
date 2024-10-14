@@ -11,6 +11,7 @@ import {
     Alert,
     TextInput,
     Image,
+    LogBox,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
@@ -172,6 +173,10 @@ const AcademicInfoScreen = ({ route }: any) => {
     const [goalGPA, setGoalGPA] = useState<number>(1); // 목표 학점
     const [isModalVisible, setModalVisible] = useState(false); // 목표 학점 설정 모달의 가시성
     const [changegoalGPA, setChangegoalGPA] = useState(''); // 목표 학점 변경 입력 상태
+
+    useEffect(() => {
+        LogBox.ignoreAllLogs()
+    },[]);
 
     // 목표 학점을 서버에서 가져오는 함수
     useFocusEffect(
