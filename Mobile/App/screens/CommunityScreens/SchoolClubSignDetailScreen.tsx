@@ -109,6 +109,16 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
       }
   };
 
+    const showAlert = () => {
+      Alert.alert(
+        "알림",
+        "쪽지를 성공적으로 전송했습니다!",
+        [
+          { text: "확인", onPress: () => navigation.goBack() }
+        ]
+      );
+    };
+
 
   // 데이터를 불러오거나 준비가 완료되면 로딩 상태를 false로 변경
   useEffect(() => {
@@ -216,7 +226,7 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
               onPress={async () => {
                 await updateComment();
                 await SendAramData();
-                console.log(user_id);
+                showAlert();
               }}>
                 <Text style={styles.sendButtonText}>전송</Text>
               </TouchableOpacity>

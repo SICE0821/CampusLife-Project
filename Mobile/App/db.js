@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '14.6.152.120',
+    host: '172.30.1.51',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -291,7 +291,7 @@ async function getMyPostData(user_id) {
     try {
         conn = await pool.getConnection();
         const query = (
-            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.inform_check, post.contest_check, student.name, user.title AS user_title, student.campus_id " 
+            "SELECT post.post_id, post.title, post.contents, post.date, post.view, post.`like`, post.inform_check, post.contest_check, student.name, user.title AS user_title, student.campus_id "
             + ",post.department_check, post.Club_check "
             + "FROM "
             + "post "
@@ -1746,7 +1746,8 @@ async function get_aram_data(user_id) {
             my_recomment_like.comment_id AS recomment_comment_id,
             my_recomment_like.contents AS recomment_contents,
             my_club_register.Post_fk AS my_club_register_post_id,
-            my_club_register.comment AS my_club_register_comment
+            my_club_register.comment AS my_club_register_comment,
+            student.name AS student_name
         FROM
             aram
         LEFT JOIN
@@ -1774,7 +1775,12 @@ async function get_aram_data(user_id) {
         LEFT JOIN
              recomment AS my_recomment_like ON aram.target_type = 'my_recomment_like' AND aram.target_id = my_recomment_like.recomment_id
         LEFT JOIN
-        		 club_register AS my_club_register ON aram.target_type = 'school_club' AND aram.target_id = my_club_register.Post_fk
+    		 user ON aram.user_id = user.user_id  
+		LEFT JOIN
+             student ON user.student_id = student.student_id
+        LEFT JOIN
+        	 club_register AS my_club_register ON aram.target_type = 'school_club' AND aram.target_id = my_club_register.Post_fk
+             AND student.name = my_club_register.Name
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -3656,7 +3662,7 @@ WHERE student.name = ?`;
     }
 }
 
-async function SendAramData(user_id, target_id, title ) {
+async function SendAramData(user_id, target_id, title) {
     let conn;
     try {
         conn = await pool.getConnection();

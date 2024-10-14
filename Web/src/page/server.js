@@ -235,10 +235,10 @@ app.post('/GetTotalStudentInfo', async (req, res) => {
 // 해당 학생 출석정보 변경
 app.post('/ChangeStudentState', async (req, res) => {
     const { student_id, lecture_id, weeknum, classnum, student_info } = req.body;
+    console.log('Received Data:', { student_id, lecture_id, weeknum, classnum, student_info }); // 로그 추가
     try {
         const conn = await pool.getConnection();
-        const query =
-            `
+        const query = `
             UPDATE 
                 lecture_week_info
             SET 
@@ -251,8 +251,9 @@ app.post('/ChangeStudentState', async (req, res) => {
                 lecture_fk = ?
             AND
                 classnum = ?;
-            `;
-        await conn.query(query, [student_info, student_id, weeknum, lecture_id, classnum]);
+        `;
+        const result = await conn.query(query, [student_info, student_id, weeknum, lecture_id, classnum]);
+        console.log('Query Result:', result); // 쿼리 결과 로그
         conn.release();
         console.log("해당 학생 출석정보 변경 성공");
         res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
@@ -332,6 +333,113 @@ app.post('/InsertMissingStudentAttendance', async (req, res) => {
 });
 
 
+app.post('/GetAttendanceStudent', async (req, res) => {
+    const { student_id, lecture_id } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        
+        const query = `
+            SELECT nonattendance, attendance, tardy, absent 
+            FROM lecture_have_object 
+            WHERE student_id = ? AND lecture_id = ?
+        `;
+
+        // 쿼리 실행
+        const rows = await conn.query(query, [student_id, lecture_id]);
+        conn.release();
+
+        // 데이터를 필요한 형식으로 가공
+        const processedData = rows.map(item => ({
+            nonattendance: item.nonattendance,
+            attendance: item.attendance,
+            tardy: item.tardy,
+            absent: item.absent
+        }));
+
+        console.log("해당 과목 출석 학생 정보 가져오기 성공");
+        res.json(processedData);
+    } catch (error) {
+        console.error("해당 과목 출석 학생 정보 가져오기 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+app.post('/GetabsentStudent', async (req, res) => {
+    const { lecture_id } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        
+        const query = `
+            SELECT absent, nonattendance 
+            FROM lecture_have_object 
+            WHERE lecture_id = ?
+            `
+        ;
+
+        // 쿼리 실행
+        const rows = await conn.query(query, [lecture_id]);
+        conn.release();
+
+        // 데이터를 필요한 형식으로 가공
+        const processedData = rows.map(item => ({
+            absent: item.absent,
+            nonattendance : item.nonattendance
+        }));
+
+        console.log("해당 과목 출석 학생 정보 가져오기 성공");
+        res.json(processedData);
+    } catch (error) {
+        console.error("해당 과목 출석 학생 정보 가져오기 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+
+app.post('/ChangeStudentInfo', async (req, res) => {
+    const { student_id, lecture_id, nonattendance, attendance, tardy, absent } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query = `
+            UPDATE lecture_have_object 
+            SET 
+                nonattendance = ?, 
+                attendance = ?, 
+                tardy = ?, 
+                absent = ? 
+            WHERE student_id = ? AND lecture_id = ?
+        `;
+        await conn.query(query, [nonattendance, attendance, tardy, absent, student_id, lecture_id]);
+        conn.release();
+        console.log("해당 학생 출석정보 변경 성공");
+        res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+    } catch (error) {
+        console.error("해당 학생 출석정보 변경 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+});
+
+app.post('/ChangeAllStudentInfo', async (req, res) => {
+    const { lecture_id, nonattendance, attendance, tardy, absent } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        const query = `
+            UPDATE lecture_have_object 
+            SET 
+                nonattendance = ?, 
+                attendance = ?, 
+                tardy = ?, 
+                absent = ? 
+            WHERE lecture_id = ?`
+        ;
+        await conn.query(query, [nonattendance, attendance, tardy, absent, lecture_id]);
+        conn.release();
+        console.log("해당 학생 출석정보 변경 성공");
+        res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+    } catch (error) {
+        console.error("해당 학생 출석정보 변경 실패:", error);
+        res.status(500).json({ success: false, message: "연결 실패" });
+    }
+}); 
 
 app.listen(PORT, () => {
     console.log(`서버가 포트 ${PORT}에서 실행 중입니다.`);
