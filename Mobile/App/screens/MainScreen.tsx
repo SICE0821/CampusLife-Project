@@ -8,7 +8,9 @@ import {
   Dimensions,
   Image,
   Alert,
-  Linking
+  Linking,
+  Modal,
+  Pressable
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Swiper from 'react-native-swiper';
@@ -26,6 +28,7 @@ import IconG from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconH from 'react-native-vector-icons/Foundation';
 import IconI from 'react-native-vector-icons/FontAwesome5';
 import IconJ from 'react-native-vector-icons/MaterialIcons';
+import IconK from 'react-native-vector-icons/Entypo';
 
 // 디바이스 너비 가져오기
 const width = Dimensions.get('window').width;
@@ -84,6 +87,7 @@ type ContestData = {
 
 const MainPage = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
+  const [isModalVisible, setModalVisible] = useState(false); // 모달 상태 관리
 
   // 상태 변수 선언
   const [schoolPostData, setSchoolPostData] = useState<PostData[]>([]);
@@ -96,6 +100,10 @@ const MainPage = ({ navigation, route }: any) => {
   const [contestdata, setContestdata] = useState<ContestData[]>([]);
   // 프로필 사진 URI
   const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
 
   /**
    * 포스트의 조회수를 증가시키는 함수
@@ -416,72 +424,188 @@ const MainPage = ({ navigation, route }: any) => {
     <View style={styles.container}>
       <ScrollView>
         {/* 프로필 영역 */}
-        <View style={styles.profileArea}>
-          <View style={styles.profileBox}>
-            {/* 프로필 상단 영역 */}
-            <View style={styles.profileBoxTop}>
-              <TouchableOpacity onPress={getPhotos} style={styles.profileImageArea}>
-                {userData.profile_photo ? (
-                  <Image source={{ uri: fileUri }} style={styles.profileImage} />
-                ) : (
-                  <IconI name="user" size={40} color="black" />
-                )}
-              </TouchableOpacity>
-              <View style={styles.userInfoNPointArea}>
-                <View style={styles.userInfoArea}>
-                  <View style={styles.userNameRow}>
-                    <Text style={styles.userName}>{userData.name}</Text>
+        <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
+          <View style={styles.profileArea}>
+            <View style={styles.profileBox}>
+              {/* 프로필 상단 영역 */}
+              <View style={styles.profileBoxTop}>
+                <TouchableOpacity onPress={getPhotos} style={styles.profileImageArea}>
+                  {userData.profile_photo ? (
+                    <Image source={{ uri: fileUri }} style={styles.profileImage} />
+                  ) : (
+                    <IconI name="user" size={40} color="black" />
+                  )}
+                </TouchableOpacity>
+                <View style={styles.userInfoNPointArea}>
+                  <View style={styles.userInfoArea}>
+                    <View style={styles.userNameRow}>
+                      <Text style={styles.userName}>{userData.name}</Text>
+                      <TouchableOpacity
+                        style={styles.pointCheckBox}
+                        onPress={() => navigation.navigate("PointHistoryScreen")}
+                      >
+                        <Text style={styles.pointCheckFont}>내 포인트 이력</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={styles.userInfo}>{userDepartment}/{userData.grade}학년</Text>
+                  </View>
+                  <View style={styles.pointArea}>
+                    <IconA style={styles.pointIcon} name="payments" size={36} />
+                    <Text style={styles.userPoint}>{userPoint?.point}P</Text>
                     <TouchableOpacity
-                      style={styles.pointCheckBox}
-                      onPress={() => navigation.navigate("PointHistoryScreen")}
+                      onPress={() => navigation.navigate("EventScreenStackNavigator")}
                     >
-                      <Text style={styles.pointCheckFont}>내 포인트 이력</Text>
+                      <IconB name={"caretright"} size={22} style={styles.pointNavigationIcon} />
                     </TouchableOpacity>
                   </View>
-                  <Text style={styles.userInfo}>{userDepartment}/{userData.grade}학년</Text>
-                </View>
-                <View style={styles.pointArea}>
-                  <IconA style={styles.pointIcon} name="payments" size={36} />
-                  <Text style={styles.userPoint}>{userPoint?.point}P</Text>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate("EventScreenStackNavigator")}
-                  >
-                    <IconB name={"caretright"} size={22} style={styles.pointNavigationIcon} />
-                  </TouchableOpacity>
                 </View>
               </View>
-            </View>
-            {/* 프로필 하단 영역 */}
-            <View style={styles.profileBoxBottom}>
-              <TouchableOpacity style={styles.tabButton} onPress={navigateToStudentInfo}>
-                <IconB style={styles.tabIcon} name="idcard" size={30} />
-                <Text style={styles.tabText}>정보변경</Text>
-              </TouchableOpacity>
+              {/* 프로필 하단 영역 */}
+              <View style={styles.profileBoxBottom}>
+                <TouchableOpacity style={styles.tabButton} onPress={navigateToStudentInfo}>
+                  <IconB style={styles.tabIcon} name="idcard" size={30} />
+                  <Text style={styles.tabText}>정보변경</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("StudyRoomStackNavigator")}>
-                <IconF style={styles.tabIcon} name="prescription" size={30} />
-                <Text style={styles.tabText}>스터디룸</Text>
-              </TouchableOpacity>
+                <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("StudyRoomStackNavigator")}>
+                  <IconF style={styles.tabIcon} name="prescription" size={30} />
+                  <Text style={styles.tabText}>스터디룸</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={navigateToAcademicInfo}>
-                <IconC style={styles.tabIcon} name="calendar-check-o" size={30} />
-                <Text style={styles.tabText}>학적정보</Text>
-              </TouchableOpacity>
+                <TouchableOpacity style={styles.tabButton} onPress={navigateToAcademicInfo}>
+                  <IconC style={styles.tabIcon} name="calendar-check-o" size={30} />
+                  <Text style={styles.tabText}>학적정보</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("SchoolInfoScreen")}>
-                <IconE style={styles.tabIcon} name="information-circle-outline" size={30} />
-                <Text style={styles.tabText}>학교정보</Text>
-              </TouchableOpacity>
+                <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("SchoolInfoScreen")}>
+                  <IconE style={styles.tabIcon} name="information-circle-outline" size={30} />
+                  <Text style={styles.tabText}>학교정보</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AlarmDialogScreen")}>
-                <IconD style={styles.tabIcon} name="bell" size={30} />
-                <Text style={styles.tabText}>알림</Text>
-              </TouchableOpacity>
+                <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AlarmDialogScreen")}>
+                  <IconD style={styles.tabIcon} name="bell" size={30} />
+                  <Text style={styles.tabText}>알림</Text>
+                </TouchableOpacity>
 
+              </View>
             </View>
           </View>
-        </View>
-
+          {/* 뱃지 영역 */}
+          <View style={styles.badgeArea}>
+            <View style={styles.badgeBox}>
+              <View style={styles.TitleArea}>
+                <IconK name="help-with-circle" size={25} color={'white'}/>
+                <Text style={styles.badgeTitleText}>내 보유 뱃지</Text>
+                <TouchableOpacity onPress={toggleModal}>
+                  <IconK style={styles.badgeTitleIcon} name="help-with-circle" size={25} color={'#333'}/>
+                </TouchableOpacity>
+              </View>
+              <ScrollView horizontal={true} style={styles.badgeContainer} nestedScrollEnabled={true}>
+                <View style={styles.badgeItem}>
+                  {/* 
+                  source={require('../assets/뱃지.png')}
+                  source={require('../assets/뱃지2.png')}
+                  source={require('../assets/뱃지3.png')}
+                  source={require('../assets/뱃지4.png')}
+                  source={require('../assets/뱃지5.png')}
+                  source={require('../assets/뱃지6.png')}
+                  source={require('../assets/뱃지7.png')}
+                  */}
+                  <Image
+                    source={require('../assets/뱃지.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지1</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지2.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지2</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지3.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지3</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지1</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지2.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지2</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지3.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지3</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지1</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지2.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지2</Text>
+                </View>
+                <View style={styles.badgeItem}>
+                  <Image
+                    source={require('../assets/뱃지3.png')}
+                    resizeMode="contain"
+                    style={styles.badgeImage}
+                  />
+                  <Text style={styles.badgeText}>뱃지3</Text>
+                </View>
+              </ScrollView>
+            </View>
+            {/* 모달 구현 */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={toggleModal}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>뱃지 획득 방법</Text>
+              <Text style={styles.modalText}>
+                뱃지는 특정 이벤트, 출석 체크, 포인트 적립 등을 통해 획득할 수 있습니다.
+                각 뱃지는 특별한 의미를 가지고 있으며, 다양한 활동을 통해 뱃지를 모아보세요!
+              </Text>
+              <Pressable style={styles.closeButton} onPress={toggleModal}>
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+          </View>
+        </ScrollView>
         {/* 이벤트 영역 */}
         <View style={styles.eventArea}>
           <View style={styles.eventHead}>
@@ -736,6 +860,7 @@ const styles = StyleSheet.create({
     width: width * 0.9,
     height: 190, // 프로필 박스 높이
     marginVertical: 20,
+    marginHorizontal: (width - width * 0.9) / 2
   },
   profileBox: {
     flex: 1,
@@ -844,6 +969,96 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 15,
   },
+  badgeArea: {
+    alignSelf: 'center',
+    width: width * 0.9,
+    height: 190, // 기존보다 약간 높여서 공간 확보
+    marginVertical: 20,
+    marginHorizontal: (width - width * 0.9) / 2,
+    backgroundColor: '#E8F0FE', // 부드러운 배경색 추가
+    borderRadius: 15, // 모서리를 둥글게
+    elevation: 5, // 그림자 추가
+  },
+  badgeBox: {
+    backgroundColor: '#FFFFFF', // 배경을 흰색으로 유지
+    borderRadius: 15,
+    elevation: 5,
+    padding: 10, // 내부 여백 추가
+  },
+  TitleArea:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 10
+  },
+  badgeTitleText: {
+    color: '#333', // 제목을 조금 더 어두운 색상으로
+    fontWeight: 'bold',
+    fontSize: 22, // 폰트 크기를 약간 키움
+    padding: 10,
+  },
+  badgeTitleIcon:{
+    bottom: 10
+  },
+  badgeContainer: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#FFFFFF',
+  },
+  badgeItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 8, // 간격을 조금 더 넓힘
+    backgroundColor: '#F3F4F6', // 뱃지 아이템마다 배경색 추가
+    borderRadius: 10, // 둥근 모서리
+    padding: 10, // 패딩 추가
+    elevation: 3, // 약간의 그림자 추가
+  },
+  badgeImage: {
+    width: 65, // 이미지 크기를 조금 키움
+    height: 65,
+    opacity: 0.9, // 이미지 투명도를 조금 줄여 더 뚜렷하게
+  },
+  badgeText: {
+    color: '#333', // 텍스트를 어두운 색으로
+    fontWeight: 'bold', // 강조
+    marginTop: 5, // 텍스트와 이미지 사이 여백 추가
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+  },
+  modalContent: {
+    width: width * 0.8,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  closeButton: {
+    backgroundColor: '#FFC700',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+
   eventArea: {
     width: width,
     alignSelf: 'center',

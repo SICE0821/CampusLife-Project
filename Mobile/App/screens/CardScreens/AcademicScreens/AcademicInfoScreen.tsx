@@ -10,12 +10,14 @@ import {
     TouchableOpacity,
     Alert,
     TextInput,
+    Image,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
 import { UserData, Lecture } from '../../../types/type';
 import LottieView from 'lottie-react-native';
 import IconH from 'react-native-vector-icons/FontAwesome';
+import IconB from 'react-native-vector-icons/SimpleLineIcons';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../../config';
 import Svg, { Circle } from 'react-native-svg';
@@ -395,7 +397,6 @@ const AcademicInfoScreen = ({ route }: any) => {
 
     return (
         <View style={styles.container}>
-
             <ScrollView>
                 {/* 원형 프로그레스 표시 */}
                 <View style={styles.progressCircleContainer}>
@@ -422,7 +423,6 @@ const AcademicInfoScreen = ({ route }: any) => {
                 <View style={styles.goalGPAContainer}>
                     <View style={styles.goalGPATitleContainer}>
                         <Text style={styles.goalGPATitleText}>목표학점</Text>
-                        {/* 트로피 아이콘 제거 */}
                         <IconH style={styles.goalGPAIcon} name="trophy" size={30} />
                     </View>
                 </View>
@@ -567,19 +567,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-    },
-    // 뱃지 영역 스타일
-    badgeContainer: {
-        flexDirection: 'row',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        backgroundColor: '#f5f5f5',
-        height: 100,
-    },
-    badgeItem: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginHorizontal: 5,
     },
     // 프로그레스 서클 영역 스타일
     progressCircleContainer: {

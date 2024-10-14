@@ -381,11 +381,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '학적정보',
@@ -399,11 +394,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '알람 확인',
@@ -418,11 +408,6 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '학교 정보',
@@ -540,11 +525,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '학적정보',
@@ -558,11 +538,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("AdminMain")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '알람 확인',
@@ -577,11 +552,6 @@ export const AdminMainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("SchoolInfoChangeScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="edit" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '학교 정보',
@@ -954,11 +924,6 @@ export const StudyRoomStackNavigator = ({ navigation, route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
-                    headerRight: () => (
-                        <TouchableOpacity onPress={() => navigation.navigate("MainScreen")}>
-                            <IconF style={{ marginRight: 10 }} name="check" size={30} color="white" />
-                        </TouchableOpacity>
-                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '스터디룸',
