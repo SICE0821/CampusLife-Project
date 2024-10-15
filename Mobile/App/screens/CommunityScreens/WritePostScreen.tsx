@@ -5,16 +5,15 @@ import {
   TouchableOpacity, 
   TextInput, 
   FlatList, 
-  Alert, 
   Image, 
   Dimensions, 
   StyleSheet, 
-  ScrollView 
+  ScrollView,
+  Modal
 } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import IconAntDesign from 'react-native-vector-icons/AntDesign'; // AntDesign 아이콘 컴포넌트
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome'; // FontAwesome 아이콘 컴포넌트
-import Modal from 'react-native-modal'; // 일반 모달 컴포넌트
 import ModalBox from 'react-native-modalbox'; // 모달 박스 컴포넌트
 import { launchImageLibrary } from 'react-native-image-picker'; // 이미지 라이브러리 접근 함수
 import LottieView from 'lottie-react-native'; // Lottie 애니메이션 컴포넌트
@@ -27,13 +26,13 @@ const { width } = Dimensions.get('window'); // 화면의 너비 가져오기
  * 비어있는 상태에서 보여줄 안내 텍스트 컴포넌트
  */
 const EmptyMainText = () => {
-  const content =     "\n\n\n" +
+  const content = "\n\n\n" +
   "캠퍼스라이프는 누구나 기분 좋게 참여할 수 있는 커뮤니티를 만들기 위해 커뮤니티 이용규칙을 제정하여 운영하고 있습니다. 위반 시 게시물이 삭제되고 서비스 이용이 일정 기간 제한될 수 있습니다." +
   "\n\n정치·사회 관련 행위 금지\n\n국가기관, 정치 관련 단체, 언론, 시민단체에 대한 언급 혹은 이와 관련한 행위" +
   "\n정책·외교 또는 정치·정파에 대한 의견, 주장 및 이념, 가치관을 드러내는 행위\n성별, 종교, 인종, 출신, 지역, 직업, 이념 등 사회적 이슈에 대한 언급 혹은 이와 관련한 행위" +
   "\n위와 같은 내용으로 유추될 수 있는 비유, 은어 사용 행위\n영리 여부와 관계 없이 사업체·기관·단체·개인에게 직간접적으로 영향을 줄 수 있는 게시물 작성 행위\n불법촬영물 유통 금지\n불법촬영물등을 게재할 경우 전기통신사업법에 따라 삭제 조치 및 서비스 이용이 영구적으로 제한될 수 있으며 관련 법률에 따라 처벌받을 수 있습니다." +
   "\n\n그 밖의 규칙 위반\n타인의 권리를 침해하거나 불쾌감을 주는 행위\n범죄, 불법 행위 등 법령을 위반하는 행위\n욕설, 비하, 차별, 혐오, 자살, 폭력 관련 내용을 포함한 게시물 작성 행위\n음란물, 성적 수치심을 유발하는 행위\n스포일러, 공포, 속임, 놀라게 하는 행위"
-  
+
   return (
     <View style={styles.emptyTextContainer}>
       <Text style={styles.emptyText}>{content}</Text>
@@ -174,11 +173,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
    * 게시물 작성 완료 알림 및 이전 화면으로 이동
    */
   const completePost = () => {
-    Alert.alert(
-      "게시물 작성",
-      "게시물 작성을 완료했습니다!",
-      [{ text: "확인", onPress: () => goBack() }]
-    );
+    setIsModalVisible(true); // 모달 표시
   };
 
   /**
@@ -418,13 +413,26 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
       </ModalBox>
 
       {/* 글 등록 확인 모달 */}
-      <Modal isVisible={isModalVisible}>
-        <View style={modalStyles.modalContainer}>
-          <Text style={modalStyles.title}>등록 확인</Text>
-          <Text style={modalStyles.message}>글이 등록되었습니다.</Text>
-          <TouchableOpacity style={modalStyles.confirmButton} onPress={goBack}>
-            <Text style={modalStyles.confirmButtonText}>확인</Text>
-          </TouchableOpacity>
+      <Modal 
+        visible={isModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={modalStyles.modalOverlay}>
+          <View style={modalStyles.modalContainer}>
+            <Text style={modalStyles.title}>게시물 작성</Text>
+            <Text style={modalStyles.message}>게시물 작성을 완료했습니다!</Text>
+            <TouchableOpacity
+              style={modalStyles.confirmButton}
+              onPress={() => {
+                setIsModalVisible(false); // 모달 닫기
+                goBack(); // 이전 화면으로 이동
+              }}
+            >
+              <Text style={modalStyles.confirmButtonText}>확인</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </View>
@@ -489,9 +497,9 @@ const styles = StyleSheet.create({
     alignItems: 'center', // 중앙 정렬
   },
   imagePreviewArea: {
-    marginTop: 150, // 위 여백 20
+    marginTop: 20, // 위 여백 20
     width: '100%', // 너비 100%
-    height: 300, // 높이 200
+    height: 300, // 높이 300
     alignItems: 'center', // 중앙 정렬
   },
   imageCard: {
@@ -581,28 +589,37 @@ const modalStyles = StyleSheet.create({
   confirmButton: {
     backgroundColor: '#9A9EFF', // 배경색 연보라
     borderRadius: 10, // 모서리 반경 10
-    paddingVertical: 15, // 상하 패딩 15
+    paddingVertical: 10, // 상하 패딩 10
     paddingHorizontal: 30, // 좌우 패딩 30
   },
   confirmButtonText: {
     fontSize: 18, // 글자 크기 18
     color: 'white', // 글자 색상 흰색
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)', // 반투명 배경
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   modalContainer: {
     backgroundColor: 'white', // 배경색 흰색
     borderRadius: 20, // 모서리 반경 20
     padding: 20, // 패딩 20
+    width: '80%', // 너비 80%
     alignItems: 'center', // 중앙 정렬
   },
   title: {
     fontSize: 20, // 글자 크기 20
     fontWeight: 'bold', // 글자 두께 굵게
-    marginBottom: 10, // 아래 여백 10
+    marginBottom: 10, // 아래 여백 10,
+    color: '#333'
   },
   message: {
     fontSize: 16, // 글자 크기 16
     marginBottom: 20, // 아래 여백 20
     textAlign: 'center', // 중앙 정렬
+    color: '#333'
   },
 });
 
