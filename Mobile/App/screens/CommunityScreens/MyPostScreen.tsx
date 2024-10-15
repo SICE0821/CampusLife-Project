@@ -283,16 +283,9 @@ const MyPostScreen = ({ route, navigation }: any) => {
                         console.log(item);
                         if (item.inform_check === true && item.Club_check === false) {
                             navigation.navigate('NoticePostDetailScreen', { item, userData })
-<<<<<<< HEAD
-
-                        } else if(item.inform_check === false && item.Club_check === false) {
-                            navigation.navigate('PostDetailScreen', { item, userData });
-                        } else {
-=======
                         } else if(item.inform_check === false && item.Club_check === false){
                             navigation.navigate('PostDetailScreen', { item, userData });
                         } else if(item.Club_check === true){
->>>>>>> Feat/AttendancePage
                             navigation.navigate('SchoolClubDetailScreen', { item, userData });
                         }
                     }}>
