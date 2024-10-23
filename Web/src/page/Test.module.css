@@ -292,15 +292,15 @@ p {
 }
 
 .attendaceCheckBox.present {
-  background-color: green; 
+  background-color: #4CAF50; 
 }
 
 .attendaceCheckBox.late {
-  background-color: yellow; 
+  background-color: #FF9100; 
 }
 
 .attendaceCheckBox.absent {
-  background-color: red; 
+  background-color: #C7253E; 
 }
 
 .modalheaderBox {
