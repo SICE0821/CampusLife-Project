@@ -20,7 +20,7 @@ const options = [
 function Test() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { selectLecture } = location.state || {};
+    const { selectLecture, ProfessorInfo } = location.state || {};
     const [selected, setSelected] = useState({ weekIndex: 0, classIndex: 0 }); //주차와 교시(차시)를 선택할때 사용하는 데이터
     const [totalStudentNum, setTotalStudentNum] = useState();
     const [studentAttendanceStates, setStudentAttendanceStates] = useState([]); //주차와 교시(차시)를 선택하여 학생들의 데이터를 가져옴
@@ -135,7 +135,7 @@ function Test() {
 
     //QR 코드 화면으로 이동하기
     const handleNavigateToQrCheck = (weeknum) => {
-        navigate('/qrcheck', { state: { selectLecture, weeknum } });
+        navigate('/qrcheck', { state: { selectLecture, weeknum, ProfessorInfo } });
     };
 
     //해당 과목을 듣는 전체 총 학생 수 가져오기

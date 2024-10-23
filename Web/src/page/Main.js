@@ -98,8 +98,8 @@ function Main() {
     }
   }
 
-  const handleNavigateToTest = (selectLecture) => {
-    navigate('/test', { state: { selectLecture } } );
+  const handleNavigateToTest = (selectLecture, ProfessorInfo) => {
+    navigate('/test', { state: { selectLecture, ProfessorInfo} } );
   };
 
   const lectures = {
@@ -130,7 +130,7 @@ function Main() {
           {/*여기서 해당 과목의 정보를 넘겨줄거임 test 페이지로 */}
           {professorLectures[selectedCategory].map((lecture, index) => (
             <Pagebtn key={index} handleNavigateToTest={ () => {
-              handleNavigateToTest(lecture)
+              handleNavigateToTest(lecture, ProfessorInfo)
             }
               } lecture={lecture} />
           ))}
