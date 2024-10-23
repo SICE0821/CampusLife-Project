@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
+  ScrollView
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useFocusEffect } from '@react-navigation/native';
@@ -175,88 +176,91 @@ const AttendanceCheckEventScreen = ({ route }: any) => {
   const AttendanceCheckEvent = require('../../assets/AttendanceCheckEvent.jpg');
 
   return (
-    <View style={styles.container}>
-      {/* 배경 이미지 */}
-      <Image
-        source={AttendanceCheckEvent}
-        style={styles.backgroundImage}
-      />
+    <ScrollView>
 
-      {/* 상단 정보 영역 */}
-      <View style={styles.topInfo}>
-        <View style={styles.pointContainer}>
-          <Text style={styles.pointText}>현재 포인트 : {userData.point}P</Text>
-        </View>
-      </View>
+      <View style={styles.container}>
+        {/* 배경 이미지 */}
+        <Image
+          source={AttendanceCheckEvent}
+          style={styles.backgroundImage}
+        />
 
-      {/* 달력 컴포넌트 */}
-      <Calendar
-        style={styles.calendar}
-        theme={{
-          todayTextColor: 'black',
-          textDayFontSize: 20,
-          textDayFontWeight: 'bold',
-          textMonthFontSize: 20,
-          textMonthFontWeight: 'bold',
-          textSectionTitleColor: 'black',
-        }}
-        monthFormat={'M월'}
-        showSixWeeks={true}
-        markedDates={markedDates}
-        markingType={'custom'}
-        dayComponent={({ date, state }: any) => {
-          const marked = markedDates[date.dateString];
-          return (
-            <View style={styles.dayContainer}>
-              <Text
-                style={[
-                  styles.dayText,
-                  state === 'disabled' ? styles.disabledText : null,
-                  marked && styles.selectedText, // 선택된 날짜의 텍스트 스타일 적용
-                ]}
-              >
-                {date.day}
-              </Text>
-              {marked && renderImage()}
-            </View>
-          );
-        }}
-      />
-
-      {/* 출석 체크 버튼 */}
-      <TouchableOpacity
-        onPress={async () => {
-          await handleAttendanceCheck();
-          await getAppAttendanceDate();
-        }}
-      >
-        <View style={styles.buttonArea}>
-          <Text style={styles.buttonText}>출석체크</Text>
-        </View>
-      </TouchableOpacity>
-
-      {/* Custom Alert Modal */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isAlertVisible}
-        onRequestClose={() => {
-          setIsAlertVisible(false);
-        }}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalMessage}>{alertMessage}</Text>
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => setIsAlertVisible(false)}
-            >
-              <Text style={styles.modalButtonText}>확인</Text>
-            </Pressable>
+        {/* 상단 정보 영역 */}
+        <View style={styles.topInfo}>
+          <View style={styles.pointContainer}>
+            <Text style={styles.pointText}>현재 포인트 : {userData.point}P</Text>
           </View>
         </View>
-      </Modal>
-    </View>
+
+        {/* 달력 컴포넌트 */}
+        <Calendar
+          style={styles.calendar}
+          theme={{
+            todayTextColor: 'black',
+            textDayFontSize: 20,
+            textDayFontWeight: 'bold',
+            textMonthFontSize: 20,
+            textMonthFontWeight: 'bold',
+            textSectionTitleColor: 'black',
+          }}
+          monthFormat={'M월'}
+          showSixWeeks={true}
+          markedDates={markedDates}
+          markingType={'custom'}
+          dayComponent={({ date, state }: any) => {
+            const marked = markedDates[date.dateString];
+            return (
+              <View style={styles.dayContainer}>
+                <Text
+                  style={[
+                    styles.dayText,
+                    state === 'disabled' ? styles.disabledText : null,
+                    marked && styles.selectedText, // 선택된 날짜의 텍스트 스타일 적용
+                  ]}
+                >
+                  {date.day}
+                </Text>
+                {marked && renderImage()}
+              </View>
+            );
+          }}
+        />
+
+        {/* 출석 체크 버튼 */}
+        <TouchableOpacity
+          onPress={async () => {
+            await handleAttendanceCheck();
+            await getAppAttendanceDate();
+          }}
+        >
+          <View style={styles.buttonArea}>
+            <Text style={styles.buttonText}>출석체크</Text>
+          </View>
+        </TouchableOpacity>
+
+        {/* Custom Alert Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isAlertVisible}
+          onRequestClose={() => {
+            setIsAlertVisible(false);
+          }}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalMessage}>{alertMessage}</Text>
+              <Pressable
+                style={styles.modalButton}
+                onPress={() => setIsAlertVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>확인</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+      </View>
+    </ScrollView>
   );
 };
 
