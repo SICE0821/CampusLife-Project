@@ -453,7 +453,7 @@ const MainPage = ({ navigation, route }: any) => {
                     <IconA style={styles.pointIcon} name="payments" size={36} />
                     <Text style={styles.userPoint}>{userPoint?.point}P</Text>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate("EventScreenStackNavigator")}
+                      onPress={() => navigation.navigate("EventScreenStackNavigator", { userPoint })} 
                     >
                       <IconB name={"caretright"} size={22} style={styles.pointNavigationIcon} />
                     </TouchableOpacity>
