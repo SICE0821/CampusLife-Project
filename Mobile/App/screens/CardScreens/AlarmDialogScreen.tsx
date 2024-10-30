@@ -448,62 +448,68 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
             {loading ? ( // 로딩 중일 때 ActivityIndicator를 보여줌
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#F29F05" />
-                    <Text style={{color: '#333'}}>불러오는 중...</Text>
+                    <Text style={{ color: '#333' }}>불러오는 중...</Text>
                 </View>
             ) : (
-            <ScrollView
-                style={styles.scrollView}
-                refreshControl={
-                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
-            >
-                {aramList.map((item, index) => (
-                    <View key={index} style={styles.alarmContainer}>
-                        <TouchableHighlight
-                            style={styles.touchable}
-                            underlayColor="#E0E0E0"
-                            onPress={() => NavigationPage(item)}
-                            onLongPress={() => delete_aram_data(item.aram_id)}
-                        >
-                            <View style={styles.card}>
-                                <View style={styles.iconArea}>
-                                    {renderTargetIcon(item)}
-                                </View>
-                                <View style={styles.textArea}>
-                                    <Text style={styles.title}>{item.title}</Text>
-                                    {renderTargetContent(item)}
-                                    <Text style={styles.time}>{item.time}</Text>
-                                </View>
-                            </View>
-                        </TouchableHighlight>
-                    </View>
-                ))}
-                <Modal
-                    animationType="slide"
-                    transparent={true}
-                    visible={isModalVisible}
-                    onRequestClose={() => {
-                        setIsModalVisible(false);
-                    }}
+                <ScrollView
+                    style={styles.scrollView}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
                 >
-                    <View style={styles.modalContainer}>
-                        <View style={styles.modalContent}>
-                            <Text style={styles.modalTitle}>동아리 쪽지</Text>
-                            <Text
-                                style={styles.messageInput}
-                                numberOfLines={4}
+                    {aramList.map((item, index) => (
+                        <View key={index} style={styles.alarmContainer}>
+                            <TouchableHighlight
+                                style={styles.touchable}
+                                underlayColor="#E0E0E0"
+                                onPress={() => NavigationPage(item)}
+                                onLongPress={() => delete_aram_data(item.aram_id)}
                             >
-                                {club_aram}
-                            </Text>
-                            <View style={styles.modalButtons}>
-                                <TouchableOpacity style={styles.closeButton} onPress={() => setIsModalVisible(false)}>
-                                    <Text style={styles.closeButtonText}>취소</Text>
-                                </TouchableOpacity>
+                                {/* 안 읽은 알람이면 테두리 추가 */}
+                                <View style={[
+                                    styles.card,
+                                    item.time == '2024-10-30' && styles.unreadBorder // 안 읽은 알람에 테두리 스타일 추가
+                                ]}>
+                                    <View style={styles.iconArea}>
+                                        {renderTargetIcon(item)}
+                                        {/* 안 읽은 알람이면 빨간 점 추가 */}
+                                        {item.time == '2024-10-30' && <View style={styles.unreadDot} />}
+                                    </View>
+                                    <View style={styles.textArea}>
+                                        <Text style={styles.title}>{item.title}</Text>
+                                        {renderTargetContent(item)}
+                                        <Text style={styles.time}>{item.time}</Text>
+                                    </View>
+                                </View>
+                            </TouchableHighlight>
+                        </View>
+                    ))}
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={isModalVisible}
+                        onRequestClose={() => {
+                            setIsModalVisible(false);
+                        }}
+                    >
+                        <View style={styles.modalContainer}>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>동아리 쪽지</Text>
+                                <Text
+                                    style={styles.messageInput}
+                                    numberOfLines={4}
+                                >
+                                    {club_aram}
+                                </Text>
+                                <View style={styles.modalButtons}>
+                                    <TouchableOpacity style={styles.closeButton} onPress={() => setIsModalVisible(false)}>
+                                        <Text style={styles.closeButtonText}>취소</Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
                         </View>
-                    </View>
-                </Modal>
-            </ScrollView>
+                    </Modal>
+                </ScrollView>
             )}
         </View>
     );
@@ -545,6 +551,11 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 3,
     },
+    unreadBorder: {
+        borderWidth: 1,
+        borderColor: '#FFC107', // 강조 테두리 색상
+        borderRadius: 10,
+    },
     iconArea: {
         width: 50,
         height: 50,
@@ -553,6 +564,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 15,
+    },
+    unreadDot: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: 'red', // 빨간 점
     },
     textArea: {
         flex: 1,

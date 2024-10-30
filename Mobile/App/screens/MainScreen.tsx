@@ -33,6 +33,8 @@ import IconK from 'react-native-vector-icons/Entypo';
 // 디바이스 너비 가져오기
 const width = Dimensions.get('window').width;
 
+const aramCount = 10
+
 // 포스트 데이터 타입 정의
 type PostData = {
   post_id: number,
@@ -453,7 +455,7 @@ const MainPage = ({ navigation, route }: any) => {
                     <IconA style={styles.pointIcon} name="payments" size={36} />
                     <Text style={styles.userPoint}>{userPoint?.point}P</Text>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate("EventScreenStackNavigator", { userPoint })} 
+                      onPress={() => navigation.navigate("EventScreenStackNavigator", { userPoint })}
                     >
                       <IconB name={"caretright"} size={22} style={styles.pointNavigationIcon} />
                     </TouchableOpacity>
@@ -485,7 +487,13 @@ const MainPage = ({ navigation, route }: any) => {
                 <TouchableOpacity style={styles.tabButton} onPress={() => navigation.navigate("AlarmDialogScreen")}>
                   <IconD style={styles.tabIcon} name="bell" size={30} />
                   <Text style={styles.tabText}>알림</Text>
+                  {aramCount > 0 && (
+                    <View style={styles.notificationBadge}>
+                      <Text style={styles.notificationCount}>{aramCount}</Text>
+                    </View>
+                  )}
                 </TouchableOpacity>
+
 
               </View>
             </View>
@@ -494,10 +502,10 @@ const MainPage = ({ navigation, route }: any) => {
           <View style={styles.badgeArea}>
             <View style={styles.badgeBox}>
               <View style={styles.TitleArea}>
-                <IconK name="help-with-circle" size={25} color={'white'}/>
+                <IconK name="help-with-circle" size={25} color={'white'} />
                 <Text style={styles.badgeTitleText}>내 보유 뱃지</Text>
                 <TouchableOpacity onPress={toggleModal}>
-                  <IconK style={styles.badgeTitleIcon} name="help-with-circle" size={25} color={'#333'}/>
+                  <IconK style={styles.badgeTitleIcon} name="help-with-circle" size={25} color={'#333'} />
                 </TouchableOpacity>
               </View>
               <ScrollView horizontal={true} style={styles.badgeContainer} nestedScrollEnabled={true}>
@@ -585,25 +593,25 @@ const MainPage = ({ navigation, route }: any) => {
               </ScrollView>
             </View>
             {/* 모달 구현 */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isModalVisible}
-          onRequestClose={toggleModal}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>뱃지 획득 방법</Text>
-              <Text style={styles.modalText}>
-                뱃지는 특정 이벤트, 출석 체크, 포인트 적립 등을 통해 획득할 수 있습니다.
-                각 뱃지는 특별한 의미를 가지고 있으며, 다양한 활동을 통해 뱃지를 모아보세요!
-              </Text>
-              <Pressable style={styles.closeButton} onPress={toggleModal}>
-                <Text style={styles.closeButtonText}>닫기</Text>
-              </Pressable>
-            </View>
-          </View>
-        </Modal>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={isModalVisible}
+              onRequestClose={toggleModal}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalTitle}>뱃지 획득 방법</Text>
+                  <Text style={styles.modalText}>
+                    뱃지는 특정 이벤트, 출석 체크, 포인트 적립 등을 통해 획득할 수 있습니다.
+                    각 뱃지는 특별한 의미를 가지고 있으며, 다양한 활동을 통해 뱃지를 모아보세요!
+                  </Text>
+                  <Pressable style={styles.closeButton} onPress={toggleModal}>
+                    <Text style={styles.closeButtonText}>닫기</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </Modal>
           </View>
         </ScrollView>
         {/* 이벤트 영역 */}
@@ -969,6 +977,22 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 15,
   },
+  notificationBadge: {
+    position: 'absolute',
+    right: 10, // 아이콘에 대한 위치 조정
+    top: 5,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationCount: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   badgeArea: {
     alignSelf: 'center',
     width: width * 0.9,
@@ -985,7 +1009,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     padding: 10, // 내부 여백 추가
   },
-  TitleArea:{
+  TitleArea: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -997,7 +1021,7 @@ const styles = StyleSheet.create({
     fontSize: 22, // 폰트 크기를 약간 키움
     padding: 10,
   },
-  badgeTitleIcon:{
+  badgeTitleIcon: {
     bottom: 10
   },
   badgeContainer: {
