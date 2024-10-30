@@ -16,9 +16,10 @@
     "react-modal": "^3.16.1",
     "react-qr-code": "^2.0.14",
     "react-router-dom": "^6.26.2",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "react-select": "^5.8.1",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "webpack": "^5.95.0"
   },
   "scripts": {
     "start": "set PORT=3002 && react-scripts start",
