@@ -108,7 +108,7 @@ const formatTime = (time: string): string => {
 };
 
 const App = ({ route }: any) => {
-  const [selectedGradeAndSemester, setSelectedGradeAndSemester] = useState('1학년 1학기');
+  const [selectedGradeAndSemester, setSelectedGradeAndSemester] = useState('3학년 1학기');
   const { userdata, LectureData } = route.params;
   const [userData, setUserData] = useState<UserData>(userdata);
   const [userLecture, setUserLecture] = useState<TimeTableLecture[]>(LectureData);

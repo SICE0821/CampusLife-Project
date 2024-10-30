@@ -24,7 +24,7 @@ type userEvent = {
   event_id: number;
 };
 
-const DeadlineEventScreen = ({ route }: any) => {
+const DeadlineEventScreen = ({ route, navigation }: any) => { // Added navigation prop
   const { userdata, eventdata } = route.params;
 
   const [maintext, setMainText] = useState('');
@@ -117,7 +117,12 @@ const DeadlineEventScreen = ({ route }: any) => {
         name: `${Date.now()}_${userData.user_pk}_${eventData.event_id}.png`,
       });
     });
+
+    // 파일 업로드 함수 호출
     await uploadImages(formData);
+
+    // 업로드 완료 후 파일 목록 초기화
+    setSelectedFiles([]);
   };
 
   const uploadImages = async (formData: FormData) => {
@@ -168,6 +173,7 @@ const DeadlineEventScreen = ({ route }: any) => {
               await uploadAllFiles();
             }
             setUserEventData([...usereventData, { user_id: userData.user_pk, event_id: eventData.event_id }]);
+            navigation.navigate("MainScreen"); // Navigate to MainScreen after submission
           },
         },
       ]);

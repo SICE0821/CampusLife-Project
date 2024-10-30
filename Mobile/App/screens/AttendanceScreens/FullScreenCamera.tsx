@@ -98,7 +98,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
       </View>
       {isCameraActive && device && (
         <Camera
-          style={{ width: width, height: width * 2 }}
+          style={{ width: width, height: width * 1.9 }}
           device={device}
           photo={true}
           video={false}

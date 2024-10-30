@@ -380,6 +380,7 @@ const ParticipantEvent = ({ route }: any) => {
               </TouchableOpacity>
             )
           )}
+        <View style={{height: 80}}></View>
         </ScrollView>
       ) : (
         <Text style={styles.noEventText}>해당 이벤트 참여자가 없습니다.</Text>
