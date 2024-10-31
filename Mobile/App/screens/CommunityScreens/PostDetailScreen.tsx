@@ -49,6 +49,9 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [showModal, setShowModal] = useState(false);
     const [activeImageIndex, setActiveImageIndex] = useState<null | number>(null);
 
+    const [isAdminDeleteModalVisible, setIsAdminDeleteModalVisible] = useState(false);
+    const [selectedDeleteReason, setSelectedDeleteReason] = useState('');
+
     const toggleOptions = () => {
         setShowOptions(!showOptions);
     };
@@ -642,6 +645,54 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     };
 
+    // Predefined reasons for deletion
+    const deleteReasons = [
+        '욕설/인신공격',
+        '음란성/선정성',
+        '광고 게시물',
+        '같은 내용의 반복 게시(도배)',
+        '기타',
+    ];
+
+    // Function to handle admin delete post
+    const adminDeletePost = async () => {
+        setIsAdminDeleteModalVisible(true);
+    };
+
+    // Function to confirm deletion with selected reason
+    const confirmAdminDeletePost = async () => {
+        if (!selectedDeleteReason) {
+            Alert.alert('Please select a reason for deletion.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${config.serverUrl}/deletepost`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ post_id: postDetailInfo?.post_id })
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            await response.json();
+
+            Alert.alert(
+                '알림',
+                '게시글이 삭제되었습니다.',
+                [{ text: '확인', onPress: () => navigation.goBack() }],
+                { cancelable: false }
+            );
+        } catch (error) {
+            console.error('게시글 삭제 실패:', error);
+            Alert.alert('오류', '게시글 삭제에 실패했습니다.');
+        } finally {
+            setIsAdminDeleteModalVisible(false)
+        }
+    };
+
     const put_user_comment_report = async (comment_id: number) => {
         try {
             const response = await fetch(`${config.serverUrl}/putusercommentreport`, {
@@ -1057,7 +1108,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                 }}>
                                 <Text style={optionStyle.boxText}>신고</Text>
                             </TouchableOpacity>
-                            {(userdata?.title === "학교" || postDetailInfo?.post_writer === userdata?.name) && (
+                            {(postDetailInfo?.post_writer === userdata?.name) && (
                                 <>
                                     <View style={optionStyle.boxLine}></View>
                                     <TouchableOpacity style={optionStyle.boxArea}
@@ -1066,8 +1117,57 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                     </TouchableOpacity>
                                 </>
                             )}
+                            {(userdata?.title === "학교") && (
+                                <>
+                                    <View style={optionStyle.boxLine}></View>
+                                    <TouchableOpacity style={optionStyle.boxArea}
+                                        onPress={adminDeletePost}>
+                                        <Text style={optionStyle.boxText}>삭제</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
                         </View>
                     )}
+                    {/* 관리자 삭제 모달 */}
+            <Modal
+                visible={isAdminDeleteModalVisible}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setIsAdminDeleteModalVisible(false)}
+            >
+                <View style={modalStyles.modalBackground}>
+                    <View style={modalStyles.modalContainer}>
+                        <Text style={modalStyles.modalTitle}>게시물 삭제</Text>
+                        <Text style={modalStyles.modalSubtitle}>삭제 사유 선택</Text>
+                        {deleteReasons.map((reason, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={[
+                                    modalStyles.reasonOption,
+                                    selectedDeleteReason === reason && modalStyles.selectedReason,
+                                ]}
+                                onPress={() => setSelectedDeleteReason(reason)}
+                            >
+                                <Text style={modalStyles.reasonText}>{reason}</Text>
+                            </TouchableOpacity>
+                        ))}
+                        <View style={modalStyles.modalButtons}>
+                            <TouchableOpacity
+                                style={modalStyles.cancelButton}
+                                onPress={() => setIsAdminDeleteModalVisible(false)}
+                            >
+                                <Text style={modalStyles.buttonText}>취소</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={modalStyles.confirmButton}
+                                onPress={confirmAdminDeletePost}
+                            >
+                                <Text style={modalStyles.buttonText}>삭제</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
 
                 </View>
                 <View style={styles.postArea}>
@@ -1640,5 +1740,67 @@ const optionStyle = StyleSheet.create({
         alignSelf: 'center'
     }
 })
+
+const modalStyles = StyleSheet.create({
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        elevation: 10,
+    },
+    modalTitle: {
+        fontSize: 26,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: 'black',
+    },
+    modalSubtitle: {
+        fontSize: 16,
+        marginBottom: 20,
+        color: 'black',
+    },
+    reasonOption: {
+        padding: 10,
+        borderRadius: 5,
+        backgroundColor: '#f0f0f0',
+        marginBottom: 10,
+    },
+    selectedReason: {
+        backgroundColor: '#d3d3d3',
+    },
+    reasonText: {
+        fontSize: 16,
+        color: 'black',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginTop: 20,
+    },
+    cancelButton: {
+        backgroundColor: '#aaa',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
+        marginRight: 10,
+    },
+    confirmButton: {
+        backgroundColor: '#FF3B30',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 5,
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+});
 
 export default PostDetailScreen;

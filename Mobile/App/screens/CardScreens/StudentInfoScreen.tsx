@@ -5,10 +5,10 @@ import {
     View,
     StyleSheet,
     TouchableOpacity,
-    Alert,
     ScrollView,
     Image,
-    Dimensions
+    Dimensions,
+    Modal,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import IconA from 'react-native-vector-icons/FontAwesome5';
@@ -23,6 +23,8 @@ const width = Dimensions.get('window').width;
 const StudentInfoScreen = ({ route, navigation }: any) => {
     // 모달 상태 관리 변수
     const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+    const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
 
     // 라우트 파라미터에서 사용자 데이터 추출
     const { userData, Userdepartment } = route.params;
@@ -96,18 +98,13 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             });
             const data = await response.json();
             if (response.ok) {
-                Alert.alert(data.message, "", [
-                    {
-                        text: "확인",
-                        onPress: () => navigation.navigate("LoginScreen"),
-                    },
-                ]);
+                showAlertModal(data.message, () => navigation.navigate("LoginScreen"));
             } else {
                 throw new Error(data.message);
             }
         } catch (error) {
             console.error('계정 삭제 실패:', error);
-            Alert.alert("계정 삭제 실패");
+            showAlertModal("계정 삭제 실패");
         }
     };
 
@@ -137,23 +134,13 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                         await updateImage(imageFileName);
                     }
                 }
-                Alert.alert(data.message, "", [
-                    {
-                        text: "확인",
-                        onPress: () => navigation.navigate("MainScreen", { updatedUserData: userdata }),
-                    },
-                ]);
+                showAlertModal(data.message, () => navigation.navigate("MainScreen", { updatedUserData: userdata }));
             } else {
-                Alert.alert(data.message, "", [
-                    {
-                        text: "확인",
-                        onPress: () => navigation.navigate("AdminScreen", { updatedUserData: userdata }),
-                    },
-                ]);
+                showAlertModal(data.message, () => navigation.navigate("AdminScreen", { updatedUserData: userdata }));
             }
         } catch (error) {
             console.error('계정 업데이트 실패:', error);
-            Alert.alert("계정 업데이트 실패");
+            showAlertModal("계정 업데이트 실패");
         }
     };
 
@@ -215,6 +202,22 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
     const closeCameraModal = () => setIsCameraModalOpen(false);
 
     /**
+     * 알림 모달 표시 함수
+     */
+    const showAlertModal = (message: string, onComplete?: () => void) => {
+        setAlertMessage(message);
+        setIsAlertModalOpen(true);
+
+        // 모달이 열리면 2초 후에 자동으로 닫힘
+        setTimeout(() => {
+            setIsAlertModalOpen(false);
+            if (onComplete) {
+                onComplete();
+            }
+        }, 500); // 2초 후에 모달 닫기
+    };
+
+    /**
      * 화면 포커스 시 사용자 대학 이름을 가져오는 효과
      */
     useFocusEffect(
@@ -222,9 +225,9 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
             const fetchData = async () => {
                 await getUserUniversity(); // 비동기 함수 호출
             };
-    
+
             fetchData(); // 비동기 함수를 호출하여 실행
-    
+
         }, [])
     );
 
@@ -335,6 +338,20 @@ const StudentInfoScreen = ({ route, navigation }: any) => {
                     </TouchableOpacity>
                 </View>
             </ModalBox>
+
+            {/* 알림 모달 */}
+            <Modal
+                visible={isAlertModalOpen}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setIsAlertModalOpen(false)}
+            >
+                <View style={stylesAlertModal.modalBackground}>
+                    <View style={stylesAlertModal.modalContainer}>
+                        <Text style={stylesAlertModal.modalMessage}>{alertMessage}</Text>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -389,7 +406,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         paddingVertical: 20,
-        paddingBottom: 80
+        paddingBottom: 80,
     },
     profilePicture: {
         marginTop: 10,
@@ -555,6 +572,27 @@ const stylesModal = StyleSheet.create({
         fontSize: 18,
         color: "#6200EE",
         fontWeight: "600",
+    },
+});
+
+const stylesAlertModal = StyleSheet.create({
+    modalBackground: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContainer: {
+        width: '80%',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    modalMessage: {
+        fontSize: 18,
+        color: '#333333',
+        textAlign: 'center',
     },
 });
 

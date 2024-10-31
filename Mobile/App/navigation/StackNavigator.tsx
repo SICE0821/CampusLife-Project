@@ -774,12 +774,12 @@ export const NoticeScreenStackNavigator = ({ route, navigation }: any) => {
 
 //이벤트 페이지 관련 스택 네비게이터
 export const EventScreenStackNavigator = ({ navigation, route }: any) => {
-    const { userdata } = route.params;
+    const { userdata, userPoint } = route.params;
     return (
         <EventStack.Navigator>
             <EventStack.Screen name="EventShopScreenStackNavigator"
                 component={EventShopScreenStackNavigator}
-                initialParams={{ userdata }}
+                initialParams={{ userdata, userPoint }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -803,7 +803,7 @@ export const EventScreenStackNavigator = ({ navigation, route }: any) => {
             />
             <EventShopStack.Screen name="EventHaveCouponScreen"
                 component={EventHaveCouponScreen}
-                initialParams={{ userdata }}
+                initialParams={{ userdata, userPoint }}
                 options={{
                     headerStyle: {
                         backgroundColor: '#F27405',
@@ -880,14 +880,14 @@ export const TimetableScreenStackNavigator = ({ route, navigation }: any) => {
 };
 
 export const EventShopScreenStackNavigator = ({ navigation, route }: any) => {
-    const { userdata } = route.params;
+    const { userdata, userPoint } = route.params;
     //console.log(userdata);
     return (
         <EventShopStack.Navigator>
             <EventShopStack.Screen
                 name="EventShopScreen"
                 component={EventShopScreen}
-                initialParams={{ userdata }}
+                initialParams={{ userdata, userPoint }}
                 options={{
                     headerShown: false
                 }} />

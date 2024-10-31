@@ -11,7 +11,7 @@ function QrCheck() {
   const [remainingTime, setRemainingTime] = useState(1); // QR code validity time (seconds)
   const qrTime = 1; // QR code regeneration interval (seconds)
   const location = useLocation();
-  const { selectLecture, weeknum } = location.state || {};
+  const { selectLecture, weeknum, ProfessorInfo } = location.state || {};
 
   useEffect(() => {
     const generateQRDataWithTimestamp = () => {
@@ -44,7 +44,7 @@ function QrCheck() {
   }, []);
 
   const handleNavigateToTest = () => {
-    navigate('/test', { state: { selectLecture } });
+    navigate('/test', { state: { selectLecture, ProfessorInfo } });
   };
 
   useEffect(() => {

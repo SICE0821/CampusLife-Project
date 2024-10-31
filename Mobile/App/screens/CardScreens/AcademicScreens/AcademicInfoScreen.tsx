@@ -11,6 +11,7 @@ import {
     Alert,
     TextInput,
     Image,
+    LogBox,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Table, Row } from 'react-native-table-component';
@@ -167,11 +168,15 @@ const AcademicInfoScreen = ({ route }: any) => {
     const { userdata, LectureData } = route.params;
     const [userData] = useState<UserData>(userdata); // 사용자 데이터를 상태로 관리
     const [userLecture] = useState<Lecture[]>(LectureData); // 강의 데이터를 상태로 관리
-    const [selectedYear, setSelectedYear] = useState<number>(1); // 선택된 학년
+    const [selectedYear, setSelectedYear] = useState<number>(3); // 선택된 학년
     const [selectedSemester, setSelectedSemester] = useState<number>(0); // 선택된 학기 (0: 1학기, 1: 2학기)
     const [goalGPA, setGoalGPA] = useState<number>(1); // 목표 학점
     const [isModalVisible, setModalVisible] = useState(false); // 목표 학점 설정 모달의 가시성
     const [changegoalGPA, setChangegoalGPA] = useState(''); // 목표 학점 변경 입력 상태
+
+    useEffect(() => {
+        LogBox.ignoreAllLogs()
+    }, []);
 
     // 목표 학점을 서버에서 가져오는 함수
     useFocusEffect(
@@ -271,6 +276,36 @@ const AcademicInfoScreen = ({ route }: any) => {
     });
 
     const gradesData = Array(9).fill(0); // 등급별 성적 카운트를 저장하는 배열
+
+    // 추가할 상태 변수
+    const [remainingCredits, setRemainingCredits] = useState(0); // 남은 학점
+    const [requiredSemesterGPA, setRequiredSemesterGPA] = useState(0); // 이번 학기 필요한 GPA
+    // 목표 달성 여부 상태 추가
+    const [goalAchieved, setGoalAchieved] = useState(false);
+
+    useEffect(() => {
+        const totalRequiredCredits = 120; // 졸업에 필요한 총 학점, 예시로 120 설정
+
+        // 남은 학점 계산
+        const creditsLeft = totalRequiredCredits - gpaData.totalCredits;
+        setRemainingCredits(creditsLeft > 0 ? creditsLeft : 0);
+
+        // 목표 GPA에 도달하기 위해 이번 학기에 필요한 GPA 계산
+        if (creditsLeft > 0) {
+            const neededGPA = ((goalGPA * totalRequiredCredits) - (gpaData.overallGPA * gpaData.totalCredits)) / creditsLeft;
+
+            // 목표 GPA가 4.5를 초과하지 않도록 제한하고 목표 달성 여부 체크
+            const cappedNeededGPA = Math.min(neededGPA, 4.5); // 4.5 이하로 제한
+            setRequiredSemesterGPA(cappedNeededGPA > 0 ? parseFloat(cappedNeededGPA.toFixed(2)) : 0);
+
+            // 목표 달성 여부 확인
+            setGoalAchieved(gpaData.overallGPA >= goalGPA); // 현재 GPA가 목표 GPA 이상인지 확인
+        } else {
+            setRequiredSemesterGPA(0);
+            setGoalAchieved(gpaData.overallGPA >= goalGPA); // 남은 학점이 없을 때도 목표 달성 여부 확인
+        }
+    }, [goalGPA, gpaData]);
+
 
     // 강의 데이터를 순회하여 등급별 성적 카운트
     userLecture.forEach((lecture) => {
@@ -426,6 +461,22 @@ const AcademicInfoScreen = ({ route }: any) => {
                         <IconH style={styles.goalGPAIcon} name="trophy" size={30} />
                     </View>
                 </View>
+
+                <View style={styles.goalTextArea}>
+                    {/* 목표 학점에 도달하지 않은 경우에만 남은 점수와 필요한 학점을 표시 */}
+                    {!goalAchieved && (
+                        <>
+                            <Text style={styles.goalText}>
+                                목표 학점까지 앞으로 {(goalGPA - progressCircleConfigs[0].value).toFixed(2)} !!
+                            </Text>
+                            <Text style={styles.goalText}>
+                                이번 학기에 필요한 평균 학점: {requiredSemesterGPA >= 4.5 ? '4.5+' : requiredSemesterGPA}
+                            </Text>
+                        </>
+                    )}
+                    {goalAchieved && <Text style={styles.goalAchievedText}>🎉 목표를 달성했습니다! 🎉</Text>}
+                </View>
+
 
                 {/* 가로 막대 그래프 */}
                 <HorizontalBarGraph
@@ -625,6 +676,22 @@ const styles = StyleSheet.create({
         color: '#F29F05',
         marginLeft: 5
     },
+    goalTextArea: {
+        alignItems: 'center',
+        marginBottom: 20
+    },
+    goalText: {
+        fontSize: 22,
+        color: 'black'
+    },
+    goalAchievedText: {
+        fontSize: 22,
+        color: '#FF6F61', // 강렬한 색상으로 강조
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 10, // 위아래 여백 추가
+    },
+
     // 목표 학점 변경 버튼 스타일
     changeGoalGPAButtonContainer: {
         alignItems: 'center',

@@ -31,11 +31,15 @@ const AcademicRecord = ({ route }: any) => {
             semesters.push(year * 2);     // Even semester
         }
         setVisibleSemesters(semesters);
-
-        if (semesters.length > 0) {
+    
+        // 3학년 1학기에 해당하는 값을 기본값으로 설정
+        if (semesters.includes(5)) {
+            setSelectedSemester(5);
+        } else if (semesters.length > 0) {
             setSelectedSemester(semesters[0]);
         }
     }, [userData.college]);
+        
 
     const semesterLabels: Record<number, string> = {
         1: '1학년 1학기',

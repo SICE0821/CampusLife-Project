@@ -13,26 +13,28 @@ const renderEmptyItem = () => {
   )
 }
 const EventShopScreen = ({ navigation, route }: any) => {
-  const { userdata } = route.params;
+  const { userdata, userPoint } = route.params;
+  const [userPointBalance, setUserPointBalance] = useState(userPoint.point); // Initialize state for user point balance
   const [isModalOpen, setIsModalOpen] = useState(false); // 모달의 열기/닫기 상태를 useState로 관리
-  const [userData, setUserData] = useState<UserData>(userdata);
   const [items, setItemData]: any = useState([]);
   const [SelectItem, SetSelectItem] = useState<ShopItemData | undefined>(undefined);
   const [refreshing, setRefreshing] = useState(false);
+
+  //console.log(userdata);
 
   useFocusEffect(
     React.useCallback(() => {
         const fetchData = async () => {
             try {
-              setUserData(userdata);
               await getItems();
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
         };
         fetchData();
-    }, [])
+    }, [userdata])
 );
+
 
   const groupData = (data: any) => {
     const groupedData = [];
@@ -78,7 +80,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          campus_id: userData.campus_pk
+          campus_id: userdata.campus_pk
         })
       })
       const items = await response.json();
@@ -137,7 +139,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: userData.user_pk,
+          user_id: userdata.user_pk,
           object_id : SelectItem?.object_id
         })
       });
@@ -156,12 +158,12 @@ const EventShopScreen = ({ navigation, route }: any) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_pk : userData.user_pk,
+          user_pk : userdata.user_pk,
           price : SelectItem?.price
         })
       })
       //console.log("포인트 차감 성공")
-      userData.point = userData.point - (SelectItem ? SelectItem.price : 0)
+      setUserPointBalance((prevBalance: number) => prevBalance - (SelectItem ? SelectItem.price : 0));
     } catch (error) {
       console.error('포인트 차감 실패', error);
     }
@@ -193,8 +195,10 @@ const EventShopScreen = ({ navigation, route }: any) => {
             Alert.alert(
               "알림",
               "상품 구매가 완료되었습니다.",
-              [{ text: "확인"}]
+              [{ text: "확인" }]
             );
+            onRefresh();
+            closeModal(); // Close the modal after refreshing
           }
         },
         { text: "취소" }
@@ -210,7 +214,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id : userData.user_pk,
+          user_id : userdata.user_pk,
           product : item,
           point : point
         })
@@ -300,7 +304,7 @@ const EventShopScreen = ({ navigation, route }: any) => {
           보유 포인트 : 
         </Text>
         <Text style = {{fontSize : 25, fontWeight : 'bold', color : "#ED9E2B", marginLeft : 3, marginBottom : 2}}>
-           {userData.point}P
+           {userPointBalance}P
         </Text>
       </View>
       <FlatList
@@ -357,17 +361,17 @@ const EventShopScreen = ({ navigation, route }: any) => {
             </Text>
           </View>
           <View style={{ height: '15%', padding: 15 }}>
-            <Text style={{ color: 'black', fontSize: 20, }}>현재 보유 포인트 : {userData.point}P</Text>
+            <Text style={{ color: 'black', fontSize: 20, }}>현재 보유 포인트 : {userPointBalance}P</Text>
             <Text style={{ color: 'black', fontSize: 20, }}>상품 포인트 : {SelectItem?.price}P</Text>
             <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
-              <Text style={{ color: 'black', fontSize: 20,}}>잔액 : {userData.point} - {SelectItem?.price} :</Text>
-              <Text style={{ fontSize: 20, color: 'black', marginLeft: 6, fontWeight: 'bold' }}>{userData.point - (SelectItem ? SelectItem.price : 0)}P</Text>
+              <Text style={{ color: 'black', fontSize: 20,}}>잔액 : {userPointBalance} - {SelectItem?.price} :</Text>
+              <Text style={{ fontSize: 20, color: 'black', marginLeft: 6, fontWeight: 'bold' }}>{userPointBalance - (SelectItem ? SelectItem.price : 0)}P</Text>
             </View>
           </View>
           <TouchableOpacity
             style={styles.buyButtonBox}
             onPress={() => {
-              if (userData.point - (SelectItem ? SelectItem.price : 0) > 0) {
+              if (userPointBalance - (SelectItem ? SelectItem.price : 0) >= 0) {
                 ok_5_Dollar();
               } else {
                 your_point_row();
