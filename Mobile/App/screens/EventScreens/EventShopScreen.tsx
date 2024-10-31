@@ -358,17 +358,17 @@ const EventShopScreen = ({ navigation, route }: any) => {
             </Text>
           </View>
           <View style={{ height: '15%', padding: 15 }}>
-            <Text style={{ color: 'black', fontSize: 20, }}>현재 보유 포인트 : {userdata.point}P</Text>
+            <Text style={{ color: 'black', fontSize: 20, }}>현재 보유 포인트 : {userPoint}P</Text>
             <Text style={{ color: 'black', fontSize: 20, }}>상품 포인트 : {SelectItem?.price}P</Text>
             <View style={{ flexDirection: 'row', paddingVertical: 5 }}>
-              <Text style={{ color: 'black', fontSize: 20,}}>잔액 : {userdata.point} - {SelectItem?.price} :</Text>
-              <Text style={{ fontSize: 20, color: 'black', marginLeft: 6, fontWeight: 'bold' }}>{userdata.point - (SelectItem ? SelectItem.price : 0)}P</Text>
+              <Text style={{ color: 'black', fontSize: 20,}}>잔액 : {userPoint} - {SelectItem?.price} :</Text>
+              <Text style={{ fontSize: 20, color: 'black', marginLeft: 6, fontWeight: 'bold' }}>{userPoint - (SelectItem ? SelectItem.price : 0)}P</Text>
             </View>
           </View>
           <TouchableOpacity
             style={styles.buyButtonBox}
             onPress={() => {
-              if (userdata.point - (SelectItem ? SelectItem.price : 0) > 0) {
+              if (userPoint - (SelectItem ? SelectItem.price : 0) > 0) {
                 ok_5_Dollar();
               } else {
                 your_point_row();

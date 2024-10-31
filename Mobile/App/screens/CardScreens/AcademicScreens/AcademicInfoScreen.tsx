@@ -168,8 +168,8 @@ const AcademicInfoScreen = ({ route }: any) => {
     const { userdata, LectureData } = route.params;
     const [userData] = useState<UserData>(userdata); // 사용자 데이터를 상태로 관리
     const [userLecture] = useState<Lecture[]>(LectureData); // 강의 데이터를 상태로 관리
-    const [selectedYear, setSelectedYear] = useState<number>(1); // 선택된 학년
-    const [selectedSemester, setSelectedSemester] = useState<number>(0); // 선택된 학기 (0: 1학기, 1: 2학기)
+    const [selectedYear, setSelectedYear] = useState<number>(userData.grade); // 선택된 학년
+    const [selectedSemester, setSelectedSemester] = useState<number>(userData.student_semester); // 선택된 학기 (0: 1학기, 1: 2학기)
     const [goalGPA, setGoalGPA] = useState<number>(1); // 목표 학점
     const [isModalVisible, setModalVisible] = useState(false); // 목표 학점 설정 모달의 가시성
     const [changegoalGPA, setChangegoalGPA] = useState(''); // 목표 학점 변경 입력 상태
