@@ -173,8 +173,9 @@ const { getGeneralPosts,
   getContestPosts,
   GetClubPersonPK,
   SendAramData,
-  updateComment
-
+  updateComment,
+  addDeletePostInfo,
+  SendReportPostAram
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -201,7 +202,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '14.6.152.230',
+  host: '122.38.184.17',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -1642,7 +1643,10 @@ app.post('/get_aram_data', async (req, res) => {
       recomment_comment_id: item.recomment_comment_id,
       recomment_contents: item.recomment_contents,
       my_club_register_post_id : item.my_club_register_post_id,
-      my_club_register_comment : item.my_club_register_comment
+      my_club_register_comment : item.my_club_register_comment,
+      delete_post_id : item.delete_post_id,
+      delete_post_reason : item.delete_post_reason,
+      delete_post_title : item.delete_post_title
     }));
     console.log("[AlarmDialogScreen] : 해당 유저의 모든 알람 데이터 가져오기 성공");
     res.json(processedData);
@@ -3308,6 +3312,32 @@ app.post('/updateComment', async (req, res) => {
   const { comment, Phone } = req.body;
   try {
     await updateComment(comment, Phone);
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
+    console.log(error)
+  }
+});
+
+//관리자 게시물 삭제 시 정보저장 테이블에 저장
+app.post('/addDeletePostInfo', async (req, res) => {
+  const { post_id, title, reason } = req.body;
+  try {
+    await addDeletePostInfo(post_id, title, reason);
+    console.log("[PostDetailScreen] : 관리자 요청 신고 게시물 정보저장 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
+    console.log("[PostDetailScreen] : 관리자 요청 신고 게시물 정보저장 실패");
+  }
+});
+
+
+//관리자 게시물 삭제 시 해당 유저에게 알림 전송
+app.post('/SendReportPostAram', async (req, res) => {
+  const { user_id, target_id, title } = req.body;
+  try {
+    const rows = await SendReportPostAram(user_id, target_id, title);
     res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
   } catch (error) {
     res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });

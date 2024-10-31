@@ -11,6 +11,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { PostDeatilData, CommentsWithRecomments, PostPhoto } from "../../types/type"
 import { UserData } from '../../types/type'
 import config from '../../config';
+import Reservation from 'react-native-calendars/src/agenda/reservation-list/reservation';
 
 const width = Dimensions.get("window").width;
 
@@ -665,7 +666,8 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             Alert.alert('Please select a reason for deletion.');
             return;
         }
-
+        await addDeletePostInfo();
+        await SendReportPostAram();
         try {
             const response = await fetch(`${config.serverUrl}/deletepost`, {
                 method: 'POST',
@@ -690,6 +692,44 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
             Alert.alert('오류', '게시글 삭제에 실패했습니다.');
         } finally {
             setIsAdminDeleteModalVisible(false)
+        }
+    };
+
+    // 일단 삭제된 Post의 제목과, 삭제 사유, 그리고 그에대한 pk를 테이블에 저장할 함수임
+    const addDeletePostInfo = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/addDeletePostInfo`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    post_id: postDetailInfo?.post_id,
+                    title: postDetailInfo?.title,
+                    reason: selectedDeleteReason
+
+                }),
+            });
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    //신고 게시물 삭제 알림 보내기
+    const SendReportPostAram = async () => {
+        try {
+            const response = await fetch(`${config.serverUrl}/SendReportPostAram`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: postDetailInfo?.user_id,
+                    target_id: postDetailInfo?.post_id,
+                    title: selectedDeleteReason
+                }),
+            });
+            await response.json();
+
+        } catch (error) {
+            console.error(error);
         }
     };
 
@@ -1129,45 +1169,45 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                         </View>
                     )}
                     {/* 관리자 삭제 모달 */}
-            <Modal
-                visible={isAdminDeleteModalVisible}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setIsAdminDeleteModalVisible(false)}
-            >
-                <View style={modalStyles.modalBackground}>
-                    <View style={modalStyles.modalContainer}>
-                        <Text style={modalStyles.modalTitle}>게시물 삭제</Text>
-                        <Text style={modalStyles.modalSubtitle}>삭제 사유 선택</Text>
-                        {deleteReasons.map((reason, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                style={[
-                                    modalStyles.reasonOption,
-                                    selectedDeleteReason === reason && modalStyles.selectedReason,
-                                ]}
-                                onPress={() => setSelectedDeleteReason(reason)}
-                            >
-                                <Text style={modalStyles.reasonText}>{reason}</Text>
-                            </TouchableOpacity>
-                        ))}
-                        <View style={modalStyles.modalButtons}>
-                            <TouchableOpacity
-                                style={modalStyles.cancelButton}
-                                onPress={() => setIsAdminDeleteModalVisible(false)}
-                            >
-                                <Text style={modalStyles.buttonText}>취소</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={modalStyles.confirmButton}
-                                onPress={confirmAdminDeletePost}
-                            >
-                                <Text style={modalStyles.buttonText}>삭제</Text>
-                            </TouchableOpacity>
+                    <Modal
+                        visible={isAdminDeleteModalVisible}
+                        transparent={true}
+                        animationType="fade"
+                        onRequestClose={() => setIsAdminDeleteModalVisible(false)}
+                    >
+                        <View style={modalStyles.modalBackground}>
+                            <View style={modalStyles.modalContainer}>
+                                <Text style={modalStyles.modalTitle}>게시물 삭제</Text>
+                                <Text style={modalStyles.modalSubtitle}>삭제 사유 선택</Text>
+                                {deleteReasons.map((reason, index) => (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={[
+                                            modalStyles.reasonOption,
+                                            selectedDeleteReason === reason && modalStyles.selectedReason,
+                                        ]}
+                                        onPress={() => setSelectedDeleteReason(reason)}
+                                    >
+                                        <Text style={modalStyles.reasonText}>{reason}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                                <View style={modalStyles.modalButtons}>
+                                    <TouchableOpacity
+                                        style={modalStyles.cancelButton}
+                                        onPress={() => setIsAdminDeleteModalVisible(false)}
+                                    >
+                                        <Text style={modalStyles.buttonText}>취소</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={modalStyles.confirmButton}
+                                        onPress={confirmAdminDeletePost}
+                                    >
+                                        <Text style={modalStyles.buttonText}>삭제</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
                         </View>
-                    </View>
-                </View>
-            </Modal>
+                    </Modal>
 
                 </View>
                 <View style={styles.postArea}>

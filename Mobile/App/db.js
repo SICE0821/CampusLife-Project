@@ -3,7 +3,7 @@ const PORT = 3000;
 
 //마리아 db설정
 const pool = mariadb.createPool({
-    host: '14.6.152.230',
+    host: '122.38.184.17',
     port: 3306,
     user: 'dohyun',
     password: '0000',
@@ -1747,6 +1747,9 @@ async function get_aram_data(user_id) {
             my_recomment_like.contents AS recomment_contents,
             my_club_register.Post_fk AS my_club_register_post_id,
             my_club_register.comment AS my_club_register_comment,
+            delete_post_info.post_id AS delete_post_id,
+            delete_post_info.reason AS delete_post_reason,
+            delete_post_info.title AS delete_post_title,
             student.name AS student_name
         FROM
             aram
@@ -1781,6 +1784,8 @@ async function get_aram_data(user_id) {
         LEFT JOIN
         	 club_register AS my_club_register ON aram.target_type = 'school_club' AND aram.target_id = my_club_register.Post_fk
              AND student.name = my_club_register.Name
+        LEFT JOIN
+             delete_post_info AS delete_post_info ON aram.target_type = 'report_delete' AND aram.target_id = delete_post_info.post_id
         WHERE
             aram.user_id = ?
         ORDER BY
@@ -3704,6 +3709,48 @@ WHERE Phone = ?;
     }
 }
 
+//관리자 게시물 삭제 시 정보저장 테이블에 저장
+async function addDeletePostInfo(post_id, title, reason) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const query = "INSERT INTO delete_post_info (post_id, title, reason) VALUES (?, ?, ?)"
+        const result = await conn.query(query, [post_id, title, reason]);
+    } catch (err) {
+        console.error('Error updating data:', err);
+        return false;
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+// 관리자 삭제 알림 전송
+async function SendReportPostAram(user_id, target_id, title) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        
+        // 데이터 조회 쿼리 작성
+        const query = `
+        INSERT INTO aram (user_id, target_id, title, target_type, time)
+        VALUES 
+        (?, ?, ?, 'report_delete', DEFAULT)
+        `;
+
+        // title 결합
+        const modifiedTitle = `"${title}"에 의해 \n게시물이 삭제되었습니다`;
+        
+        const rows = await conn.query(query, [user_id, target_id, modifiedTitle]);
+        console.log('Query result:', rows); // 쿼리 결과 확인
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        throw err; // 오류 발생 시 던짐
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
 module.exports = {
@@ -3878,5 +3925,7 @@ module.exports = {
     getContestPosts,
     GetClubPersonPK,
     SendAramData,
-    updateComment
+    updateComment,
+    addDeletePostInfo,
+    SendReportPostAram
 };

@@ -400,6 +400,9 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
             case 'school_club':
                 console.log(item.my_club_register_comment);
                 return <Text style={styles.content} numberOfLines={1}>{item.my_club_register_comment}</Text>;
+            case 'report_delete':
+                console.log(item.delete_post_title)
+                return <Text style={styles.content} numberOfLines={1}>{item.delete_post_title}</Text>;
             default:
                 return null;
         }
@@ -438,6 +441,8 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                 return <IconB name="like1" size={30} color="#F29F05" />;
             case 'school_club': // 내 대댓글 좋아요
                 return <IconE name="address-book" size={30} color="#F29F05" />;
+            case 'report_delete':
+                return <IconE name="exclamation" size={30} color="#F29F05" />;
             default:
                 return null;
         }
