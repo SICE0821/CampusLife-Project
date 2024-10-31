@@ -53,6 +53,8 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [isAdminDeleteModalVisible, setIsAdminDeleteModalVisible] = useState(false);
     const [selectedDeleteReason, setSelectedDeleteReason] = useState('');
 
+    const [isPostLike, setIsPostLike] = useState(false); // 1회용임 ㅋㅋ
+
     const toggleOptions = () => {
         setShowOptions(!showOptions);
     };
@@ -905,6 +907,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                             if (postDetailInfo?.like == 29) {
                                 await addHotAram();
                             }
+                            setIsPostLike(true);
                         } else {
                             console.log("이미 좋아요를 눌렀습니다.")
                         }
@@ -924,6 +927,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     text: "확인", onPress: async () => {
                         await like_num_down(post_id);
                         await cancel_post_like(post_id);
+                        setIsPostLike(false);
                     }
                 }
             ]
@@ -1121,53 +1125,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     <TouchableOpacity onPress={toggleOptions} style={styles.optionsButton}>
                         <IconA size={35} color="black" name={"dots-three-vertical"} />
                     </TouchableOpacity>
-                    {showOptions && (
-                        <View style={optionStyle.container}>
-                            <TouchableOpacity style={optionStyle.boxArea}
-                                onPress={async () => {
-                                    if (userdata.user_pk === postDetailInfo?.user_id) {
-                                        const post_edit_info = await get_post_info();
-                                        navigation.navigate("EditPostScreen", { userdata, post_edit_info, postImages })
-                                    } else {
-                                        NoyourPostAlert();
-                                        toggleOptions();
-                                    }
-                                }}>
-                                <Text style={optionStyle.boxText}>수정</Text>
-                            </TouchableOpacity>
-                            <View style={optionStyle.boxLine}></View>
-                            <TouchableOpacity
-                                style={optionStyle.boxArea}
-                                onPress={() => {
-                                    if (userdata.user_pk === postDetailInfo?.user_id) {
-                                        Alert.alert("본인은 신고할 수 없습니다.");
-                                    } else {
-                                        // 포스트 신고
-                                        ReportUserduplicate();
-                                    }
-                                }}>
-                                <Text style={optionStyle.boxText}>신고</Text>
-                            </TouchableOpacity>
-                            {(postDetailInfo?.post_writer === userdata?.name) && (
-                                <>
-                                    <View style={optionStyle.boxLine}></View>
-                                    <TouchableOpacity style={optionStyle.boxArea}
-                                        onPress={deletePost}>
-                                        <Text style={optionStyle.boxText}>삭제</Text>
-                                    </TouchableOpacity>
-                                </>
-                            )}
-                            {(userdata?.title === "학교") && (
-                                <>
-                                    <View style={optionStyle.boxLine}></View>
-                                    <TouchableOpacity style={optionStyle.boxArea}
-                                        onPress={adminDeletePost}>
-                                        <Text style={optionStyle.boxText}>삭제</Text>
-                                    </TouchableOpacity>
-                                </>
-                            )}
-                        </View>
-                    )}
+                    
                     {/* 관리자 삭제 모달 */}
                     <Modal
                         visible={isAdminDeleteModalVisible}
@@ -1227,23 +1185,72 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                         ))}
                     </ScrollView>
                 </View>
+                {showOptions && (
+                        <View style={optionStyle.container}>
+                            <TouchableOpacity style={optionStyle.boxArea}
+                                onPress={async () => {
+                                    if (userdata.user_pk === postDetailInfo?.user_id) {
+                                        const post_edit_info = await get_post_info();
+                                        navigation.navigate("EditPostScreen", { userdata, post_edit_info, postImages })
+                                    } else {
+                                        NoyourPostAlert();
+                                        toggleOptions();
+                                    }
+                                }}>
+                                <Text style={optionStyle.boxText}>수정</Text>
+                            </TouchableOpacity>
+                            <View style={optionStyle.boxLine}></View>
+                            <TouchableOpacity
+                                style={optionStyle.boxArea}
+                                onPress={() => {
+                                    if (userdata.user_pk === postDetailInfo?.user_id) {
+                                        Alert.alert("본인은 신고할 수 없습니다.");
+                                    } else {
+                                        // 포스트 신고
+                                        ReportUserduplicate();
+                                    }
+                                }}>
+                                <Text style={optionStyle.boxText}>신고</Text>
+                            </TouchableOpacity>
+                            {(postDetailInfo?.post_writer === userdata?.name) && (
+                                <>
+                                    <View style={optionStyle.boxLine}></View>
+                                    <TouchableOpacity style={optionStyle.boxArea}
+                                        onPress={deletePost}>
+                                        <Text style={optionStyle.boxText}>삭제</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
+                            {(userdata?.title === "학교") && (
+                                <>
+                                    <View style={optionStyle.boxLine}></View>
+                                    <TouchableOpacity style={optionStyle.boxArea}
+                                        onPress={adminDeletePost}>
+                                        <Text style={optionStyle.boxText}>삭제</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
+                        </View>
+                    )}
                 <View style={styles.postState}>
                     <TouchableOpacity onPress={async () => {
-                        const is_post_like: boolean = await is_user_post_like();
-                        if (is_post_like) {
-                            Post_Like_alert(postDetailInfo?.post_id)
+                        const newLikeStatus = await is_user_post_like();
+        
+                        if (newLikeStatus) {
+                            Post_Like_alert(postDetailInfo?.post_id);
                         } else {
-                            Post_Cancel_Like_alert(postDetailInfo?.post_id)
+                            Post_Cancel_Like_alert(postDetailInfo?.post_id);
                         }
                     }}>
-                        <IconB name="like1" size={24} color={'black'} />
+                        <IconB name="like1" size={24} color={isPostLike  ? '#F29F05' : 'black'} />
                     </TouchableOpacity>
                     <Text style={styles.postStateText}> {postDetailInfo?.like}</Text>
-                    <Text style={styles.postStateIcon}><IconB name="eyeo" size={24} /></Text>
-                    <Text style={styles.postStateText}>{postDetailInfo?.view}</Text>
+                    <Text style={styles.postStateIcon}><IconB name="eyeo" size={24}/></Text>
+                    <Text style={[styles.postStateText, {marginLeft: 4}]}>{postDetailInfo?.view}</Text>
                 </View>
                 {
-                    comments.map(item => (
+                    comments.length > 0 ? (
+                        comments.map(item => (
                         <View key={item.comment_id} style={styles.commentcontainer}>
                             <View style={styles.commentTop}>
                                 <View style={styles.commentInfo}>
@@ -1414,7 +1421,12 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                                 </View>
                             ))}
                         </View>
-                    ))
+                    ))) : (
+                        <View style={styles.noCommentsContainer}>
+                            <Text style={styles.noCommentsText}>댓글이 없습니다.</Text>
+                            <Text style={styles.noCommentsText}>첫 댓글을 달아보세요!</Text>
+                        </View>
+                    )
                 }
                 <View style={styles.bottomSpacing}></View>
 
@@ -1539,15 +1551,16 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     postTitle: {
-        fontSize: 20,
+        fontSize: 22,
         color: 'black',
         fontWeight: 'bold',
+        marginTop: 5,
     },
     postContent: { // 게시물 내용
         fontSize: 18,
         color: 'black',
         marginTop: 10,
-        marginBottom: 20,
+        marginBottom: 10,
     },
     imagePreviewContainer: {
         flexDirection: 'row',
@@ -1585,6 +1598,7 @@ const styles = StyleSheet.create({
     postStateIcon: {
         color: 'black',
         marginLeft: 5,
+        top: 1
     },
     commentcontainer: {
         minHeight: 120,
@@ -1744,6 +1758,14 @@ const styles = StyleSheet.create({
         color: '#F29F05',
         justifyContent: 'flex-end',
     },
+    noCommentsContainer: {
+        alignItems: 'center',
+        paddingVertical: 20,
+    },
+    noCommentsText: {
+        fontSize: 18,
+        color: 'gray',
+    },
 });
 
 const optionStyle = StyleSheet.create({
@@ -1753,7 +1775,7 @@ const optionStyle = StyleSheet.create({
         right: 20,
         backgroundColor: 'white',
         elevation: 5,
-        borderRadius: 10
+        borderRadius: 10,
     },
     commentContainer: {
         position: 'absolute',
@@ -1778,7 +1800,8 @@ const optionStyle = StyleSheet.create({
         width: '85%',
         height: 1,
         alignSelf: 'center'
-    }
+    },
+    
 })
 
 const modalStyles = StyleSheet.create({
