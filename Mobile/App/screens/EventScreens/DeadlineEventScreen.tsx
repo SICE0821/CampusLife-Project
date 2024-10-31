@@ -118,8 +118,10 @@ const DeadlineEventScreen = ({ route, navigation }: any) => { // Added navigatio
       });
     });
 
+
     // 파일 업로드 함수 호출
     await uploadImages(formData);
+
 
     // 업로드 완료 후 파일 목록 초기화
     setSelectedFiles([]);
