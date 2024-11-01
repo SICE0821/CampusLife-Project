@@ -473,12 +473,12 @@ const AlarmDialogScreen = ({ route, navigation }: any) => {
                                 {/* 안 읽은 알람이면 테두리 추가 */}
                                 <View style={[
                                     styles.card,
-                                    item.time == '2024-10-30' && styles.unreadBorder // 안 읽은 알람에 테두리 스타일 추가
+                                    item.time == '2024-02-30' && styles.unreadBorder // 안 읽은 알람에 테두리 스타일 추가
                                 ]}>
                                     <View style={styles.iconArea}>
                                         {renderTargetIcon(item)}
                                         {/* 안 읽은 알람이면 빨간 점 추가 */}
-                                        {item.time == '2024-10-30' && <View style={styles.unreadDot} />}
+                                        {item.time == '2024-02-30' && <View style={styles.unreadDot} />}
                                     </View>
                                     <View style={styles.textArea}>
                                         <Text style={styles.title}>{item.title}</Text>

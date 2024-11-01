@@ -10,7 +10,8 @@ import {
   Alert,
   Linking,
   Modal,
-  Pressable
+  Pressable,
+  LogBox 
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Swiper from 'react-native-swiper';
@@ -34,6 +35,7 @@ import IconK from 'react-native-vector-icons/Entypo';
 const width = Dimensions.get('window').width;
 
 const aramCount = 10
+
 
 // 포스트 데이터 타입 정의
 type PostData = {
@@ -90,6 +92,10 @@ type ContestData = {
 const MainPage = ({ navigation, route }: any) => {
   const { userdata, LectureData } = route.params;
   const [isModalVisible, setModalVisible] = useState(false); // 모달 상태 관리
+
+  useEffect(() => {
+    LogBox.ignoreAllLogs()
+  }, [])
 
   // 상태 변수 선언
   const [schoolPostData, setSchoolPostData] = useState<PostData[]>([]);
