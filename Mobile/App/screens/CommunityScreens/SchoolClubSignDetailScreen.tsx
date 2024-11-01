@@ -71,6 +71,21 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
     }
 };
 
+  const UpdateAramCount = async (user_id: any) => {
+    try {
+      await fetch(`${config.serverUrl}/update_aram_count`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user_id
+        })
+      });
+    } catch (error) {
+      console.error('알람 카운트 업데이트 실패', error);
+    }
+  };
+
+
       // 쪽지 보내기
       const SendAramData = async () => {
         try {
@@ -84,7 +99,7 @@ const SchoolClubSignDetailScreen = ({ route, navigation }: any) => {
                 }),
             });
             await response.json();
-        
+            await UpdateAramCount(user_id)
         } catch (error) {
             console.error('일반 게시물 가져오기 실패:', error);
         }
