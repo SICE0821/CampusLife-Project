@@ -203,21 +203,41 @@ const RegisterEvent = ({ route }: any) => {
     }
   };
 
-  const UpdateAramCount = async () => {
+  const GetUserPk = async () => {
     try {
-      await fetch(`${config.serverUrl}/update_aram_count`, {
+      const response = await fetch(`${config.serverUrl}/getAllUserIds`);
+      if (!response.ok) throw new Error('데이터를 가져오는 데 실패했습니다.');
+      
+      const userIds = await response.json();
+      console.log('Fetched user IDs:', userIds); // user ID를 가져온 후 로그 추가
+  
+      // 각 user_id에 대해 UpdateAramCount 함수 호출
+      for (const user of userIds) {
+        await UpdateAramCount(user.user_id);
+      }
+    } catch (error) {
+      console.error('Error fetching user IDs:', error);
+    }
+  };
+  
+  const UpdateAramCount = async (userId: any) => {
+    try {
+      const response = await fetch(`${config.serverUrl}/update_aram_count`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: userData.user_pk
-        })
+          user_id: userId,
+        }),
       });
+  
+      if (!response.ok) throw new Error(`Failed to update count for user_id: ${userId}`);
+      console.log(`알람 카운트 업데이트 성공 for user_id: ${userId}`);
     } catch (error) {
       console.error('알람 카운트 업데이트 실패', error);
     }
   };
-
-  //이벤트 등록시 
+  
+  // 이벤트 등록 시 호출
   const addNewEventAram = async (event_pk: number) => {
     try {
       const response = await fetch(`${config.serverUrl}/addNewEventAram`, {
@@ -227,12 +247,17 @@ const RegisterEvent = ({ route }: any) => {
         },
         body: JSON.stringify({
           target_id: event_pk,
-        })
+        }),
       });
+  
+      if (!response.ok) throw new Error('Failed to send event notification');
+      console.log('Event notification sent successfully'); // 이벤트 알림 전송 성공 시 로그 추가
+  
+      await GetUserPk(); // 이후 사용자 알림 업데이트
     } catch (error) {
       console.error('알람 전송 실패', error);
     }
-  }
+  };
 
   // 이미지 선택 함수
   const handleImagePick = () => {

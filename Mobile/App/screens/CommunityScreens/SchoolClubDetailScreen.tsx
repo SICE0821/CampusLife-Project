@@ -211,13 +211,13 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     };
 
-    const UpdateAramCount = async () => {
+    const UpdateAramCount = async (user_id : any) => {
         try {
             await fetch(`${config.serverUrl}/update_aram_count`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    user_id : userData.user_pk
+                    user_id : user_id
                 })
             });
         } catch (error) {
@@ -238,7 +238,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            await UpdateAramCount();
+            //await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -256,7 +256,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(21);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -275,7 +275,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(postDetailInfo?.user_id);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -545,7 +545,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: comment_id, //이거 comment PK 넣어줘야됨
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(user_id);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -728,7 +728,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: comment_id, //이거 recomment PK 넣어줘야됨
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(user_id);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -958,7 +958,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(21);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }

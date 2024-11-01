@@ -371,13 +371,13 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     };
 
     // 알람 카운트 업데이트
-    const UpdateAramCount = async () => {
+    const UpdateAramCount = async (user_id : any) => {
         try {
             await fetch(`${config.serverUrl}/update_aram_count`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    user_id : userData.user_pk
+                    user_id : user_id
                 })
             });
         } catch (error) {
@@ -396,7 +396,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(postDetailInfo?.user_id);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -411,7 +411,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target_id: postDetailInfo?.post_id })
             });
-            await UpdateAramCount();
+            //await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -425,7 +425,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target_id: postDetailInfo?.post_id })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(21);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -438,7 +438,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target_id: postDetailInfo?.post_id })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(21);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -455,7 +455,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(postDetailInfo?.user_id);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -472,7 +472,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: comment_id,
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(user_id);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -489,7 +489,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: comment_id,
                 })
             });
-            await UpdateAramCount();
+            await UpdateAramCount(user_id);
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -752,7 +752,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 }),
             });
             await response.json();
-
+            await UpdateAramCount(postDetailInfo?.user_id)
         } catch (error) {
             console.error(error);
         }

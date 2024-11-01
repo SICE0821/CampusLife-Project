@@ -1955,7 +1955,7 @@ async function allUser_id() {
     let conn;
     try {
         conn = await pool.getConnection();
-        const userIds = await conn.query('SELECT user_id FROM user');
+        const userIds = await conn.query('SELECT user_id FROM user WHERE admin_check != 1');
         return userIds
     } catch (err) {
         console.error(err);
