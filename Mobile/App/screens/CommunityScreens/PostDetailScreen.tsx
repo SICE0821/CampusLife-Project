@@ -27,7 +27,6 @@ type ReportCommentUser = {
 }
 
 const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
-    console.log("you are in PostDetailScreen")
     const { item, userData } = route.params;
     const [commenttext, setcommenttext] = useState('');
     const [inputheight, setinputheight] = useState(40);
@@ -54,6 +53,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
     const [selectedDeleteReason, setSelectedDeleteReason] = useState('');
 
     const [isPostLike, setIsPostLike] = useState(false); // 1회용임 ㅋㅋ
+
 
     const toggleOptions = () => {
         setShowOptions(!showOptions);
@@ -370,6 +370,21 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     };
 
+    // 알람 카운트 업데이트
+    const UpdateAramCount = async () => {
+        try {
+            await fetch(`${config.serverUrl}/update_aram_count`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    user_id : userData.user_pk
+                })
+            });
+        } catch (error) {
+            console.error('알람 카운트 업데이트 실패', error);
+        }
+    };
+
     // 댓글 작성 알람 추가
     const addCommentAram = async () => {
         try {
@@ -381,6 +396,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
+            UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }

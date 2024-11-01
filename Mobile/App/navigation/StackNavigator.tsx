@@ -53,6 +53,7 @@ import IconD from 'react-native-vector-icons/AntDesign';
 import IconG from 'react-native-vector-icons/FontAwesome6';
 import IconF from 'react-native-vector-icons/FontAwesome';
 import IconH from 'react-native-vector-icons/FontAwesome5';
+import config from '../config';
 
 const RootStack = createStackNavigator();
 const LoginStack = createStackNavigator();
@@ -394,6 +395,27 @@ export const MainScreenStackNavigator = ({ route }: any) => {
                     headerStyle: {
                         backgroundColor: '#F27405',
                     },
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={async () => {
+                                try {
+                                    // 서버 요청을 보냄
+                                    await fetch(`${config.serverUrl}/init_aram_count`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ user_id: userdata.user_pk }),
+                                    });
+                                    console.log('알람 카운트 초기화 성공');
+                                } catch (error) {
+                                    console.error('알람 카운트 초기화 실패', error);
+                                }
+                                // 서버 요청이 끝난 후 뒤로 가기
+                                navigation.navigate("MainScreen")
+                            }}
+                        >
+                            <IconD style={{ marginLeft: 10 }} name="back" size={30} color="white" />
+                        </TouchableOpacity>
+                    ),
                     headerTintColor: 'white',
                     headerTitleAlign: 'center',
                     title: '알람 확인',
