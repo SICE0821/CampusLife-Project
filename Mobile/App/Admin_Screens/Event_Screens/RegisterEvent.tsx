@@ -203,6 +203,20 @@ const RegisterEvent = ({ route }: any) => {
     }
   };
 
+  const UpdateAramCount = async () => {
+    try {
+      await fetch(`${config.serverUrl}/update_aram_count`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userData.user_pk
+        })
+      });
+    } catch (error) {
+      console.error('알람 카운트 업데이트 실패', error);
+    }
+  };
+
   //이벤트 등록시 
   const addNewEventAram = async (event_pk: number) => {
     try {

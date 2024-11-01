@@ -205,6 +205,39 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
     }
   }
 
+  const updateAllAramCounts = async () => {
+    try {
+      // 모든 학생의 user_id를 가져오기
+      const response = await fetch(`${config.serverUrl}/getAllUserIds`);
+      const data = await response.json();
+  
+      if (data && data.userIds && data.userIds.length > 0) {
+        // 각 user_id에 대해 UpdateAramCount 호출
+        for (const userId of data.userIds) {
+          await UpdateAramCount(userId); // userId를 파라미터로 전달
+        }
+      } else {
+        console.log('유저가 없습니다.');
+      }
+    } catch (error) {
+      console.error('유저 ID 가져오기 실패:', error);
+    }
+  };
+
+  const UpdateAramCount = async (userId: any) => {
+    try {
+      await fetch(`${config.serverUrl}/update_aram_count`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: userId // 각 userId로 전송
+        })
+      });
+    } catch (error) {
+      console.error('알람 카운트 업데이트 실패', error);
+    }
+  };
+
   const addSchoolNoticeAram = async (value: number) => {
     try {
       const response = await fetch(`${config.serverUrl}/addSchoolNoticeAram`, {
@@ -216,6 +249,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           target_id: value
         })
       });
+      //await UpdateAramCount();
     } catch (error) {
       console.error('알람 전송 실패', error);
     }
@@ -233,6 +267,7 @@ const WritePostPage: React.FC = ({ navigation, route }: any) => {
           target_id: value
         })
       });
+      //await UpdateAramCount();
     } catch (error) {
       console.error('알람 전송 실패', error);
     }

@@ -396,11 +396,12 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-            UpdateAramCount();
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
     };
+
 
     // 좋아요 30개가 넘으면 핫포스터로 등록되면서 모든 user에게 알람 보내기
     const addHotAram = async () => {
@@ -410,6 +411,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target_id: postDetailInfo?.post_id })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -423,6 +425,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target_id: postDetailInfo?.post_id })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -435,6 +438,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ target_id: postDetailInfo?.post_id })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -451,6 +455,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -467,6 +472,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: comment_id,
                 })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -483,6 +489,7 @@ const PostDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: comment_id,
                 })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }

@@ -211,6 +211,21 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
         }
     };
 
+    const UpdateAramCount = async () => {
+        try {
+            await fetch(`${config.serverUrl}/update_aram_count`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    user_id : userData.user_pk
+                })
+            });
+        } catch (error) {
+            console.error('알람 카운트 업데이트 실패', error);
+        }
+    };
+
+
     // 좋아요 30개 이상 시 핫 포스터 등록 및 알림 전송
     const addHotAlarm = async () => {
         try {
@@ -223,6 +238,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -240,23 +256,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
-        } catch (error) {
-            console.error('알람 전송 실패', error);
-        }
-    };
-
-    // 댓글 신고 알람 전송 함수
-    const reportCommentAlarm = async () => {
-        try {
-            await fetch(`${config.serverUrl}/reportCommentAram`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    target_id: postDetailInfo?.post_id,
-                })
-            });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -275,6 +275,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -543,7 +544,8 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     user_id: user_id, //이거, 댓글 쓴 사람 PK 넣어줘야됨
                     target_id: comment_id, //이거 comment PK 넣어줘야됨
                 })
-            });;
+            });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -725,7 +727,8 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     user_id: user_id, //이거, 대댓글 쓴 사람 PK 넣어줘야됨
                     target_id: comment_id, //이거 recomment PK 넣어줘야됨
                 })
-            });;
+            });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }
@@ -955,6 +958,7 @@ const SchoolClubDetailScreen: React.FC = ({ route, navigation }: any) => {
                     target_id: postDetailInfo?.post_id,
                 })
             });
+            await UpdateAramCount();
         } catch (error) {
             console.error('알람 전송 실패', error);
         }

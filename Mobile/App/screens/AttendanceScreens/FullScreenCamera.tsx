@@ -98,7 +98,7 @@ const FullScreenCamera: React.FC<any> = ({ navigation, route }) => {
       </View>
       {isCameraActive && device && (
         <Camera
-          style={{ width: width, height: width * 1.9 }}
+          style={{ width: width, height: width * 2 }}
           device={device}
           photo={true}
           video={false}
@@ -119,8 +119,8 @@ const styles = StyleSheet.create({
   scannerFrame: {
     position: 'absolute',
     top: '30%', // 화면 중앙에 위치시키기 위해 조정
-    left: '10%',
-    right: '10%',
+    left: '20%',
+    right: '20%',
     height: '40%',
     justifyContent: 'center',
     alignItems: 'center',

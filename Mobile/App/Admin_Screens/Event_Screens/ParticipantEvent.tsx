@@ -138,6 +138,22 @@ const ParticipantEvent = ({ route }: any) => {
     }
   };
 
+  // 알람 카운트 업데이트
+  const UpdateAramCount = async (user_id : number) => {
+    try {
+      await fetch(`${config.serverUrl}/update_aram_count`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user_id
+        })
+      });
+    } catch (error) {
+      console.error('알람 카운트 업데이트 실패', error);
+    }
+  };
+
+
   /**
    * 유저에게 당첨 알림을 보냅니다.
    * @param user_id 유저 ID
@@ -150,6 +166,7 @@ const ParticipantEvent = ({ route }: any) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user_id, target_id: event_id }),
       });
+      await UpdateAramCount(user_id);
     } catch (error) {
       console.error('알람 전송 실패', error);
     }

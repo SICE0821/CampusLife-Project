@@ -205,7 +205,7 @@ function formatDate2(dateString) {
 
 
 const pool = mariadb.createPool({
-  host: '122.38.184.17',
+  host: '172.16.106.231',
   port: 3306,
   user: 'dohyun',
   password: '0000',
@@ -3381,6 +3381,16 @@ app.post('/getUserAramCount', async (req, res) => {
     res.json(rows[0].aram_count); // 쿼리 결과를 JSON으로 클라이언트로 전송
   } catch (error) {
     console.log("[PostDetailScreen] : 알람 카운트 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+//모든 학생의 pk값 가져오기
+app.get('/getAllUserIds', async (req, res) => {
+  try {
+    const userIds = await allUser_id();
+    res.json(userIds); // 조회 결과를 JSON 형식으로 반환
+  } catch (err) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
