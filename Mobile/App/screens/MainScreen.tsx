@@ -100,6 +100,7 @@ const MainPage = ({ navigation, route }: any) => {
   const [eventData, setEventData] = useState<EventData[]>([]);
   const [userDepartment, setUserDepartment] = useState<string>('');
   const [contestdata, setContestdata] = useState<ContestData[]>([]);
+  const [aramCount, setaramCount] = useState(0);
   // 프로필 사진 URI
   const fileUri = `${config.serverUrl}/${userData.profile_photo}`;
 
@@ -349,6 +350,22 @@ const MainPage = ({ navigation, route }: any) => {
     }
   };
 
+  const getUserAramCount = async () => {
+    try {
+      const response = await fetch(`${config.serverUrl}/getUserAramCount`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: userData.user_pk }),
+      });
+      const userAramCount = await response.json();
+      setaramCount(userAramCount);
+    } catch (error) {
+      console.error('유저 알람 카운트 가져오기 실패:', error);
+    }
+  };
+
   // 초기 이벤트 데이터 (임시)
   const initialEvents = [
     {
@@ -406,6 +423,7 @@ const MainPage = ({ navigation, route }: any) => {
           await getUserDepartment();
           await getUserPoint();
           await getEventData();
+          await getUserAramCount();
 
           // 업데이트된 사용자 데이터가 있는지 확인 후 상태 업데이트
           const currentRoute = navigation.getState().routes[navigation.getState().index];

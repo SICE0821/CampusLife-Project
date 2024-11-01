@@ -597,6 +597,7 @@ async function getuserpk(user_id, user_passwd) {
                 user.id,
                 user.title,
                 user.report_confirm,
+                user.aram_count,
                 student.name, 
                 student.campus_id, 
                 student.department_id, 
@@ -3750,6 +3751,58 @@ async function SendReportPostAram(user_id, target_id, title) {
     }
 }
 
+//알람 카운트 업데이트
+async function UpdateAramCount(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `UPDATE user
+                        SET aram_count = aram_count + 1
+                        WHERE user_id = ? `
+        const result = await conn.query(query, [user_id]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+//알람 카운트 초기화
+async function initAramCount(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        // 데이터 업데이트 쿼리 작성
+        const query = `UPDATE user
+                        SET aram_count = 0
+                        WHERE user_id = ? `
+        const result = await conn.query(query, [user_id]);
+        // 쿼리 실행
+        console.log('Data updated successfully:', result);
+    } catch (err) {
+        console.error('Error updating data:', err);
+    } finally {
+        if (conn) conn.release(); // 연결 해제
+    }
+}
+
+async function get_aram_count(user_id) {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        const rows = await conn.query(
+            `SELECT aram_count FROM user WHERE user_id = ? `, [user_id]);
+        return rows;
+
+    } catch (err) {
+        throw err;
+    } finally {
+        if (conn) conn.release();
+    }
+}
 
 
 //모듈화를 시키지 않으면, server.js 파일에서 함수를 가져오지 못함.
@@ -3927,5 +3980,8 @@ module.exports = {
     SendAramData,
     updateComment,
     addDeletePostInfo,
-    SendReportPostAram
+    SendReportPostAram,
+    UpdateAramCount,
+    initAramCount,
+    get_aram_count
 };

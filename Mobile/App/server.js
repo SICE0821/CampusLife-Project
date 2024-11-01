@@ -175,7 +175,10 @@ const { getGeneralPosts,
   SendAramData,
   updateComment,
   addDeletePostInfo,
-  SendReportPostAram
+  SendReportPostAram,
+  UpdateAramCount,
+  initAramCount,
+  get_aram_count
 } = require('./db.js'); // db 파일에서 함수 가져오기
 app.use(express.json());
 app.use(express.static('./App/images/'));
@@ -347,6 +350,7 @@ app.post('/get_user_data', async (req, res) => {
       college: rows[0].college,
       title: rows[0].title,
       report_confirm: rows[0].report_confirm,
+      aram_count : rows[0].aram_count
     };
     res.json(userData);
 
@@ -3342,6 +3346,42 @@ app.post('/SendReportPostAram', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "삭제에 실패했습니다(오류발생)" });
     console.log(error)
+  }
+});
+
+app.post('/update_aram_count', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    await UpdateAramCount(user_id);
+    console.log("[PostDetailScreen] : 유저의 알람 카운트 업데이트 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 유저의 알람 카운트 업데이트 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/init_aram_count', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    await initAramCount(user_id);
+    console.log("[PostDetailScreen] : 유저의 알람 카운트 초기화 성공");
+    res.status(200).json({ message: '서버가 잘 마무리되었습니다.' });
+  } catch (error) {
+    console.log("[PostDetailScreen] : 유저의 알람 카운트 초기화 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/getUserAramCount', async (req, res) => {
+  const { user_id } = req.body;
+  try {
+    const rows = await get_aram_count(user_id);
+    console.log("[PostDetailScreen] : 알람 카운트 가져오기 성공");
+    res.json(rows[0].aram_count); // 쿼리 결과를 JSON으로 클라이언트로 전송
+  } catch (error) {
+    console.log("[PostDetailScreen] : 알람 카운트 가져오기 실패");
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

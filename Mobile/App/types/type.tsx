@@ -30,6 +30,7 @@ export type UserData = {
   college : number,
   title : string,
   report_confirm : number, 
+  aram_count : number
 }
 
 export type PostDeatilData = {
