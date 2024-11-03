@@ -481,7 +481,7 @@ const MainPage = ({ navigation, route }: any) => {
                     <TouchableOpacity
                       onPress={() => navigation.navigate("EventScreenStackNavigator", { userPoint })}
                     >
-                      <IconB name={"caretright"} size={22} style={styles.pointNavigationIcon} />
+                      <IconI name={"shopping-bag"} size={23} style={styles.pointNavigationIcon} />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -978,7 +978,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   pointNavigationIcon: {
-    color: 'black',
+    color: '#2e8b57',
   },
   profileBoxBottom: {
     backgroundColor: 'white',
