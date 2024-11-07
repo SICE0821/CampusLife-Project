@@ -421,15 +421,15 @@ const MainPage = ({ navigation, route }: any) => {
     React.useCallback(() => {
       const fetchData = async () => {
         try {
+          setUserData(userdata);
+          await getUserAramCount();
           await fetchSchoolPostData();
           await fetchDepartmentPostData();
           await fetchHotPostData();
           await fetchContestpostData();
-          setUserData(userdata);
           await getUserDepartment();
           await getUserPoint();
           await getEventData();
-          await getUserAramCount();
 
           // 업데이트된 사용자 데이터가 있는지 확인 후 상태 업데이트
           const currentRoute = navigation.getState().routes[navigation.getState().index];

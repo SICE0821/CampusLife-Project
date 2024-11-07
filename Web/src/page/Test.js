@@ -332,25 +332,27 @@ function Test() {
 
     const weeksData = Array.from({ length: selectLecture.lecture_have_week }, (_, i) => {
         const Tiemslosts = splitTimeSlots(selectLecture.lecture_time);
-        const lecture_start_date = formatDateWithOffset(selectLecture.lecture_start_date, i * 7);
-        //console.log(lecture_start_date);
-
+    
+        // 8월 28일이 첫 주차가 되도록 시작 날짜를 조정
+        const firstWeekDate = new Date("2023-11-05"); // 1주차 기준 날짜를 8월 28일로 설정
+        const lecture_start_date = formatDateWithOffset(firstWeekDate, i * 7); // 매주 7일씩 증가
+    
         let attendanceCount = 0;
         let lateCount = 0;
         let absentCount = 0;
-
+    
         studentAttendanceStates.forEach(student => {
-        if (student.weeknum === i + 1) { // 현재 주차에 맞는 학생들만 처리
-            if (student.attendance_Info === '출결') {
-                attendanceCount++;
-            } else if (student.attendance_Info === '지각') {
-                lateCount++;
-            } else if (student.attendance_Info === '결석') {
-                absentCount++;
+            if (student.weeknum === i + 1) { // 현재 주차에 맞는 학생들만 처리
+                if (student.attendance_Info === '출결') {
+                    attendanceCount++;
+                } else if (student.attendance_Info === '지각') {
+                    lateCount++;
+                } else if (student.attendance_Info === '결석') {
+                    absentCount++;
+                }
             }
-        }
-    });
-
+        });
+    
         return {
             week: `${i + 1}주차 (${lecture_start_date})`,
             attendance: `출석: ${attendanceCount} 지각: ${lateCount} 결석: ${absentCount}`,
@@ -362,6 +364,7 @@ function Test() {
             ]
         };
     });
+    
 
     useEffect(() => {
         if (selectedStudent) {

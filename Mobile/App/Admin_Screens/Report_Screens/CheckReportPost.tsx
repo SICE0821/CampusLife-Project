@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
   },
   viewCountText: {
     color: 'black',
-    marginLeft: 4,
+    marginLeft: 7,
   },
   authorName: {
     fontSize: 13,

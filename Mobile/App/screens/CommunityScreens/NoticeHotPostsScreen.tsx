@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     },
     likeCountText: {
         color: 'black',
-        marginLeft: 4,
+        marginLeft: 7,
         top: 1,
     },
 });
