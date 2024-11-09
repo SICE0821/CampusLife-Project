@@ -3767,6 +3767,7 @@ async function UpdateAramCount(user_id) {
         console.error('Error updating data:', err);
         console.log("확인");
         console.log("확인2");
+        console.log("확인3");
     } finally {
         if (conn) conn.release(); // 연결 해제
     }
